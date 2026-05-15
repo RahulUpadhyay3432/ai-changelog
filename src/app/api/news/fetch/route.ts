@@ -136,18 +136,25 @@ export async function GET(request: NextRequest) {
 
   // Re-summarize mode: fix existing items with short summaries
   if (mode === "resummary") {
+    const limitParam = parseInt(request.nextUrl.searchParams.get("limit") ?? "30", 10);
+    const offsetParam = parseInt(request.nextUrl.searchParams.get("offset") ?? "0", 10);
+
     const { data: items } = await supabase
       .from("news_items")
-      .select("id, title, summary, source_name")
+      .select("id, title, summary")
       .order("created_at", { ascending: false });
 
-    const short = (items ?? []).filter(
-      (i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45
-    );
+    const short = (items ?? [])
+      .filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45)
+      .slice(offsetParam, offsetParam + limitParam);
 
-    const results = { updated: 0, errors: [] as string[] };
+    const results = { updated: 0, skipped: short.length === 0 ? 0 : undefined, errors: [] as string[], remaining: Math.max(0, ((items ?? []).filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45).length) - offsetParam - limitParam) };
 
     for (const item of short) {
+      // Respect 8 req/min free tier — wait 8s between calls
+      if (results.updated > 0) {
+        await new Promise((r) => setTimeout(r, 8000));
+      }
       try {
         const newSummary = await summarize(item.title, item.title);
         const { error } = await supabase

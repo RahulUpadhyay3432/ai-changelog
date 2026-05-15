@@ -75,6 +75,49 @@ function extractImageUrl(item: ParserItem): string | null {
   return null;
 }
 
+async function fetchOgImage(url: string): Promise<string | null> {
+  if (!url) return null;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+
+    // Read only first 50KB — meta tags are always in <head>
+    const reader = res.body?.getReader();
+    if (!reader) return null;
+    const decoder = new TextDecoder();
+    let html = "";
+    try {
+      while (html.length < 51200) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        html += decoder.decode(value, { stream: true });
+      }
+    } finally {
+      reader.cancel();
+    }
+
+    const og =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ??
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    if (og?.[1]) return og[1];
+
+    const tw =
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) ??
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+    if (tw?.[1]) return tw[1];
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function summarize(title: string, content: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -109,7 +152,7 @@ type FeedItem = {
 
 async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
-  return (parsed.items ?? []).slice(0, 10).map((item) => {
+  const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
     const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
     const content = rawContent.trim() || (item.title ?? "");
     return {
@@ -122,6 +165,18 @@ async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
       imageUrl: extractImageUrl(item),
     };
   });
+
+  // Fetch OG images for all items in parallel (5s timeout each)
+  const ogResults = await Promise.allSettled(
+    rawItems.map((item) => fetchOgImage(item.sourceUrl))
+  );
+
+  return rawItems.map((item, i) => ({
+    ...item,
+    imageUrl:
+      (ogResults[i].status === "fulfilled" ? ogResults[i].value : null) ??
+      item.imageUrl,
+  }));
 }
 
 export async function GET(request: NextRequest) {

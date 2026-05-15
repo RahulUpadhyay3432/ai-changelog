@@ -75,8 +75,25 @@ function extractImageUrl(item: ParserItem): string | null {
   return null;
 }
 
-async function fetchOgImage(url: string): Promise<string | null> {
-  if (!url) return null;
+type PageMeta = { imageUrl: string | null; description: string | null };
+
+function decodeHTMLEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;|&#x27;/g, "'")
+    .replace(/&nbsp;/g, " ").trim();
+}
+
+function extractMeta(html: string, property: string, nameAttr = "property"): string | null {
+  return (
+    html.match(new RegExp(`<meta[^>]+${nameAttr}=["']${property}["'][^>]+content=["']([^"']+)["']`, "i"))?.[1] ??
+    html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+${nameAttr}=["']${property}["']`, "i"))?.[1] ??
+    null
+  );
+}
+
+async function fetchPageMeta(url: string): Promise<PageMeta> {
+  if (!url) return { imageUrl: null, description: null };
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
@@ -85,11 +102,10 @@ async function fetchOgImage(url: string): Promise<string | null> {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
     });
     clearTimeout(timer);
-    if (!res.ok) return null;
+    if (!res.ok) return { imageUrl: null, description: null };
 
-    // Read only first 50KB — meta tags are always in <head>
     const reader = res.body?.getReader();
-    if (!reader) return null;
+    if (!reader) return { imageUrl: null, description: null };
     const decoder = new TextDecoder();
     let html = "";
     try {
@@ -102,19 +118,22 @@ async function fetchOgImage(url: string): Promise<string | null> {
       reader.cancel();
     }
 
-    const og =
-      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ??
-      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-    if (og?.[1]) return og[1];
+    const imageUrl =
+      extractMeta(html, "og:image") ??
+      extractMeta(html, "twitter:image", "name") ??
+      null;
 
-    const tw =
-      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) ??
-      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
-    if (tw?.[1]) return tw[1];
+    const description =
+      extractMeta(html, "og:description") ??
+      extractMeta(html, "twitter:description", "name") ??
+      null;
 
-    return null;
+    return {
+      imageUrl,
+      description: description ? decodeHTMLEntities(description) : null,
+    };
   } catch {
-    return null;
+    return { imageUrl: null, description: null };
   }
 }
 
@@ -179,17 +198,17 @@ type FeedItem = {
   content: string;
   publishedAt: string;
   imageUrl: string | null;
+  directSummary: string | null;
 };
 
 async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
   const isPH = feed.sourceName === "Product Hunt";
+
   const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
     const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
     const trimmed = rawContent.trim();
-    const content = isPH && trimmed.length < 50
-      ? `Write a 40-80 word summary about this product: ${item.title ?? ""}`
-      : trimmed || (item.title ?? "");
+    const content = trimmed || (item.title ?? "");
     return {
       title: item.title ?? "",
       sourceUrl: item.link ?? item.guid ?? "",
@@ -198,20 +217,24 @@ async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
       content,
       publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
       imageUrl: extractImageUrl(item),
+      directSummary: null as string | null,
     };
   });
 
-  // Fetch OG images for all items in parallel (5s timeout each)
-  const ogResults = await Promise.allSettled(
-    rawItems.map((item) => fetchOgImage(item.sourceUrl))
+  // Fetch page meta (og:image + og:description) for all items in parallel
+  const metaResults = await Promise.allSettled(
+    rawItems.map((item) => fetchPageMeta(item.sourceUrl))
   );
 
-  return rawItems.map((item, i) => ({
-    ...item,
-    imageUrl:
-      (ogResults[i].status === "fulfilled" ? ogResults[i].value : null) ??
-      item.imageUrl,
-  }));
+  return rawItems.map((item, i) => {
+    const meta = metaResults[i].status === "fulfilled" ? metaResults[i].value : { imageUrl: null, description: null };
+    const ogDescription = meta.description ?? null;
+    return {
+      ...item,
+      imageUrl: meta.imageUrl ?? item.imageUrl,
+      directSummary: isPH && ogDescription ? ogDescription : null,
+    };
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -290,11 +313,21 @@ export async function GET(request: NextRequest) {
       }
 
       let summary = "";
-      try {
-        summary = await summarize(item.title, item.content);
-      } catch (err) {
-        results.errors.push(`Summarize "${item.title}": ${String(err)}`);
-        summary = item.content.slice(0, 300);
+      if (item.directSummary) {
+        const wordCount = item.directSummary.split(/\s+/).filter(Boolean).length;
+        summary = wordCount <= 80
+          ? item.directSummary
+          : await summarize(item.title, item.directSummary);
+      } else {
+        const aiContent = item.content.length < 50 && item.sourceName === "Product Hunt"
+          ? `Write a 40-80 word summary about this product: ${item.title}`
+          : item.content;
+        try {
+          summary = await summarize(item.title, aiContent);
+        } catch (err) {
+          results.errors.push(`Summarize "${item.title}": ${String(err)}`);
+          summary = item.content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
+        }
       }
 
       const { error } = await supabase.from("news_items").insert({

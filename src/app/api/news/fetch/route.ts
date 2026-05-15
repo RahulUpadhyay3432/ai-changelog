@@ -171,6 +171,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Normal fetch mode
+  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  await supabase.from("news_items").delete().lt("published_at", cutoff);
+
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
   for (const feed of RSS_FEEDS) {

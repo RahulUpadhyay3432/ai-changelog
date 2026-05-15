@@ -32,9 +32,12 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
 }
 
 export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {
+  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+
   let query = supabase
     .from("news_items")
     .select("*")
+    .gte("published_at", cutoff)
     .order("published_at", { ascending: false })
     .limit(100);
 

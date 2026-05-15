@@ -231,8 +231,8 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            position: "absolute",
-            bottom: 100,
+            position: "fixed",
+            bottom: 72,
             left: "50%",
             transform: "translateX(-50%)",
             background: "rgba(30,30,30,0.85)",

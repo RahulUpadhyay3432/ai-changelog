@@ -16,7 +16,31 @@ const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
   { url: "https://www.producthunt.com/feed", category: "producthunt", sourceName: "Product Hunt" },
 ];
 
-const parser = new Parser({ timeout: 10000 });
+type ParserItem = {
+  title?: string;
+  link?: string;
+  guid?: string;
+  pubDate?: string;
+  contentSnippet?: string;
+  content?: string;
+  summary?: string;
+  description?: string;
+  enclosure?: { url?: string; type?: string };
+  mediaContent?: { $?: { url?: string } } | string;
+  mediaThumbnail?: { $?: { url?: string } };
+  "media:content"?: { $?: { url?: string } };
+  "media:thumbnail"?: { $?: { url?: string } };
+};
+
+const parser = new Parser<Record<string, unknown>, ParserItem>({
+  timeout: 10000,
+  customFields: {
+    item: [
+      ["media:content", "mediaContent"],
+      ["media:thumbnail", "mediaThumbnail"],
+    ],
+  },
+});
 
 function getSupabaseAdmin() {
   return createClient(
@@ -25,11 +49,37 @@ function getSupabaseAdmin() {
   );
 }
 
+function extractImageUrl(item: ParserItem): string | null {
+  // media:content
+  const mc = item.mediaContent ?? item["media:content"];
+  if (mc && typeof mc === "object" && (mc as { $?: { url?: string } }).$?.url) {
+    return (mc as { $: { url: string } }).$.url;
+  }
+
+  // media:thumbnail
+  const mt = item.mediaThumbnail ?? item["media:thumbnail"];
+  if (mt && typeof mt === "object" && (mt as { $?: { url?: string } }).$?.url) {
+    return (mt as { $: { url: string } }).$.url;
+  }
+
+  // enclosure
+  if (item.enclosure?.url && item.enclosure.type?.startsWith("image/")) {
+    return item.enclosure.url;
+  }
+
+  // <img> tag inside description / content
+  const html = (item.description ?? item.content ?? "") as string;
+  const m = html.match(/<img[^>]+src=["']([^"'>]+)["']/i);
+  if (m) return m[1];
+
+  return null;
+}
+
 async function summarize(title: string, content: string): Promise<string> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -38,7 +88,7 @@ async function summarize(title: string, content: string): Promise<string> {
       messages: [
         {
           role: "user",
-          content: `Summarize this AI news article in EXACTLY 60 words. Be precise and informative. No filler. Output only the summary, nothing else.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
+          content: `Summarize this AI/tech news article in EXACTLY 60 words. Count carefully — no more, no less. Be specific and informative about the actual news. Do not use vague phrases. Output only the 60-word summary, nothing else.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
         },
       ],
     }),
@@ -48,25 +98,31 @@ async function summarize(title: string, content: string): Promise<string> {
   return (data.choices?.[0]?.message?.content ?? "").trim();
 }
 
-async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<
-  {
-    title: string;
-    sourceUrl: string;
-    sourceName: string;
-    category: string;
-    content: string;
-    publishedAt: string;
-  }[]
-> {
+type FeedItem = {
+  title: string;
+  sourceUrl: string;
+  sourceName: string;
+  category: string;
+  content: string;
+  publishedAt: string;
+  imageUrl: string | null;
+};
+
+async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
-  return (parsed.items ?? []).slice(0, 10).map((item) => ({
-    title: item.title ?? "",
-    sourceUrl: item.link ?? item.guid ?? "",
-    sourceName: feed.sourceName,
-    category: feed.category,
-    content: item.contentSnippet ?? item.content ?? item.summary ?? item.title ?? "",
-    publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-  }));
+  return (parsed.items ?? []).slice(0, 10).map((item) => {
+    const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
+    const content = rawContent.trim() || (item.title ?? "");
+    return {
+      title: item.title ?? "",
+      sourceUrl: item.link ?? item.guid ?? "",
+      sourceName: feed.sourceName,
+      category: feed.category,
+      content,
+      publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+      imageUrl: extractImageUrl(item),
+    };
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -75,12 +131,44 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const mode = request.nextUrl.searchParams.get("mode");
   const supabase = getSupabaseAdmin();
 
+  // Re-summarize mode: fix existing items with short summaries
+  if (mode === "resummary") {
+    const { data: items } = await supabase
+      .from("news_items")
+      .select("id, title, summary, source_name")
+      .order("created_at", { ascending: false });
+
+    const short = (items ?? []).filter(
+      (i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45
+    );
+
+    const results = { updated: 0, errors: [] as string[] };
+
+    for (const item of short) {
+      try {
+        const newSummary = await summarize(item.title, item.title);
+        const { error } = await supabase
+          .from("news_items")
+          .update({ summary: newSummary })
+          .eq("id", item.id);
+        if (error) results.errors.push(`Update ${item.id}: ${error.message}`);
+        else results.updated++;
+      } catch (err) {
+        results.errors.push(`Summarize "${item.title}": ${String(err)}`);
+      }
+    }
+
+    return Response.json(results);
+  }
+
+  // Normal fetch mode
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
   for (const feed of RSS_FEEDS) {
-    let items: Awaited<ReturnType<typeof fetchFeed>> = [];
+    let items: FeedItem[] = [];
     try {
       items = await fetchFeed(feed);
     } catch (err) {
@@ -91,7 +179,6 @@ export async function GET(request: NextRequest) {
     for (const item of items) {
       if (!item.title || !item.sourceUrl) continue;
 
-      // Check duplicate
       const { data: existing } = await supabase
         .from("news_items")
         .select("id")
@@ -118,6 +205,7 @@ export async function GET(request: NextRequest) {
         source_name: item.sourceName,
         category_slug: item.category,
         published_at: item.publishedAt,
+        image_url: item.imageUrl,
       });
 
       if (error) {

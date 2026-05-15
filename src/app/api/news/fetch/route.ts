@@ -83,7 +83,7 @@ async function summarize(title: string, content: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "qwen/qwen3-coder:free",
+      model: "meta-llama/llama-3.3-70b-instruct:free",
       max_tokens: 200,
       messages: [
         {
@@ -148,13 +148,13 @@ export async function GET(request: NextRequest) {
       .filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45)
       .slice(offsetParam, offsetParam + limitParam);
 
-    const results = { updated: 0, skipped: short.length === 0 ? 0 : undefined, errors: [] as string[], remaining: Math.max(0, ((items ?? []).filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45).length) - offsetParam - limitParam) };
+    const totalShort = (items ?? []).filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45).length;
+    const results = { updated: 0, errors: [] as string[], remaining: Math.max(0, totalShort - offsetParam - limitParam) };
 
-    for (const item of short) {
-      // Respect 8 req/min free tier — wait 8s between calls
-      if (results.updated > 0) {
-        await new Promise((r) => setTimeout(r, 8000));
-      }
+    for (let i = 0; i < short.length; i++) {
+      // Wait before every call except the first (8 RPM free tier = 7.5s; use 10s for safety)
+      if (i > 0) await new Promise((r) => setTimeout(r, 10000));
+      const item = short[i];
       try {
         const newSummary = await summarize(item.title, item.title);
         const { error } = await supabase

@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import Parser from "rss-parser";
-import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
@@ -19,8 +18,6 @@ const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
 
 const parser = new Parser({ timeout: 10000 });
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,18 +26,26 @@ function getSupabaseAdmin() {
 }
 
 async function summarize(title: string, content: string): Promise<string> {
-  const msg = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 200,
-    messages: [
-      {
-        role: "user",
-        content: `Summarize this AI news article in EXACTLY 60 words. Be precise and informative. No filler. Output only the summary, nothing else.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
-      },
-    ],
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "qwen/qwen3-coder:free",
+      max_tokens: 200,
+      messages: [
+        {
+          role: "user",
+          content: `Summarize this AI news article in EXACTLY 60 words. Be precise and informative. No filler. Output only the summary, nothing else.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
+        },
+      ],
+    }),
   });
-  const block = msg.content[0];
-  return block.type === "text" ? block.text.trim() : "";
+  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  return (data.choices?.[0]?.message?.content ?? "").trim();
 }
 
 async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<

@@ -8,12 +8,12 @@ export const maxDuration = 300;
 const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
   { url: "https://blog.google/technology/ai/rss/", category: "ai-models", sourceName: "Google AI Blog" },
   { url: "https://openai.com/blog/rss.xml", category: "ai-models", sourceName: "OpenAI Blog" },
-  { url: "https://www.anthropic.com/rss.xml", category: "tools", sourceName: "Anthropic" },
   { url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "research", sourceName: "TechCrunch AI" },
   { url: "https://huggingface.co/blog/feed.xml", category: "open-source", sourceName: "Hugging Face" },
   { url: "https://venturebeat.com/category/ai/feed/", category: "research", sourceName: "VentureBeat AI" },
   { url: "https://the-decoder.com/feed/", category: "ai-models", sourceName: "The Decoder" },
   { url: "https://www.producthunt.com/feed", category: "producthunt", sourceName: "Product Hunt" },
+  { url: "https://simonwillison.net/atom/everything/", category: "tools", sourceName: "Simon Willison" },
 ];
 
 type ParserItem = {
@@ -118,26 +118,57 @@ async function fetchOgImage(url: string): Promise<string | null> {
   }
 }
 
-async function summarize(title: string, content: string): Promise<string> {
+function buildPrompt(title: string, content: string): string {
+  // PH items pass a full instruction as content when tagline is missing
+  if (content.startsWith("Write a 40-80 word summary")) return content;
+  return `Summarize this article in 40-80 words. Be specific and informative.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`;
+}
+
+async function summarizeGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: `Summarize this article in 40-80 words. Be specific and informative.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
-            },
-          ],
-        },
-      ],
-    }),
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
   });
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  return (data.candidates?.[0]?.content?.parts?.[0]?.text ?? "").trim();
+  const text = (data.candidates?.[0]?.content?.parts?.[0]?.text ?? "").trim();
+  if (!text) throw new Error("Gemini returned empty response");
+  return text;
+}
+
+async function summarizeOpenRouter(prompt: string): Promise<string> {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.0-flash-lite:free",
+      max_tokens: 200,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("OpenRouter returned empty response");
+  return text;
+}
+
+async function summarize(title: string, content: string): Promise<string> {
+  const prompt = buildPrompt(title, content);
+  try {
+    return await summarizeGemini(prompt);
+  } catch {
+    try {
+      return await summarizeOpenRouter(prompt);
+    } catch {
+      return content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
+    }
+  }
 }
 
 type FeedItem = {
@@ -152,9 +183,13 @@ type FeedItem = {
 
 async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
+  const isPH = feed.sourceName === "Product Hunt";
   const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
     const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
-    const content = rawContent.trim() || (item.title ?? "");
+    const trimmed = rawContent.trim();
+    const content = isPH && trimmed.length < 50
+      ? `Write a 40-80 word summary about this product: ${item.title ?? ""}`
+      : trimmed || (item.title ?? "");
     return {
       title: item.title ?? "",
       sourceUrl: item.link ?? item.guid ?? "",

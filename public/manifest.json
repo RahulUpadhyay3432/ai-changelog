@@ -1,0 +1,16 @@
+{
+  "name": "AI Changelog",
+  "short_name": "AI News",
+  "description": "What happened in AI today.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/globe.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

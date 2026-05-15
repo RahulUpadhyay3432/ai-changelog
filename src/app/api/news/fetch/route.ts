@@ -76,26 +76,25 @@ function extractImageUrl(item: ParserItem): string | null {
 }
 
 async function summarize(title: string, content: string): Promise<string> {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const res = await fetch(url, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "meta-llama/llama-3.3-70b-instruct:free",
-      max_tokens: 200,
-      messages: [
+      contents: [
         {
-          role: "user",
-          content: `Summarize this AI/tech news article in EXACTLY 60 words. Count carefully — no more, no less. Be specific and informative about the actual news. Do not use vague phrases. Output only the 60-word summary, nothing else.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
+          parts: [
+            {
+              text: `Summarize this article in 40-80 words. Be specific and informative.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`,
+            },
+          ],
         },
       ],
     }),
   });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  return (data.choices?.[0]?.message?.content ?? "").trim();
+  return (data.candidates?.[0]?.content?.parts?.[0]?.text ?? "").trim();
 }
 
 type FeedItem = {

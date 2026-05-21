@@ -144,18 +144,51 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
   }
 }
 
+/**
+ * Detects summaries that should never reach the feed:
+ * - LOW_SIGNAL flag from the AI editor
+ * - Leaked prompt strings
+ * - Raw release note patterns that slipped through
+ */
 function isBadSummary(text: string): boolean {
-  const t = text.trim().toLowerCase();
+  const t = text.trim();
+  const lower = t.toLowerCase();
   return (
-    t.startsWith("write a ") ||
-    t.startsWith("the provided content") ||
-    t.includes("summarize this article")
+    t === "LOW_SIGNAL" ||
+    lower.startsWith("low_signal") ||
+    lower.startsWith("write a ") ||
+    lower.startsWith("the provided content") ||
+    lower.includes("summarize this article") ||
+    // Raw release note leak patterns
+    /^release:\s/i.test(t) ||
+    /\btags:\s*[\w,\s]+$/.test(t) ||
+    /refs\s+\S+#\d+/i.test(t) ||
+    /^v?\d+\.\d+[\w.]*\s*[-–]\s*/i.test(t)
   );
 }
 
-function buildPrompt(title: string, content: string): string {
-  if (content.startsWith("Write a 40-80 word summary")) return content;
-  return `Summarize this article in 40-80 words. Be specific and informative.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`;
+/**
+ * Premium tech editor prompt.
+ * Instructs the AI to write a contextual dispatch — not paraphrase raw notes.
+ * Returns exactly "LOW_SIGNAL" for minor patches with no user-facing changes.
+ */
+function buildEditorPrompt(title: string, content: string): string {
+  return `You are a tech editor for "AI Changelog", a premium intelligence feed for AI developers and enthusiasts.
+
+Given the title and raw content below, write a 2-3 sentence dispatch that:
+(a) explains what this tool or library does in plain English (assume the reader hasn't heard of it)
+(b) describes what changed or was announced
+(c) explains why it matters to an AI developer or enthusiast
+
+Rules:
+- NEVER echo raw commit messages, issue references (#7, refs #123), tag lists, or version metadata
+- NEVER start with "This article", "This release", "This post", or the product name alone
+- Write in present tense, active voice
+- If this update has NO meaningful user-facing changes (pure dependency bump, typo fix, internal refactor, test changes only) — respond with exactly: LOW_SIGNAL
+
+Title: ${title}
+
+Content: ${content.slice(0, 2000)}`;
 }
 
 async function summarizeGemini(prompt: string): Promise<string> {
@@ -192,16 +225,20 @@ async function summarizeOpenRouter(prompt: string): Promise<string> {
   return text;
 }
 
-async function summarize(title: string, content: string): Promise<string> {
-  const prompt = buildPrompt(title, content);
+/**
+ * Returns null if both LLMs fail — callers must skip the item.
+ * Never falls back to raw content (that's what caused the bug).
+ */
+async function summarize(title: string, content: string): Promise<string | null> {
+  const prompt = buildEditorPrompt(title, content);
   try {
     return await summarizeGemini(prompt);
   } catch {
     try {
       return await summarizeOpenRouter(prompt);
     } catch {
-      const fallback = content.startsWith("Write a ") ? title : content;
-      return fallback.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
+      // Both failed — do NOT return raw content. Skip the item instead.
+      return null;
     }
   }
 }
@@ -279,7 +316,7 @@ function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
 async function insertItems(
   items: FeedItem[],
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  results: { inserted: number; skipped: number; errors: string[] }
+  results: { inserted: number; skipped: number; lowSignal: number; errors: string[] }
 ) {
   for (const item of items) {
     if (!item.title || !item.sourceUrl) continue;
@@ -295,23 +332,27 @@ async function insertItems(
       continue;
     }
 
-    let summary = "";
+    let summary: string | null = null;
+
     if (item.directSummary) {
+      // PH / pre-structured content: use directly if short, else run editor pass
       const wordCount = item.directSummary.split(/\s+/).filter(Boolean).length;
       summary = wordCount <= 80
         ? item.directSummary
         : await summarize(item.title, item.directSummary);
     } else {
-      try {
-        summary = await summarize(item.title, item.content);
-      } catch (err) {
-        results.errors.push(`Summarize "${item.title}": ${String(err)}`);
-        summary = item.content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
-      }
+      summary = await summarize(item.title, item.content);
     }
 
+    // null = both LLMs failed → skip, do not store raw content
+    if (summary === null) {
+      results.errors.push(`Summarization failed (both LLMs) for "${item.title}" — skipped`);
+      continue;
+    }
+
+    // LOW_SIGNAL or leaked raw text → filter from feed
     if (isBadSummary(summary)) {
-      results.errors.push(`Bad summary skipped for "${item.title}"`);
+      results.lowSignal++;
       continue;
     }
 
@@ -371,8 +412,8 @@ export async function GET(request: NextRequest) {
       const item = short[i];
       try {
         const newSummary = await summarize(item.title, item.title);
-        if (isBadSummary(newSummary)) {
-          results.errors.push(`Bad re-summary skipped for "${item.title}"`);
+        if (newSummary === null || isBadSummary(newSummary)) {
+          results.errors.push(`Bad/failed re-summary skipped for "${item.title}"`);
           continue;
         }
         const { error } = await supabase
@@ -400,7 +441,7 @@ export async function GET(request: NextRequest) {
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   await supabase.from("news_items").delete().lt("published_at", cutoff);
 
-  const results = { inserted: 0, skipped: 0, errors: [] as string[] };
+  const results = { inserted: 0, skipped: 0, lowSignal: 0, errors: [] as string[] };
 
   // ── RSS feeds (parallel) ─────────────────────────────────────────────────
   const rssSettled = await Promise.allSettled(RSS_FEEDS.map((feed) => fetchRSSFeed(feed)));

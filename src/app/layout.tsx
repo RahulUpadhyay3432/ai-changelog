@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
   title: "AI Changelog — What happened in AI today",
@@ -29,6 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" style={{ height: "100%", overflow: "hidden" }}>
+      <PostHogProvider>
       <body
         style={{
           height: "100%",
@@ -53,6 +55,7 @@ export default function RootLayout({
         </main>
         <BottomNav />
       </body>
+      </PostHogProvider>
     </html>
   );
 }

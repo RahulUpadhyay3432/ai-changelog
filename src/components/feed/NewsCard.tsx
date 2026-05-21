@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bookmark, Share2, ChevronUp, ChevronDown, Check } from "lucide-react";
+import { Bookmark, Share2, ChevronUp, ChevronDown } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
 import { isStorySaved, saveStory, removeStory } from "@/lib/storage";
+import { ShareSheet } from "./ShareSheet";
 import posthog from "posthog-js";
 
 interface NewsCardProps {
@@ -107,8 +108,8 @@ function cleanText(text: string): string {
 
 export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
-  const [copied, setCopied] = useState(false);
   const [sharePressed, setSharePressed] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
@@ -140,44 +141,11 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     onSave?.(item.id);
   };
 
-  const handleShare = async (e: React.MouseEvent) => {
+  const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSharePressed(true);
     setTimeout(() => setSharePressed(false), 200);
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: item.title, url: item.sourceUrl });
-        posthog.capture("story_shared", {
-          story_id: item.id,
-          story_title: item.title,
-          category: item.categorySlug,
-          source_name: item.sourceName,
-          share_method: "native",
-        });
-      } else {
-        await navigator.clipboard.writeText(item.sourceUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        posthog.capture("story_shared", {
-          story_id: item.id,
-          story_title: item.title,
-          category: item.categorySlug,
-          source_name: item.sourceName,
-          share_method: "clipboard",
-        });
-      }
-    } catch {
-      await navigator.clipboard.writeText(item.sourceUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      posthog.capture("story_shared", {
-        story_id: item.id,
-        story_title: item.title,
-        category: item.categorySlug,
-        source_name: item.sourceName,
-        share_method: "clipboard_fallback",
-      });
-    }
+    setShowShareSheet(true);
   };
 
   return (
@@ -282,11 +250,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             padding: "12px",
           }}
         >
-          {copied ? (
-            <Check size={20} color="#4ade80" strokeWidth={2.5} />
-          ) : (
-            <Share2 size={20} color="#ffffff" strokeWidth={2} />
-          )}
+          <Share2 size={20} color="#ffffff" strokeWidth={2} />
         </button>
       </div>
 
@@ -425,6 +389,10 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           </div>
         </div>
       </div>
+
+      {showShareSheet && (
+        <ShareSheet item={item} onClose={() => setShowShareSheet(false)} />
+      )}
     </div>
   );
 }

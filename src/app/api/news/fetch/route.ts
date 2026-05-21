@@ -1,10 +1,16 @@
 import type { NextRequest } from "next/server";
 import Parser from "rss-parser";
 import { createClient } from "@supabase/supabase-js";
+import {
+  fetchProductHuntPosts,
+  buildPHSummary,
+  type PHFeedItem,
+} from "@/lib/producthunt";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+// Product Hunt removed — now uses GraphQL API (src/lib/producthunt.ts)
 const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
   { url: "https://blog.google/technology/ai/rss/", category: "ai-models", sourceName: "Google AI Blog" },
   { url: "https://openai.com/blog/rss.xml", category: "ai-models", sourceName: "OpenAI Blog" },
@@ -12,7 +18,6 @@ const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
   { url: "https://huggingface.co/blog/feed.xml", category: "open-source", sourceName: "Hugging Face" },
   { url: "https://venturebeat.com/category/ai/feed/", category: "research", sourceName: "VentureBeat AI" },
   { url: "https://the-decoder.com/feed/", category: "ai-models", sourceName: "The Decoder" },
-  { url: "https://www.producthunt.com/feed", category: "producthunt", sourceName: "Product Hunt" },
   { url: "https://simonwillison.net/atom/everything/", category: "tools", sourceName: "Simon Willison" },
 ];
 
@@ -195,7 +200,6 @@ async function summarize(title: string, content: string): Promise<string> {
     try {
       return await summarizeOpenRouter(prompt);
     } catch {
-      // If content is a prompt string (not real article text), fall back to title
       const fallback = content.startsWith("Write a ") ? title : content;
       return fallback.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
     }
@@ -213,7 +217,7 @@ type FeedItem = {
   directSummary: string | null;
 };
 
-async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
+async function fetchRSSFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
 
   const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
@@ -236,18 +240,41 @@ async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
     rawItems.map((item) => fetchPageMeta(item.sourceUrl))
   );
 
-  const isPH = feed.sourceName === "Product Hunt";
-
   return rawItems.map((item, i) => {
-    const meta = metaResults[i].status === "fulfilled" ? metaResults[i].value : { imageUrl: null, description: null, title: null };
+    const meta = metaResults[i].status === "fulfilled"
+      ? metaResults[i].value
+      : { imageUrl: null, description: null, title: null };
     return {
       ...item,
       imageUrl: meta.imageUrl ?? item.imageUrl,
-      directSummary: isPH && meta.description ? meta.description : null,
+      directSummary: null,
     };
   });
 }
 
+/**
+ * Convert PHFeedItem[] → FeedItem[] for the shared insert pipeline.
+ * Uses tagline + description as directSummary — no scraping needed.
+ */
+function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
+  return posts.map((post) => {
+    const rawSummary = buildPHSummary(post);
+    const wordCount = rawSummary.split(/\s+/).filter(Boolean).length;
+
+    return {
+      title: post.title,
+      sourceUrl: post.sourceUrl,
+      sourceName: "Product Hunt",
+      category: "producthunt",
+      // content is only used as fallback when directSummary is null
+      content: post.tagline,
+      publishedAt: post.publishedAt,
+      imageUrl: post.imageUrl,
+      // If ≤80 words: use as-is (no LLM call). If longer: let summarize() trim it.
+      directSummary: wordCount <= 80 ? rawSummary : rawSummary,
+    };
+  });
+}
 
 async function insertItems(
   items: FeedItem[],
@@ -275,11 +302,8 @@ async function insertItems(
         ? item.directSummary
         : await summarize(item.title, item.directSummary);
     } else {
-      const aiContent = item.content.length < 50 && item.sourceName === "Product Hunt"
-        ? `Write a 40-80 word summary about this product: ${item.title}`
-        : item.content;
       try {
-        summary = await summarize(item.title, aiContent);
+        summary = await summarize(item.title, item.content);
       } catch (err) {
         results.errors.push(`Summarize "${item.title}": ${String(err)}`);
         summary = item.content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
@@ -318,7 +342,7 @@ export async function GET(request: NextRequest) {
   const mode = request.nextUrl.searchParams.get("mode");
   const supabase = getSupabaseAdmin();
 
-  // Re-summarize mode: fix existing items with short summaries
+  // Re-summarize mode
   if (mode === "resummary") {
     const limitParam = parseInt(request.nextUrl.searchParams.get("limit") ?? "30", 10);
     const offsetParam = parseInt(request.nextUrl.searchParams.get("offset") ?? "0", 10);
@@ -332,8 +356,15 @@ export async function GET(request: NextRequest) {
       .filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45)
       .slice(offsetParam, offsetParam + limitParam);
 
-    const totalShort = (items ?? []).filter((i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45).length;
-    const results = { updated: 0, errors: [] as string[], remaining: Math.max(0, totalShort - offsetParam - limitParam) };
+    const totalShort = (items ?? []).filter(
+      (i: { summary: string }) => i.summary.trim().split(/\s+/).filter(Boolean).length < 45
+    ).length;
+
+    const results = {
+      updated: 0,
+      errors: [] as string[],
+      remaining: Math.max(0, totalShort - offsetParam - limitParam),
+    };
 
     for (let i = 0; i < short.length; i++) {
       if (i > 0) await new Promise((r) => setTimeout(r, 10000));
@@ -358,9 +389,9 @@ export async function GET(request: NextRequest) {
     return Response.json(results);
   }
 
-  // Normal fetch mode
+  // ── Normal fetch ──────────────────────────────────────────────────────────
 
-  // Clean up leaked prompt text saved as summaries
+  // Clean up leaked prompt strings saved as summaries
   await supabase.from("news_items").delete().ilike("summary", "Write a 40%");
   await supabase.from("news_items").delete().ilike("summary", "The provided content%");
   await supabase.from("news_items").delete().ilike("summary", "%summarize this article%");
@@ -371,16 +402,25 @@ export async function GET(request: NextRequest) {
 
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
-  // Fetch RSS feeds
-  for (const feed of RSS_FEEDS) {
-    let items: FeedItem[] = [];
-    try {
-      items = await fetchFeed(feed);
-    } catch (err) {
-      results.errors.push(`Feed ${feed.url}: ${String(err)}`);
-      continue;
+  // ── RSS feeds (parallel) ─────────────────────────────────────────────────
+  const rssSettled = await Promise.allSettled(RSS_FEEDS.map((feed) => fetchRSSFeed(feed)));
+
+  for (let i = 0; i < rssSettled.length; i++) {
+    const result = rssSettled[i];
+    if (result.status === "fulfilled") {
+      await insertItems(result.value, supabase, results);
+    } else {
+      results.errors.push(`RSS feed "${RSS_FEEDS[i].url}": ${String(result.reason)}`);
     }
-    await insertItems(items, supabase, results);
+  }
+
+  // ── Product Hunt GraphQL API ─────────────────────────────────────────────
+  try {
+    const phPosts = await fetchProductHuntPosts(48);
+    const phItems = phPostsToFeedItems(phPosts);
+    await insertItems(phItems, supabase, results);
+  } catch (err) {
+    results.errors.push(`Product Hunt API: ${String(err)}`);
   }
 
   return Response.json(results);

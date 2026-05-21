@@ -107,6 +107,7 @@ function cleanText(text: string): string {
 export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
   const [copied, setCopied] = useState(false);
+  const [sharePressed, setSharePressed] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
@@ -128,6 +129,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    setSharePressed(true);
+    setTimeout(() => setSharePressed(false), 200);
     try {
       if (navigator.share) {
         await navigator.share({ title: item.title, url: item.sourceUrl });
@@ -152,6 +155,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         flexDirection: "column",
         background: "#0a0a0a",
         userSelect: "none",
+        position: "relative",
       }}
     >
       {/* Hero — slightly taller for cinematic feel */}
@@ -184,71 +188,70 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           }}
         />
 
-        {/* Action buttons */}
-        <div
+      </div>
+
+      {/* Inshorts-style action buttons — stacked vertically, straddling image/text boundary */}
+      <div
+        style={{
+          position: "absolute",
+          right: "16px",
+          top: "calc(42% - 52px)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+          zIndex: 20,
+        }}
+      >
+        <button
+          onClick={handleSave}
+          className={`card-action-btn${saved ? " bookmark-saved" : ""}`}
+          aria-label={saved ? "Remove bookmark" : "Bookmark story"}
           style={{
-            position: "absolute",
-            top: "12px",
-            right: "14px",
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            background: "rgba(0, 0, 0, 0.52)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "none",
             display: "flex",
-            gap: "7px",
-            zIndex: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
           }}
         >
-          <button
-            onClick={handleSave}
-            className="card-action-btn"
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              background: "rgba(10, 10, 10, 0.6)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: saved ? "#fbbf24" : "#d4d4d4",
-              transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-              transform: saved ? "scale(1.05)" : "scale(1)",
-            }}
-            aria-label={saved ? "Remove bookmark" : "Bookmark story"}
-          >
-            <Bookmark
-              size={15}
-              fill={saved ? "#fbbf24" : "none"}
-              strokeWidth={saved ? 0 : 1.8}
-            />
-          </button>
-          <button
-            onClick={handleShare}
-            className="card-action-btn"
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              background: "rgba(10, 10, 10, 0.6)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: copied ? "#4ade80" : "#d4d4d4",
-              transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
-            aria-label="Share story"
-          >
-            {copied ? (
-              <Check size={15} color="#4ade80" strokeWidth={2.5} />
-            ) : (
-              <Share2 size={15} strokeWidth={1.8} />
-            )}
-          </button>
-        </div>
+          <Bookmark
+            size={18}
+            fill={saved ? "#fbbf24" : "none"}
+            color={saved ? "#fbbf24" : "#ffffff"}
+            strokeWidth={saved ? 0 : 2}
+            style={{ transition: "fill 0.2s ease, color 0.2s ease" }}
+          />
+        </button>
+        <button
+          onClick={handleShare}
+          className={`card-action-btn${sharePressed ? " share-pulse" : ""}`}
+          aria-label="Share story"
+          style={{
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            background: "rgba(0, 0, 0, 0.52)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          {copied ? (
+            <Check size={18} color="#4ade80" strokeWidth={2.5} />
+          ) : (
+            <Share2 size={18} color="#ffffff" strokeWidth={2} />
+          )}
+        </button>
       </div>
 
       {/* Content */}

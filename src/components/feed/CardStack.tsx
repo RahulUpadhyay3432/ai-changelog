@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useLayoutEffect, useEffect } from "react";
 import {
   motion,
+  AnimatePresence,
   useMotionValue,
   useTransform,
   animate,
@@ -11,6 +12,7 @@ import {
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
 import { updateStreak } from "@/lib/storage";
+import posthog from "posthog-js";
 
 interface CardStackProps {
   items: NewsItem[];
@@ -83,6 +85,15 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
       setCurrentIndex((prev) => {
         const next = prev + direction;
         onIndexChange?.(next, items.length);
+        const currentItem = items[prev];
+        posthog.capture("story_swiped", {
+          direction: direction === 1 ? "next" : "previous",
+          story_id: currentItem?.id,
+          story_title: currentItem?.title,
+          category: currentItem?.categorySlug,
+          position: prev,
+          total: items.length,
+        });
         return next;
       });
 
@@ -92,7 +103,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
         navigator.vibrate(10);
       }
     },
-    [dragY, items.length, onIndexChange]
+    [dragY, items, onIndexChange]
   );
 
 
@@ -121,6 +132,9 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
           setIsRefreshing(true);
           try {
             await onRefresh();
+            posthog.capture("feed_refreshed", {
+              stories_count: items.length,
+            });
             if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
             setShowToast(true);
             toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
@@ -233,33 +247,35 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
         </div>
       )}
 
-      {/* "Feed Updated!" toast */}
-      {showToast && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            position: "fixed",
-            bottom: 58,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "rgba(30,30,30,0.85)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            color: "#f5f5f5",
-            padding: "10px 22px",
-            borderRadius: "100px",
-            fontSize: "14px",
-            fontWeight: 600,
-            zIndex: 20,
-            whiteSpace: "nowrap",
-            border: "1px solid rgba(255,255,255,0.15)",
-            pointerEvents: "none",
-          }}
-        >
-          Feed Updated!
-        </motion.div>
-      )}
+      {/* Feed Updated toast */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 4, x: "-50%", transition: { duration: 0.3 } }}
+            style={{
+              position: "fixed",
+              bottom: 80,
+              left: "50%",
+              background: "rgba(255,255,255,0.10)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              color: "#a3a3a3",
+              padding: "6px 16px",
+              borderRadius: "20px",
+              fontSize: "12px",
+              fontWeight: 500,
+              zIndex: 50,
+              whiteSpace: "nowrap",
+              border: "1px solid rgba(255,255,255,0.10)",
+              pointerEvents: "none",
+            }}
+          >
+            Feed Updated
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -82,13 +82,14 @@ export function HomeFeed() {
         <h1
           style={{
             fontSize: "19px",
-            fontWeight: 600,
-            color: "#f0f0f0",
+            fontWeight: 500,
+            color: "#E8E4DE",
             margin: 0,
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.02em",
+            fontFamily: "var(--font-space-grotesk), sans-serif",
           }}
         >
-          Kapyn
+          kapyn
         </h1>
         <div
           style={{

@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Space_Grotesk } from "next/font/google";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PostHogProvider } from "@/components/PostHogProvider";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Kapyn — What happened in AI today",
@@ -29,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ height: "100%", overflow: "hidden" }}>
+    <html lang="en" className={spaceGrotesk.variable} style={{ height: "100%", overflow: "hidden" }}>
       <PostHogProvider>
       <body
         style={{

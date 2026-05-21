@@ -43,24 +43,26 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
             key={slug}
             ref={active ? activeRef : undefined}
             onClick={() => onChange(slug)}
+            className={`category-tab-btn${active ? " active-pill" : ""}`}
             style={{
               flexShrink: 0,
-              padding: "5px 12px",
+              padding: "5px 13px",
               borderRadius: "100px",
               fontSize: "11px",
-              fontWeight: active ? 600 : 400,
+              fontWeight: active ? 700 : 500,
               border: "1px solid",
               borderColor: active
-                ? "rgba(255, 255, 255, 0.28)"
-                : "rgba(255, 255, 255, 0.07)",
+                ? "rgba(251, 146, 60, 0.0)"
+                : "rgba(255, 255, 255, 0.08)",
               background: active
-                ? "rgba(255, 255, 255, 0.13)"
+                ? "linear-gradient(135deg, #f97316 0%, #f59e0b 100%)"
                 : "transparent",
-              color: active ? "#f0f0f0" : "#606060",
+              color: active ? "#fff" : "#555555",
               cursor: "pointer",
-              transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-              letterSpacing: "0.015em",
+              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+              letterSpacing: active ? "0.01em" : "0.015em",
               whiteSpace: "nowrap",
+              boxShadow: active ? "0 2px 10px rgba(249, 115, 22, 0.35)" : "none",
             }}
           >
             {label === "All" ? "All Dispatches" : label}

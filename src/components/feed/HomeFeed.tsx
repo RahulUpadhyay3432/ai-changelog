@@ -70,7 +70,7 @@ export function HomeFeed() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "16px 20px 8px",
+          padding: "10px 20px 6px",
           flexShrink: 0,
         }}
       >

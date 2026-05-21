@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - heading "AI Changelog" [level=1] [ref=e5]
+        - generic [ref=e6]: 1 / 12
+      - generic [ref=e7]:
+        - button "All" [ref=e8] [cursor=pointer]
+        - button "AI" [ref=e9] [cursor=pointer]
+        - button "Tools" [ref=e10] [cursor=pointer]
+        - button "Startups" [ref=e11] [cursor=pointer]
+        - button "Open Source" [ref=e12] [cursor=pointer]
+        - button "Research" [ref=e13] [cursor=pointer]
+        - button "Funding" [ref=e14] [cursor=pointer]
+        - button "Big Tech" [ref=e15] [cursor=pointer]
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - img [ref=e22]
+          - generic [ref=e29]:
+            - button "Bookmark story" [ref=e30] [cursor=pointer]:
+              - img [ref=e31]
+            - button "Share story" [ref=e33] [cursor=pointer]:
+              - img [ref=e34]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: Research
+            - generic [ref=e43]: 9h ago
+          - heading "Mistral AI Releases 70B Open-Weight Model Beating GPT-4" [level=2] [ref=e44]
+          - paragraph [ref=e45]: Mistral AI has open-sourced Mistral-Large-2, a 70B parameter model that outperforms GPT-4 on MMLU, HumanEval, and GSM8K benchmarks. Available under Apache 2.0 license on HuggingFace. The release marks the largest open-weight model from the Paris-based lab to date.
+          - generic [ref=e47]: · Hugging Face
+          - generic [ref=e48]:
+            - img [ref=e49]
+            - generic [ref=e51]: Swipe for next story
+            - img [ref=e52]
+  - navigation [ref=e54]:
+    - link "Home" [ref=e55] [cursor=pointer]:
+      - /url: /
+      - img [ref=e56]
+      - generic [ref=e59]: Home
+    - link "Categories" [ref=e60] [cursor=pointer]:
+      - /url: /categories
+      - img [ref=e61]
+      - generic [ref=e63]: Categories
+    - link "Trending" [ref=e64] [cursor=pointer]:
+      - /url: /trending
+      - img [ref=e65]
+      - generic [ref=e68]: Trending
+    - link "Saved" [ref=e69] [cursor=pointer]:
+      - /url: /saved
+      - img [ref=e70]
+      - generic [ref=e72]: Saved
+    - link "Profile" [ref=e73] [cursor=pointer]:
+      - /url: /profile
+      - img [ref=e74]
+      - generic [ref=e77]: Profile

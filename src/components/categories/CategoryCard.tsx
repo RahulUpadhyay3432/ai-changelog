@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bookmark, Brain, Rocket, Building2, FlaskConical, Wrench, Code2, DollarSign, Zap } from "lucide-react";
 import type { Category } from "@/lib/types";
+import { isCategoryPinned, toggleCategoryPin } from "@/lib/storage";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Brain,
@@ -22,7 +23,19 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category, onPress }: CategoryCardProps) {
   const [pinned, setPinned] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const Icon = ICON_MAP[category.icon] ?? Brain;
+
+  // Safe client-only read of pin state to avoid hydration mismatches
+  useEffect(() => {
+    setPinned(isCategoryPinned(category.slug));
+  }, [category.slug]);
+
+  const handlePin = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextState = toggleCategoryPin(category.slug);
+    setPinned(nextState);
+  };
 
   return (
     <div
@@ -32,49 +45,59 @@ export function CategoryCard({ category, onPress }: CategoryCardProps) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onPress?.(category.slug);
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "8px",
+        gap: "10px",
         padding: "16px",
-        background: "#ffffff",
+        background: isHovered 
+          ? "rgba(30, 30, 30, 0.85)" 
+          : "rgba(22, 22, 22, 0.65)",
         borderRadius: "16px",
-        border: "1px solid rgba(0,0,0,0.06)",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+        border: "1px solid",
+        borderColor: isHovered 
+          ? "rgba(255, 255, 255, 0.15)" 
+          : "rgba(255, 255, 255, 0.06)",
+        boxShadow: isHovered
+          ? `0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px ${category.colorAccent}25`
+          : "0 4px 12px rgba(0, 0, 0, 0.2)",
         cursor: "pointer",
         textAlign: "left",
         position: "relative",
-        minHeight: "100px",
+        minHeight: "115px",
         width: "100%",
-        transition: "box-shadow 150ms",
+        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+        transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
       }}
     >
       {/* Pin button */}
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setPinned((p) => !p);
-        }}
+        onClick={handlePin}
         style={{
           position: "absolute",
-          top: "12px",
-          right: "12px",
+          top: "14px",
+          right: "14px",
           background: "none",
           border: "none",
           padding: "4px",
           cursor: "pointer",
-          color: pinned ? "#ef4444" : "#d4d4d4",
+          color: pinned ? "#ef4444" : "rgba(255, 255, 255, 0.3)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transition: "color 200ms",
+          transition: "all 0.2s ease",
+          transform: pinned ? "scale(1.15)" : "scale(1)",
         }}
         aria-label={pinned ? "Unpin category" : "Pin category"}
       >
         <Bookmark
           size={16}
           fill={pinned ? "#ef4444" : "none"}
-          strokeWidth={2}
+          strokeWidth={pinned ? 0 : 2}
         />
       </button>
 
@@ -87,20 +110,25 @@ export function CategoryCard({ category, onPress }: CategoryCardProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: `${category.colorAccent}20`,
+          background: `${category.colorAccent}15`,
+          border: `1px solid ${category.colorAccent}30`,
+          boxShadow: `0 0 8px ${category.colorAccent}10`,
+          transition: "all 0.3s ease",
+          transform: isHovered ? "scale(1.05)" : "scale(1)",
         }}
       >
-        <Icon size={20} color={category.colorAccent} strokeWidth={2} />
+        <Icon size={18} color={category.colorAccent} strokeWidth={2.5} />
       </div>
 
       {/* Name */}
       <span
         style={{
-          fontSize: "15px",
+          fontSize: "14px",
           fontWeight: 600,
-          color: "#0a0a0a",
-          lineHeight: 1.2,
+          color: "#f5f5f5",
+          lineHeight: 1.3,
           paddingRight: "24px",
+          letterSpacing: "-0.01em",
         }}
       >
         {category.name}
@@ -115,13 +143,13 @@ export function CategoryCard({ category, onPress }: CategoryCardProps) {
           marginTop: "auto",
         }}
       >
-        <span style={{ fontSize: "12px", color: "#737373" }}>
-          {category.storyCount} stories
+        <span style={{ fontSize: "11px", color: "#a3a3a3", fontWeight: 500 }}>
+          {category.storyCount} dispatches
         </span>
         {category.lastUpdated && (
           <>
-            <span style={{ fontSize: "12px", color: "#d4d4d4" }}>·</span>
-            <span style={{ fontSize: "12px", color: "#737373" }}>
+            <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.15)" }}>·</span>
+            <span style={{ fontSize: "11px", color: "#737373" }}>
               {category.lastUpdated}
             </span>
           </>
@@ -130,3 +158,4 @@ export function CategoryCard({ category, onPress }: CategoryCardProps) {
     </div>
   );
 }
+

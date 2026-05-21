@@ -1,14 +1,22 @@
-import { Bookmark } from "lucide-react";
+"use client";
+
+import { useState } from "react";
 import { CategoryGrid } from "@/components/categories/CategoryGrid";
 import { CATEGORIES, CATEGORY_TABS } from "@/lib/categories";
 
 export default function CategoriesPage() {
+  const [activeTab, setActiveTab] = useState<string>("all");
+
+  const filteredCategories = activeTab === "all" 
+    ? CATEGORIES 
+    : CATEGORIES.filter(c => c.slug === activeTab);
+
   return (
     <div
       style={{
         height: "100%",
         overflowY: "auto",
-        background: "#ffffff",
+        background: "#0a0a0a",
         display: "flex",
         flexDirection: "column",
       }}
@@ -17,36 +25,20 @@ export default function CategoriesPage() {
       {/* Header */}
       <div
         style={{
-          padding: "20px 20px 0",
+          padding: "24px 20px 0",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           position: "relative",
         }}
       >
-        <button
-          style={{
-            position: "absolute",
-            left: "20px",
-            top: "20px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#0a0a0a",
-            padding: "4px",
-          }}
-          aria-label="Saved categories"
-        >
-          <Bookmark size={20} strokeWidth={2} />
-        </button>
-
         <h1
+          className="text-gradient"
           style={{
-            fontSize: "28px",
+            fontSize: "26px",
             fontWeight: 800,
             letterSpacing: "0.15em",
-            color: "#0a0a0a",
-            margin: "0 0 4px",
+            margin: "0 0 6px",
             textTransform: "uppercase",
           }}
         >
@@ -59,7 +51,7 @@ export default function CategoriesPage() {
             letterSpacing: "0.12em",
             color: "#737373",
             textTransform: "uppercase",
-            margin: "0 0 20px",
+            margin: "0 0 24px",
           }}
         >
           Browse &amp; filter tech intelligence
@@ -76,30 +68,37 @@ export default function CategoriesPage() {
           }}
           className="scrollbar-none"
         >
-          {CATEGORY_TABS.map(({ slug, label }) => (
-            <button
-              key={slug}
-              style={{
-                flexShrink: 0,
-                padding: "6px 14px",
-                borderRadius: "100px",
-                fontSize: "13px",
-                fontWeight: 400,
-                border: "1px solid rgba(0,0,0,0.15)",
-                background: "transparent",
-                color: "#525252",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {label === "All" ? "All Dispatches" : label}
-            </button>
-          ))}
+          {CATEGORY_TABS.map(({ slug, label }) => {
+            const isActive = activeTab === slug;
+            return (
+              <button
+                key={slug}
+                onClick={() => setActiveTab(slug)}
+                style={{
+                  flexShrink: 0,
+                  padding: "8px 16px",
+                  borderRadius: "100px",
+                  fontSize: "12px",
+                  fontWeight: isActive ? 600 : 400,
+                  border: "1px solid",
+                  borderColor: isActive ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
+                  background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.02)",
+                  color: isActive ? "#ffffff" : "#a3a3a3",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}
+              >
+                {label === "All" ? "All Dispatches" : label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Category grid */}
-      <CategoryGrid categories={CATEGORIES} />
+      <CategoryGrid categories={filteredCategories} />
     </div>
   );
 }
+

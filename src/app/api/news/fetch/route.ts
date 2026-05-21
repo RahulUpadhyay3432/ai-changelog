@@ -50,24 +50,20 @@ function getSupabaseAdmin() {
 }
 
 function extractImageUrl(item: ParserItem): string | null {
-  // media:content
   const mc = item.mediaContent ?? item["media:content"];
   if (mc && typeof mc === "object" && (mc as { $?: { url?: string } }).$?.url) {
     return (mc as { $: { url: string } }).$.url;
   }
 
-  // media:thumbnail
   const mt = item.mediaThumbnail ?? item["media:thumbnail"];
   if (mt && typeof mt === "object" && (mt as { $?: { url?: string } }).$?.url) {
     return (mt as { $: { url: string } }).$.url;
   }
 
-  // enclosure
   if (item.enclosure?.url && item.enclosure.type?.startsWith("image/")) {
     return item.enclosure.url;
   }
 
-  // <img> tag inside description / content
   const html = (item.description ?? item.content ?? "") as string;
   const m = html.match(/<img[^>]+src=["']([^"'>]+)["']/i);
   if (m) return m[1];
@@ -75,7 +71,7 @@ function extractImageUrl(item: ParserItem): string | null {
   return null;
 }
 
-type PageMeta = { imageUrl: string | null; description: string | null };
+type PageMeta = { imageUrl: string | null; description: string | null; title: string | null };
 
 function decodeHTMLEntities(text: string): string {
   return text
@@ -93,7 +89,7 @@ function extractMeta(html: string, property: string, nameAttr = "property"): str
 }
 
 async function fetchPageMeta(url: string): Promise<PageMeta> {
-  if (!url) return { imageUrl: null, description: null };
+  if (!url) return { imageUrl: null, description: null, title: null };
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
@@ -102,10 +98,10 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
     });
     clearTimeout(timer);
-    if (!res.ok) return { imageUrl: null, description: null };
+    if (!res.ok) return { imageUrl: null, description: null, title: null };
 
     const reader = res.body?.getReader();
-    if (!reader) return { imageUrl: null, description: null };
+    if (!reader) return { imageUrl: null, description: null, title: null };
     const decoder = new TextDecoder();
     let html = "";
     try {
@@ -128,17 +124,31 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
       extractMeta(html, "twitter:description", "name") ??
       null;
 
+    const titleRaw =
+      extractMeta(html, "og:title") ??
+      extractMeta(html, "twitter:title", "name") ??
+      null;
+
     return {
       imageUrl,
       description: description ? decodeHTMLEntities(description) : null,
+      title: titleRaw ? decodeHTMLEntities(titleRaw) : null,
     };
   } catch {
-    return { imageUrl: null, description: null };
+    return { imageUrl: null, description: null, title: null };
   }
 }
 
+function isBadSummary(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  return (
+    t.startsWith("write a ") ||
+    t.startsWith("the provided content") ||
+    t.includes("summarize this article")
+  );
+}
+
 function buildPrompt(title: string, content: string): string {
-  // PH items pass a full instruction as content when tagline is missing
   if (content.startsWith("Write a 40-80 word summary")) return content;
   return `Summarize this article in 40-80 words. Be specific and informative.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`;
 }
@@ -185,7 +195,9 @@ async function summarize(title: string, content: string): Promise<string> {
     try {
       return await summarizeOpenRouter(prompt);
     } catch {
-      return content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
+      // If content is a prompt string (not real article text), fall back to title
+      const fallback = content.startsWith("Write a ") ? title : content;
+      return fallback.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
     }
   }
 }
@@ -203,7 +215,6 @@ type FeedItem = {
 
 async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
-  const isPH = feed.sourceName === "Product Hunt";
 
   const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
     const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
@@ -221,20 +232,81 @@ async function fetchFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
     };
   });
 
-  // Fetch page meta (og:image + og:description) for all items in parallel
   const metaResults = await Promise.allSettled(
     rawItems.map((item) => fetchPageMeta(item.sourceUrl))
   );
 
+  const isPH = feed.sourceName === "Product Hunt";
+
   return rawItems.map((item, i) => {
-    const meta = metaResults[i].status === "fulfilled" ? metaResults[i].value : { imageUrl: null, description: null };
-    const ogDescription = meta.description ?? null;
+    const meta = metaResults[i].status === "fulfilled" ? metaResults[i].value : { imageUrl: null, description: null, title: null };
     return {
       ...item,
       imageUrl: meta.imageUrl ?? item.imageUrl,
-      directSummary: isPH && ogDescription ? ogDescription : null,
+      directSummary: isPH && meta.description ? meta.description : null,
     };
   });
+}
+
+
+async function insertItems(
+  items: FeedItem[],
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  results: { inserted: number; skipped: number; errors: string[] }
+) {
+  for (const item of items) {
+    if (!item.title || !item.sourceUrl) continue;
+
+    const { data: existing } = await supabase
+      .from("news_items")
+      .select("id")
+      .eq("source_url", item.sourceUrl)
+      .maybeSingle();
+
+    if (existing) {
+      results.skipped++;
+      continue;
+    }
+
+    let summary = "";
+    if (item.directSummary) {
+      const wordCount = item.directSummary.split(/\s+/).filter(Boolean).length;
+      summary = wordCount <= 80
+        ? item.directSummary
+        : await summarize(item.title, item.directSummary);
+    } else {
+      const aiContent = item.content.length < 50 && item.sourceName === "Product Hunt"
+        ? `Write a 40-80 word summary about this product: ${item.title}`
+        : item.content;
+      try {
+        summary = await summarize(item.title, aiContent);
+      } catch (err) {
+        results.errors.push(`Summarize "${item.title}": ${String(err)}`);
+        summary = item.content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
+      }
+    }
+
+    if (isBadSummary(summary)) {
+      results.errors.push(`Bad summary skipped for "${item.title}"`);
+      continue;
+    }
+
+    const { error } = await supabase.from("news_items").insert({
+      title: item.title,
+      summary,
+      source_url: item.sourceUrl,
+      source_name: item.sourceName,
+      category_slug: item.category,
+      published_at: item.publishedAt,
+      image_url: item.imageUrl,
+    });
+
+    if (error) {
+      results.errors.push(`Insert "${item.title}": ${error.message}`);
+    } else {
+      results.inserted++;
+    }
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -264,11 +336,14 @@ export async function GET(request: NextRequest) {
     const results = { updated: 0, errors: [] as string[], remaining: Math.max(0, totalShort - offsetParam - limitParam) };
 
     for (let i = 0; i < short.length; i++) {
-      // Wait before every call except the first (8 RPM free tier = 7.5s; use 10s for safety)
       if (i > 0) await new Promise((r) => setTimeout(r, 10000));
       const item = short[i];
       try {
         const newSummary = await summarize(item.title, item.title);
+        if (isBadSummary(newSummary)) {
+          results.errors.push(`Bad re-summary skipped for "${item.title}"`);
+          continue;
+        }
         const { error } = await supabase
           .from("news_items")
           .update({ summary: newSummary })
@@ -284,11 +359,19 @@ export async function GET(request: NextRequest) {
   }
 
   // Normal fetch mode
+
+  // Clean up leaked prompt text saved as summaries
+  await supabase.from("news_items").delete().ilike("summary", "Write a 40%");
+  await supabase.from("news_items").delete().ilike("summary", "The provided content%");
+  await supabase.from("news_items").delete().ilike("summary", "%summarize this article%");
+
+  // Remove stale items older than 48h
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   await supabase.from("news_items").delete().lt("published_at", cutoff);
 
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
+  // Fetch RSS feeds
   for (const feed of RSS_FEEDS) {
     let items: FeedItem[] = [];
     try {
@@ -297,55 +380,7 @@ export async function GET(request: NextRequest) {
       results.errors.push(`Feed ${feed.url}: ${String(err)}`);
       continue;
     }
-
-    for (const item of items) {
-      if (!item.title || !item.sourceUrl) continue;
-
-      const { data: existing } = await supabase
-        .from("news_items")
-        .select("id")
-        .eq("source_url", item.sourceUrl)
-        .maybeSingle();
-
-      if (existing) {
-        results.skipped++;
-        continue;
-      }
-
-      let summary = "";
-      if (item.directSummary) {
-        const wordCount = item.directSummary.split(/\s+/).filter(Boolean).length;
-        summary = wordCount <= 80
-          ? item.directSummary
-          : await summarize(item.title, item.directSummary);
-      } else {
-        const aiContent = item.content.length < 50 && item.sourceName === "Product Hunt"
-          ? `Write a 40-80 word summary about this product: ${item.title}`
-          : item.content;
-        try {
-          summary = await summarize(item.title, aiContent);
-        } catch (err) {
-          results.errors.push(`Summarize "${item.title}": ${String(err)}`);
-          summary = item.content.split(/\s+/).filter(Boolean).slice(0, 60).join(" ");
-        }
-      }
-
-      const { error } = await supabase.from("news_items").insert({
-        title: item.title,
-        summary,
-        source_url: item.sourceUrl,
-        source_name: item.sourceName,
-        category_slug: item.category,
-        published_at: item.publishedAt,
-        image_url: item.imageUrl,
-      });
-
-      if (error) {
-        results.errors.push(`Insert "${item.title}": ${error.message}`);
-      } else {
-        results.inserted++;
-      }
-    }
+    await insertItems(items, supabase, results);
   }
 
   return Response.json(results);

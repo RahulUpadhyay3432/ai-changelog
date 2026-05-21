@@ -1,0 +1,104 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - button "Saved categories" [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - heading "Categories" [level=1] [ref=e8]
+        - paragraph [ref=e9]: Browse & filter tech intelligence
+        - generic [ref=e10]:
+          - button "All Dispatches" [ref=e11] [cursor=pointer]
+          - button "AI" [ref=e12] [cursor=pointer]
+          - button "Tools" [ref=e13] [cursor=pointer]
+          - button "Startups" [ref=e14] [cursor=pointer]
+          - button "Open Source" [ref=e15] [cursor=pointer]
+          - button "Research" [ref=e16] [cursor=pointer]
+          - button "Funding" [ref=e17] [cursor=pointer]
+          - button "Big Tech" [ref=e18] [cursor=pointer]
+      - generic [ref=e19]:
+        - button [ref=e20] [cursor=pointer]
+        - button "Pin category" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+        - img [ref=e25]
+        - generic [ref=e33]: AI / Models
+        - generic [ref=e34]:
+          - generic [ref=e35]: 47 stories
+          - generic [ref=e36]: ·
+          - generic [ref=e37]: 14m ago
+        - button [ref=e38] [cursor=pointer]
+        - button "Pin category" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - img [ref=e43]
+        - generic [ref=e48]: Startups
+        - generic [ref=e49]:
+          - generic [ref=e50]: 23 stories
+          - generic [ref=e51]: ·
+          - generic [ref=e52]: 41m ago
+        - button [ref=e53] [cursor=pointer]
+        - button "Pin category" [ref=e54] [cursor=pointer]:
+          - img [ref=e55]
+        - img [ref=e58]
+        - generic [ref=e62]: Big Tech
+        - generic [ref=e63]:
+          - generic [ref=e64]: 31 stories
+          - generic [ref=e65]: ·
+          - generic [ref=e66]: 1h ago
+        - button [ref=e67] [cursor=pointer]
+        - button "Pin category" [ref=e68] [cursor=pointer]:
+          - img [ref=e69]
+        - img [ref=e72]
+        - generic [ref=e74]: Research
+        - generic [ref=e75]:
+          - generic [ref=e76]: 18 stories
+          - generic [ref=e77]: ·
+          - generic [ref=e78]: 2h ago
+        - button [ref=e79] [cursor=pointer]
+        - button "Pin category" [ref=e80] [cursor=pointer]:
+          - img [ref=e81]
+        - img [ref=e84]
+        - generic [ref=e86]: Tools
+        - generic [ref=e87]:
+          - generic [ref=e88]: 29 stories
+          - generic [ref=e89]: ·
+          - generic [ref=e90]: 55m ago
+        - button [ref=e91] [cursor=pointer]
+        - button "Pin category" [ref=e92] [cursor=pointer]:
+          - img [ref=e93]
+        - img [ref=e96]
+        - generic [ref=e100]: Open Source
+        - generic [ref=e101]:
+          - generic [ref=e102]: 14 stories
+          - generic [ref=e103]: ·
+          - generic [ref=e104]: 3h ago
+        - button [ref=e105] [cursor=pointer]
+        - button "Pin category" [ref=e106] [cursor=pointer]:
+          - img [ref=e107]
+        - img [ref=e110]
+        - generic [ref=e112]: Funding
+        - generic [ref=e113]:
+          - generic [ref=e114]: 9 stories
+          - generic [ref=e115]: ·
+          - generic [ref=e116]: 5h ago
+  - navigation [ref=e117]:
+    - link "Home" [ref=e118] [cursor=pointer]:
+      - /url: /
+      - img [ref=e119]
+      - generic [ref=e122]: Home
+    - link "Categories" [ref=e123] [cursor=pointer]:
+      - /url: /categories
+      - img [ref=e124]
+      - generic [ref=e126]: Categories
+    - link "Trending" [ref=e127] [cursor=pointer]:
+      - /url: /trending
+      - img [ref=e128]
+      - generic [ref=e131]: Trending
+    - link "Saved" [ref=e132] [cursor=pointer]:
+      - /url: /saved
+      - img [ref=e133]
+      - generic [ref=e135]: Saved
+    - link "Profile" [ref=e136] [cursor=pointer]:
+      - /url: /profile
+      - img [ref=e137]
+      - generic [ref=e140]: Profile
+  - button "Open Next.js Dev Tools" [ref=e146] [cursor=pointer]:
+    - img [ref=e147]

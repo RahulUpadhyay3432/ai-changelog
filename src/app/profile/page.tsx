@@ -1,11 +1,15 @@
-import { User, Bell, Info, ChevronRight } from "lucide-react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { User, Bell, Info, ChevronRight, Bookmark, Flame, Sparkles, Sliders } from "lucide-react";
+import { getSavedStories, getStreak, getPinnedCategories } from "@/lib/storage";
 
 const SETTINGS_SECTIONS = [
   {
     title: "Preferences",
     items: [
       { label: "Notification Settings", icon: Bell },
-      { label: "Category Subscriptions", icon: ChevronRight },
+      { label: "Category Subscriptions", icon: Sliders },
     ],
   },
   {
@@ -15,6 +19,18 @@ const SETTINGS_SECTIONS = [
 ];
 
 export default function ProfilePage() {
+  const [savedCount, setSavedCount] = useState(0);
+  const [streakCount, setStreakCount] = useState(0);
+  const [pinnedCount, setPinnedCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setSavedCount(getSavedStories().length);
+    setStreakCount(getStreak());
+    setPinnedCount(getPinnedCategories().length);
+    setIsLoading(false);
+  }, []);
+
   return (
     <div
       style={{
@@ -32,91 +48,186 @@ export default function ProfilePage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "40px 20px 32px",
-          gap: "12px",
+          padding: "45px 20px 32px",
+          gap: "16px",
         }}
       >
         <div
           style={{
-            width: "72px",
-            height: "72px",
+            position: "relative",
+            width: "80px",
+            height: "80px",
             borderRadius: "50%",
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.08)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
           }}
         >
-          <User size={32} color="#525252" strokeWidth={1.5} />
+          <User size={36} color="#a3a3a3" strokeWidth={1.5} />
+          
+          {/* Subtle active pulse ring */}
+          <div
+            style={{
+              position: "absolute",
+              inset: "-4px",
+              borderRadius: "50%",
+              border: "1px solid rgba(255,255,255,0.04)",
+              pointerEvents: "none",
+            }}
+          />
         </div>
         <div style={{ textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: "18px",
-              fontWeight: 600,
-              color: "#f5f5f5",
-              margin: 0,
-            }}
-          >
-            Reader
-          </p>
-          <p style={{ fontSize: "13px", color: "#525252", margin: "4px 0 0" }}>
-            Following all categories
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+            <p
+              style={{
+                fontSize: "20px",
+                fontWeight: 700,
+                color: "#f5f5f5",
+                margin: 0,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Reader
+            </p>
+            <Sparkles size={16} color="#fbbf24" style={{ opacity: streakCount > 0 ? 1 : 0.3 }} />
+          </div>
+          <p style={{ fontSize: "13px", color: "#737373", margin: "6px 0 0", fontWeight: 500 }}>
+            {pinnedCount > 0 ? `Following ${pinnedCount} pinned categories` : "Following all categories"}
           </p>
         </div>
       </div>
 
-      {/* Stats row */}
+      {/* Stats row with glassmorphic cards and glows */}
       <div
         style={{
           display: "flex",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          marginBottom: "24px",
+          gap: "12px",
+          padding: "0 20px",
+          marginBottom: "28px",
         }}
       >
-        {[
-          { value: "0", label: "Saved" },
-          { value: "7", label: "Categories" },
-          { value: "0", label: "Streak" },
-        ].map((stat, i) => (
-          <div
-            key={i}
+        {/* Saved stories stat card */}
+        <div
+          style={{
+            flex: 1,
+            background: "rgba(255, 255, 255, 0.02)",
+            border: "1px solid rgba(255, 255, 255, 0.06)",
+            borderRadius: "16px",
+            padding: "16px 12px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <Bookmark size={16} color="#fbbf24" style={{ opacity: savedCount > 0 ? 1 : 0.4 }} />
+          <span
             style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "16px",
-              borderRight:
-                i < 2 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              fontSize: "24px",
+              fontWeight: 800,
+              color: "#f5f5f5",
+              letterSpacing: "-0.03em",
+              lineHeight: 1,
+              marginTop: "4px",
             }}
           >
-            <span
-              style={{ fontSize: "22px", fontWeight: 700, color: "#f5f5f5" }}
-            >
-              {stat.value}
-            </span>
-            <span style={{ fontSize: "12px", color: "#525252" }}>
-              {stat.label}
-            </span>
-          </div>
-        ))}
+            {isLoading ? "—" : savedCount}
+          </span>
+          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Saved
+          </span>
+        </div>
+
+        {/* Categories count stat card */}
+        <div
+          style={{
+            flex: 1,
+            background: "rgba(255, 255, 255, 0.02)",
+            border: "1px solid rgba(255, 255, 255, 0.06)",
+            borderRadius: "16px",
+            padding: "16px 12px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+          }}
+        >
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", letterSpacing: "0.02em" }}>ALL</span>
+          <span
+            style={{
+              fontSize: "24px",
+              fontWeight: 800,
+              color: "#f5f5f5",
+              letterSpacing: "-0.03em",
+              lineHeight: 1,
+              marginTop: "4px",
+            }}
+          >
+            7
+          </span>
+          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Channels
+          </span>
+        </div>
+
+        {/* Streak gamification stat card with active glow */}
+        <div
+          style={{
+            flex: 1,
+            background: streakCount > 0 ? "rgba(249, 115, 22, 0.04)" : "rgba(255, 255, 255, 0.02)",
+            border: streakCount > 0 ? "1px solid rgba(249, 115, 22, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
+            borderRadius: "16px",
+            padding: "16px 12px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+            boxShadow: streakCount > 0 ? "0 0 16px rgba(249, 115, 22, 0.08)" : "none",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <Flame
+            size={18}
+            color={streakCount > 0 ? "#f97316" : "#525252"}
+            fill={streakCount > 0 ? "#f97316" : "none"}
+            className={streakCount > 0 ? "animate-bounce" : ""}
+            style={{ animationDuration: "2s" }}
+          />
+          <span
+            style={{
+              fontSize: "24px",
+              fontWeight: 800,
+              color: streakCount > 0 ? "#f97316" : "#f5f5f5",
+              letterSpacing: "-0.03em",
+              lineHeight: 1,
+              marginTop: "2px",
+            }}
+          >
+            {isLoading ? "—" : `${streakCount}d`}
+          </span>
+          <span style={{ fontSize: "11px", color: streakCount > 0 ? "#ea580c" : "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Streak
+          </span>
+        </div>
       </div>
 
       {/* Settings sections */}
       {SETTINGS_SECTIONS.map((section) => (
-        <div key={section.title} style={{ marginBottom: "24px" }}>
+        <div key={section.title} style={{ marginBottom: "28px" }}>
           <p
             style={{
               fontSize: "11px",
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               color: "#525252",
-              margin: "0 0 8px",
-              padding: "0 20px",
+              margin: "0 0 10px",
+              padding: "0 24px",
             }}
           >
             {section.title}
@@ -124,8 +235,8 @@ export default function ProfilePage() {
           <div
             style={{
               background: "#111111",
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-              borderBottom: "1px solid rgba(255,255,255,0.06)",
+              borderTop: "1px solid rgba(255,255,255,0.04)",
+              borderBottom: "1px solid rgba(255,255,255,0.04)",
             }}
           >
             {section.items.map((item, i) => {
@@ -138,20 +249,26 @@ export default function ProfilePage() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "16px 20px",
+                    padding: "16px 24px",
                     background: "none",
                     border: "none",
                     borderBottom:
                       i < section.items.length - 1
-                        ? "1px solid rgba(255,255,255,0.06)"
+                        ? "1px solid rgba(255,255,255,0.04)"
                         : "none",
                     cursor: "pointer",
-                    color: "#f5f5f5",
+                    color: "#e5e5e5",
                     fontSize: "15px",
+                    fontWeight: 500,
+                    transition: "background 0.2s ease",
                   }}
+                  className="hover:bg-white/[0.02]"
                 >
-                  <span>{item.label}</span>
-                  <ChevronRight size={16} color="#525252" />
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <Icon size={16} color="#737373" strokeWidth={2} />
+                    <span>{item.label}</span>
+                  </div>
+                  <ChevronRight size={16} color="#404040" />
                 </button>
               );
             })}

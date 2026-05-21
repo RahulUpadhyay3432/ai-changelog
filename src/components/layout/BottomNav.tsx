@@ -22,7 +22,7 @@ export function BottomNav() {
         bottom: 0,
         left: 0,
         right: 0,
-        height: "60px",
+        height: "52px",
         background: "rgba(10, 10, 10, 0.95)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
@@ -44,14 +44,14 @@ export function BottomNav() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "4px",
-              padding: "8px 16px",
+              gap: "3px",
+              padding: "5px 16px",
               color: active ? "#f5f5f5" : "#525252",
               textDecoration: "none",
               transition: "color 150ms",
             }}
           >
-            <Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
+            <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
             <span
               style={{
                 fontSize: "10px",

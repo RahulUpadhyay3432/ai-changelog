@@ -10,21 +10,23 @@ import {
 } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
+import { updateStreak } from "@/lib/storage";
 
 interface CardStackProps {
   items: NewsItem[];
   onIndexChange?: (index: number, total: number) => void;
   onRefresh?: () => Promise<void>;
+  onSave?: (id: string) => void;
 }
 
 const THRESHOLD = 0.3;
-const SPRING = { type: "spring" as const, stiffness: 300, damping: 30 };
+const SPRING = { type: "spring" as const, stiffness: 350, damping: 28 };
 
 function vh() {
   return typeof window !== "undefined" ? window.innerHeight : 800;
 }
 
-export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
+export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -61,6 +63,8 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
   }, [currentIndex, dragY]);
 
   useEffect(() => {
+    // Record streak on mount
+    updateStreak();
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
@@ -70,6 +74,9 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
     async (direction: 1 | -1) => {
       if (isAnimatingRef.current) return;
       isAnimatingRef.current = true;
+
+      // Update streak on interaction
+      updateStreak();
 
       await animate(dragY, direction === 1 ? -vh() : vh(), SPRING);
 
@@ -87,6 +94,7 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
     },
     [dragY, items.length, onIndexChange]
   );
+
 
   const handleDragEnd = useCallback(
     async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -172,7 +180,7 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
             opacity: prevOpacity,
           }}
         >
-          <NewsCard item={prevItem} />
+          <NewsCard item={prevItem} onSave={onSave} />
         </motion.div>
       )}
 
@@ -187,7 +195,7 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
             opacity: nextOpacity,
           }}
         >
-          <NewsCard item={nextItem} />
+          <NewsCard item={nextItem} onSave={onSave} />
         </motion.div>
       )}
 
@@ -206,7 +214,7 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
         }}
         whileDrag={{ cursor: "grabbing" }}
       >
-        <NewsCard item={currentItem} />
+        <NewsCard item={currentItem} onSave={onSave} />
       </motion.div>
 
       {/* Pull-to-refresh spinner */}
@@ -232,7 +240,7 @@ export function CardStack({ items, onIndexChange, onRefresh }: CardStackProps) {
           animate={{ opacity: 1, y: 0 }}
           style={{
             position: "fixed",
-            bottom: 72,
+            bottom: 64,
             left: "50%",
             transform: "translateX(-50%)",
             background: "rgba(30,30,30,0.85)",

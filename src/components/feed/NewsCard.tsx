@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Bookmark, Share2, ChevronUp, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bookmark, Share2, ChevronUp, ChevronDown, Check } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
+import { isStorySaved, saveStory, removeStory } from "@/lib/storage";
 
 interface NewsCardProps {
   item: NewsItem;
@@ -94,23 +95,56 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
   );
 }
 
+function cleanText(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/<[^>]*>/g, "") // Strip HTML tags
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;|&#x27;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
 export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
+  const [copied, setCopied] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
+  // Sync state safely on the client
+  useEffect(() => {
+    setSaved(isStorySaved(item.id));
+  }, [item.id]);
+
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSaved((s) => !s);
+    if (saved) {
+      removeStory(item.id);
+      setSaved(false);
+    } else {
+      saveStory(item);
+      setSaved(true);
+    }
     onSave?.(item.id);
   };
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (navigator.share) {
-      await navigator.share({ title: item.title, url: item.sourceUrl }).catch(() => {});
-    } else {
-      await navigator.clipboard.writeText(item.sourceUrl).catch(() => {});
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: item.title, url: item.sourceUrl });
+      } else {
+        await navigator.clipboard.writeText(item.sourceUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      await navigator.clipboard.writeText(item.sourceUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -121,12 +155,12 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: "#111111",
+        background: "#0a0a0a",
         userSelect: "none",
       }}
     >
       {/* Hero image area */}
-      <div style={{ position: "relative", flex: "0 0 36%", overflow: "hidden" }}>
+      <div style={{ position: "relative", flex: "0 0 38%", overflow: "hidden" }}>
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -142,6 +176,17 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         ) : (
           <CardHeroBackground categorySlug={item.categorySlug} />
         )}
+
+        {/* Ambient Gradient overlay to improve readability of elements on top of images */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.4) 60%, rgba(10,10,10,0) 100%)",
+            zIndex: 2,
+            pointerEvents: "none",
+          }}
+        />
 
         {/* Action buttons */}
         <div
@@ -160,22 +205,24 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
               width: "36px",
               height: "36px",
               borderRadius: "50%",
-              background: "rgba(0,0,0,0.5)",
-              backdropFilter: "blur(10px)",
-              border: "none",
+              background: "rgba(10, 10, 10, 0.65)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
               color: saved ? "#fbbf24" : "#f5f5f5",
-              transition: "color 200ms",
+              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+              transform: saved ? "scale(1.05)" : "scale(1)",
             }}
             aria-label={saved ? "Remove bookmark" : "Bookmark story"}
           >
             <Bookmark
               size={16}
               fill={saved ? "#fbbf24" : "none"}
-              strokeWidth={2}
+              strokeWidth={saved ? 0 : 2}
             />
           </button>
           <button
@@ -184,18 +231,24 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
               width: "36px",
               height: "36px",
               borderRadius: "50%",
-              background: "rgba(0,0,0,0.5)",
-              backdropFilter: "blur(10px)",
-              border: "none",
+              background: "rgba(10, 10, 10, 0.65)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              color: "#f5f5f5",
+              color: copied ? "#4ade80" : "#f5f5f5",
+              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
             aria-label="Share story"
           >
-            <Share2 size={16} strokeWidth={2} />
+            {copied ? (
+              <Check size={16} color="#4ade80" strokeWidth={2.5} />
+            ) : (
+              <Share2 size={16} strokeWidth={2} />
+            )}
           </button>
         </div>
       </div>
@@ -206,7 +259,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          padding: "16px 20px 12px",
+          padding: "12px 20px 10px",
           overflow: "hidden",
         }}
       >
@@ -216,26 +269,29 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            marginBottom: "10px",
+            marginBottom: "8px",
           }}
         >
           <span
             style={{
-              fontSize: "11px",
-              fontWeight: 600,
-              letterSpacing: "0.08em",
+              fontSize: "10px",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: category?.colorLabel ?? "#a3a3a3",
               background: category
-                ? `${category.colorAccent}20`
-                : "rgba(255,255,255,0.1)",
-              padding: "3px 8px",
-              borderRadius: "4px",
+                ? `${category.colorAccent}15`
+                : "rgba(255,255,255,0.05)",
+              border: category
+                ? `1px solid ${category.colorAccent}25`
+                : "1px solid rgba(255,255,255,0.08)",
+              padding: "3px 9px",
+              borderRadius: "100px",
             }}
           >
             {category?.name ?? item.categorySlug}
           </span>
-          <span style={{ fontSize: "12px", color: "#525252" }} suppressHydrationWarning>
+          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 500 }} suppressHydrationWarning>
             {timeAgo}
           </span>
         </div>
@@ -247,16 +303,18 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
           style={{
-            fontSize: "22px",
-            fontWeight: 700,
-            lineHeight: 1.3,
+            fontSize: "23px",
+            fontWeight: 800,
+            lineHeight: 1.25,
             color: "#f5f5f5",
             margin: 0,
-            marginBottom: "12px",
-            letterSpacing: "-0.02em",
+            marginBottom: "10px",
+            letterSpacing: "-0.03em",
             textDecoration: "none",
             display: "block",
+            transition: "color 0.2s ease",
           }}
+          className="hover:text-white"
         >
           {item.title}
         </a>
@@ -271,17 +329,17 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             marginBottom: "auto",
             overflow: "hidden",
             display: "-webkit-box",
-            WebkitLineClamp: 4,
+            WebkitLineClamp: 6,
             WebkitBoxOrient: "vertical",
           }}
         >
-          {item.summary}
+          {cleanText(item.summary)}
         </p>
 
         {/* Source */}
-        <div style={{ paddingTop: "12px" }}>
-          <span style={{ fontSize: "12px", color: "#525252" }}>
-            · {item.sourceName}
+        <div style={{ paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            {item.sourceName}
           </span>
         </div>
 
@@ -291,18 +349,19 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "6px",
-            paddingTop: "10px",
-            color: "#404040",
+            gap: "5px",
+            paddingTop: "8px",
+            color: "rgba(255, 255, 255, 0.12)",
           }}
         >
-          <ChevronUp size={14} />
-          <span style={{ fontSize: "11px", letterSpacing: "0.04em" }}>
-            Swipe for next story
+          <ChevronUp size={12} />
+          <span style={{ fontSize: "9px", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            Swipe for next
           </span>
-          <ChevronDown size={14} />
+          <ChevronDown size={12} />
         </div>
       </div>
     </div>
   );
 }
+

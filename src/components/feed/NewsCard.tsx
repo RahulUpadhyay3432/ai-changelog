@@ -355,13 +355,13 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           }}
           className="news-title-link"
           style={{
-            fontSize: "25px",
-            fontWeight: 300,
-            lineHeight: 1.28,
+            fontSize: "23px",
+            fontWeight: 500,
+            lineHeight: 1.3,
             color: "#E8E4DE",
             margin: 0,
             marginBottom: "8px",
-            letterSpacing: "0.01em",
+            letterSpacing: "0",
             textDecoration: "none",
             display: "block",
             flexShrink: 0,
@@ -376,7 +376,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           style={{
             fontSize: "13.5px",
             lineHeight: 1.58,
-            color: "#888",
+            color: "#9A9A9A",
+            fontWeight: 400,
             margin: 0,
             flex: 1,
             overflow: "hidden",

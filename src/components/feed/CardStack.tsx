@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useLayoutEffect, useEffect } from "react";
+import { CompletionCard } from "./CompletionCard";
 import {
   motion,
   AnimatePresence,
@@ -32,8 +33,14 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [caughtUpToast, setCaughtUpToast] = useState(false);
   const isAnimatingRef = useRef(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const itemsLenRef = useRef(items.length);
+  const refreshingForCompletionRef = useRef(false);
+  const prevLenBeforeRefreshRef = useRef(0);
 
   const dragY = useMotionValue(0);
 
@@ -64,13 +71,38 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
     dragY.set(0);
   }, [currentIndex, dragY]);
 
+  // Keep itemsLenRef current
+  useEffect(() => {
+    itemsLenRef.current = items.length;
+  }, [items.length]);
+
   useEffect(() => {
     // Record streak on mount
     updateStreak();
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
     };
   }, []);
+
+  // After completion-triggered refresh, detect new items vs none
+  useEffect(() => {
+    if (!refreshingForCompletionRef.current) return;
+    refreshingForCompletionRef.current = false;
+    if (items.length > prevLenBeforeRefreshRef.current) {
+      // New dispatches arrived — exit completion, advance to first new item
+      setShowCompletion(false);
+      const firstNew = prevLenBeforeRefreshRef.current;
+      setCurrentIndex(firstNew);
+      onIndexChange?.(firstNew, items.length);
+    } else {
+      // Nothing new
+      if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
+      setCaughtUpToast(true);
+      caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
 
   const advanceTo = useCallback(
     async (direction: 1 | -1) => {
@@ -107,6 +139,13 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   );
 
 
+  const handleCompletionRefresh = useCallback(async () => {
+    if (!onRefresh) return;
+    prevLenBeforeRefreshRef.current = itemsLenRef.current;
+    refreshingForCompletionRef.current = true;
+    await onRefresh();
+  }, [onRefresh]);
+
   const handleDragEnd = useCallback(
     async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       if (isAnimatingRef.current) {
@@ -123,6 +162,8 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
         if (idx < items.length - 1) {
           await advanceTo(1);
         } else {
+          // Last card — show completion instead of bouncing
+          setShowCompletion(true);
           animate(dragY, 0, SPRING);
         }
       } else if (offset.y > threshold || velocity.y > 500) {
@@ -246,6 +287,19 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
           <div className="refresh-spinner" />
         </div>
       )}
+
+      {/* Completion card */}
+      <AnimatePresence>
+        {showCompletion && (
+          <CompletionCard
+            key="completion"
+            readCount={items.length}
+            onBack={() => setShowCompletion(false)}
+            onRefresh={handleCompletionRefresh}
+            caughtUpToast={caughtUpToast}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Feed Updated toast */}
       <AnimatePresence>

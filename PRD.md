@@ -1,4 +1,4 @@
-# Product Requirements Document — AI Changelog
+# Product Requirements Document — Kapyn
 
 **Tagline:** What happened in AI today.
 **Version:** 1.0
@@ -8,7 +8,7 @@
 
 ## Overview
 
-AI Changelog is a mobile-first PWA that delivers AI news in a full-screen, swipeable card format (Inshorts-style). One story per screen. Swipe to advance. Zero friction.
+Kapyn is a mobile-first PWA that delivers AI news in a full-screen, swipeable card format (Inshorts-style). One story per screen. Swipe to advance. Zero friction.
 
 ## Problem
 

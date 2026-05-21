@@ -7,6 +7,7 @@ import { CardStack } from "./CardStack";
 import { fetchNewsItems } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import type { CategorySlug, NewsItem } from "@/lib/types";
+import posthog from "posthog-js";
 
 export function HomeFeed() {
   const searchParams = useSearchParams();
@@ -40,8 +41,12 @@ export function HomeFeed() {
   }, [activeCategory]);
 
   const handleCategoryChange = useCallback((slug: CategorySlug) => {
+    posthog.capture("category_changed", {
+      category: slug,
+      previous_category: activeCategory,
+    });
     setActiveCategory(slug);
-  }, []);
+  }, [activeCategory]);
 
   const handleIndexChange = useCallback((index: number, total: number) => {
     setCardPosition({ index, total });
@@ -83,7 +88,7 @@ export function HomeFeed() {
             letterSpacing: "-0.03em",
           }}
         >
-          AI Changelog
+          Kapyn
         </h1>
         <div
           style={{

@@ -1,4 +1,4 @@
-# Implementation Plan — AI Changelog
+# Implementation Plan — Kapyn
 
 Build sequence for an AI agent. Each step is self-contained and testable.
 

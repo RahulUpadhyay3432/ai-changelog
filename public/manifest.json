@@ -1,6 +1,6 @@
 {
-  "name": "AI Changelog",
-  "short_name": "AI News",
+  "name": "Kapyn",
+  "short_name": "Kapyn",
   "description": "What happened in AI today.",
   "start_url": "/",
   "display": "standalone",

@@ -1,4 +1,4 @@
-# Backend Schema — AI Changelog (Supabase)
+# Backend Schema — Kapyn (Supabase)
 
 ## Tables
 

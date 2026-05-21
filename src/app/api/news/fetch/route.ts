@@ -6,6 +6,7 @@ import {
   type PHFeedItem,
 } from "@/lib/producthunt";
 import type { CategorySlug } from "@/lib/types";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -147,7 +148,7 @@ function buildClassifyAndSummarizePrompt(
   content: string,
   defaultCategory: string
 ): string {
-  return `You are a tech editor for "AI Changelog", a premium intelligence feed for AI developers.
+  return `You are a tech editor for "Kapyn", a premium intelligence feed for AI developers.
 
 Classify this dispatch into ONE category slug and write a summary.
 
@@ -533,6 +534,20 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     results.errors.push(`Product Hunt API: ${String(err)}`);
   }
+
+  // Track fetch completion server-side
+  const posthog = getPostHogClient();
+  posthog.capture({
+    distinctId: "cron-job",
+    event: "news_fetch_completed",
+    properties: {
+      inserted: results.inserted,
+      skipped: results.skipped,
+      low_signal: results.lowSignal,
+      errors: results.errors.length,
+    },
+  });
+  await posthog.shutdown();
 
   return Response.json(results);
 }

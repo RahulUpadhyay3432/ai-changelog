@@ -1,4 +1,4 @@
-# App Flow — AI Changelog
+# App Flow — Kapyn
 
 ## Navigation Structure
 
@@ -20,7 +20,7 @@ App Launch
     │
     ▼
 [Home Screen]
-  TopBar: "AI Changelog"    [current / total]
+  TopBar: "Kapyn"    [current / total]
   CategoryTabs: [All] [AI] [Tools] [Startups] [OSS] [Research] [Funding]
   │
   ▼

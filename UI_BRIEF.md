@@ -1,8 +1,8 @@
-# UI Design Brief — AI Changelog
+# UI Design Brief — Kapyn
 
 ## Brand
 
-- **App name:** AI Changelog
+- **App name:** Kapyn
 - **Tagline:** What happened in AI today.
 - **Personality:** Smart, fast, minimal. Like a Bloomberg terminal that respects your time.
 

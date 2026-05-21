@@ -5,6 +5,7 @@ import { Bookmark } from "lucide-react";
 import { CardStack } from "@/components/feed/CardStack";
 import { getSavedStories } from "@/lib/storage";
 import type { NewsItem } from "@/lib/types";
+import posthog from "posthog-js";
 
 export default function SavedPage() {
   const [savedStories, setSavedStories] = useState<NewsItem[]>([]);
@@ -14,10 +15,14 @@ export default function SavedPage() {
     const stories = getSavedStories();
     setSavedStories(stories);
     setIsLoading(false);
+    return stories;
   };
 
   useEffect(() => {
-    loadStories();
+    const stories = loadStories();
+    posthog.capture("saved_stories_viewed", {
+      saved_count: stories.length,
+    });
   }, []);
 
   const handleSaveChange = () => {

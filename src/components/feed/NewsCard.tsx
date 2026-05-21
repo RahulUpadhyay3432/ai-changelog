@@ -6,6 +6,7 @@ import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
 import { isStorySaved, saveStory, removeStory } from "@/lib/storage";
+import posthog from "posthog-js";
 
 interface NewsCardProps {
   item: NewsItem;
@@ -120,9 +121,21 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     if (saved) {
       removeStory(item.id);
       setSaved(false);
+      posthog.capture("story_unbookmarked", {
+        story_id: item.id,
+        story_title: item.title,
+        category: item.categorySlug,
+        source_name: item.sourceName,
+      });
     } else {
       saveStory(item);
       setSaved(true);
+      posthog.capture("story_bookmarked", {
+        story_id: item.id,
+        story_title: item.title,
+        category: item.categorySlug,
+        source_name: item.sourceName,
+      });
     }
     onSave?.(item.id);
   };
@@ -134,15 +147,36 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     try {
       if (navigator.share) {
         await navigator.share({ title: item.title, url: item.sourceUrl });
+        posthog.capture("story_shared", {
+          story_id: item.id,
+          story_title: item.title,
+          category: item.categorySlug,
+          source_name: item.sourceName,
+          share_method: "native",
+        });
       } else {
         await navigator.clipboard.writeText(item.sourceUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        posthog.capture("story_shared", {
+          story_id: item.id,
+          story_title: item.title,
+          category: item.categorySlug,
+          source_name: item.sourceName,
+          share_method: "clipboard",
+        });
       }
     } catch {
       await navigator.clipboard.writeText(item.sourceUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      posthog.capture("story_shared", {
+        story_id: item.id,
+        story_title: item.title,
+        category: item.categorySlug,
+        source_name: item.sourceName,
+        share_method: "clipboard_fallback",
+      });
     }
   };
 
@@ -309,7 +343,16 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           href={item.sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            posthog.capture("story_link_clicked", {
+              story_id: item.id,
+              story_title: item.title,
+              category: item.categorySlug,
+              source_name: item.sourceName,
+              url: item.sourceUrl,
+            });
+          }}
           className="news-title-link"
           style={{
             fontSize: "22px",

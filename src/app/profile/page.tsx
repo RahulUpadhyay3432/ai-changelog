@@ -14,7 +14,7 @@ const SETTINGS_SECTIONS = [
   },
   {
     title: "About",
-    items: [{ label: "About AI Changelog", icon: Info }],
+    items: [{ label: "About Kapyn", icon: Info }],
   },
 ];
 
@@ -286,7 +286,7 @@ export default function ProfilePage() {
           padding: "24px",
         }}
       >
-        AI Changelog v1.0.0 · What happened in AI today.
+        Kapyn v1.0.0 · What happened in AI today.
       </p>
     </div>
   );

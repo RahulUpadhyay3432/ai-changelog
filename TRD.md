@@ -1,4 +1,4 @@
-# Technical Requirements Document — AI Changelog
+# Technical Requirements Document — Kapyn
 
 ## Stack
 

@@ -4,14 +4,14 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
-  title: "AI Changelog — What happened in AI today",
+  title: "Kapyn — What happened in AI today",
   description:
-    "Full-screen AI news cards. Swipe through the most important AI stories, summaries in 60 words.",
+    "Kapyn: Full-screen AI news cards. Swipe through the most important AI stories, summaries in 60 words.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "AI Changelog",
+    title: "Kapyn",
   },
 };
 

@@ -190,16 +190,22 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
 
       </div>
 
-      {/* Inshorts-style action buttons — stacked vertically, straddling image/text boundary */}
+      {/* Inshorts-style action buttons — horizontal pill at image/text boundary */}
       <div
         style={{
           position: "absolute",
-          right: "16px",
-          top: "calc(42% - 52px)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
+          right: "12px",
+          top: "calc(42% - 22px)",
           zIndex: 20,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "0px",
+          background: "rgba(0, 0, 0, 0.70)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          borderRadius: "8px",
+          padding: "0 2px",
         }}
       >
         <button
@@ -209,19 +215,17 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           style={{
             width: "44px",
             height: "44px",
-            borderRadius: "50%",
-            background: "rgba(0, 0, 0, 0.52)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
+            background: "none",
             border: "none",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
+            padding: "12px",
           }}
         >
           <Bookmark
-            size={18}
+            size={20}
             fill={saved ? "#fbbf24" : "none"}
             color={saved ? "#fbbf24" : "#ffffff"}
             strokeWidth={saved ? 0 : 2}
@@ -235,21 +239,19 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           style={{
             width: "44px",
             height: "44px",
-            borderRadius: "50%",
-            background: "rgba(0, 0, 0, 0.52)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
+            background: "none",
             border: "none",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
+            padding: "12px",
           }}
         >
           {copied ? (
-            <Check size={18} color="#4ade80" strokeWidth={2.5} />
+            <Check size={20} color="#4ade80" strokeWidth={2.5} />
           ) : (
-            <Share2 size={18} color="#ffffff" strokeWidth={2} />
+            <Share2 size={20} color="#ffffff" strokeWidth={2} />
           )}
         </button>
       </div>

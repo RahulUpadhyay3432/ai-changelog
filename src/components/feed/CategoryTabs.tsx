@@ -29,14 +29,11 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
       className="scrollbar-none"
       style={{
         display: "flex",
-        gap: "8px",
+        gap: "6px",
         overflowX: "auto",
-        padding: "8px 16px 8px",
+        padding: "6px 16px 6px",
         flexShrink: 0,
-        background: "rgba(10, 10, 10, 0.5)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
       }}
     >
       {CATEGORY_TABS.map(({ slug, label }) => {
@@ -48,19 +45,21 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
             onClick={() => onChange(slug)}
             style={{
               flexShrink: 0,
-              padding: "7px 15px",
+              padding: "5px 12px",
               borderRadius: "100px",
-              fontSize: "12px",
+              fontSize: "11px",
               fontWeight: active ? 600 : 400,
               border: "1px solid",
               borderColor: active
-                ? "rgba(255, 255, 255, 0.25)"
-                : "rgba(255, 255, 255, 0.08)",
-              background: active ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.02)",
-              color: active ? "#ffffff" : "#a3a3a3",
+                ? "rgba(255, 255, 255, 0.28)"
+                : "rgba(255, 255, 255, 0.07)",
+              background: active
+                ? "rgba(255, 255, 255, 0.13)"
+                : "transparent",
+              color: active ? "#f0f0f0" : "#606060",
               cursor: "pointer",
-              transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-              letterSpacing: "0.02em",
+              transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+              letterSpacing: "0.015em",
               whiteSpace: "nowrap",
             }}
           >
@@ -71,4 +70,3 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
     </div>
   );
 }
-

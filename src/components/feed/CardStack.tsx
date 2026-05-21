@@ -240,7 +240,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
           animate={{ opacity: 1, y: 0 }}
           style={{
             position: "fixed",
-            bottom: 64,
+            bottom: 58,
             left: "50%",
             transform: "translateX(-50%)",
             background: "rgba(30,30,30,0.85)",

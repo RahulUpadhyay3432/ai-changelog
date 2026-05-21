@@ -27,7 +27,7 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
         overflow: "hidden",
       }}
     >
-      {/* Ambient glow circles */}
+      {/* Ambient glow */}
       <div
         style={{
           position: "absolute",
@@ -62,11 +62,7 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
             />
           </pattern>
         </defs>
-        <rect
-          width="100%"
-          height="100%"
-          fill={`url(#grid-${categorySlug})`}
-        />
+        <rect width="100%" height="100%" fill={`url(#grid-${categorySlug})`} />
       </svg>
       {/* Floating nodes */}
       {[
@@ -98,7 +94,7 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
 function cleanText(text: string): string {
   if (!text) return "";
   return text
-    .replace(/<[^>]*>/g, "") // Strip HTML tags
+    .replace(/<[^>]*>/g, "")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
@@ -114,7 +110,6 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
-  // Sync state safely on the client
   useEffect(() => {
     setSaved(isStorySaved(item.id));
   }, [item.id]);
@@ -159,8 +154,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         userSelect: "none",
       }}
     >
-      {/* Hero image area */}
-      <div style={{ position: "relative", flex: "0 0 38%", overflow: "hidden" }}>
+      {/* Hero — slightly taller for cinematic feel */}
+      <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden" }}>
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -177,12 +172,13 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           <CardHeroBackground categorySlug={item.categorySlug} />
         )}
 
-        {/* Ambient Gradient overlay to improve readability of elements on top of images */}
+        {/* Gradient fade into content */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.4) 60%, rgba(10,10,10,0) 100%)",
+            background:
+              "linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.35) 55%, rgba(10,10,10,0) 100%)",
             zIndex: 2,
             pointerEvents: "none",
           }}
@@ -192,176 +188,194 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         <div
           style={{
             position: "absolute",
-            top: "16px",
-            right: "16px",
+            top: "12px",
+            right: "14px",
             display: "flex",
-            gap: "8px",
+            gap: "7px",
             zIndex: 10,
           }}
         >
           <button
             onClick={handleSave}
+            className="card-action-btn"
             style={{
-              width: "36px",
-              height: "36px",
+              width: "34px",
+              height: "34px",
               borderRadius: "50%",
-              background: "rgba(10, 10, 10, 0.65)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              background: "rgba(10, 10, 10, 0.6)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
               border: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              color: saved ? "#fbbf24" : "#f5f5f5",
-              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+              color: saved ? "#fbbf24" : "#d4d4d4",
+              transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
               transform: saved ? "scale(1.05)" : "scale(1)",
             }}
             aria-label={saved ? "Remove bookmark" : "Bookmark story"}
           >
             <Bookmark
-              size={16}
+              size={15}
               fill={saved ? "#fbbf24" : "none"}
-              strokeWidth={saved ? 0 : 2}
+              strokeWidth={saved ? 0 : 1.8}
             />
           </button>
           <button
             onClick={handleShare}
+            className="card-action-btn"
             style={{
-              width: "36px",
-              height: "36px",
+              width: "34px",
+              height: "34px",
               borderRadius: "50%",
-              background: "rgba(10, 10, 10, 0.65)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              background: "rgba(10, 10, 10, 0.6)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
               border: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              color: copied ? "#4ade80" : "#f5f5f5",
-              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+              color: copied ? "#4ade80" : "#d4d4d4",
+              transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
             aria-label="Share story"
           >
             {copied ? (
-              <Check size={16} color="#4ade80" strokeWidth={2.5} />
+              <Check size={15} color="#4ade80" strokeWidth={2.5} />
             ) : (
-              <Share2 size={16} strokeWidth={2} />
+              <Share2 size={15} strokeWidth={1.8} />
             )}
           </button>
         </div>
       </div>
 
-      {/* Content area */}
+      {/* Content */}
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          padding: "12px 20px 10px",
+          padding: "10px 20px 8px",
           overflow: "hidden",
+          minHeight: 0,
         }}
       >
-        {/* Category + time row */}
+        {/* Category + time */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            marginBottom: "8px",
+            marginBottom: "6px",
+            flexShrink: 0,
           }}
         >
           <span
             style={{
-              fontSize: "10px",
+              fontSize: "9px",
               fontWeight: 700,
-              letterSpacing: "0.06em",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               color: category?.colorLabel ?? "#a3a3a3",
               background: category
-                ? `${category.colorAccent}15`
-                : "rgba(255,255,255,0.05)",
+                ? `${category.colorAccent}12`
+                : "rgba(255,255,255,0.04)",
               border: category
-                ? `1px solid ${category.colorAccent}25`
-                : "1px solid rgba(255,255,255,0.08)",
-              padding: "3px 9px",
+                ? `1px solid ${category.colorAccent}20`
+                : "1px solid rgba(255,255,255,0.07)",
+              padding: "2px 8px",
               borderRadius: "100px",
             }}
           >
             {category?.name ?? item.categorySlug}
           </span>
-          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 500 }} suppressHydrationWarning>
+          <span
+            style={{ fontSize: "10px", color: "#555", fontWeight: 500 }}
+            suppressHydrationWarning
+          >
             {timeAgo}
           </span>
         </div>
 
-        {/* Title — tappable, opens source */}
+        {/* Title */}
         <a
           href={item.sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
+          className="news-title-link"
           style={{
-            fontSize: "23px",
+            fontSize: "22px",
             fontWeight: 800,
-            lineHeight: 1.25,
-            color: "#f5f5f5",
+            lineHeight: 1.18,
+            color: "#f0f0f0",
             margin: 0,
-            marginBottom: "10px",
-            letterSpacing: "-0.03em",
+            marginBottom: "8px",
+            letterSpacing: "-0.04em",
             textDecoration: "none",
             display: "block",
-            transition: "color 0.2s ease",
+            flexShrink: 0,
+            transition: "opacity 0.15s ease",
           }}
-          className="hover:text-white"
         >
           {item.title}
         </a>
 
-        {/* Summary */}
+        {/* Summary — fills remaining space */}
         <p
           style={{
-            fontSize: "14px",
-            lineHeight: 1.65,
-            color: "#a3a3a3",
+            fontSize: "13.5px",
+            lineHeight: 1.58,
+            color: "#888",
             margin: 0,
-            marginBottom: "auto",
+            flex: 1,
             overflow: "hidden",
             display: "-webkit-box",
-            WebkitLineClamp: 6,
+            WebkitLineClamp: 7,
             WebkitBoxOrient: "vertical",
           }}
         >
           {cleanText(item.summary)}
         </p>
 
-        {/* Source */}
-        <div style={{ paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            {item.sourceName}
-          </span>
-        </div>
-
-        {/* Swipe hint */}
+        {/* Footer: source + swipe indicators — merged into one compact row */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "5px",
             paddingTop: "8px",
-            color: "rgba(255, 255, 255, 0.12)",
+            marginTop: "auto",
+            borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexShrink: 0,
           }}
         >
-          <ChevronUp size={12} />
-          <span style={{ fontSize: "9px", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-            Swipe for next
+          <span
+            style={{
+              fontSize: "10px",
+              color: "#444",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
+            {item.sourceName}
           </span>
-          <ChevronDown size={12} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "3px",
+              color: "rgba(255,255,255,0.1)",
+            }}
+          >
+            <ChevronUp size={11} strokeWidth={2} />
+            <ChevronDown size={11} strokeWidth={2} />
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

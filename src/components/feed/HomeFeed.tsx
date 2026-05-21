@@ -70,15 +70,15 @@ export function HomeFeed() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "10px 20px 6px",
+          padding: "8px 20px 4px",
           flexShrink: 0,
         }}
       >
         <h1
           style={{
-            fontSize: "22px",
-            fontWeight: 700,
-            color: "#f5f5f5",
+            fontSize: "19px",
+            fontWeight: 600,
+            color: "#f0f0f0",
             margin: 0,
             letterSpacing: "-0.03em",
           }}
@@ -90,10 +90,10 @@ export function HomeFeed() {
             background: "#1a1a1a",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "100px",
-            padding: "4px 12px",
-            fontSize: "13px",
+            padding: "3px 10px",
+            fontSize: "11px",
             fontWeight: 500,
-            color: "#737373",
+            color: "#555",
           }}
         >
           {loading ? "…" : `${cardPosition.index + 1} / ${cardPosition.total}`}

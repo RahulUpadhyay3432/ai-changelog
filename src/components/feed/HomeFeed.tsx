@@ -2,10 +2,13 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
+import { SinceYouLeftCard } from "./SinceYouLeftCard";
 import { fetchNewsItems } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
+import { getLastVisitTimestamp, setLastVisitTimestamp } from "@/lib/storage";
 import type { CategorySlug, NewsItem } from "@/lib/types";
 import posthog from "posthog-js";
 
@@ -17,6 +20,11 @@ export function HomeFeed() {
   const [stories, setStories] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [cardPosition, setCardPosition] = useState({ index: 0, total: 0 });
+
+  // Since You Left card
+  const [showSYL, setShowSYL] = useState(false);
+  const [lastVisitTimestamp, setLastVisitTs] = useState<number | null>(null);
+  const [isFirstTime, setIsFirstTime] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -39,6 +47,32 @@ export function HomeFeed() {
       })
       .finally(() => setLoading(false));
   }, [activeCategory]);
+
+  // Check last visit on mount — show SYL if away 1+ hour or first time
+  useEffect(() => {
+    const ts = getLastVisitTimestamp();
+    const ONE_HOUR = 60 * 60 * 1000;
+    if (ts === null) {
+      setIsFirstTime(true);
+      setShowSYL(true);
+    } else if (Date.now() - ts >= ONE_HOUR) {
+      setLastVisitTs(ts);
+      setShowSYL(true);
+    }
+    setLastVisitTimestamp();
+  }, []);
+
+  const handleDismissSYL = useCallback(() => setShowSYL(false), []);
+
+  const handleStartReading = useCallback(() => setShowSYL(false), []);
+
+  const handleQuickCatchUp = useCallback((newItems: NewsItem[]) => {
+    setShowSYL(false);
+    if (newItems.length > 0) {
+      setStories(newItems);
+      setCardPosition({ index: 0, total: newItems.length });
+    }
+  }, []);
 
   const handleCategoryChange = useCallback((slug: CategorySlug) => {
     posthog.capture("category_changed", {
@@ -108,27 +142,43 @@ export function HomeFeed() {
 
       <CategoryTabs activeSlug={activeCategory} onChange={handleCategoryChange} />
 
-      {loading ? (
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#525252",
-            fontSize: "14px",
-          }}
-        >
-          Loading stories…
-        </div>
-      ) : (
-        <CardStack
-          key={activeCategory}
-          items={stories}
-          onIndexChange={handleIndexChange}
-          onRefresh={handleRefresh}
-        />
-      )}
+      <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
+        {loading ? (
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#525252",
+              fontSize: "14px",
+            }}
+          >
+            Loading stories…
+          </div>
+        ) : (
+          <CardStack
+            key={activeCategory}
+            items={stories}
+            onIndexChange={handleIndexChange}
+            onRefresh={handleRefresh}
+          />
+        )}
+
+        <AnimatePresence>
+          {showSYL && !loading && (
+            <SinceYouLeftCard
+              key="syl"
+              allItems={stories}
+              lastVisitTimestamp={lastVisitTimestamp}
+              isFirstTime={isFirstTime}
+              onDismiss={handleDismissSYL}
+              onStartReading={handleStartReading}
+              onQuickCatchUp={handleQuickCatchUp}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

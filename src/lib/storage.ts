@@ -7,7 +7,29 @@ const KEYS = {
   BOOKMARKS: "ai_changelog_bookmarks",
   PINNED_CATEGORIES: "ai_changelog_pinned_categories",
   STREAK_DATES: "ai_changelog_streak_dates",
+  LAST_VISIT: "kapyn_last_visit",
 };
+
+// ==========================================
+// Last Visit Timestamp
+// ==========================================
+
+export function getLastVisitTimestamp(): number | null {
+  if (!isBrowser) return null;
+  try {
+    const raw = localStorage.getItem(KEYS.LAST_VISIT);
+    return raw ? parseInt(raw, 10) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setLastVisitTimestamp(): void {
+  if (!isBrowser) return;
+  try {
+    localStorage.setItem(KEYS.LAST_VISIT, Date.now().toString());
+  } catch {}
+}
 
 // ==========================================
 // Bookmarks Storage

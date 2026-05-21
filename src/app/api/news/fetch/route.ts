@@ -3,22 +3,27 @@ import Parser from "rss-parser";
 import { createClient } from "@supabase/supabase-js";
 import {
   fetchProductHuntPosts,
-  buildPHSummary,
   type PHFeedItem,
 } from "@/lib/producthunt";
+import type { CategorySlug } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-// Product Hunt removed — now uses GraphQL API (src/lib/producthunt.ts)
-const RSS_FEEDS: { url: string; category: string; sourceName: string }[] = [
-  { url: "https://blog.google/technology/ai/rss/", category: "ai-models", sourceName: "Google AI Blog" },
-  { url: "https://openai.com/blog/rss.xml", category: "ai-models", sourceName: "OpenAI Blog" },
-  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "research", sourceName: "TechCrunch AI" },
-  { url: "https://huggingface.co/blog/feed.xml", category: "open-source", sourceName: "Hugging Face" },
-  { url: "https://venturebeat.com/category/ai/feed/", category: "research", sourceName: "VentureBeat AI" },
-  { url: "https://the-decoder.com/feed/", category: "ai-models", sourceName: "The Decoder" },
-  { url: "https://simonwillison.net/atom/everything/", category: "tools", sourceName: "Simon Willison" },
+// Valid category slugs — used for AI classifier validation
+const VALID_SLUGS: CategorySlug[] = [
+  "ai-models", "dev-tools", "startups", "research",
+  "funding-ma", "big-tech", "infrastructure", "policy",
+];
+
+const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string }[] = [
+  { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",    sourceName: "Google AI Blog" },
+  { url: "https://openai.com/blog/rss.xml",                              defaultCategory: "ai-models",   sourceName: "OpenAI Blog" },
+  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "research",    sourceName: "TechCrunch AI" },
+  { url: "https://huggingface.co/blog/feed.xml",                         defaultCategory: "dev-tools",   sourceName: "Hugging Face" },
+  { url: "https://venturebeat.com/category/ai/feed/",                    defaultCategory: "research",    sourceName: "VentureBeat AI" },
+  { url: "https://the-decoder.com/feed/",                                defaultCategory: "ai-models",   sourceName: "The Decoder" },
+  { url: "https://simonwillison.net/atom/everything/",                   defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
 ];
 
 type ParserItem = {
@@ -59,20 +64,16 @@ function extractImageUrl(item: ParserItem): string | null {
   if (mc && typeof mc === "object" && (mc as { $?: { url?: string } }).$?.url) {
     return (mc as { $: { url: string } }).$.url;
   }
-
   const mt = item.mediaThumbnail ?? item["media:thumbnail"];
   if (mt && typeof mt === "object" && (mt as { $?: { url?: string } }).$?.url) {
     return (mt as { $: { url: string } }).$.url;
   }
-
   if (item.enclosure?.url && item.enclosure.type?.startsWith("image/")) {
     return item.enclosure.url;
   }
-
   const html = (item.description ?? item.content ?? "") as string;
   const m = html.match(/<img[^>]+src=["']([^"'>]+)["']/i);
   if (m) return m[1];
-
   return null;
 }
 
@@ -104,7 +105,6 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
     });
     clearTimeout(timer);
     if (!res.ok) return { imageUrl: null, description: null, title: null };
-
     const reader = res.body?.getReader();
     if (!reader) return { imageUrl: null, description: null, title: null };
     const decoder = new TextDecoder();
@@ -118,22 +118,12 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
     } finally {
       reader.cancel();
     }
-
     const imageUrl =
-      extractMeta(html, "og:image") ??
-      extractMeta(html, "twitter:image", "name") ??
-      null;
-
+      extractMeta(html, "og:image") ?? extractMeta(html, "twitter:image", "name") ?? null;
     const description =
-      extractMeta(html, "og:description") ??
-      extractMeta(html, "twitter:description", "name") ??
-      null;
-
+      extractMeta(html, "og:description") ?? extractMeta(html, "twitter:description", "name") ?? null;
     const titleRaw =
-      extractMeta(html, "og:title") ??
-      extractMeta(html, "twitter:title", "name") ??
-      null;
-
+      extractMeta(html, "og:title") ?? extractMeta(html, "twitter:title", "name") ?? null;
     return {
       imageUrl,
       description: description ? decodeHTMLEntities(description) : null,
@@ -144,11 +134,78 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
   }
 }
 
+// ─── Classification + Summarization ──────────────────────────────────────────
+
 /**
- * Detects summaries that should never reach the feed:
- * - LOW_SIGNAL flag from the AI editor
- * - Leaked prompt strings
- * - Raw release note patterns that slipped through
+ * Single-pass LLM prompt: classifies into the new taxonomy AND writes the
+ * summary. One call per item — no extra round-trips.
+ *
+ * Returns "LOW_SIGNAL" in the SUMMARY field for minor patches.
+ */
+function buildClassifyAndSummarizePrompt(
+  title: string,
+  content: string,
+  defaultCategory: string
+): string {
+  return `You are a tech editor for "AI Changelog", a premium intelligence feed for AI developers.
+
+Classify this dispatch into ONE category slug and write a summary.
+
+CATEGORIES:
+  ai-models      — LLMs, model releases, benchmarks, capabilities, multimodal AI
+                   e.g. "GPT-5 Released", "Claude Scores SOTA on MMLU", "Gemini 2.0 Launch"
+  dev-tools      — Dev tools, APIs, SDKs, open-source libraries, frameworks, CLIs, plugins
+                   e.g. "LangChain 0.3 Adds Agent Memory", "Cursor Gets Multi-File Edit Mode"
+  startups       — New companies, product launches, pivots, early-stage growth
+                   e.g. "Cohere Launches Enterprise Platform", "AI writing startup raises seed"
+  research       — Academic papers, lab findings, benchmarks, evals, university research
+                   e.g. "DeepMind Paper on Reasoning", "MIT Study on LLM Hallucination"
+  funding-ma     — Funding rounds, acquisitions, mergers, acqui-hires, strategic investments
+                   e.g. "Anthropic Raises $4B Series E", "Microsoft Acquires Inflection AI"
+  big-tech       — FAANG+, cloud providers (AWS/GCP/Azure), enterprise AI platform updates
+                   e.g. "Google Releases Gemini Ultra", "AWS Bedrock Adds Claude 3"
+  infrastructure — Chips, GPUs, data centers, cloud compute, hardware, edge AI deployment
+                   e.g. "Nvidia H200 Now Shipping", "Meta Builds 100K GPU Cluster"
+  policy         — AI regulation, governance, safety frameworks, government orders, compliance
+                   e.g. "EU AI Act Enforcement Begins", "Biden Signs AI Executive Order"
+
+If genuinely unsure, use default: ${defaultCategory}
+
+SUMMARY RULES:
+- 2-3 sentences, plain English, present tense, active voice
+- Explain: (a) what this is, (b) what changed, (c) why it matters to AI developers
+- NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
+- NEVER start with "This article", "This release", or "This post"
+- If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
+
+Respond in EXACTLY this format — no extra text before or after:
+CATEGORY: <slug>
+SUMMARY: <2-3 sentences or LOW_SIGNAL>
+
+Title: ${title}
+Content: ${content.slice(0, 2000)}`;
+}
+
+interface ClassifyResult {
+  category: CategorySlug;
+  summary: string; // "LOW_SIGNAL" triggers isBadSummary
+}
+
+function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyResult {
+  const categoryMatch = text.match(/^CATEGORY:\s*(\S+)/m);
+  const summaryMatch = text.match(/^SUMMARY:\s*([\s\S]+)/m);
+
+  const rawSlug = categoryMatch?.[1]?.trim() ?? "";
+  const category: CategorySlug = VALID_SLUGS.includes(rawSlug as CategorySlug)
+    ? (rawSlug as CategorySlug)
+    : fallback;
+
+  const summary = summaryMatch?.[1]?.trim() ?? "";
+  return { category, summary };
+}
+
+/**
+ * Detects summaries that must never reach the feed.
  */
 function isBadSummary(text: string): boolean {
   const t = text.trim();
@@ -159,7 +216,6 @@ function isBadSummary(text: string): boolean {
     lower.startsWith("write a ") ||
     lower.startsWith("the provided content") ||
     lower.includes("summarize this article") ||
-    // Raw release note leak patterns
     /^release:\s/i.test(t) ||
     /\btags:\s*[\w,\s]+$/.test(t) ||
     /refs\s+\S+#\d+/i.test(t) ||
@@ -167,31 +223,7 @@ function isBadSummary(text: string): boolean {
   );
 }
 
-/**
- * Premium tech editor prompt.
- * Instructs the AI to write a contextual dispatch — not paraphrase raw notes.
- * Returns exactly "LOW_SIGNAL" for minor patches with no user-facing changes.
- */
-function buildEditorPrompt(title: string, content: string): string {
-  return `You are a tech editor for "AI Changelog", a premium intelligence feed for AI developers and enthusiasts.
-
-Given the title and raw content below, write a 2-3 sentence dispatch that:
-(a) explains what this tool or library does in plain English (assume the reader hasn't heard of it)
-(b) describes what changed or was announced
-(c) explains why it matters to an AI developer or enthusiast
-
-Rules:
-- NEVER echo raw commit messages, issue references (#7, refs #123), tag lists, or version metadata
-- NEVER start with "This article", "This release", "This post", or the product name alone
-- Write in present tense, active voice
-- If this update has NO meaningful user-facing changes (pure dependency bump, typo fix, internal refactor, test changes only) — respond with exactly: LOW_SIGNAL
-
-Title: ${title}
-
-Content: ${content.slice(0, 2000)}`;
-}
-
-async function summarizeGemini(prompt: string): Promise<string> {
+async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
     method: "POST",
@@ -205,7 +237,7 @@ async function summarizeGemini(prompt: string): Promise<string> {
   return text;
 }
 
-async function summarizeOpenRouter(prompt: string): Promise<string> {
+async function callOpenRouter(prompt: string): Promise<string> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -214,7 +246,7 @@ async function summarizeOpenRouter(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: "google/gemini-2.0-flash-lite:free",
-      max_tokens: 200,
+      max_tokens: 250,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -226,50 +258,62 @@ async function summarizeOpenRouter(prompt: string): Promise<string> {
 }
 
 /**
- * Returns null if both LLMs fail — callers must skip the item.
- * Never falls back to raw content (that's what caused the bug).
+ * Single LLM call that returns both the correct category and a clean summary.
+ * Falls back to OpenRouter if Gemini fails.
+ * Returns null if both fail — callers must skip the item.
  */
-async function summarize(title: string, content: string): Promise<string | null> {
-  const prompt = buildEditorPrompt(title, content);
+async function classifyAndSummarize(
+  title: string,
+  content: string,
+  defaultCategory: CategorySlug
+): Promise<ClassifyResult | null> {
+  const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
   try {
-    return await summarizeGemini(prompt);
+    const raw = await callGemini(prompt);
+    return parseClassifyResponse(raw, defaultCategory);
   } catch {
     try {
-      return await summarizeOpenRouter(prompt);
+      const raw = await callOpenRouter(prompt);
+      return parseClassifyResponse(raw, defaultCategory);
     } catch {
-      // Both failed — do NOT return raw content. Skip the item instead.
-      return null;
+      return null; // Both failed — skip item, never show raw content
     }
   }
 }
+
+// ─── Feed types ───────────────────────────────────────────────────────────────
 
 type FeedItem = {
   title: string;
   sourceUrl: string;
   sourceName: string;
-  category: string;
+  defaultCategory: CategorySlug;
   content: string;
   publishedAt: string;
   imageUrl: string | null;
-  directSummary: string | null;
 };
 
-async function fetchRSSFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
+// ─── RSS fetch ────────────────────────────────────────────────────────────────
+
+async function fetchRSSFeed(
+  feed: (typeof RSS_FEEDS)[0]
+): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
 
   const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
-    const rawContent = item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
-    const trimmed = rawContent.trim();
-    const content = trimmed || (item.title ?? "");
+    const rawContent =
+      item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
+    const content = rawContent.trim() || (item.title ?? "");
     return {
       title: item.title ?? "",
       sourceUrl: item.link ?? item.guid ?? "",
       sourceName: feed.sourceName,
-      category: feed.category,
+      defaultCategory: feed.defaultCategory,
       content,
-      publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+      publishedAt: item.pubDate
+        ? new Date(item.pubDate).toISOString()
+        : new Date().toISOString(),
       imageUrl: extractImageUrl(item),
-      directSummary: null as string | null,
     };
   });
 
@@ -278,40 +322,30 @@ async function fetchRSSFeed(feed: (typeof RSS_FEEDS)[0]): Promise<FeedItem[]> {
   );
 
   return rawItems.map((item, i) => {
-    const meta = metaResults[i].status === "fulfilled"
-      ? metaResults[i].value
-      : { imageUrl: null, description: null, title: null };
-    return {
-      ...item,
-      imageUrl: meta.imageUrl ?? item.imageUrl,
-      directSummary: null,
-    };
+    const meta =
+      metaResults[i].status === "fulfilled"
+        ? metaResults[i].value
+        : { imageUrl: null, description: null, title: null };
+    return { ...item, imageUrl: meta.imageUrl ?? item.imageUrl };
   });
 }
 
-/**
- * Convert PHFeedItem[] → FeedItem[] for the shared insert pipeline.
- * Uses tagline + description as directSummary — no scraping needed.
- */
+// ─── Product Hunt feed items ──────────────────────────────────────────────────
+
 function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
-  return posts.map((post) => {
-    const rawSummary = buildPHSummary(post);
-    const wordCount = rawSummary.split(/\s+/).filter(Boolean).length;
-
-    return {
-      title: post.title,
-      sourceUrl: post.sourceUrl,
-      sourceName: "Product Hunt",
-      category: "producthunt",
-      // content is only used as fallback when directSummary is null
-      content: post.tagline,
-      publishedAt: post.publishedAt,
-      imageUrl: post.imageUrl,
-      // If ≤80 words: use as-is (no LLM call). If longer: let summarize() trim it.
-      directSummary: wordCount <= 80 ? rawSummary : rawSummary,
-    };
-  });
+  return posts.map((post) => ({
+    title: post.title,
+    sourceUrl: post.sourceUrl,
+    sourceName: "Product Hunt",
+    // Default to startups (most PH launches are products); classifier may override
+    defaultCategory: "startups" as CategorySlug,
+    content: [post.tagline, post.description].filter(Boolean).join(". "),
+    publishedAt: post.publishedAt,
+    imageUrl: post.imageUrl,
+  }));
 }
+
+// ─── Insert pipeline ──────────────────────────────────────────────────────────
 
 async function insertItems(
   items: FeedItem[],
@@ -332,25 +366,21 @@ async function insertItems(
       continue;
     }
 
-    let summary: string | null = null;
+    const result = await classifyAndSummarize(
+      item.title,
+      item.content,
+      item.defaultCategory
+    );
 
-    if (item.directSummary) {
-      // PH / pre-structured content: use directly if short, else run editor pass
-      const wordCount = item.directSummary.split(/\s+/).filter(Boolean).length;
-      summary = wordCount <= 80
-        ? item.directSummary
-        : await summarize(item.title, item.directSummary);
-    } else {
-      summary = await summarize(item.title, item.content);
-    }
-
-    // null = both LLMs failed → skip, do not store raw content
-    if (summary === null) {
-      results.errors.push(`Summarization failed (both LLMs) for "${item.title}" — skipped`);
+    // Both LLMs failed — skip, never store raw content
+    if (result === null) {
+      results.errors.push(`LLM failed for "${item.title}" — skipped`);
       continue;
     }
 
-    // LOW_SIGNAL or leaked raw text → filter from feed
+    const { category, summary } = result;
+
+    // LOW_SIGNAL or raw-text leak — filter from feed
     if (isBadSummary(summary)) {
       results.lowSignal++;
       continue;
@@ -361,7 +391,7 @@ async function insertItems(
       summary,
       source_url: item.sourceUrl,
       source_name: item.sourceName,
-      category_slug: item.category,
+      category_slug: category,        // AI-classified, not hardcoded
       published_at: item.publishedAt,
       image_url: item.imageUrl,
     });
@@ -374,8 +404,12 @@ async function insertItems(
   }
 }
 
+// ─── Route handler ────────────────────────────────────────────────────────────
+
 export async function GET(request: NextRequest) {
-  const secret = request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
+  const secret =
+    request.headers.get("x-cron-secret") ??
+    request.nextUrl.searchParams.get("secret");
   if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -383,14 +417,14 @@ export async function GET(request: NextRequest) {
   const mode = request.nextUrl.searchParams.get("mode");
   const supabase = getSupabaseAdmin();
 
-  // Re-summarize mode
+  // ── Re-summarize mode ──────────────────────────────────────────────────────
   if (mode === "resummary") {
     const limitParam = parseInt(request.nextUrl.searchParams.get("limit") ?? "30", 10);
     const offsetParam = parseInt(request.nextUrl.searchParams.get("offset") ?? "0", 10);
 
     const { data: items } = await supabase
       .from("news_items")
-      .select("id, title, summary")
+      .select("id, title, summary, category_slug")
       .order("created_at", { ascending: false });
 
     const short = (items ?? [])
@@ -411,14 +445,18 @@ export async function GET(request: NextRequest) {
       if (i > 0) await new Promise((r) => setTimeout(r, 10000));
       const item = short[i];
       try {
-        const newSummary = await summarize(item.title, item.title);
-        if (newSummary === null || isBadSummary(newSummary)) {
+        const r = await classifyAndSummarize(
+          item.title,
+          item.title,
+          (item.category_slug as CategorySlug) ?? "ai-models"
+        );
+        if (r === null || isBadSummary(r.summary)) {
           results.errors.push(`Bad/failed re-summary skipped for "${item.title}"`);
           continue;
         }
         const { error } = await supabase
           .from("news_items")
-          .update({ summary: newSummary })
+          .update({ summary: r.summary, category_slug: r.category })
           .eq("id", item.id);
         if (error) results.errors.push(`Update ${item.id}: ${error.message}`);
         else results.updated++;
@@ -430,9 +468,33 @@ export async function GET(request: NextRequest) {
     return Response.json(results);
   }
 
-  // ── Normal fetch ──────────────────────────────────────────────────────────
+  // ── Reclassify mode — migrate old slugs ────────────────────────────────────
+  if (mode === "reclassify") {
+    const migrated: Record<string, number> = {};
 
-  // Clean up leaked prompt strings saved as summaries
+    // Simple deterministic renames — no AI needed
+    const renames: Array<[string, CategorySlug]> = [
+      ["tools",       "dev-tools"],
+      ["open-source", "dev-tools"],
+      ["funding",     "funding-ma"],
+      ["producthunt", "startups"],   // safe default; AI pass below refines these
+    ];
+
+    for (const [oldSlug, newSlug] of renames) {
+      const { data, error } = await supabase
+        .from("news_items")
+        .update({ category_slug: newSlug })
+        .eq("category_slug", oldSlug)
+        .select("id");
+      if (!error) migrated[`${oldSlug}→${newSlug}`] = data?.length ?? 0;
+    }
+
+    return Response.json({ migrated });
+  }
+
+  // ── Normal fetch ───────────────────────────────────────────────────────────
+
+  // Clean up leaked prompt strings
   await supabase.from("news_items").delete().ilike("summary", "Write a 40%");
   await supabase.from("news_items").delete().ilike("summary", "The provided content%");
   await supabase.from("news_items").delete().ilike("summary", "%summarize this article%");
@@ -441,21 +503,29 @@ export async function GET(request: NextRequest) {
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   await supabase.from("news_items").delete().lt("published_at", cutoff);
 
+  // Idempotent slug migrations (runs harmlessly after first pass)
+  await supabase.from("news_items").update({ category_slug: "dev-tools"  }).eq("category_slug", "tools");
+  await supabase.from("news_items").update({ category_slug: "dev-tools"  }).eq("category_slug", "open-source");
+  await supabase.from("news_items").update({ category_slug: "funding-ma" }).eq("category_slug", "funding");
+  await supabase.from("news_items").update({ category_slug: "startups"   }).eq("category_slug", "producthunt");
+
   const results = { inserted: 0, skipped: 0, lowSignal: 0, errors: [] as string[] };
 
-  // ── RSS feeds (parallel) ─────────────────────────────────────────────────
-  const rssSettled = await Promise.allSettled(RSS_FEEDS.map((feed) => fetchRSSFeed(feed)));
+  // RSS feeds — parallel fetch
+  const rssSettled = await Promise.allSettled(
+    RSS_FEEDS.map((feed) => fetchRSSFeed(feed))
+  );
 
   for (let i = 0; i < rssSettled.length; i++) {
     const result = rssSettled[i];
     if (result.status === "fulfilled") {
       await insertItems(result.value, supabase, results);
     } else {
-      results.errors.push(`RSS feed "${RSS_FEEDS[i].url}": ${String(result.reason)}`);
+      results.errors.push(`RSS "${RSS_FEEDS[i].url}": ${String(result.reason)}`);
     }
   }
 
-  // ── Product Hunt GraphQL API ─────────────────────────────────────────────
+  // Product Hunt GraphQL
   try {
     const phPosts = await fetchProductHuntPosts(48);
     const phItems = phPostsToFeedItems(phPosts);

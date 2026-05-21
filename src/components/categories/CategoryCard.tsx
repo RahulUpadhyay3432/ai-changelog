@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bookmark, Brain, Rocket, Building2, FlaskConical, Wrench, Code2, DollarSign, Zap } from "lucide-react";
+import { Bookmark, Brain, Rocket, Building2, FlaskConical, Wrench, DollarSign, Terminal, Server, Shield } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { isCategoryPinned, toggleCategoryPin } from "@/lib/storage";
 
@@ -11,9 +11,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Building2,
   FlaskConical,
   Wrench,
-  Code2,
   DollarSign,
-  Zap,
+  Terminal,
+  Server,
+  Shield,
 };
 
 interface CategoryCardProps {

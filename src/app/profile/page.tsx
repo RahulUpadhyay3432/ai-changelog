@@ -168,7 +168,7 @@ export default function ProfilePage() {
               marginTop: "4px",
             }}
           >
-            7
+            8
           </span>
           <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Channels

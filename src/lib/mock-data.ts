@@ -28,7 +28,7 @@ export const MOCK_STORIES: NewsItem[] = [
       "Anthropic closed its largest funding round to date with Amazon leading at $2.5B, followed by Google. The capital will fund compute infrastructure for Claude model training and expanded safety research. Anthropic is now the second most valuable private AI lab globally.",
     sourceName: "The Information",
     sourceUrl: "https://theinformation.com",
-    categorySlug: "funding",
+    categorySlug: "funding-ma",
     publishedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -58,7 +58,7 @@ export const MOCK_STORIES: NewsItem[] = [
       "Meta's Llama 3.3 70B model adds 128K token context, supports 8 languages natively, and matches GPT-4o on MMLU at a fraction of inference cost. Released under the Llama 3 Community License, compatible with commercial use for companies under 700M monthly users.",
     sourceName: "Meta AI Blog",
     sourceUrl: "https://ai.meta.com/blog",
-    categorySlug: "open-source",
+    categorySlug: "dev-tools",
     publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -78,7 +78,7 @@ export const MOCK_STORIES: NewsItem[] = [
       "Vercel's AI SDK 4.0 introduces first-class agent primitives with tool-calling, streaming support across 25+ model providers, and a new router that automatically selects the cheapest capable model per request. TypeScript-native with full Edge Runtime compatibility.",
     sourceName: "Vercel Blog",
     sourceUrl: "https://vercel.com/blog",
-    categorySlug: "tools",
+    categorySlug: "dev-tools",
     publishedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -98,7 +98,7 @@ export const MOCK_STORIES: NewsItem[] = [
       "LangChain's LangGraph Cloud provides managed infrastructure for stateful, multi-step AI agents with built-in persistence, human-in-the-loop checkpoints, and observability. Pricing starts at $0.001 per agent step. Available now with a 14-day free trial.",
     sourceName: "LangChain Blog",
     sourceUrl: "https://blog.langchain.dev",
-    categorySlug: "tools",
+    categorySlug: "dev-tools",
     publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
   },
   {

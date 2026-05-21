@@ -1,13 +1,13 @@
 export type CategorySlug =
   | "all"
   | "ai-models"
-  | "tools"
+  | "dev-tools"
   | "startups"
-  | "open-source"
   | "research"
-  | "funding"
+  | "funding-ma"
   | "big-tech"
-  | "producthunt";
+  | "infrastructure"
+  | "policy";
 
 export interface Category {
   slug: CategorySlug;

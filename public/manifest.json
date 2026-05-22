@@ -1,16 +1,25 @@
 {
   "name": "Kapyn",
   "short_name": "Kapyn",
-  "description": "What happened in AI today.",
+  "description": "The calm intelligence layer for AI",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "background_color": "#0E0D0C",
+  "theme_color": "#0E0D0C",
+  "categories": ["news", "technology"],
   "icons": [
     {
-      "src": "/globe.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/api/icon/192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/api/icon/512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

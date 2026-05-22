@@ -177,6 +177,12 @@
   animation: share-pulse 0.2s ease-out forwards !important;
 }
 
+/* PWA Add to Home Screen banner entrance */
+@keyframes aths-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Category pill tap + hover feedback */
 .category-tab-btn:not(.active-pill):hover {
   color: #909090 !important;

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { AddToHomeScreen } from "@/components/pwa/AddToHomeScreen";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -13,22 +14,29 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Kapyn — What happened in AI today",
-  description:
-    "Kapyn: Full-screen AI news cards. Swipe through the most important AI stories, summaries in 60 words.",
+  description: "The calm intelligence layer for AI",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Kapyn",
   },
+  icons: {
+    icon: [
+      { url: "/api/icon/192", sizes: "192x192", type: "image/png" },
+      { url: "/api/icon/512", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/api/icon/180", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#0E0D0C",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -46,6 +54,7 @@ export default function RootLayout({
           display: "flex",
           flexDirection: "column",
           background: "#0a0a0a",
+          paddingTop: "env(safe-area-inset-top, 0px)",
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
         }}
@@ -56,12 +65,13 @@ export default function RootLayout({
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            paddingBottom: "60px",
+            paddingBottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
           }}
         >
           {children}
         </main>
         <BottomNav />
+        <AddToHomeScreen />
       </body>
       </PostHogProvider>
     </html>

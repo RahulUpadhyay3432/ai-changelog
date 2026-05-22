@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Grid2x2, TrendingUp, Bookmark, User } from "lucide-react";
+import { Home, TrendingUp, Bookmark, User } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", Icon: Home },
-  { href: "/categories", label: "Categories", Icon: Grid2x2 },
   { href: "/trending", label: "Trending", Icon: TrendingUp },
   { href: "/saved", label: "Saved", Icon: Bookmark },
   { href: "/profile", label: "Profile", Icon: User },

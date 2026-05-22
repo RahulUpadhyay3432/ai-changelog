@@ -355,7 +355,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           }}
           className="news-title-link"
           style={{
-            fontSize: "23px",
+            fontSize: "clamp(20px, 2.8dvh, 26px)",
             fontWeight: 500,
             lineHeight: 1.3,
             color: "#E8E4DE",
@@ -371,19 +371,16 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           {item.title}
         </a>
 
-        {/* Summary — fills remaining space */}
+        {/* Summary — fills remaining space, no clamp so text flows to fill height */}
         <p
           style={{
-            fontSize: "13.5px",
-            lineHeight: 1.58,
+            fontSize: "clamp(13px, 1.7dvh, 16px)",
+            lineHeight: 1.6,
             color: "#9A9A9A",
             fontWeight: 400,
             margin: 0,
             flex: 1,
             overflow: "hidden",
-            display: "-webkit-box",
-            WebkitLineClamp: 7,
-            WebkitBoxOrient: "vertical",
           }}
         >
           {cleanText(item.summary)}

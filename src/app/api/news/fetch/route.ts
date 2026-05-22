@@ -173,8 +173,9 @@ CATEGORIES:
 If genuinely unsure, use default: ${defaultCategory}
 
 SUMMARY RULES:
-- 2-3 sentences, plain English, present tense, active voice
-- Explain: (a) what this is, (b) what changed, (c) why it matters to AI developers
+- 3-5 sentences, plain English, present tense, active voice
+- Explain: (a) what this is, (b) what changed or was announced, (c) key details or numbers, (d) why it matters to AI developers
+- Make it substantial — readers should feel informed after reading, not like they need to click through
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
 - NEVER start with "This article", "This release", or "This post"
 - If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
@@ -247,7 +248,7 @@ async function callOpenRouter(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: "google/gemini-2.0-flash-lite:free",
-      max_tokens: 250,
+      max_tokens: 400,
       messages: [{ role: "user", content: prompt }],
     }),
   });

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bookmark, Share2, ChevronUp, ChevronDown, Check } from "lucide-react";
+import { Bookmark, Share2, Check } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
 import { isStorySaved, saveStory, removeStory } from "@/lib/storage";
+import { BreakdownSheet } from "./BreakdownSheet";
 import posthog from "posthog-js";
 
 interface NewsCardProps {
@@ -109,6 +110,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
   const [copied, setCopied] = useState(false);
   const [sharePressed, setSharePressed] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
@@ -409,19 +411,40 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           >
             {item.sourceName}
           </span>
-          <div
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowBreakdown(true);
+              posthog.capture("story_breakdown_opened", {
+                story_id: item.id,
+                story_title: item.title,
+                category: item.categorySlug,
+              });
+            }}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "3px",
-              color: "rgba(255,255,255,0.1)",
+              background: category ? `${category.colorAccent}18` : "rgba(255,255,255,0.06)",
+              border: category
+                ? `1px solid ${category.colorAccent}30`
+                : "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "20px",
+              padding: "3px 10px",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: category?.colorLabel ?? "#a3a3a3",
+              cursor: "pointer",
+              letterSpacing: "0.01em",
             }}
           >
-            <ChevronUp size={11} strokeWidth={2} />
-            <ChevronDown size={11} strokeWidth={2} />
-          </div>
+            Break it down
+          </button>
         </div>
       </div>
+
+      <BreakdownSheet
+        item={item}
+        open={showBreakdown}
+        onClose={() => setShowBreakdown(false)}
+      />
     </div>
   );
 }

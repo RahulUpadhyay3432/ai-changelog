@@ -13,7 +13,7 @@ export const maxDuration = 300;
 
 // Valid category slugs — used for AI classifier validation
 const VALID_SLUGS: CategorySlug[] = [
-  "ai-models", "dev-tools", "startups", "research",
+  "ai-models", "dev-tools", "open-source", "startups", "research",
   "funding-ma", "big-tech", "infrastructure", "policy",
 ];
 
@@ -25,6 +25,8 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://venturebeat.com/category/ai/feed/",                    defaultCategory: "research",    sourceName: "VentureBeat AI" },
   { url: "https://the-decoder.com/feed/",                                defaultCategory: "ai-models",   sourceName: "The Decoder" },
   { url: "https://simonwillison.net/atom/everything/",                   defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
+  { url: "https://github.blog/feed/",                                    defaultCategory: "open-source", sourceName: "GitHub Blog" },
+  { url: "https://hnrss.org/showhn",                                     defaultCategory: "open-source", sourceName: "Show HN" },
 ];
 
 type ParserItem = {
@@ -155,8 +157,10 @@ Classify this dispatch into ONE category slug and write a summary.
 CATEGORIES:
   ai-models      — LLMs, model releases, benchmarks, capabilities, multimodal AI
                    e.g. "GPT-5 Released", "Claude Scores SOTA on MMLU", "Gemini 2.0 Launch"
-  dev-tools      — Dev tools, APIs, SDKs, open-source libraries, frameworks, CLIs, plugins
+  dev-tools      — Commercial/hosted dev tools, APIs, SDKs, frameworks, CLIs, plugins
                    e.g. "LangChain 0.3 Adds Agent Memory", "Cursor Gets Multi-File Edit Mode"
+  open-source    — New open-source projects, GitHub releases, OSS tools gaining traction
+                   e.g. "New OSS vector DB hits 10k stars", "Show HN: CLI tool for LLM evals"
   startups       — New companies, product launches, pivots, early-stage growth
                    e.g. "Cohere Launches Enterprise Platform", "AI writing startup raises seed"
   research       — Academic papers, lab findings, benchmarks, evals, university research
@@ -477,9 +481,8 @@ export async function GET(request: NextRequest) {
     // Simple deterministic renames — no AI needed
     const renames: Array<[string, CategorySlug]> = [
       ["tools",       "dev-tools"],
-      ["open-source", "dev-tools"],
       ["funding",     "funding-ma"],
-      ["producthunt", "startups"],   // safe default; AI pass below refines these
+      ["producthunt", "startups"],
     ];
 
     for (const [oldSlug, newSlug] of renames) {
@@ -507,7 +510,6 @@ export async function GET(request: NextRequest) {
 
   // Idempotent slug migrations (runs harmlessly after first pass)
   await supabase.from("news_items").update({ category_slug: "dev-tools"  }).eq("category_slug", "tools");
-  await supabase.from("news_items").update({ category_slug: "dev-tools"  }).eq("category_slug", "open-source");
   await supabase.from("news_items").update({ category_slug: "funding-ma" }).eq("category_slug", "funding");
   await supabase.from("news_items").update({ category_slug: "startups"   }).eq("category_slug", "producthunt");
 

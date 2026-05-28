@@ -16,11 +16,9 @@ export function HomeFeed() {
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cardPosition, setCardPosition] = useState({ index: 0, total: 0 });
 
   useEffect(() => {
     setLoading(true);
-    setCardPosition({ index: 0, total: 0 });
 
     fetchNewsItems(activeCategory)
       .then((items) => {
@@ -28,14 +26,12 @@ export function HomeFeed() {
           (s) => activeCategory === "all" || s.categorySlug === activeCategory
         );
         setStories(result);
-        setCardPosition({ index: 0, total: result.length });
       })
       .catch(() => {
         const fallback = MOCK_STORIES.filter(
           (s) => activeCategory === "all" || s.categorySlug === activeCategory
         );
         setStories(fallback);
-        setCardPosition({ index: 0, total: fallback.length });
       })
       .finally(() => setLoading(false));
   }, [activeCategory]);
@@ -48,16 +44,9 @@ export function HomeFeed() {
     setActiveCategory(slug);
   }, [activeCategory]);
 
-  const handleIndexChange = useCallback((index: number, total: number) => {
-    setCardPosition({ index, total });
-  }, []);
-
   const handleRefresh = useCallback(async () => {
     const items = await fetchNewsItems(activeCategory).catch(() => [] as typeof stories);
-    if (items.length > 0) {
-      setStories(items);
-      setCardPosition({ index: 0, total: items.length });
-    }
+    if (items.length > 0) setStories(items);
   }, [activeCategory]);
 
   return (
@@ -72,9 +61,6 @@ export function HomeFeed() {
       {/* Top bar */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
           padding: "8px 20px 4px",
           flexShrink: 0,
         }}
@@ -91,19 +77,6 @@ export function HomeFeed() {
         >
           kapyn
         </h1>
-        <div
-          style={{
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "100px",
-            padding: "3px 10px",
-            fontSize: "11px",
-            fontWeight: 500,
-            color: "#555",
-          }}
-        >
-          {loading ? "…" : `${cardPosition.index + 1} / ${cardPosition.total}`}
-        </div>
       </div>
 
       <CategoryTabs activeSlug={activeCategory} onChange={handleCategoryChange} />
@@ -125,7 +98,6 @@ export function HomeFeed() {
         <CardStack
           key={activeCategory}
           items={stories}
-          onIndexChange={handleIndexChange}
           onRefresh={handleRefresh}
         />
       )}

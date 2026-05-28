@@ -315,7 +315,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         >
           <span
             style={{
-              fontSize: "9px",
+              fontSize: "11px",
               fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
@@ -428,7 +428,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
                 : "1px solid rgba(255,255,255,0.1)",
               borderRadius: "20px",
               padding: "3px 10px",
-              fontSize: "11px",
+              fontSize: "13px",
               fontWeight: 600,
               color: category?.colorLabel ?? "#a3a3a3",
               cursor: "pointer",

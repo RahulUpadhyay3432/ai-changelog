@@ -67,7 +67,7 @@ export function HomeFeed() {
       >
         <h1
           style={{
-            fontSize: "19px",
+            fontSize: "26px",
             fontWeight: 500,
             color: "#E8E4DE",
             margin: 0,

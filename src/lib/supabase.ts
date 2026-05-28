@@ -31,6 +31,18 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
   };
 }
 
+const CATEGORY_ORDER: Record<string, number> = {
+  "ai-models":    1,
+  "startups":     2,
+  "big-tech":     3,
+  "dev-tools":    4,
+  "research":     5,
+  "infrastructure": 6,
+  "policy":       6,
+  "funding-ma":   6,
+  "open-source":  7,
+};
+
 export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 
@@ -47,5 +59,17 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
 
   const { data, error } = await query;
   if (error) throw error;
-  return (data as DbNewsItem[]).map(dbToNewsItem);
+
+  const items = (data as DbNewsItem[]).map(dbToNewsItem);
+
+  if (!categorySlug || categorySlug === "all") {
+    items.sort((a, b) => {
+      const wa = CATEGORY_ORDER[a.categorySlug] ?? 5;
+      const wb = CATEGORY_ORDER[b.categorySlug] ?? 5;
+      if (wa !== wb) return wa - wb;
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    });
+  }
+
+  return items;
 }

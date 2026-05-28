@@ -310,8 +310,10 @@ async function fetchRSSFeed(
     const rawContent =
       item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
     const content = rawContent.trim() || (item.title ?? "");
+    const rawTitle = item.title ?? "";
+    const title = rawTitle.replace(/^(Show HN|Ask HN|Tell HN):\s*/i, "").trim();
     return {
-      title: item.title ?? "",
+      title,
       sourceUrl: item.link ?? item.guid ?? "",
       sourceName: feed.sourceName,
       defaultCategory: feed.defaultCategory,

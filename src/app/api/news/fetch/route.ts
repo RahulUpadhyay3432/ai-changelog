@@ -26,7 +26,7 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://the-decoder.com/feed/",                                defaultCategory: "ai-models",   sourceName: "The Decoder" },
   { url: "https://simonwillison.net/atom/everything/",                   defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
   { url: "https://github.blog/feed/",                                    defaultCategory: "open-source", sourceName: "GitHub Blog" },
-  { url: "https://hnrss.org/showhn",                                     defaultCategory: "open-source", sourceName: "Show HN" },
+  { url: "https://hnrss.org/show",                                       defaultCategory: "open-source", sourceName: "Show HN" },
 ];
 
 type ParserItem = {

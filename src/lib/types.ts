@@ -2,6 +2,7 @@ export type CategorySlug =
   | "all"
   | "ai-models"
   | "dev-tools"
+  | "open-source"
   | "startups"
   | "research"
   | "funding-ma"

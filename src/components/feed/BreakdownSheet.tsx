@@ -225,7 +225,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   fontStyle: "italic",
                 }}
               >
-                Breaking it down...
+                Analysing what matters...
               </p>
             </div>
           )}
@@ -263,7 +263,15 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                 whiteSpace: "pre-wrap",
               }}
             >
-              {explanation}
+              {explanation.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
+                part.startsWith("**") && part.endsWith("**") ? (
+                  <strong key={i} style={{ color: "#E8E4DE", fontWeight: 600 }}>
+                    {part.slice(2, -2)}
+                  </strong>
+                ) : (
+                  part
+                )
+              )}
             </p>
           )}
         </div>

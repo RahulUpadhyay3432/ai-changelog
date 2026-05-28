@@ -435,7 +435,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
               letterSpacing: "0.01em",
             }}
           >
-            Break it down
+            Why it matters
           </button>
         </div>
       </div>

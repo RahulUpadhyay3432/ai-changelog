@@ -19,11 +19,16 @@ export async function POST(req: NextRequest) {
 Headline: "${title}"
 Summary: "${summary}"
 
-Respond in exactly this format (no headers, no markdown, no bullet points):
+Respond in exactly this format:
 
 [2-3 sentences explaining what this is in plain English]
 
-Why it matters: [1-2 sentences on the real-world significance or impact]`
+Why it matters: [1-2 sentences on the real-world significance or impact]
+
+Rules:
+- Use **bold** around 3-5 key technical terms, company names, or numbers that are most important
+- No headers, no bullet points, no other markdown
+- Bold only the most signal-rich words, not common words`
     );
 
     const text = result.response.text();

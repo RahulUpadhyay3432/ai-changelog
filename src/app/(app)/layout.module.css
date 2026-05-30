@@ -40,12 +40,14 @@
 @media (min-width: 431px) {
   .outer {
     align-items: center;
+    justify-content: center;
     padding: 28px 0;
     min-height: 100dvh;
   }
 
   .phoneShell {
     display: block;
+    width: fit-content;
     flex-shrink: 0;
     background: linear-gradient(160deg, oklch(22% 0 0) 0%, oklch(16% 0 0) 50%, oklch(19% 0 0) 100%);
     border-radius: 54px;
@@ -56,11 +58,11 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
       0 50px 130px rgba(0, 0, 0, 0.85),
       0 0 100px oklch(43% 0.155 255 / 0.1);
-    position: relative;
   }
 
   .phoneBezel {
     display: block;
+    width: fit-content;
     background: oklch(5.5% 0 0);
     border-radius: 44px;
     padding: 4px;

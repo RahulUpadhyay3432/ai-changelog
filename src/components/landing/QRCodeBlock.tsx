@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 export function QRCodeBlock() {
   return (
     <QRCodeSVG
-      value="https://kapyn.vercel.app"
+      value="https://kapyn.app"
       size={56}
       bgColor="#ffffff"
       fgColor="#0a0a0a"

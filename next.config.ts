@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const securityHeaders = [
   // Prevent browsers guessing content type
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Don't allow this app to be embedded in an iframe on other sites
-  { key: "X-Frame-Options", value: "DENY" },
+  // Allow same-origin iframing (landing page embeds the app)
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Stop leaking full referrer URL to third parties
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Restrict browser features

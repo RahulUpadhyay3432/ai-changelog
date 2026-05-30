@@ -14,7 +14,7 @@ export default function LandingPage() {
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <span className={styles.wordmark}>kapyn</span>
-          <Link href="https://kapyn.vercel.app" className={styles.navCta} target="_blank">
+          <Link href="https://kapyn.app" className={styles.navCta} target="_blank">
             Open App
             <span className={styles.arrowCircle}>
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -62,7 +62,7 @@ export default function LandingPage() {
                 <div className={styles.phoneIframeWrap}>
                   <iframe
                     className={styles.phoneIframe}
-                    src="https://kapyn.vercel.app"
+                    src="https://kapyn.app"
                     frameBorder="0"
                     allow="autoplay"
                     title="Kapyn app"
@@ -179,19 +179,19 @@ export default function LandingPage() {
             <div className={styles.pwaSub}>Works like native on iOS, Android, and desktop. No App Store required.</div>
           </div>
           <div className={styles.pwaBtns}>
-            <Link href="https://kapyn.vercel.app" className={styles.btnGhost} target="_blank">
+            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
                 <path d="M7 1v8M4 6l3 3 3-3M2.5 11h9" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               iOS Safari
             </Link>
-            <Link href="https://kapyn.vercel.app" className={styles.btnGhost} target="_blank">
+            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
                 <path d="M7 1v8M4 6l3 3 3-3M2.5 11h9" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               Android
             </Link>
-            <Link href="https://kapyn.vercel.app" className={styles.btnGhost} target="_blank">
+            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
                 <rect x="1.5" y="2.5" width="11" height="9" rx="1.5"/>
                 <path d="M1.5 6h11" strokeLinecap="round"/>

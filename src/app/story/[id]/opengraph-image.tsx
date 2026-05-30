@@ -75,7 +75,7 @@ export default async function OgImage({
           <span
             style={{
               fontSize: 28,
-              color: "#666",
+              color: "#C8C4BE",
               fontWeight: 400,
               letterSpacing: "0.01em",
             }}

@@ -60,8 +60,8 @@ export default async function OgImage({
           }}
         />
 
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center" }}>
+        {/* Logo + tagline */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <span
             style={{
               fontSize: 38,
@@ -74,11 +74,10 @@ export default async function OgImage({
           </span>
           <span
             style={{
-              marginLeft: 16,
-              fontSize: 18,
-              color: "#444",
+              fontSize: 28,
+              color: "#666",
               fontWeight: 400,
-              letterSpacing: "0.02em",
+              letterSpacing: "0.01em",
             }}
           >
             AI & tech news in 30-second reads

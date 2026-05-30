@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
-import { BottomNav } from "@/components/layout/BottomNav";
 import { PostHogProvider } from "@/components/PostHogProvider";
-import { AddToHomeScreen } from "@/components/pwa/AddToHomeScreen";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -45,34 +43,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={spaceGrotesk.variable} style={{ height: "100%", overflow: "hidden" }}>
+    <html lang="en" className={spaceGrotesk.variable}>
       <PostHogProvider>
-      <body
-        style={{
-          height: "100%",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          background: "#0a0a0a",
-          paddingTop: "env(safe-area-inset-top, 0px)",
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
-        }}
-      >
-        <main
+        <body
           style={{
-            flex: 1,
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-            paddingBottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
+            margin: 0,
+            background: "#0a0a0a",
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
           }}
         >
           {children}
-        </main>
-        <BottomNav />
-        <AddToHomeScreen />
-      </body>
+        </body>
       </PostHogProvider>
     </html>
   );

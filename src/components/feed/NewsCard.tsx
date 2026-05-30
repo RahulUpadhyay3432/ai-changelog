@@ -146,9 +146,10 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     e.stopPropagation();
     setSharePressed(true);
     setTimeout(() => setSharePressed(false), 200);
+    const shareUrl = `https://kapyn.vercel.app/story/${item.id}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: item.title, url: item.sourceUrl });
+        await navigator.share({ title: item.title, url: shareUrl });
         posthog.capture("story_shared", {
           story_id: item.id,
           story_title: item.title,
@@ -157,7 +158,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           share_method: "native",
         });
       } else {
-        await navigator.clipboard.writeText(item.sourceUrl);
+        await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         posthog.capture("story_shared", {
@@ -169,7 +170,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         });
       }
     } catch {
-      await navigator.clipboard.writeText(item.sourceUrl);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       posthog.capture("story_shared", {

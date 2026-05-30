@@ -43,6 +43,17 @@ const CATEGORY_ORDER: Record<string, number> = {
   "open-source":  7,
 };
 
+export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
+  const { data, error } = await supabase
+    .from("news_items")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return dbToNewsItem(data as DbNewsItem);
+}
+
 export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 

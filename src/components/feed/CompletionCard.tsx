@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, animate, type PanInfo } from "framer-motion";
 import { Check, Flame } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { getStreak, getSavedStories } from "@/lib/storage";
+import { getStreak } from "@/lib/storage";
 
 interface CompletionCardProps {
   readCount: number;
-  onBack: () => void;
+  onBackToTop: () => void;
   onRefresh: () => Promise<void>;
   caughtUpToast: boolean;
 }
@@ -19,29 +18,22 @@ function vh() {
 
 export function CompletionCard({
   readCount,
-  onBack,
+  onBackToTop,
   onRefresh,
   caughtUpToast,
 }: CompletionCardProps) {
-  const router = useRouter();
   const y = useMotionValue(0);
   const [streak, setStreak] = useState(0);
-  const [savedCount, setSavedCount] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     setStreak(getStreak());
-    setSavedCount(getSavedStories().length);
   }, []);
 
   const handleDragEnd = async (_: unknown, info: PanInfo) => {
     const { offset, velocity } = info;
 
-    if (offset.y < -80 || velocity.y < -500) {
-      // Swipe up → back to last dispatch
-      await animate(y, -vh(), { duration: 0.22, ease: "easeIn" });
-      onBack();
-    } else if (offset.y > 80 || velocity.y > 500) {
+    if (offset.y > 80 || velocity.y > 500) {
       // Swipe down → pull-to-refresh
       setIsRefreshing(true);
       await animate(y, 56, { duration: 0.12 });
@@ -49,6 +41,7 @@ export function CompletionCard({
       setIsRefreshing(false);
       animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
     } else {
+      // Swipe up is a hard stop — snap back
       animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
     }
   };
@@ -59,7 +52,7 @@ export function CompletionCard({
     <motion.div
       drag="y"
       dragMomentum={false}
-      dragConstraints={{ top: -vh(), bottom: 200 }}
+      dragConstraints={{ top: 0, bottom: 200 }}
       onDragEnd={handleDragEnd}
       style={{
         position: "absolute",
@@ -198,9 +191,7 @@ export function CompletionCard({
           style={{ pointerEvents: "auto" }}
         >
           <button
-            onClick={() =>
-              router.push(savedCount > 0 ? "/saved" : "/categories")
-            }
+            onClick={onBackToTop}
             style={{
               background: "none",
               border: "none",
@@ -212,9 +203,7 @@ export function CompletionCard({
               letterSpacing: "0.01em",
             }}
           >
-            {savedCount > 0
-              ? "Revisit your saved dispatches →"
-              : "Browse categories →"}
+            Back to top →
           </button>
         </motion.div>
       </div>

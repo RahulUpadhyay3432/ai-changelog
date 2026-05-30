@@ -294,7 +294,11 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
           <CompletionCard
             key="completion"
             readCount={items.length}
-            onBack={() => setShowCompletion(false)}
+            onBackToTop={() => {
+              setShowCompletion(false);
+              setCurrentIndex(0);
+              onIndexChange?.(0, items.length);
+            }}
             onRefresh={handleCompletionRefresh}
             caughtUpToast={caughtUpToast}
           />

@@ -199,3 +199,27 @@ export function updateStreak(): void {
     console.error("Error updating streak:", e);
   }
 }
+
+// ==========================================
+// Push Notification Opt-in Storage
+// ==========================================
+
+export function getPushOptedIn(): boolean {
+  if (!isBrowser) return false;
+  return localStorage.getItem("kapyn_push_opted_in") === "true";
+}
+
+export function setPushOptedIn(): void {
+  if (!isBrowser) return;
+  localStorage.setItem("kapyn_push_opted_in", "true");
+}
+
+export function getPushDismissed(): boolean {
+  if (!isBrowser) return false;
+  return localStorage.getItem("kapyn_push_dismissed") === "true";
+}
+
+export function setPushDismissed(): void {
+  if (!isBrowser) return;
+  localStorage.setItem("kapyn_push_dismissed", "true");
+}

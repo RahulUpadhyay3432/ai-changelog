@@ -1,35 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Info, ChevronRight, Bookmark, Flame, Sparkles, Sliders } from "lucide-react";
-import { getSavedStories, getStreak, getPinnedCategories } from "@/lib/storage";
+import { User, Bell, BellOff, Info, ChevronRight, Bookmark, Flame, Sparkles, Sliders } from "lucide-react";
+import { getSavedStories, getStreak } from "@/lib/storage";
 
-const SETTINGS_SECTIONS = [
-  {
-    title: "Preferences",
-    items: [
-      { label: "Notification Settings", icon: Bell },
-      { label: "Category Subscriptions", icon: Sliders },
-    ],
-  },
-  {
-    title: "About",
-    items: [{ label: "About Kapyn", icon: Info }],
-  },
-];
+type NotifStatus = "default" | "granted" | "denied";
 
 export default function ProfilePage() {
   const [savedCount, setSavedCount] = useState(0);
   const [streakCount, setStreakCount] = useState(0);
-  const [pinnedCount, setPinnedCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [notifStatus, setNotifStatus] = useState<NotifStatus>("default");
+  const [notifRequesting, setNotifRequesting] = useState(false);
 
   useEffect(() => {
     setSavedCount(getSavedStories().length);
     setStreakCount(getStreak());
-    setPinnedCount(getPinnedCategories().length);
     setIsLoading(false);
+    if (typeof Notification !== "undefined") {
+      setNotifStatus(Notification.permission as NotifStatus);
+    }
   }, []);
+
+  const handleNotifications = async () => {
+    if (notifStatus === "denied") return;
+    if (notifStatus === "granted") return;
+    setNotifRequesting(true);
+    try {
+      const result = await Notification.requestPermission();
+      setNotifStatus(result as NotifStatus);
+    } finally {
+      setNotifRequesting(false);
+    }
+  };
+
+  const notifLabel = notifStatus === "granted" ? "On" : notifStatus === "denied" ? "Blocked" : "Enable";
+  const notifColor = notifStatus === "granted" ? "#4ade80" : notifStatus === "denied" ? "#ef4444" : "#a3a3a3";
 
   return (
     <div
@@ -67,8 +73,6 @@ export default function ProfilePage() {
           }}
         >
           <User size={36} color="#a3a3a3" strokeWidth={1.5} />
-          
-          {/* Subtle active pulse ring */}
           <div
             style={{
               position: "absolute",
@@ -94,13 +98,10 @@ export default function ProfilePage() {
             </p>
             <Sparkles size={16} color="#fbbf24" style={{ opacity: streakCount > 0 ? 1 : 0.3 }} />
           </div>
-          <p style={{ fontSize: "13px", color: "#737373", margin: "6px 0 0", fontWeight: 500 }}>
-            {pinnedCount > 0 ? `Following ${pinnedCount} pinned categories` : "Following all categories"}
-          </p>
         </div>
       </div>
 
-      {/* Stats row with glassmorphic cards and glows */}
+      {/* Stats row — Saved + Streak only */}
       <div
         style={{
           display: "flex",
@@ -109,7 +110,6 @@ export default function ProfilePage() {
           marginBottom: "28px",
         }}
       >
-        {/* Saved stories stat card */}
         <div
           style={{
             flex: 1,
@@ -121,8 +121,6 @@ export default function ProfilePage() {
             flexDirection: "column",
             alignItems: "center",
             gap: "6px",
-            position: "relative",
-            overflow: "hidden",
           }}
         >
           <Bookmark size={16} color="#fbbf24" style={{ opacity: savedCount > 0 ? 1 : 0.4 }} />
@@ -143,39 +141,6 @@ export default function ProfilePage() {
           </span>
         </div>
 
-        {/* Categories count stat card */}
-        <div
-          style={{
-            flex: 1,
-            background: "rgba(255, 255, 255, 0.02)",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-            borderRadius: "16px",
-            padding: "16px 12px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "6px",
-          }}
-        >
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", letterSpacing: "0.02em" }}>ALL</span>
-          <span
-            style={{
-              fontSize: "24px",
-              fontWeight: 800,
-              color: "#f5f5f5",
-              letterSpacing: "-0.03em",
-              lineHeight: 1,
-              marginTop: "4px",
-            }}
-          >
-            8
-          </span>
-          <span style={{ fontSize: "11px", color: "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Channels
-          </span>
-        </div>
-
-        {/* Streak gamification stat card with active glow */}
         <div
           style={{
             flex: 1,
@@ -216,67 +181,122 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Settings sections */}
-      {SETTINGS_SECTIONS.map((section) => (
-        <div key={section.title} style={{ marginBottom: "28px" }}>
-          <p
+      {/* Preferences section */}
+      <div style={{ marginBottom: "28px" }}>
+        <p
+          style={{
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#525252",
+            margin: "0 0 10px",
+            padding: "0 24px",
+          }}
+        >
+          Preferences
+        </p>
+        <div
+          style={{
+            background: "#111111",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
+            borderBottom: "1px solid rgba(255,255,255,0.04)",
+          }}
+        >
+          {/* Notifications row */}
+          <button
+            onClick={handleNotifications}
+            disabled={notifStatus === "denied" || notifRequesting}
             style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#525252",
-              margin: "0 0 10px",
-              padding: "0 24px",
-            }}
-          >
-            {section.title}
-          </p>
-          <div
-            style={{
-              background: "#111111",
-              borderTop: "1px solid rgba(255,255,255,0.04)",
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "16px 24px",
+              background: "none",
+              border: "none",
               borderBottom: "1px solid rgba(255,255,255,0.04)",
+              cursor: notifStatus === "denied" ? "not-allowed" : "pointer",
+              color: "#e5e5e5",
+              fontSize: "15px",
+              fontWeight: 500,
+            }}
+            className="hover:bg-white/2"
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {notifStatus === "denied" ? (
+                <BellOff size={16} color="#737373" strokeWidth={2} />
+              ) : (
+                <Bell size={16} color="#737373" strokeWidth={2} />
+              )}
+              <span>Notifications</span>
+            </div>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: notifColor }}>
+              {notifRequesting ? "..." : notifLabel}
+            </span>
+          </button>
+
+          {/* Category Preferences row */}
+          <button
+            disabled
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "16px 24px",
+              background: "none",
+              border: "none",
+              cursor: "default",
+              color: "#737373",
+              fontSize: "15px",
+              fontWeight: 500,
+              opacity: 0.7,
             }}
           >
-            {section.items.map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={i}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "16px 24px",
-                    background: "none",
-                    border: "none",
-                    borderBottom:
-                      i < section.items.length - 1
-                        ? "1px solid rgba(255,255,255,0.04)"
-                        : "none",
-                    cursor: "pointer",
-                    color: "#e5e5e5",
-                    fontSize: "15px",
-                    fontWeight: 500,
-                    transition: "background 0.2s ease",
-                  }}
-                  className="hover:bg-white/[0.02]"
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <Icon size={16} color="#737373" strokeWidth={2} />
-                    <span>{item.label}</span>
-                  </div>
-                  <ChevronRight size={16} color="#404040" />
-                </button>
-              );
-            })}
-          </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <Sliders size={16} color="#525252" strokeWidth={2} />
+              <span>Category Preferences</span>
+            </div>
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#525252", letterSpacing: "0.04em" }}>
+              SOON
+            </span>
+          </button>
         </div>
-      ))}
+      </div>
 
-      {/* Version */}
+      {/* About section */}
+      <div style={{ marginBottom: "28px" }}>
+        <p
+          style={{
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#525252",
+            margin: "0 0 10px",
+            padding: "0 24px",
+          }}
+        >
+          About
+        </p>
+        <div
+          style={{
+            background: "#111111",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
+            borderBottom: "1px solid rgba(255,255,255,0.04)",
+            padding: "16px 24px",
+          }}
+        >
+          <p style={{ fontSize: "14px", color: "#a3a3a3", lineHeight: 1.6, margin: "0 0 12px", fontWeight: 500 }}>
+            Kapyn delivers AI and tech news in 30-second reads — no noise, no paywalls.
+          </p>
+          <p style={{ fontSize: "13px", color: "#525252", lineHeight: 1.6, margin: 0 }}>
+            Sources: OpenAI Blog · Google DeepMind · Hugging Face · TechCrunch AI · VentureBeat · The Verge · Ars Technica · MIT Tech Review · Microsoft AI
+          </p>
+        </div>
+      </div>
+
       <p
         style={{
           textAlign: "center",

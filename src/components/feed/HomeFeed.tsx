@@ -46,6 +46,10 @@ export function HomeFeed() {
   }, [activeCategory]);
 
   const handleRefresh = useCallback(async () => {
+    // Trigger a real RSS fetch in the background, then re-read Supabase
+    fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
+    // Give the fetch pipeline a moment to pull in new items
+    await new Promise((r) => setTimeout(r, 4000));
     const items = await fetchNewsItems(activeCategory).catch(() => [] as typeof stories);
     if (items.length > 0) setStories(items);
   }, [activeCategory]);

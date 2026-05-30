@@ -7,6 +7,7 @@ import {
 } from "@/lib/producthunt";
 import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
+import { sendMorningNotification } from "@/lib/push";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -580,6 +581,22 @@ export async function GET(request: NextRequest) {
       errors: results.errors.length,
     },
   });
+
+  // Morning notification — only at 02:xx UTC, only when new items were inserted
+  const hourUTC = new Date().getUTCHours();
+  if (results.inserted > 0 && hourUTC === 2) {
+    try {
+      await sendMorningNotification(supabase, results.inserted);
+      posthog.capture({
+        distinctId: "cron-job",
+        event: "push_notification_sent",
+        properties: { count: results.inserted },
+      });
+    } catch (err) {
+      console.error("Morning notification failed:", err);
+    }
+  }
+
   await posthog.shutdown();
 
   return Response.json(results);

@@ -18,9 +18,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Story not found — Kapyn" };
   }
 
-  const description = story.summary.length > 155
-    ? story.summary.slice(0, 152) + "..."
+  const tagline = " · Kapyn — AI & tech news in 30-second reads.";
+  const maxSummary = 155 - tagline.length;
+  const truncated = story.summary.length > maxSummary
+    ? story.summary.slice(0, maxSummary - 3) + "..."
     : story.summary;
+  const description = truncated + tagline;
 
   return {
     title: `${story.title} — Kapyn`,

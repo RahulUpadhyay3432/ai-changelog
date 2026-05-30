@@ -374,11 +374,13 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           {item.title}
         </a>
 
-        {/* Summary — first sentence as lead, rest as body */}
+        {/* Summary — split lead only for short product-name titles */}
         {(() => {
           const full = cleanText(item.summary);
+          const titleWordCount = item.title.trim().split(/\s+/).length;
+          const isShortTitle = titleWordCount <= 4;
           const firstDot = full.search(/\.\s+[A-Z]/);
-          const lead = firstDot > 0 && firstDot < 120 ? full.slice(0, firstDot + 1) : null;
+          const lead = isShortTitle && firstDot > 0 && firstDot < 120 ? full.slice(0, firstDot + 1) : null;
           const body = lead ? full.slice(firstDot + 2) : full;
           return (
             <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -395,9 +397,9 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
                 </p>
               )}
               <p style={{
-                fontSize: "clamp(12px, 1.6dvh, 15px)",
+                fontSize: "clamp(13px, 1.7dvh, 16px)",
                 lineHeight: 1.6,
-                color: "#757575",
+                color: "#9A9A9A",
                 fontWeight: 400,
                 margin: 0,
                 flex: 1,

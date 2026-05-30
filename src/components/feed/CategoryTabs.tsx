@@ -52,17 +52,15 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
               fontWeight: active ? 700 : 500,
               border: "1px solid",
               borderColor: active
-                ? "rgba(251, 146, 60, 0.0)"
+                ? "transparent"
                 : "rgba(255, 255, 255, 0.08)",
-              background: active
-                ? "linear-gradient(135deg, #f97316 0%, #f59e0b 100%)"
-                : "transparent",
+              background: active ? "#1565C0" : "transparent",
               color: active ? "#fff" : "#555555",
               cursor: "pointer",
               transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
               letterSpacing: active ? "0.01em" : "0.015em",
               whiteSpace: "nowrap",
-              boxShadow: active ? "0 2px 10px rgba(249, 115, 22, 0.35)" : "none",
+              boxShadow: active ? "0 2px 12px rgba(21, 101, 192, 0.4)" : "none",
             }}
           >
             {label === "All" ? "All Dispatches" : label}

@@ -46,7 +46,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
   return (
     <div
       style={{
-        position: "fixed",
+        position: "absolute",
         inset: 0,
         zIndex: 9999,
         display: "flex",
@@ -289,8 +289,9 @@ export function BreakdownSheet({ item, open, onClose }: BreakdownSheetProps) {
 
   if (!mounted) return null;
 
+  const container = document.getElementById("phone-overlay-root") ?? document.body;
   return createPortal(
     <AnimatePresence>{open && <SheetContent item={item} onClose={onClose} />}</AnimatePresence>,
-    document.body
+    container
   );
 }

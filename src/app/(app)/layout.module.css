@@ -83,7 +83,7 @@
   .column {
     width: 330px;
     max-width: 330px;
-    height: min(860px, calc(100dvh - 56px));
+    height: min(780px, calc(100dvh - 140px));
     border-radius: 38px;
     overflow: hidden;
     padding-top: 0;

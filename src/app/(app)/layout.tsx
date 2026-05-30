@@ -48,6 +48,8 @@ export default function AppLayout({
             </main>
             <BottomNav />
             <AddToHomeScreen />
+            {/* Portal target for overlays — keeps sheets inside phone frame on desktop */}
+            <div id="phone-overlay-root" style={{ position: "absolute", inset: 0, zIndex: 100, pointerEvents: "none", overflow: "hidden", borderRadius: "inherit" }} />
           </div>
         </div>
       </div>

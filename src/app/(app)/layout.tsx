@@ -36,7 +36,7 @@ export default function AppLayout({
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            paddingBottom: "calc(60px + env(safe-area-inset-bottom, 0px))",
+            paddingBottom: "calc(48px + env(safe-area-inset-bottom, 0px))",
           }}
         >
           {children}

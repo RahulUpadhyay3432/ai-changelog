@@ -130,8 +130,21 @@ async function fetchPageMeta(url: string): Promise<PageMeta> {
     } finally {
       reader.cancel();
     }
-    const imageUrl =
-      extractMeta(html, "og:image") ?? extractMeta(html, "twitter:image", "name") ?? null;
+    const rawImageUrl =
+      extractMeta(html, "og:image") ??
+      extractMeta(html, "og:image:secure_url") ??
+      extractMeta(html, "twitter:image", "name") ??
+      extractMeta(html, "twitter:image:src", "name") ??
+      null;
+    // Resolve relative URLs to absolute
+    let imageUrl: string | null = null;
+    if (rawImageUrl) {
+      try {
+        imageUrl = new URL(rawImageUrl, url).href;
+      } catch {
+        imageUrl = rawImageUrl.startsWith("http") ? rawImageUrl : null;
+      }
+    }
     const description =
       extractMeta(html, "og:description") ?? extractMeta(html, "twitter:description", "name") ?? null;
     const titleRaw =

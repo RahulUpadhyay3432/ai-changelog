@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
+import { SwipeHint } from "./SwipeHint";
 import { fetchNewsItems } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import type { CategorySlug, NewsItem } from "@/lib/types";
@@ -101,6 +102,7 @@ export function HomeFeed() {
           onRefresh={handleRefresh}
         />
       )}
+      <SwipeHint />
     </div>
   );
 }

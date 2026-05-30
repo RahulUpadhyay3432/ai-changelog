@@ -383,7 +383,16 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           const lead = isShortTitle && firstDot > 0 && firstDot < 120 ? full.slice(0, firstDot + 1) : null;
           const body = lead ? full.slice(firstDot + 2) : full;
           return (
-            <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div style={{
+              flex: 1,
+              minHeight: 0,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+              maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+            }}>
               {lead && (
                 <p style={{
                   fontSize: "clamp(14px, 1.85dvh, 17px)",
@@ -402,7 +411,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
                 color: "#9A9A9A",
                 fontWeight: 400,
                 margin: 0,
-                flex: 1,
+                minHeight: 0,
                 overflow: "hidden",
               }}>
                 {body}

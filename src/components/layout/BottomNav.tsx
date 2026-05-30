@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, TrendingUp, Bookmark, User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/feed", label: "Home", Icon: Home },
+  { href: "/", label: "Home", Icon: Home },
   { href: "/trending", label: "Trending", Icon: TrendingUp },
   { href: "/saved", label: "Saved", Icon: Bookmark },
   { href: "/profile", label: "Profile", Icon: User },

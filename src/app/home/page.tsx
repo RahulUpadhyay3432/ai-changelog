@@ -62,7 +62,7 @@ export default function LandingPage() {
                 <div className={styles.phoneIframeWrap}>
                   <iframe
                     className={styles.phoneIframe}
-                    src="https://kapyn.vercel.app/feed"
+                    src="https://kapyn.vercel.app"
                     frameBorder="0"
                     allow="autoplay"
                     title="Kapyn app"
@@ -205,7 +205,7 @@ export default function LandingPage() {
       {/* FOOTER */}
       <footer className={styles.footer}>
         <span className={styles.footerMark}>kapyn</span>
-        <span className={styles.footerNote}>kapyn.vercel.app</span>
+        <span className={styles.footerNote}>kapyn.vercel.app/home</span>
       </footer>
 
     </div>

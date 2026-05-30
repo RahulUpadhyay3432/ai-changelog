@@ -79,9 +79,9 @@
   }
 
   .column {
-    width: 360px;
-    max-width: 360px;
-    height: min(780px, calc(100dvh - 80px));
+    width: 330px;
+    max-width: 330px;
+    height: min(860px, calc(100dvh - 56px));
     border-radius: 38px;
     overflow: hidden;
     padding-top: 0;
@@ -116,38 +116,38 @@
 
 /* ── Side panel content styles ─────────────────────────────── */
 .sideWordmark {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 800;
   letter-spacing: -0.045em;
   color: oklch(90% 0 0);
 }
 
 .sideTagline {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.65;
   color: oklch(53% 0 0);
-  max-width: 200px;
+  max-width: 220px;
   text-align: right;
 }
 
 .sideFeatures {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .sideFeature {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 13px;
+  gap: 10px;
+  font-size: 15px;
   color: oklch(48% 0 0);
   justify-content: flex-end;
 }
 
 .sideFeatureDot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: oklch(43% 0.155 255 / 0.8);
   flex-shrink: 0;
@@ -156,27 +156,27 @@
 
 .qrWrap {
   background: #fff;
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 14px;
+  padding: 12px;
   display: inline-flex;
 }
 
 .qrLabel {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: oklch(85% 0 0);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .qrSub {
-  font-size: 11px;
+  font-size: 14px;
   color: oklch(40% 0 0);
-  line-height: 1.5;
-  max-width: 160px;
+  line-height: 1.6;
+  max-width: 180px;
 }
 
 .qrUrl {
-  font-size: 10px;
+  font-size: 12px;
   font-family: monospace;
   color: oklch(43% 0.155 255);
   letter-spacing: 0.02em;

@@ -18,15 +18,24 @@ const VALID_SLUGS: CategorySlug[] = [
 ];
 
 const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string }[] = [
+  // Model labs & AI-first sources
+  { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",   sourceName: "OpenAI Blog" },
+  { url: "https://the-decoder.com/feed/",                                 defaultCategory: "ai-models",   sourceName: "The Decoder" },
+  // Broad tech coverage — picks up Anthropic, Meta, Mistral, xAI releases
+  { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", defaultCategory: "ai-models", sourceName: "The Verge" },
+  { url: "https://feeds.arstechnica.com/arstechnica/technology-lab",      defaultCategory: "ai-models",   sourceName: "Ars Technica" },
+  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "ai-models",   sourceName: "TechCrunch AI" },
+  { url: "https://venturebeat.com/category/ai/feed/",                     defaultCategory: "ai-models",   sourceName: "VentureBeat AI" },
+  // Research
+  { url: "https://www.technologyreview.com/feed/",                        defaultCategory: "research",    sourceName: "MIT Tech Review" },
+  // Big tech
   { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",    sourceName: "Google AI Blog" },
-  { url: "https://openai.com/blog/rss.xml",                              defaultCategory: "ai-models",   sourceName: "OpenAI Blog" },
-  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "research",    sourceName: "TechCrunch AI" },
-  { url: "https://huggingface.co/blog/feed.xml",                         defaultCategory: "dev-tools",   sourceName: "Hugging Face" },
-  { url: "https://venturebeat.com/category/ai/feed/",                    defaultCategory: "research",    sourceName: "VentureBeat AI" },
-  { url: "https://the-decoder.com/feed/",                                defaultCategory: "ai-models",   sourceName: "The Decoder" },
-  { url: "https://simonwillison.net/atom/everything/",                   defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
-  { url: "https://github.blog/feed/",                                    defaultCategory: "open-source", sourceName: "GitHub Blog" },
-  { url: "https://hnrss.org/show",                                       defaultCategory: "open-source", sourceName: "Show HN" },
+  { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",    sourceName: "Microsoft AI" },
+  // Dev tools
+  { url: "https://huggingface.co/blog/feed.xml",                          defaultCategory: "dev-tools",   sourceName: "Hugging Face" },
+  { url: "https://simonwillison.net/atom/everything/",                    defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
+  // Open source
+  { url: "https://github.blog/feed/",                                     defaultCategory: "open-source", sourceName: "GitHub Blog" },
 ];
 
 type ParserItem = {

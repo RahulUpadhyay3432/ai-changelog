@@ -26,8 +26,8 @@ export function SwipeHint() {
           style={{
             position: "fixed",
             bottom: "calc(80px + env(safe-area-inset-bottom, 0px))",
-            left: "50%",
-            transform: "translateX(-50%)",
+            left: 0,
+            right: 0,
             zIndex: 200,
             display: "flex",
             flexDirection: "column",

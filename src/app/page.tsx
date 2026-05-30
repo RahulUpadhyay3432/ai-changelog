@@ -62,7 +62,7 @@ export default function LandingPage() {
                 <div className={styles.phoneIframeWrap}>
                   <iframe
                     className={styles.phoneIframe}
-                    src="https://kapyn.vercel.app"
+                    src="https://kapyn.vercel.app/feed"
                     frameBorder="0"
                     allow="autoplay"
                     title="Kapyn app"

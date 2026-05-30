@@ -374,20 +374,40 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           {item.title}
         </a>
 
-        {/* Summary — fills remaining space, no clamp so text flows to fill height */}
-        <p
-          style={{
-            fontSize: "clamp(13px, 1.7dvh, 16px)",
-            lineHeight: 1.6,
-            color: "#9A9A9A",
-            fontWeight: 400,
-            margin: 0,
-            flex: 1,
-            overflow: "hidden",
-          }}
-        >
-          {cleanText(item.summary)}
-        </p>
+        {/* Summary — first sentence as lead, rest as body */}
+        {(() => {
+          const full = cleanText(item.summary);
+          const firstDot = full.search(/\.\s+[A-Z]/);
+          const lead = firstDot > 0 && firstDot < 120 ? full.slice(0, firstDot + 1) : null;
+          const body = lead ? full.slice(firstDot + 2) : full;
+          return (
+            <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", gap: "6px" }}>
+              {lead && (
+                <p style={{
+                  fontSize: "clamp(14px, 1.85dvh, 17px)",
+                  lineHeight: 1.45,
+                  color: "#D4D0CA",
+                  fontWeight: 500,
+                  margin: 0,
+                  flexShrink: 0,
+                }}>
+                  {lead}
+                </p>
+              )}
+              <p style={{
+                fontSize: "clamp(12px, 1.6dvh, 15px)",
+                lineHeight: 1.6,
+                color: "#757575",
+                fontWeight: 400,
+                margin: 0,
+                flex: 1,
+                overflow: "hidden",
+              }}>
+                {body}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Footer: source + swipe indicators — merged into one compact row */}
         <div

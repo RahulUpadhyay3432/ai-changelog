@@ -177,9 +177,10 @@ CATEGORIES:
 If genuinely unsure, use default: ${defaultCategory}
 
 SUMMARY RULES:
-- 3-5 sentences, plain English, present tense, active voice
-- Explain: (a) what this is, (b) what changed or was announced, (c) key details or numbers, (d) why it matters to AI developers
-- Make it substantial — readers should feel informed after reading, not like they need to click through
+- FIRST SENTENCE: A single punchy line (10-15 words max) saying exactly what this IS. For products: "X is a [what it does]." For news: the core fact in one line.
+- THEN 2-3 sentences of detail: what changed or was announced, key numbers, why it matters to AI developers
+- Plain English, present tense, active voice
+- Make it substantial — readers should feel informed after reading
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
 - NEVER start with "This article", "This release", or "This post"
 - If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL

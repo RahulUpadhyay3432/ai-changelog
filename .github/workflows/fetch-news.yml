@@ -1,0 +1,17 @@
+name: Fetch News (4x daily)
+
+on:
+  schedule:
+    - cron: "0 2,8,14,20 * * *"
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger news fetch
+        run: |
+          curl -f -s -X GET \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            "https://kapyn.app/api/news/fetch" \
+            | jq .

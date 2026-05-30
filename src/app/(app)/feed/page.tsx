@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { HomeFeed } from "@/components/feed/HomeFeed";
 
-export default function HomePage() {
+export default function FeedPage() {
   return (
     <Suspense
       fallback={

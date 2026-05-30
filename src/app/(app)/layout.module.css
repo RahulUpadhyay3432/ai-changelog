@@ -1,5 +1,7 @@
 .outer {
-  min-height: 100dvh;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
   background: #050505;
   display: flex;
   align-items: flex-start;
@@ -50,7 +52,7 @@
     justify-items: center;
     padding: 32px 40px;
     gap: 0 40px;
-    min-height: 100dvh;
+    height: 100%;
   }
 
   .phoneShell {

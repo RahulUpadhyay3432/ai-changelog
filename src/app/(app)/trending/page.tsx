@@ -1,28 +1,39 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
 import { CategoryTabs } from "@/components/feed/CategoryTabs";
 import { CardStack } from "@/components/feed/CardStack";
+import { fetchNewsItems } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
-import type { CategorySlug } from "@/lib/types";
-
-// Sort by recency as trending proxy for mock data
-const TRENDING_STORIES = [...MOCK_STORIES].sort(
-  (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-);
+import type { CategorySlug, NewsItem } from "@/lib/types";
 
 export default function TrendingPage() {
   const [activeCategory, setActiveCategory] = useState<CategorySlug>("all");
-  const [cardPosition, setCardPosition] = useState({
-    index: 0,
-    total: TRENDING_STORIES.length,
-  });
+  const [stories, setStories] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [cardPosition, setCardPosition] = useState({ index: 0, total: 0 });
 
-  const stories =
-    activeCategory === "all"
-      ? TRENDING_STORIES
-      : TRENDING_STORIES.filter((s) => s.categorySlug === activeCategory);
+  useEffect(() => {
+    setLoading(true);
+    fetchNewsItems(activeCategory)
+      .then((items) => {
+        const result = items.length > 0
+          ? [...items].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          : [...MOCK_STORIES]
+              .filter((s) => activeCategory === "all" || s.categorySlug === activeCategory)
+              .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+        setStories(result);
+      })
+      .catch(() => {
+        setStories(
+          [...MOCK_STORIES]
+            .filter((s) => activeCategory === "all" || s.categorySlug === activeCategory)
+            .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+        );
+      })
+      .finally(() => setLoading(false));
+  }, [activeCategory]);
 
   const handleIndexChange = useCallback((index: number, total: number) => {
     setCardPosition({ index, total });
@@ -71,17 +82,32 @@ export default function TrendingPage() {
             color: "#737373",
           }}
         >
-          {cardPosition.index + 1} / {cardPosition.total}
+          {stories.length > 0 ? `${cardPosition.index + 1} / ${cardPosition.total}` : "—"}
         </div>
       </div>
 
       <CategoryTabs activeSlug={activeCategory} onChange={setActiveCategory} />
 
-      <CardStack
-        key={activeCategory}
-        items={stories}
-        onIndexChange={handleIndexChange}
-      />
+      {loading ? (
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#525252",
+            fontSize: "14px",
+          }}
+        >
+          Loading stories…
+        </div>
+      ) : (
+        <CardStack
+          key={activeCategory}
+          items={stories}
+          onIndexChange={handleIndexChange}
+        />
+      )}
     </div>
   );
 }

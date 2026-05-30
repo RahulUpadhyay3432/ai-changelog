@@ -36,7 +36,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className={styles.h1}>
-            AI news.<br /><span className={styles.accent}>30 seconds.</span><br />Swipe done.
+            AI news.<br /><span className={styles.accent}>30 seconds.</span><br />You&rsquo;re caught up.
           </h1>
 
           <p className={styles.heroSub}>

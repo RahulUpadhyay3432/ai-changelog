@@ -48,7 +48,7 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
               flexShrink: 0,
               padding: "5px 13px",
               borderRadius: "100px",
-              fontSize: "11px",
+              fontSize: "13px",
               fontWeight: active ? 700 : 500,
               border: "1px solid",
               borderColor: active

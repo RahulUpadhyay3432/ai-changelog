@@ -65,9 +65,14 @@ const parser = new Parser<Record<string, unknown>, ParserItem>({
 });
 
 function getSupabaseAdmin() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!serviceKey) {
+    console.warn("SUPABASE_SERVICE_ROLE_KEY not set — falling back to anon key. Add it to Vercel env vars.");
+  }
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    serviceKey ?? anonKey!
   );
 }
 

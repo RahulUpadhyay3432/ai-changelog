@@ -74,7 +74,7 @@ export default async function OgImage({
           </span>
           <span
             style={{
-              fontSize: 28,
+              fontSize: 36,
               color: "#C8C4BE",
               fontWeight: 400,
               letterSpacing: "0.01em",
@@ -125,7 +125,7 @@ export default async function OgImage({
             {categoryName}
           </div>
           <span style={{ fontSize: 20, color: "#404040", fontWeight: 400 }}>
-            kapyn.vercel.app
+            kapyn.app
           </span>
         </div>
       </div>

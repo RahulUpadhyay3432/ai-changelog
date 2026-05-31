@@ -196,7 +196,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
       }}
     >
       {/* Hero — slightly taller for cinematic feel */}
-      <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden" }}>
+      <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
         {item.imageUrl ? (
           <img
             src={item.imageUrl}

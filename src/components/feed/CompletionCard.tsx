@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, animate, type PanInfo } from "framer-motion";
 import { Check, Flame } from "lucide-react";
-import { getStreak } from "@/lib/storage";
+import posthog from "posthog-js";
+import { getStreak, getPushOptedIn, getPushDismissed, setPushOptedIn, setPushDismissed } from "@/lib/storage";
 
 interface CompletionCardProps {
   readCount: number;
@@ -12,8 +13,16 @@ interface CompletionCardProps {
   caughtUpToast: boolean;
 }
 
-function vh() {
-  return typeof window !== "undefined" ? window.innerHeight : 800;
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const buffer = new ArrayBuffer(rawData.length);
+  const output = new Uint8Array(buffer) as Uint8Array<ArrayBuffer>;
+  for (let i = 0; i < rawData.length; i++) {
+    output[i] = rawData.charCodeAt(i);
+  }
+  return output;
 }
 
 export function CompletionCard({
@@ -25,28 +34,75 @@ export function CompletionCard({
   const y = useMotionValue(0);
   const [streak, setStreak] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
+  const [pushSubscribing, setPushSubscribing] = useState(false);
 
   useEffect(() => {
     setStreak(getStreak());
+    const supported = typeof window !== "undefined" && "PushManager" in window;
+    if (supported && !getPushOptedIn() && !getPushDismissed()) {
+      setShowPushPrompt(true);
+      posthog.capture("push_permission_prompted");
+    }
   }, []);
+
+  const handlePushEnable = async () => {
+    setPushSubscribing(true);
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        setPushDismissed();
+        setShowPushPrompt(false);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+        ),
+      });
+
+      await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+
+      setPushOptedIn();
+      setShowPushPrompt(false);
+      posthog.capture("push_notification_opted_in", { source: "completion_card" });
+    } catch {
+      setPushDismissed();
+      setShowPushPrompt(false);
+    } finally {
+      setPushSubscribing(false);
+    }
+  };
+
+  const handlePushDismiss = () => {
+    setPushDismissed();
+    setShowPushPrompt(false);
+    posthog.capture("push_notification_dismissed");
+  };
 
   const handleDragEnd = async (_: unknown, info: PanInfo) => {
     const { offset, velocity } = info;
 
     if (offset.y > 80 || velocity.y > 500) {
-      // Swipe down → pull-to-refresh
       setIsRefreshing(true);
       await animate(y, 56, { duration: 0.12 });
       await onRefresh();
       setIsRefreshing(false);
       animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
     } else {
-      // Swipe up is a hard stop — snap back
       animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
     }
   };
 
-  const baseDelay = 0.35; // after card fade-in
+  const baseDelay = 0.35;
+  const pushDelay = baseDelay + (streak > 0 ? 0.4 : 0.3);
 
   return (
     <motion.div
@@ -78,7 +134,7 @@ export function CompletionCard({
           alignItems: "center",
           justifyContent: "center",
           padding: "40px 36px",
-          pointerEvents: "none", // let drag pass through, only buttons capture
+          pointerEvents: "none",
         }}
       >
         {/* Animated checkmark */}
@@ -153,11 +209,75 @@ export function CompletionCard({
             }}
           >
             <Flame size={13} color="#f97316" fill="#f97316" />
-            <span
-              style={{ fontSize: "13px", color: "#f97316", fontWeight: 600 }}
-            >
+            <span style={{ fontSize: "13px", color: "#f97316", fontWeight: 600 }}>
               {streak} day streak
             </span>
+          </motion.div>
+        )}
+
+        {/* Push opt-in prompt */}
+        {showPushPrompt && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: pushDelay, duration: 0.35, ease: "easeOut" }}
+            style={{
+              pointerEvents: "auto",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "16px",
+              padding: "20px 20px 16px",
+              textAlign: "center",
+              marginBottom: "24px",
+              maxWidth: "280px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "13px",
+                color: "#a3a3a3",
+                margin: "0 0 16px",
+                lineHeight: 1.5,
+              }}
+            >
+              Get a quiet morning briefing?
+              <br />
+              One notification per day.
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                onClick={handlePushEnable}
+                disabled={pushSubscribing}
+                style={{
+                  background: "#D4A574",
+                  border: "none",
+                  color: "#0a0a0a",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: pushSubscribing ? "wait" : "pointer",
+                  padding: "8px 20px",
+                  borderRadius: "20px",
+                  opacity: pushSubscribing ? 0.7 : 1,
+                }}
+              >
+                {pushSubscribing ? "Setting up…" : "Enable"}
+              </button>
+              <button
+                onClick={handlePushDismiss}
+                style={{
+                  background: "none",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#525252",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  padding: "8px 16px",
+                  borderRadius: "20px",
+                }}
+              >
+                Not now
+              </button>
+            </div>
           </motion.div>
         )}
 
@@ -166,7 +286,7 @@ export function CompletionCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
-            delay: baseDelay + (streak > 0 ? 0.4 : 0.3),
+            delay: pushDelay + (showPushPrompt ? 0.1 : 0),
             duration: 0.4,
           }}
           style={{
@@ -185,7 +305,7 @@ export function CompletionCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
-            delay: baseDelay + (streak > 0 ? 0.5 : 0.4),
+            delay: pushDelay + 0.1,
             duration: 0.4,
           }}
           style={{ pointerEvents: "auto" }}

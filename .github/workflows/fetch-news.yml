@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Trigger news fetch
         run: |
-          curl -f -s -X GET \
+          curl -f -s -L -X GET \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             "https://kapyn.app/api/news/fetch" \
             | jq .

@@ -56,7 +56,17 @@ export function FeedbackSheet({ open, onClose }: FeedbackSheetProps) {
   const sheet = (
     <AnimatePresence>
       {open && (
-        <>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 9999,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+            pointerEvents: "none",
+          }}
+        >
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -68,7 +78,7 @@ export function FeedbackSheet({ open, onClose }: FeedbackSheetProps) {
               position: "absolute",
               inset: 0,
               background: "rgba(0,0,0,0.6)",
-              zIndex: 40,
+              pointerEvents: "all",
             }}
           />
 
@@ -79,16 +89,13 @@ export function FeedbackSheet({ open, onClose }: FeedbackSheetProps) {
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 34 }}
             style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
+              position: "relative",
               background: "#111111",
               borderRadius: "20px 20px 0 0",
               border: "1px solid rgba(255,255,255,0.08)",
               borderBottom: "none",
               padding: "24px 20px 32px",
-              zIndex: 50,
+              pointerEvents: "all",
             }}
           >
             {/* Handle */}
@@ -201,7 +208,7 @@ export function FeedbackSheet({ open, onClose }: FeedbackSheetProps) {
               </>
             )}
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

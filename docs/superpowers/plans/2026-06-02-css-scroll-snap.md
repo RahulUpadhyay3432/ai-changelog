@@ -1,3 +1,33 @@
+# CSS Scroll-Snap CardStack Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Replace Framer Motion drag-based card stack with CSS scroll-snap for compositor-thread smooth scrolling, matching Inshorts-style native-feel swipe.
+
+**Architecture:** A single scrollable div with `scroll-snap-type: y mandatory` replaces the Framer Motion drag system. Each card (plus CompletionCard at the end) is a full-height snap child. A scroll event tracks current index; touch events implement pull-to-refresh at the top. All existing behaviors (PostHog, streak, vibration, toast, completion) are preserved.
+
+**Tech Stack:** React 19, CSS scroll-snap (native browser), touch events (native), no new dependencies.
+
+---
+
+## File Map
+
+| File | Change |
+|------|--------|
+| `src/components/feed/CardStack.tsx` | Full rewrite — replace Framer Motion drag with CSS scroll-snap |
+
+No other files change. `NewsCard`, `CompletionCard`, `HomeFeed`, `BreakdownSheet` all unchanged.
+
+---
+
+### Task 1: Rewrite CardStack.tsx
+
+**Files:**
+- Modify: `src/components/feed/CardStack.tsx`
+
+- [ ] **Step 1: Replace the file with the CSS scroll-snap implementation**
+
+```tsx
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
@@ -270,3 +300,60 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
     </div>
   );
 }
+```
+
+- [ ] **Step 2: Verify TypeScript compiles**
+
+```powershell
+npx tsc --noEmit
+```
+
+Expected: no errors
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/components/feed/CardStack.tsx
+git commit -m "feat: replace Framer Motion drag with CSS scroll-snap for native-smooth swipe"
+```
+
+---
+
+### Task 2: Push and verify Vercel preview
+
+- [ ] **Step 1: Push branch**
+
+```bash
+git push origin feat/css-scroll-snap
+```
+
+- [ ] **Step 2: Manual test checklist on phone (Vercel preview URL)**
+
+- [ ] Swipe up — goes to next card, smooth
+- [ ] Swipe down — goes to previous card
+- [ ] Fast flick — snaps to exactly one card (`scroll-snap-stop: always`)
+- [ ] Swipe past last card — CompletionCard appears
+- [ ] "Back to top" on CompletionCard — scrolls smoothly to card 0
+- [ ] Pull down on first card past threshold — feed refresh triggers, spinner shows, "Feed Updated" toast appears
+- [ ] Pull down below threshold — nothing happens
+- [ ] Category tab change — feed resets to card 0
+
+---
+
+## Behavior Preservation Checklist
+
+| Behavior | Mechanism |
+|----------|-----------|
+| Swipe up/down | CSS scroll-snap (browser compositor) |
+| No card skipping | `scroll-snap-stop: always` |
+| Current index tracking | `handleScroll` → `Math.round(scrollTop / clientHeight)` |
+| PostHog `story_swiped` | Fired in `handleScroll` on index change |
+| PostHog `feed_refreshed` | Fired in `handleTouchEnd` after refresh |
+| Streak update | `updateStreak()` in `handleScroll` + mount |
+| Haptic vibration | `navigator.vibrate(10)` in `handleScroll` |
+| Pull-to-refresh | Touch events + `overscrollBehaviorY: contain` |
+| CompletionCard | Last scroll child, always mounted |
+| Back to top | `container.scrollTo({ top: 0 })` |
+| New items after refresh | `scrollTo(firstNew * clientHeight)` |
+| "Caught up" toast | `caughtUpToast` state, same as before |
+| "Feed Updated" toast | `showToast` state, same as before |

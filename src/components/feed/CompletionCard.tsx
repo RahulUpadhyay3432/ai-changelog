@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue, animate, type PanInfo } from "
 import { Check, Flame } from "lucide-react";
 import posthog from "posthog-js";
 import { getStreak, getPushOptedIn, getPushDismissed, setPushOptedIn, setPushDismissed } from "@/lib/storage";
+import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 
 interface CompletionCardProps {
   readCount: number;
@@ -36,6 +37,7 @@ export function CompletionCard({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [pushSubscribing, setPushSubscribing] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     setStreak(getStreak());
@@ -308,7 +310,7 @@ export function CompletionCard({
             delay: pushDelay + 0.1,
             duration: 0.4,
           }}
-          style={{ pointerEvents: "auto" }}
+          style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}
         >
           <button
             onClick={onBackToTop}
@@ -325,8 +327,25 @@ export function CompletionCard({
           >
             Back to top →
           </button>
+          <button
+            onClick={() => setShowFeedback(true)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#333",
+              fontSize: "12px",
+              fontWeight: 400,
+              cursor: "pointer",
+              padding: "6px 0",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Share feedback
+          </button>
         </motion.div>
       </div>
+
+      <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
 
       {/* Pull-to-refresh spinner */}
       {isRefreshing && (

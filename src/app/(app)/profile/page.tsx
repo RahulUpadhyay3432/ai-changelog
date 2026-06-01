@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Bookmark, Flame, Sparkles, Sliders } from "lucide-react";
+import { User, Bell, Bookmark, Flame, Sparkles, Sliders, MessageSquare } from "lucide-react";
 import { getSavedStories, getStreak } from "@/lib/storage";
+import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 
 export default function ProfilePage() {
   const [savedCount, setSavedCount] = useState(0);
   const [streakCount, setStreakCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     setSavedCount(getSavedStories().length);
@@ -220,6 +222,7 @@ export default function ProfilePage() {
               padding: "16px 24px",
               background: "none",
               border: "none",
+              borderBottom: "1px solid rgba(255,255,255,0.04)",
               cursor: "default",
               color: "#737373",
               fontSize: "15px",
@@ -235,8 +238,34 @@ export default function ProfilePage() {
               SOON
             </span>
           </button>
+
+          {/* Feedback row */}
+          <button
+            onClick={() => setShowFeedback(true)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "16px 24px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#a3a3a3",
+              fontSize: "15px",
+              fontWeight: 500,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <MessageSquare size={16} color="#a3a3a3" strokeWidth={2} />
+              <span>Share feedback</span>
+            </div>
+            <span style={{ fontSize: "16px", color: "#525252" }}>→</span>
+          </button>
         </div>
       </div>
+
+      <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
 
       {/* About section */}
       <div style={{ marginBottom: "28px" }}>

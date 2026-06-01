@@ -206,16 +206,17 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
           scrollSnapType: "y mandatory",
           overscrollBehaviorY: "contain",
           WebkitOverflowScrolling: "touch",
+          display: "flex",
+          flexDirection: "column",
         } as React.CSSProperties}
       >
         {items.map((item) => (
           <div
             key={item.id}
             style={{
-              height: "100%",
+              flex: "0 0 100%",
               scrollSnapAlign: "start",
               scrollSnapStop: "always",
-              flexShrink: 0,
             }}
           >
             <NewsCard item={item} onSave={onSave} />
@@ -224,10 +225,9 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
 
         {/* Completion card — final scroll stop */}
         <div style={{
-          height: "100%",
+          flex: "0 0 100%",
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          flexShrink: 0,
         }}>
           <CompletionCard
             readCount={items.length}

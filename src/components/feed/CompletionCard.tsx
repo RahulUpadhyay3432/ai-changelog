@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, animate, type PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Check, Flame } from "lucide-react";
 import posthog from "posthog-js";
-import { getStreak, getPushOptedIn, getPushDismissed, setPushOptedIn, setPushDismissed } from "@/lib/storage";
+import { getStreak } from "@/lib/storage";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 
 interface CompletionCardProps {
@@ -14,117 +14,30 @@ interface CompletionCardProps {
   caughtUpToast: boolean;
 }
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  const buffer = new ArrayBuffer(rawData.length);
-  const output = new Uint8Array(buffer) as Uint8Array<ArrayBuffer>;
-  for (let i = 0; i < rawData.length; i++) {
-    output[i] = rawData.charCodeAt(i);
-  }
-  return output;
-}
-
 export function CompletionCard({
   readCount,
   onBackToTop,
-  onRefresh,
   caughtUpToast,
 }: CompletionCardProps) {
-  const y = useMotionValue(0);
   const [streak, setStreak] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showPushPrompt, setShowPushPrompt] = useState(false);
-  const [pushSubscribing, setPushSubscribing] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     setStreak(getStreak());
-    const supported = typeof window !== "undefined" && "PushManager" in window;
-    if (supported && !getPushOptedIn() && !getPushDismissed()) {
-      setShowPushPrompt(true);
-      posthog.capture("push_permission_prompted");
-    }
-  }, []);
-
-  const handlePushEnable = async () => {
-    setPushSubscribing(true);
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        setPushDismissed();
-        setShowPushPrompt(false);
-        return;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-        ),
-      });
-
-      await fetch("/api/push/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(subscription),
-      });
-
-      setPushOptedIn();
-      setShowPushPrompt(false);
-      posthog.capture("push_notification_opted_in", { source: "completion_card" });
-    } catch {
-      setPushDismissed();
-      setShowPushPrompt(false);
-    } finally {
-      setPushSubscribing(false);
-    }
-  };
-
-  const handlePushDismiss = () => {
-    setPushDismissed();
-    setShowPushPrompt(false);
-    posthog.capture("push_notification_dismissed");
-  };
-
-  const handleDragEnd = async (_: unknown, info: PanInfo) => {
-    const { offset, velocity } = info;
-
-    if (offset.y > 80 || velocity.y > 500) {
-      setIsRefreshing(true);
-      await animate(y, 56, { duration: 0.12 });
-      await onRefresh();
-      setIsRefreshing(false);
-      animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
-    } else {
-      animate(y, 0, { type: "spring", stiffness: 380, damping: 30 });
-    }
-  };
+    posthog.capture("feed_completed", { read_count: readCount });
+  }, [readCount]);
 
   const baseDelay = 0.35;
-  const pushDelay = baseDelay + (streak > 0 ? 0.4 : 0.3);
 
   return (
-    <motion.div
-      drag="y"
-      dragMomentum={false}
-      dragConstraints={{ top: 0, bottom: 200 }}
-      onDragEnd={handleDragEnd}
+    <div
       style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 20,
-        y,
-        touchAction: "none",
-        cursor: "grab",
+        height: "100%",
+        width: "100%",
         background: "#0a0a0a",
+        position: "relative",
+        overflow: "hidden",
       }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4 }}
     >
       {/* Centered content */}
       <div
@@ -217,80 +130,11 @@ export function CompletionCard({
           </motion.div>
         )}
 
-        {/* Push opt-in prompt */}
-        {showPushPrompt && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: pushDelay, duration: 0.35, ease: "easeOut" }}
-            style={{
-              pointerEvents: "auto",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "16px",
-              padding: "20px 20px 16px",
-              textAlign: "center",
-              marginBottom: "24px",
-              maxWidth: "280px",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "13px",
-                color: "#a3a3a3",
-                margin: "0 0 16px",
-                lineHeight: 1.5,
-              }}
-            >
-              Get a quiet morning briefing?
-              <br />
-              One notification per day.
-            </p>
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button
-                onClick={handlePushEnable}
-                disabled={pushSubscribing}
-                style={{
-                  background: "#D4A574",
-                  border: "none",
-                  color: "#0a0a0a",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  cursor: pushSubscribing ? "wait" : "pointer",
-                  padding: "8px 20px",
-                  borderRadius: "20px",
-                  opacity: pushSubscribing ? 0.7 : 1,
-                }}
-              >
-                {pushSubscribing ? "Setting up…" : "Enable"}
-              </button>
-              <button
-                onClick={handlePushDismiss}
-                style={{
-                  background: "none",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#525252",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  padding: "8px 16px",
-                  borderRadius: "20px",
-                }}
-              >
-                Not now
-              </button>
-            </div>
-          </motion.div>
-        )}
-
         {/* Tagline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{
-            delay: pushDelay + (showPushPrompt ? 0.1 : 0),
-            duration: 0.4,
-          }}
+          transition={{ delay: baseDelay + 0.4, duration: 0.4 }}
           style={{
             fontSize: "12px",
             color: "#2a2a2a",
@@ -306,11 +150,14 @@ export function CompletionCard({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{
-            delay: pushDelay + 0.1,
-            duration: 0.4,
+          transition={{ delay: baseDelay + 0.5, duration: 0.4 }}
+          style={{
+            pointerEvents: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "10px",
           }}
-          style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}
         >
           <button
             onClick={() => setShowFeedback(true)}
@@ -348,21 +195,6 @@ export function CompletionCard({
 
       <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
 
-      {/* Pull-to-refresh spinner */}
-      {isRefreshing && (
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            pointerEvents: "none",
-          }}
-        >
-          <div className="refresh-spinner" />
-        </div>
-      )}
-
       {/* "Still all caught up" toast */}
       <AnimatePresence>
         {caughtUpToast && (
@@ -391,6 +223,6 @@ export function CompletionCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

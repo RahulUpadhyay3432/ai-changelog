@@ -310,8 +310,24 @@ export function CompletionCard({
             delay: pushDelay + 0.1,
             duration: 0.4,
           }}
-          style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}
+          style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}
         >
+          <button
+            onClick={() => setShowFeedback(true)}
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "20px",
+              color: "#a3a3a3",
+              fontSize: "13px",
+              fontWeight: 500,
+              cursor: "pointer",
+              padding: "9px 22px",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Share feedback
+          </button>
           <button
             onClick={onBackToTop}
             style={{
@@ -321,26 +337,11 @@ export function CompletionCard({
               fontSize: "13px",
               fontWeight: 500,
               cursor: "pointer",
-              padding: "8px 0",
-              letterSpacing: "0.01em",
-            }}
-          >
-            Back to top →
-          </button>
-          <button
-            onClick={() => setShowFeedback(true)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#333",
-              fontSize: "12px",
-              fontWeight: 400,
-              cursor: "pointer",
               padding: "6px 0",
               letterSpacing: "0.01em",
             }}
           >
-            Share feedback
+            Back to top →
           </button>
         </motion.div>
       </div>

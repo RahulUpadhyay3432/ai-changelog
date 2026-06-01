@@ -23,7 +23,8 @@ interface CardStackProps {
 }
 
 const THRESHOLD = 0.3;
-const SPRING = { type: "spring" as const, stiffness: 350, damping: 28 };
+const SPRING = { type: "spring" as const, stiffness: 500, damping: 26, mass: 0.8 };
+const SNAPBACK = { type: "spring" as const, stiffness: 600, damping: 32 };
 
 function vh() {
   return typeof window !== "undefined" ? window.innerHeight : 800;
@@ -149,7 +150,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   const handleDragEnd = useCallback(
     async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       if (isAnimatingRef.current) {
-        animate(dragY, 0, SPRING);
+        animate(dragY, 0, SNAPBACK);
         return;
       }
 
@@ -164,7 +165,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
         } else {
           // Last card — show completion instead of bouncing
           setShowCompletion(true);
-          animate(dragY, 0, SPRING);
+          animate(dragY, 0, SNAPBACK);
         }
       } else if (offset.y > threshold || velocity.y > 500) {
         if (idx > 0) {
@@ -181,13 +182,13 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
             toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
           } finally {
             setIsRefreshing(false);
-            animate(dragY, 0, SPRING);
+            animate(dragY, 0, SNAPBACK);
           }
         } else {
-          animate(dragY, 0, SPRING);
+          animate(dragY, 0, SNAPBACK);
         }
       } else {
-        animate(dragY, 0, SPRING);
+        animate(dragY, 0, SNAPBACK);
       }
     },
     [dragY, currentIndex, items.length, advanceTo, onRefresh]
@@ -257,7 +258,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
       {/* Current card — draggable, always on top */}
       <motion.div
         drag="y"
-        dragMomentum={false}
+        dragMomentum={true}
         onDragEnd={handleDragEnd}
         style={{
           position: "absolute",

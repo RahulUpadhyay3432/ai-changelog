@@ -294,7 +294,7 @@ export function CompletionCard({
           style={{
             fontSize: "12px",
             color: "#2a2a2a",
-            margin: "0 0 52px",
+            margin: "0 0 24px",
             textAlign: "center",
             lineHeight: 1.5,
           }}

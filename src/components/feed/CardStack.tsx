@@ -196,6 +196,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
       {/* Scroll container */}
       <div
         ref={containerRef}
+        className="scrollbar-none"
         onScroll={handleScroll}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}

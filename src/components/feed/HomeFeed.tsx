@@ -138,7 +138,7 @@ export function HomeFeed() {
   const tabIdx = tabs.findIndex((t) => t.slug === activeCategory);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#0a0a0a" }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "#0a0a0a" }}>
       {/* Top bar */}
       <div style={{
         padding: "8px 16px 10px 20px",

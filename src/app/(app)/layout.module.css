@@ -22,9 +22,8 @@
 .column {
   width: 100%;
   max-width: 430px;
-  /* flex:1 fills .outer exactly — no 100dvh bugs in iOS standalone */
-  flex: 1;
-  min-height: 0;
+  /* height:100% is more reliable than flex:1 inside position:fixed on iOS WebKit */
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;

@@ -1,5 +1,4 @@
 import { BottomNav } from "@/components/layout/BottomNav";
-import { AddToHomeScreen } from "@/components/pwa/AddToHomeScreen";
 import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
 import styles from "./layout.module.css";
 
@@ -47,7 +46,6 @@ export default function AppLayout({
               {children}
             </main>
             <BottomNav />
-            <AddToHomeScreen />
             {/* Portal target for overlays — keeps sheets inside phone frame on desktop */}
             <div id="phone-overlay-root" style={{ position: "absolute", inset: 0, zIndex: 100, pointerEvents: "none", overflow: "hidden", borderRadius: "inherit" }} />
           </div>

@@ -6,6 +6,7 @@ import { motion, useMotionValue, useVelocity, animate } from "framer-motion";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
+import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
@@ -139,7 +140,13 @@ export function HomeFeed() {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#0a0a0a" }}>
       {/* Top bar */}
-      <div style={{ padding: "8px 20px 4px", flexShrink: 0 }}>
+      <div style={{
+        padding: "8px 16px 4px 20px",
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
         <h1 style={{
           fontSize: "26px", fontWeight: 500, color: "#E8E4DE",
           margin: 0, letterSpacing: "-0.02em",
@@ -147,6 +154,7 @@ export function HomeFeed() {
         }}>
           kapyn
         </h1>
+        <HomeScreenPill />
       </div>
 
       <CategoryTabs activeSlug={activeCategory} onChange={handleCategoryChange} />

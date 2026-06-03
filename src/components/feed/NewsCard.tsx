@@ -293,13 +293,13 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         </button>
       </div>
 
-      {/* Content — padding-bottom reserves space for the absolute footer */}
+      {/* Content — padding-bottom leaves room for the footer below */}
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          padding: "10px 20px 56px",
+          padding: "10px 20px 60px",
           overflow: "hidden",
           minHeight: 0,
         }}
@@ -420,59 +420,61 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           );
         })()}
 
-        {/* Footer — absolutely pinned to card bottom, never creates a mid-card gap */}
-        <div
+      </div>
+
+      {/* Footer — direct child of card (position:relative), NOT inside overflow:hidden content div.
+          This guarantees iOS WebKit always renders it at the card bottom. */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: "8px 20px 12px",
+          borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+          background: "linear-gradient(to top, rgba(10,10,10,1) 70%, rgba(10,10,10,0))",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "8px 20px 12px",
-            borderTop: "1px solid rgba(255, 255, 255, 0.04)",
-            background: "linear-gradient(to top, rgba(10,10,10,1) 70%, rgba(10,10,10,0))",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            fontSize: "10px",
+            color: "#444",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
           }}
         >
-          <span
-            style={{
-              fontSize: "10px",
-              color: "#444",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}
-          >
-            {item.sourceName}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowBreakdown(true);
-              posthog.capture("story_breakdown_opened", {
-                story_id: item.id,
-                story_title: item.title,
-                category: item.categorySlug,
-              });
-            }}
-            style={{
-              background: category ? `${category.colorAccent}18` : "rgba(255,255,255,0.06)",
-              border: category
-                ? `1px solid ${category.colorAccent}30`
-                : "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "20px",
-              padding: "3px 10px",
-              fontSize: "13px",
-              fontWeight: 600,
-              color: category?.colorLabel ?? "#a3a3a3",
-              cursor: "pointer",
-              letterSpacing: "0.01em",
-            }}
-          >
-            Why it matters
-          </button>
-        </div>
+          {item.sourceName}
+        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowBreakdown(true);
+            posthog.capture("story_breakdown_opened", {
+              story_id: item.id,
+              story_title: item.title,
+              category: item.categorySlug,
+            });
+          }}
+          style={{
+            background: category ? `${category.colorAccent}18` : "rgba(255,255,255,0.06)",
+            border: category
+              ? `1px solid ${category.colorAccent}30`
+              : "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "20px",
+            padding: "3px 10px",
+            fontSize: "13px",
+            fontWeight: 600,
+            color: category?.colorLabel ?? "#a3a3a3",
+            cursor: "pointer",
+            letterSpacing: "0.01em",
+          }}
+        >
+          Why it matters
+        </button>
       </div>
 
       <BreakdownSheet

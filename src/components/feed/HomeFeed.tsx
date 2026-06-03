@@ -178,7 +178,12 @@ export function HomeFeed() {
               animate="center"
               exit="exit"
               transition={slideTransition}
-              style={{ position: "absolute", inset: 0 }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               <CardStack
                 items={stories}

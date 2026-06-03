@@ -13,11 +13,13 @@ interface CardStackProps {
   onIndexChange?: (index: number, total: number) => void;
   onRefresh?: () => Promise<number>; // returns new item count
   onSave?: (id: string) => void;
+  onCategorySwipe?: (direction: "left" | "right") => void;
 }
 
 const PTR_THRESHOLD = 64;
+const SWIPE_X_THRESHOLD = 55; // px horizontal distance to trigger category change
 
-export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStackProps) {
+export function CardStack({ items, onIndexChange, onRefresh, onSave, onCategorySwipe }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -28,6 +30,8 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   const currentIndexRef = useRef(0);
   const touchStartY = useRef(0);
   const touchCurrentY = useRef(0);
+  const touchStartX = useRef(0);
+  const touchCurrentX = useRef(0);
   const isRefreshingRef = useRef(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -99,14 +103,20 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
     touchCurrentY.current = e.touches[0].clientY;
+    touchStartX.current = e.touches[0].clientX;
+    touchCurrentX.current = e.touches[0].clientX;
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const container = containerRef.current;
     if (!container || isRefreshingRef.current) return;
     touchCurrentY.current = e.touches[0].clientY;
-    if (container.scrollTop > 4) return;
+    touchCurrentX.current = e.touches[0].clientX;
+    const deltaX = touchCurrentX.current - touchStartX.current;
     const deltaY = touchCurrentY.current - touchStartY.current;
+    // If horizontal swipe is dominant, skip pull-to-refresh handling
+    if (Math.abs(deltaX) > Math.abs(deltaY)) return;
+    if (container.scrollTop > 4) return;
     if (deltaY > 0) {
       setPtrPull(Math.min(deltaY * 0.6, PTR_THRESHOLD * 1.2));
     }
@@ -115,7 +125,20 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
   const handleTouchEnd = useCallback(async () => {
     const container = containerRef.current;
     const deltaY = touchCurrentY.current - touchStartY.current;
+    const deltaX = touchCurrentX.current - touchStartX.current;
     setPtrPull(0);
+
+    // ── Horizontal swipe → category navigation ────────────────────────────
+    if (
+      Math.abs(deltaX) > Math.abs(deltaY) &&
+      Math.abs(deltaX) > SWIPE_X_THRESHOLD &&
+      onCategorySwipe
+    ) {
+      onCategorySwipe(deltaX < 0 ? "left" : "right");
+      return;
+    }
+
+    // ── Pull-to-refresh (vertical, first card) ────────────────────────────
     if (
       container &&
       container.scrollTop <= 4 &&
@@ -149,7 +172,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
         isRefreshingRef.current = false;
       }
     }
-  }, [onRefresh]);
+  }, [onRefresh, onCategorySwipe]);
 
   const handleCompletionRefresh = useCallback(async () => {
     if (!onRefresh) return;

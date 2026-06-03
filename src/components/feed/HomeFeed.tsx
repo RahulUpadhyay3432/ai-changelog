@@ -7,6 +7,7 @@ import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
+import { CATEGORY_TABS } from "@/lib/categories";
 import type { CategorySlug, NewsItem } from "@/lib/types";
 import posthog from "posthog-js";
 
@@ -83,6 +84,20 @@ export function HomeFeed() {
     return items.length > 0 ? items.length : stories.length;
   }, [activeCategory, stories]);
 
+  const handleCategorySwipe = useCallback((direction: "left" | "right") => {
+    const tabs = CATEGORY_TABS;
+    const currentIndex = tabs.findIndex((t) => t.slug === activeCategory);
+    const nextIndex = direction === "left" ? currentIndex + 1 : currentIndex - 1;
+    if (nextIndex < 0 || nextIndex >= tabs.length) return;
+    const nextSlug = tabs[nextIndex].slug;
+    posthog.capture("category_swiped", {
+      direction,
+      from: activeCategory,
+      to: nextSlug,
+    });
+    setActiveCategory(nextSlug);
+  }, [activeCategory]);
+
   return (
     <div
       style={{
@@ -133,6 +148,7 @@ export function HomeFeed() {
           key={activeCategory}
           items={stories}
           onRefresh={handleRefresh}
+          onCategorySwipe={handleCategorySwipe}
         />
       )}
       <SwipeHint />

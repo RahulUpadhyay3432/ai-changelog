@@ -21,26 +21,26 @@ const VALID_SLUGS: CategorySlug[] = [
 const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string }[] = [
   // ── Model labs — first-party announcements ────────────────────────────────
   { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",      sourceName: "OpenAI Blog" },
-  { url: "https://www.anthropic.com/news/rss",                            defaultCategory: "ai-models",      sourceName: "Anthropic" },
+  // Note: Anthropic has no public RSS — covered via TechCrunch/The Decoder
   { url: "https://the-decoder.com/feed/",                                 defaultCategory: "ai-models",      sourceName: "The Decoder" },
 
   // ── Big tech — official blogs (catches cross-team launches like MS Discovery)
   { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",       sourceName: "Google AI Blog" },
-  { url: "https://deepmind.google/discover/blog/rss/",                    defaultCategory: "research",       sourceName: "Google DeepMind" },
+  { url: "https://deepmind.google/blog/rss.xml",                          defaultCategory: "research",       sourceName: "Google DeepMind" },
   { url: "https://blogs.microsoft.com/feed/",                             defaultCategory: "big-tech",       sourceName: "Microsoft Blog" },
   { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",       sourceName: "Microsoft AI" },
   { url: "https://www.microsoft.com/en-us/research/feed/",                defaultCategory: "research",       sourceName: "Microsoft Research" },
-  { url: "https://ai.meta.com/blog/rss.xml",                              defaultCategory: "ai-models",      sourceName: "Meta AI" },
+  { url: "https://engineering.fb.com/feed/",                              defaultCategory: "ai-models",      sourceName: "Meta Engineering" },
   { url: "https://aws.amazon.com/blogs/machine-learning/feed/",           defaultCategory: "infrastructure", sourceName: "AWS ML Blog" },
-  { url: "https://blogs.nvidia.com/blog/category/artificial-intelligence/feed/", defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },
-  { url: "https://machinelearning.apple.com/rss/research.rss",            defaultCategory: "research",       sourceName: "Apple ML Research" },
+  { url: "https://blogs.nvidia.com/blog/category/generative-ai/feed/",   defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },
+  { url: "https://machinelearning.apple.com/research?type=rss",           defaultCategory: "research",       sourceName: "Apple ML Research" },
 
   // ── Broad tech coverage — catches everything else ─────────────────────────
   { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", defaultCategory: "ai-models",  sourceName: "The Verge" },
   { url: "https://feeds.arstechnica.com/arstechnica/technology-lab",      defaultCategory: "ai-models",      sourceName: "Ars Technica" },
   { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "ai-models",      sourceName: "TechCrunch AI" },
   { url: "https://venturebeat.com/category/ai/feed/",                     defaultCategory: "ai-models",      sourceName: "VentureBeat AI" },
-  { url: "https://www.wired.com/feed/tag/artificial-intelligence/rss",    defaultCategory: "ai-models",      sourceName: "Wired AI" },
+  { url: "https://www.wired.com/feed/rss",                                defaultCategory: "ai-models",      sourceName: "Wired" },
 
   // ── Research ──────────────────────────────────────────────────────────────
   { url: "https://www.technologyreview.com/feed/",                        defaultCategory: "research",       sourceName: "MIT Tech Review" },

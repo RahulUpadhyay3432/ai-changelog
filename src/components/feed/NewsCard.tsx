@@ -293,13 +293,13 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         </button>
       </div>
 
-      {/* Content */}
+      {/* Content — padding-bottom reserves space for the absolute footer */}
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          padding: "10px 20px 8px",
+          padding: "10px 20px 56px",
           overflow: "hidden",
           minHeight: 0,
         }}
@@ -420,16 +420,19 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           );
         })()}
 
-        {/* Footer: source + swipe indicators — merged into one compact row */}
+        {/* Footer — absolutely pinned to card bottom, never creates a mid-card gap */}
         <div
           style={{
-            paddingTop: "8px",
-            marginTop: "auto",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: "8px 20px 12px",
             borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+            background: "linear-gradient(to top, rgba(10,10,10,1) 70%, rgba(10,10,10,0))",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            flexShrink: 0,
           }}
         >
           <span

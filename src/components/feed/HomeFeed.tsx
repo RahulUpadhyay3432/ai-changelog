@@ -69,11 +69,15 @@ export function HomeFeed() {
   }, [activeCategory]);
 
   const handleRefresh = useCallback(async () => {
-    fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
-    await new Promise((r) => setTimeout(r, 4000));
+    // 1. Immediately reload from DB — shows anything the cron already ingested
+    //    since the page was loaded. Fast (< 1s), always useful.
     const items = await fetchNewsItems(activeCategory).catch(() => [] as typeof stories);
     if (items.length > 0) setStories(items);
-  }, [activeCategory]);
+
+    // 2. Also kick off a background pipeline run so the *next* pull gets fresher data.
+    //    Fire-and-forget — the pipeline takes 30–120 s, can't be awaited inline.
+    fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
+  }, [activeCategory, stories]);
 
   return (
     <div

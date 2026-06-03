@@ -125,12 +125,26 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
     ) {
       isRefreshingRef.current = true;
       setIsRefreshing(true);
+      const countBefore = itemsLenRef.current;
       try {
         await onRefresh();
-        posthog.capture("feed_refreshed", { stories_count: itemsLenRef.current });
-        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-        setShowToast(true);
-        toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
+        const newCount = itemsLenRef.current;
+        posthog.capture("feed_refreshed", {
+          stories_before: countBefore,
+          stories_after: newCount,
+          new_stories: Math.max(0, newCount - countBefore),
+        });
+        // Only show "Feed Updated" if there are actually new stories
+        if (newCount > countBefore) {
+          if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+          setShowToast(true);
+          toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
+        } else {
+          // Already caught up — show the "You're up to date" toast instead
+          if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
+          setCaughtUpToast(true);
+          caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
+        }
       } finally {
         setIsRefreshing(false);
         isRefreshingRef.current = false;

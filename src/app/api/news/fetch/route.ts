@@ -19,24 +19,39 @@ const VALID_SLUGS: CategorySlug[] = [
 ];
 
 const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string }[] = [
-  // Model labs & AI-first sources
-  { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",   sourceName: "OpenAI Blog" },
-  { url: "https://the-decoder.com/feed/",                                 defaultCategory: "ai-models",   sourceName: "The Decoder" },
-  // Broad tech coverage — picks up Anthropic, Meta, Mistral, xAI releases
-  { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", defaultCategory: "ai-models", sourceName: "The Verge" },
-  { url: "https://feeds.arstechnica.com/arstechnica/technology-lab",      defaultCategory: "ai-models",   sourceName: "Ars Technica" },
-  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "ai-models",   sourceName: "TechCrunch AI" },
-  { url: "https://venturebeat.com/category/ai/feed/",                     defaultCategory: "ai-models",   sourceName: "VentureBeat AI" },
-  // Research
-  { url: "https://www.technologyreview.com/feed/",                        defaultCategory: "research",    sourceName: "MIT Tech Review" },
-  // Big tech
-  { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",    sourceName: "Google AI Blog" },
-  { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",    sourceName: "Microsoft AI" },
-  // Dev tools
-  { url: "https://huggingface.co/blog/feed.xml",                          defaultCategory: "dev-tools",   sourceName: "Hugging Face" },
-  { url: "https://simonwillison.net/atom/everything/",                    defaultCategory: "dev-tools",   sourceName: "Simon Willison" },
-  // Open source
-  { url: "https://github.blog/feed/",                                     defaultCategory: "open-source", sourceName: "GitHub Blog" },
+  // ── Model labs — first-party announcements ────────────────────────────────
+  { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",      sourceName: "OpenAI Blog" },
+  { url: "https://www.anthropic.com/news/rss",                            defaultCategory: "ai-models",      sourceName: "Anthropic" },
+  { url: "https://the-decoder.com/feed/",                                 defaultCategory: "ai-models",      sourceName: "The Decoder" },
+
+  // ── Big tech — official blogs (catches cross-team launches like MS Discovery)
+  { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",       sourceName: "Google AI Blog" },
+  { url: "https://deepmind.google/discover/blog/rss/",                    defaultCategory: "research",       sourceName: "Google DeepMind" },
+  { url: "https://blogs.microsoft.com/feed/",                             defaultCategory: "big-tech",       sourceName: "Microsoft Blog" },
+  { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",       sourceName: "Microsoft AI" },
+  { url: "https://www.microsoft.com/en-us/research/feed/",                defaultCategory: "research",       sourceName: "Microsoft Research" },
+  { url: "https://ai.meta.com/blog/rss.xml",                              defaultCategory: "ai-models",      sourceName: "Meta AI" },
+  { url: "https://aws.amazon.com/blogs/machine-learning/feed/",           defaultCategory: "infrastructure", sourceName: "AWS ML Blog" },
+  { url: "https://blogs.nvidia.com/blog/category/artificial-intelligence/feed/", defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },
+  { url: "https://machinelearning.apple.com/rss/research.rss",            defaultCategory: "research",       sourceName: "Apple ML Research" },
+
+  // ── Broad tech coverage — catches everything else ─────────────────────────
+  { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", defaultCategory: "ai-models",  sourceName: "The Verge" },
+  { url: "https://feeds.arstechnica.com/arstechnica/technology-lab",      defaultCategory: "ai-models",      sourceName: "Ars Technica" },
+  { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "ai-models",      sourceName: "TechCrunch AI" },
+  { url: "https://venturebeat.com/category/ai/feed/",                     defaultCategory: "ai-models",      sourceName: "VentureBeat AI" },
+  { url: "https://www.wired.com/feed/tag/artificial-intelligence/rss",    defaultCategory: "ai-models",      sourceName: "Wired AI" },
+
+  // ── Research ──────────────────────────────────────────────────────────────
+  { url: "https://www.technologyreview.com/feed/",                        defaultCategory: "research",       sourceName: "MIT Tech Review" },
+
+  // ── Dev tools & OSS ───────────────────────────────────────────────────────
+  { url: "https://huggingface.co/blog/feed.xml",                          defaultCategory: "dev-tools",      sourceName: "Hugging Face" },
+  { url: "https://simonwillison.net/atom/everything/",                    defaultCategory: "dev-tools",      sourceName: "Simon Willison" },
+  { url: "https://github.blog/feed/",                                     defaultCategory: "open-source",    sourceName: "GitHub Blog" },
+
+  // ── Community signal — catches OSS/tools that go viral before press ───────
+  { url: "https://hnrss.org/frontpage",                                   defaultCategory: "dev-tools",      sourceName: "Hacker News" },
 ];
 
 type ParserItem = {
@@ -335,7 +350,7 @@ async function fetchRSSFeed(
 ): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
 
-  const rawItems = (parsed.items ?? []).slice(0, 10).map((item) => {
+  const rawItems = (parsed.items ?? []).slice(0, 20).map((item) => {
     const rawContent =
       item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
     const content = rawContent.trim() || (item.title ?? "");

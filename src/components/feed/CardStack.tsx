@@ -13,13 +13,13 @@ interface CardStackProps {
   onIndexChange?: (index: number, total: number) => void;
   onRefresh?: () => Promise<number>; // returns new item count
   onSave?: (id: string) => void;
-  onCategorySwipe?: (direction: "left" | "right") => void;
+  onHorizontalDrag?: (dx: number) => void;      // called every touchmove when horizontal
+  onHorizontalDragEnd?: (dx: number) => void;   // called on touchend
 }
 
 const PTR_THRESHOLD = 64;
-const SWIPE_X_THRESHOLD = 55; // px horizontal distance to trigger category change
 
-export function CardStack({ items, onIndexChange, onRefresh, onSave, onCategorySwipe }: CardStackProps) {
+export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizontalDrag, onHorizontalDragEnd }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -114,13 +114,16 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onCategoryS
     touchCurrentX.current = e.touches[0].clientX;
     const deltaX = touchCurrentX.current - touchStartX.current;
     const deltaY = touchCurrentY.current - touchStartY.current;
-    // If horizontal swipe is dominant, skip pull-to-refresh handling
-    if (Math.abs(deltaX) > Math.abs(deltaY)) return;
+    // Horizontal dominant — stream live position to parent, skip PTR
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(deltaX) > 6) onHorizontalDrag?.(deltaX);
+      return;
+    }
     if (container.scrollTop > 4) return;
     if (deltaY > 0) {
       setPtrPull(Math.min(deltaY * 0.6, PTR_THRESHOLD * 1.2));
     }
-  }, []);
+  }, [onHorizontalDrag]);
 
   const handleTouchEnd = useCallback(async () => {
     const container = containerRef.current;
@@ -128,13 +131,9 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onCategoryS
     const deltaX = touchCurrentX.current - touchStartX.current;
     setPtrPull(0);
 
-    // ── Horizontal swipe → category navigation ────────────────────────────
-    if (
-      Math.abs(deltaX) > Math.abs(deltaY) &&
-      Math.abs(deltaX) > SWIPE_X_THRESHOLD &&
-      onCategorySwipe
-    ) {
-      onCategorySwipe(deltaX < 0 ? "left" : "right");
+    // ── Horizontal drag end → let parent decide snap or spring-back ───────
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 6) {
+      onHorizontalDragEnd?.(deltaX);
       return;
     }
 
@@ -172,7 +171,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onCategoryS
         isRefreshingRef.current = false;
       }
     }
-  }, [onRefresh, onCategorySwipe]);
+  }, [onRefresh, onHorizontalDragEnd]);
 
   const handleCompletionRefresh = useCallback(async () => {
     if (!onRefresh) return;

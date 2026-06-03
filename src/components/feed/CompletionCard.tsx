@@ -10,7 +10,6 @@ import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 interface CompletionCardProps {
   readCount: number;
   onBackToTop: () => void;
-  onRefresh: () => Promise<void>;
   caughtUpToast: boolean;
 }
 

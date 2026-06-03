@@ -231,6 +231,7 @@ SUMMARY RULES:
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
 - NEVER start with "This article", "This release", or "This post"
 - If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
+- If the content is NOT about AI, ML, software, developer tools, tech startups, or the tech industry: write OFF_TOPIC
 
 Respond in EXACTLY this format — no extra text before or after:
 CATEGORY: <slug>
@@ -267,6 +268,8 @@ function isBadSummary(text: string): boolean {
   return (
     t === "LOW_SIGNAL" ||
     lower.startsWith("low_signal") ||
+    t === "OFF_TOPIC" ||
+    lower.startsWith("off_topic") ||
     lower.startsWith("write a ") ||
     lower.startsWith("the provided content") ||
     lower.includes("summarize this article") ||
@@ -403,60 +406,52 @@ function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
 
 // ─── Insert pipeline ──────────────────────────────────────────────────────────
 
+const INSERT_CONCURRENCY = 4; // parallel LLM calls — stays within Gemini free quota
+
 async function insertItems(
   items: FeedItem[],
   supabase: ReturnType<typeof getSupabaseAdmin>,
   results: { inserted: number; skipped: number; lowSignal: number; errors: string[] }
 ) {
-  for (const item of items) {
-    if (!item.title || !item.sourceUrl) continue;
+  const validItems = items.filter(i => i.title && i.sourceUrl);
+  if (validItems.length === 0) return;
 
-    const { data: existing } = await supabase
-      .from("news_items")
-      .select("id")
-      .eq("source_url", item.sourceUrl)
-      .maybeSingle();
+  // ── Batch dedup: one query instead of N sequential maybeSingle calls ─────
+  const urls = validItems.map(i => i.sourceUrl);
+  const { data: existingRows } = await supabase
+    .from("news_items")
+    .select("source_url")
+    .in("source_url", urls);
+  const existingUrls = new Set((existingRows ?? []).map((r: { source_url: string }) => r.source_url));
 
-    if (existing) {
-      results.skipped++;
-      continue;
-    }
+  const newItems = validItems.filter(i => !existingUrls.has(i.sourceUrl));
+  results.skipped += validItems.length - newItems.length;
 
-    const result = await classifyAndSummarize(
-      item.title,
-      item.content,
-      item.defaultCategory
-    );
-
-    // Both LLMs failed — skip, never store raw content
+  // ── Process new items with bounded concurrency ────────────────────────────
+  const processOne = async (item: FeedItem) => {
+    const result = await classifyAndSummarize(item.title, item.content, item.defaultCategory);
     if (result === null) {
       results.errors.push(`LLM failed for "${item.title}" — skipped`);
-      continue;
+      return;
     }
-
     const { category, summary } = result;
-
-    // LOW_SIGNAL or raw-text leak — filter from feed
-    if (isBadSummary(summary)) {
-      results.lowSignal++;
-      continue;
-    }
+    if (isBadSummary(summary)) { results.lowSignal++; return; }
 
     const { error } = await supabase.from("news_items").insert({
       title: item.title,
       summary,
       source_url: item.sourceUrl,
       source_name: item.sourceName,
-      category_slug: category,        // AI-classified, not hardcoded
+      category_slug: category,
       published_at: item.publishedAt,
       image_url: item.imageUrl,
     });
+    if (error) results.errors.push(`Insert "${item.title}": ${error.message}`);
+    else results.inserted++;
+  };
 
-    if (error) {
-      results.errors.push(`Insert "${item.title}": ${error.message}`);
-    } else {
-      results.inserted++;
-    }
+  for (let i = 0; i < newItems.length; i += INSERT_CONCURRENCY) {
+    await Promise.allSettled(newItems.slice(i, i + INSERT_CONCURRENCY).map(processOne));
   }
 }
 

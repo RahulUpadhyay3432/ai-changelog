@@ -26,6 +26,8 @@ export function HomeFeed() {
   const [stories, setStories] = useState<NewsItem[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const hasLoadedOnce = useRef(false);
+  const storiesLenRef = useRef(0); // stable ref so handleRefresh doesn't capture stale stories
+  useEffect(() => { storiesLenRef.current = stories.length; }, [stories.length]);
 
   // Real-time drag position — drives the card x transform without re-renders
   const dragX = useMotionValue(0);
@@ -79,11 +81,12 @@ export function HomeFeed() {
   }, [activeCategory]);
 
   const handleRefresh = useCallback(async (): Promise<number> => {
-    const items = await fetchNewsItems(activeCategory).catch(() => [] as typeof stories);
+    const items = await fetchNewsItems(activeCategory).catch(() => [] as NewsItem[]);
     if (items.length > 0) setStories(items);
     fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
-    return items.length > 0 ? items.length : stories.length;
-  }, [activeCategory, stories]);
+    // Use ref for fallback — avoids stale closure on stories and removes it from deps
+    return items.length > 0 ? items.length : storiesLenRef.current;
+  }, [activeCategory]);
 
   // ── Real-time drag (called every touchmove) ──────────────────────────────
   const handleHorizontalDrag = useCallback((dx: number) => {

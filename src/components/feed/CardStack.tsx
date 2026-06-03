@@ -37,8 +37,6 @@ export function CardStack({
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemsLenRef = useRef(items.length);
-  const refreshingForCompletionRef = useRef(false);
-  const prevLenBeforeRefreshRef = useRef(0);
 
   // Touch tracking refs — shared between the locked-direction useEffect
   const touchStartX = useRef(0);
@@ -66,24 +64,6 @@ export function CardStack({
     };
   }, []);
 
-  // Completion-refresh: scroll to first new item once items array grows
-  useEffect(() => {
-    if (!refreshingForCompletionRef.current) return;
-    refreshingForCompletionRef.current = false;
-    const container = containerRef.current;
-    if (items.length > prevLenBeforeRefreshRef.current) {
-      const firstNew = prevLenBeforeRefreshRef.current;
-      if (container) container.scrollTo({ top: firstNew * container.clientHeight, behavior: "smooth" });
-      currentIndexRef.current = firstNew;
-      setCurrentIndex(firstNew);
-      onIndexChange?.(firstNew, items.length);
-    } else {
-      if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
-      setCaughtUpToast(true);
-      caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.length]);
 
   // ─── Non-passive touch listeners ────────────────────────────────────────────
   // React attaches all synthetic touch events as `passive: true`, which means
@@ -217,13 +197,6 @@ export function CardStack({
     }
   }, [items, onIndexChange]);
 
-  const handleCompletionRefresh = useCallback(async () => {
-    if (!onRefresh) return;
-    prevLenBeforeRefreshRef.current = itemsLenRef.current;
-    refreshingForCompletionRef.current = true;
-    await onRefresh();
-  }, [onRefresh]);
-
   const handleBackToTop = useCallback(() => {
     const container = containerRef.current;
     if (container) container.scrollTo({ top: 0, behavior: "smooth" });
@@ -287,7 +260,6 @@ export function CardStack({
           <CompletionCard
             readCount={items.length}
             onBackToTop={handleBackToTop}
-            onRefresh={handleCompletionRefresh}
             caughtUpToast={caughtUpToast}
           />
         </div>

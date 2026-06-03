@@ -169,17 +169,24 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           share_method: "clipboard",
         });
       }
-    } catch {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      posthog.capture("story_shared", {
-        story_id: item.id,
-        story_title: item.title,
-        category: item.categorySlug,
-        source_name: item.sourceName,
-        share_method: "clipboard_fallback",
-      });
+    } catch (err) {
+      // User cancelled the native share sheet — don't treat as an error
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      // Genuine error — fall back to clipboard
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        posthog.capture("story_shared", {
+          story_id: item.id,
+          story_title: item.title,
+          category: item.categorySlug,
+          source_name: item.sourceName,
+          share_method: "clipboard_fallback",
+        });
+      } catch {
+        // Clipboard also unavailable — silently ignore
+      }
     }
   };
 
@@ -374,9 +381,9 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           {item.title}
         </a>
 
-        {/* Summary — split lead only for short product-name titles */}
+        {/* Summary — AI-generated, already sanitised at ingestion; no cleanText needed */}
         {(() => {
-          const full = cleanText(item.summary);
+          const full = item.summary.trim();
           const titleWordCount = item.title.trim().split(/\s+/).length;
           const isShortTitle = titleWordCount <= 4;
           const firstDot = full.search(/\.\s+[A-Z]/);

@@ -21,14 +21,16 @@ export function BottomNav() {
         bottom: 0,
         left: 0,
         right: 0,
-        height: "48px",
+        // Height grows to cover the home indicator area — background fills the gap
+        height: "calc(48px + env(safe-area-inset-bottom, 0px))",
         background: "rgba(10, 10, 10, 0.96)",
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
         borderTop: "1px solid rgba(255, 255, 255, 0.05)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start", // icons sit at top of nav, safe area fills below
         justifyContent: "space-around",
+        paddingTop: "0px",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
         zIndex: 50,
       }}

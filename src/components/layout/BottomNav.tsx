@@ -28,9 +28,10 @@ export function BottomNav() {
         WebkitBackdropFilter: "blur(24px)",
         borderTop: "1px solid rgba(255, 255, 255, 0.05)",
         display: "flex",
-        alignItems: "flex-start", // icons sit at top of nav, safe area fills below
+        alignItems: "center",
         justifyContent: "space-around",
-        paddingTop: "0px",
+        // paddingBottom shifts the centre point up into the 48px zone,
+        // leaving the safe-area space as background fill below the icons
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
         zIndex: 50,
       }}

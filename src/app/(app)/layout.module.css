@@ -3,9 +3,10 @@
   inset: 0;
   overflow: hidden;
   background: #050505;
+  /* Column direction so .column fills height, centred horizontally */
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .phoneShell {
@@ -21,7 +22,9 @@
 .column {
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
+  /* flex:1 fills .outer exactly — no 100dvh bugs in iOS standalone */
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -31,10 +34,12 @@
 
 .main {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  position: relative;
+  /* No padding-bottom — BottomNav is in normal flow so flex handles spacing */
 }
 
 /* Side panels — hidden on mobile */

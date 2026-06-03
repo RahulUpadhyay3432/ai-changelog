@@ -17,11 +17,10 @@ export function BottomNav() {
   return (
     <nav
       style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        // Height grows to cover the home indicator area — background fills the gap
+        /* In normal flex flow — .column flex-direction:column pushes this
+           to the bottom naturally. No absolute positioning needed.
+           .main (flex:1) above it gets exactly the right remaining height. */
+        flexShrink: 0,
         height: "calc(48px + env(safe-area-inset-bottom, 0px))",
         background: "rgba(10, 10, 10, 0.96)",
         backdropFilter: "blur(24px)",
@@ -30,8 +29,6 @@ export function BottomNav() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-around",
-        // paddingBottom shifts the centre point up into the 48px zone,
-        // leaving the safe-area space as background fill below the icons
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
         zIndex: 50,
       }}

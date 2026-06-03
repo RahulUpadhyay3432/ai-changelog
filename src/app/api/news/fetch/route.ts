@@ -36,14 +36,15 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://engineering.fb.com/feed/",                              defaultCategory: "ai-models",      sourceName: "Meta Engineering" },
   { url: "https://aws.amazon.com/blogs/machine-learning/feed/",           defaultCategory: "infrastructure", sourceName: "AWS ML Blog" },
   { url: "https://blogs.nvidia.com/blog/category/generative-ai/feed/",   defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },
-  { url: "https://machinelearning.apple.com/research?type=rss",           defaultCategory: "research",       sourceName: "Apple ML Research" },
+  { url: "https://machinelearning.apple.com/rss.xml",                      defaultCategory: "research",       sourceName: "Apple ML Research" },
 
   // ── Broad tech coverage — catches everything else ─────────────────────────
   { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", defaultCategory: "ai-models",  sourceName: "The Verge" },
   { url: "https://feeds.arstechnica.com/arstechnica/technology-lab",      defaultCategory: "ai-models",      sourceName: "Ars Technica" },
   { url: "https://techcrunch.com/category/artificial-intelligence/feed/", defaultCategory: "ai-models",      sourceName: "TechCrunch AI" },
   { url: "https://venturebeat.com/category/ai/feed/",                     defaultCategory: "ai-models",      sourceName: "VentureBeat AI" },
-  { url: "https://www.wired.com/feed/rss",                                defaultCategory: "ai-models",      sourceName: "Wired" },
+  // Wired: no AI-specific RSS feed exists; full site feed is 50 items of mostly
+  // non-AI content (gadgets, culture, politics) — too noisy, removed.
 
   // ── Research ──────────────────────────────────────────────────────────────
   { url: "https://www.technologyreview.com/feed/",                        defaultCategory: "research",       sourceName: "MIT Tech Review" },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
@@ -11,15 +11,20 @@ import posthog from "posthog-js";
 interface CardStackProps {
   items: NewsItem[];
   onIndexChange?: (index: number, total: number) => void;
-  onRefresh?: () => Promise<number>; // returns new item count
+  onRefresh?: () => Promise<number>;
   onSave?: (id: string) => void;
-  onHorizontalDrag?: (dx: number) => void;      // called every touchmove when horizontal
-  onHorizontalDragEnd?: (dx: number) => void;   // called on touchend
+  onHorizontalDrag?: (dx: number) => void;
+  onHorizontalDragEnd?: (dx: number) => void;
 }
 
 const PTR_THRESHOLD = 64;
+// How many px of movement before we commit to a direction
+const DIRECTION_LOCK_THRESHOLD = 8;
 
-export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizontalDrag, onHorizontalDragEnd }: CardStackProps) {
+export function CardStack({
+  items, onIndexChange, onRefresh, onSave,
+  onHorizontalDrag, onHorizontalDragEnd,
+}: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -28,10 +33,6 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
-  const touchStartY = useRef(0);
-  const touchCurrentY = useRef(0);
-  const touchStartX = useRef(0);
-  const touchCurrentX = useRef(0);
   const isRefreshingRef = useRef(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,9 +40,23 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
   const refreshingForCompletionRef = useRef(false);
   const prevLenBeforeRefreshRef = useRef(0);
 
-  useEffect(() => {
-    itemsLenRef.current = items.length;
-  }, [items.length]);
+  // Touch tracking refs — shared between the locked-direction useEffect
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchCurrentX = useRef(0);
+  const touchCurrentY = useRef(0);
+  // "none" → "horizontal" | "vertical" — locked on first significant movement
+  const gestureLock = useRef<"none" | "horizontal" | "vertical">("none");
+
+  // Keep callback refs fresh so the non-passive listener never captures stale closures
+  const onHorizontalDragRef = useRef(onHorizontalDrag);
+  const onHorizontalDragEndRef = useRef(onHorizontalDragEnd);
+  const onRefreshRef = useRef(onRefresh);
+  useEffect(() => { onHorizontalDragRef.current = onHorizontalDrag; }, [onHorizontalDrag]);
+  useEffect(() => { onHorizontalDragEndRef.current = onHorizontalDragEnd; }, [onHorizontalDragEnd]);
+  useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
+
+  useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
 
   useEffect(() => {
     updateStreak();
@@ -51,15 +66,14 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
     };
   }, []);
 
+  // Completion-refresh: scroll to first new item once items array grows
   useEffect(() => {
     if (!refreshingForCompletionRef.current) return;
     refreshingForCompletionRef.current = false;
     const container = containerRef.current;
     if (items.length > prevLenBeforeRefreshRef.current) {
       const firstNew = prevLenBeforeRefreshRef.current;
-      if (container) {
-        container.scrollTo({ top: firstNew * container.clientHeight, behavior: "smooth" });
-      }
+      if (container) container.scrollTo({ top: firstNew * container.clientHeight, behavior: "smooth" });
       currentIndexRef.current = firstNew;
       setCurrentIndex(firstNew);
       onIndexChange?.(firstNew, items.length);
@@ -71,6 +85,111 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
+  // ─── Non-passive touch listeners ────────────────────────────────────────────
+  // React attaches all synthetic touch events as `passive: true`, which means
+  // e.preventDefault() is a no-op and the browser scrolls vertically even during
+  // a horizontal swipe. We bypass React here and attach directly to the DOM with
+  // { passive: false } so we can call preventDefault() the moment we lock to
+  // horizontal — killing all vertical scroll for that gesture.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      gestureLock.current = "none";
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      touchCurrentX.current = e.touches[0].clientX;
+      touchCurrentY.current = e.touches[0].clientY;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (isRefreshingRef.current) return;
+      touchCurrentX.current = e.touches[0].clientX;
+      touchCurrentY.current = e.touches[0].clientY;
+      const dx = touchCurrentX.current - touchStartX.current;
+      const dy = touchCurrentY.current - touchStartY.current;
+
+      // Lock direction on first significant movement
+      if (gestureLock.current === "none") {
+        if (Math.abs(dx) >= DIRECTION_LOCK_THRESHOLD || Math.abs(dy) >= DIRECTION_LOCK_THRESHOLD) {
+          gestureLock.current = Math.abs(dx) >= Math.abs(dy) ? "horizontal" : "vertical";
+        }
+        return; // Wait until direction is decided
+      }
+
+      if (gestureLock.current === "horizontal") {
+        // Prevent vertical scroll — this is the key line that makes it crisp
+        e.preventDefault();
+        onHorizontalDragRef.current?.(dx);
+      } else {
+        // Vertical: handle pull-to-refresh indicator only
+        if (container.scrollTop <= 4 && dy > 0) {
+          setPtrPull(Math.min(dy * 0.6, PTR_THRESHOLD * 1.2));
+        }
+      }
+    };
+
+    const onTouchEnd = async () => {
+      const dx = touchCurrentX.current - touchStartX.current;
+      const dy = touchCurrentY.current - touchStartY.current;
+      const lock = gestureLock.current;
+      gestureLock.current = "none";
+      setPtrPull(0);
+
+      if (lock === "horizontal") {
+        onHorizontalDragEndRef.current?.(dx);
+        return;
+      }
+
+      // Vertical: pull-to-refresh
+      if (
+        lock === "vertical" &&
+        container.scrollTop <= 4 &&
+        dy >= PTR_THRESHOLD &&
+        onRefreshRef.current &&
+        !isRefreshingRef.current
+      ) {
+        isRefreshingRef.current = true;
+        setIsRefreshing(true);
+        const countBefore = itemsLenRef.current;
+        try {
+          const newCount = await onRefreshRef.current();
+          posthog.capture("feed_refreshed", {
+            stories_before: countBefore,
+            stories_after: newCount,
+            new_stories: Math.max(0, newCount - countBefore),
+          });
+          if (newCount > countBefore) {
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            setShowToast(true);
+            toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
+          } else {
+            if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
+            setCaughtUpToast(true);
+            caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
+          }
+        } finally {
+          setIsRefreshing(false);
+          isRefreshingRef.current = false;
+        }
+      }
+    };
+
+    // passive: true  → browser can optimise scroll (we never preventDefault here)
+    // passive: false → we may preventDefault; required for horizontal lock
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove",  onTouchMove,  { passive: false });
+    container.addEventListener("touchend",   onTouchEnd,   { passive: true });
+
+    return () => {
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove",  onTouchMove);
+      container.removeEventListener("touchend",   onTouchEnd);
+    };
+  }, []); // Empty — all callbacks accessed via refs
+
+  // ─── Scroll handler (vertical story tracking) ────────────────────────────
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -94,97 +213,20 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
         position: prev,
         total: items.length,
       });
-      if (typeof navigator !== "undefined" && navigator.vibrate) {
-        navigator.vibrate(10);
-      }
+      if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
     }
   }, [items, onIndexChange]);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchCurrentY.current = e.touches[0].clientY;
-    touchStartX.current = e.touches[0].clientX;
-    touchCurrentX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const container = containerRef.current;
-    if (!container || isRefreshingRef.current) return;
-    touchCurrentY.current = e.touches[0].clientY;
-    touchCurrentX.current = e.touches[0].clientX;
-    const deltaX = touchCurrentX.current - touchStartX.current;
-    const deltaY = touchCurrentY.current - touchStartY.current;
-    // Horizontal dominant — stream live position to parent, skip PTR
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (Math.abs(deltaX) > 6) onHorizontalDrag?.(deltaX);
-      return;
-    }
-    if (container.scrollTop > 4) return;
-    if (deltaY > 0) {
-      setPtrPull(Math.min(deltaY * 0.6, PTR_THRESHOLD * 1.2));
-    }
-  }, [onHorizontalDrag]);
-
-  const handleTouchEnd = useCallback(async () => {
-    const container = containerRef.current;
-    const deltaY = touchCurrentY.current - touchStartY.current;
-    const deltaX = touchCurrentX.current - touchStartX.current;
-    setPtrPull(0);
-
-    // ── Horizontal drag end → let parent decide snap or spring-back ───────
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 6) {
-      onHorizontalDragEnd?.(deltaX);
-      return;
-    }
-
-    // ── Pull-to-refresh (vertical, first card) ────────────────────────────
-    if (
-      container &&
-      container.scrollTop <= 4 &&
-      deltaY >= PTR_THRESHOLD &&
-      onRefresh &&
-      !isRefreshingRef.current
-    ) {
-      isRefreshingRef.current = true;
-      setIsRefreshing(true);
-      const countBefore = itemsLenRef.current;
-      try {
-        // onRefresh returns the new item count — don't rely on itemsLenRef
-        // which only updates after React re-renders (too late to read here)
-        const newCount = await onRefresh();
-        posthog.capture("feed_refreshed", {
-          stories_before: countBefore,
-          stories_after: newCount,
-          new_stories: Math.max(0, newCount - countBefore),
-        });
-        if (newCount > countBefore) {
-          if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-          setShowToast(true);
-          toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
-        } else {
-          if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
-          setCaughtUpToast(true);
-          caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
-        }
-      } finally {
-        setIsRefreshing(false);
-        isRefreshingRef.current = false;
-      }
-    }
-  }, [onRefresh, onHorizontalDragEnd]);
 
   const handleCompletionRefresh = useCallback(async () => {
     if (!onRefresh) return;
     prevLenBeforeRefreshRef.current = itemsLenRef.current;
     refreshingForCompletionRef.current = true;
-    await onRefresh(); // return value handled by the items.length useEffect
+    await onRefresh();
   }, [onRefresh]);
 
   const handleBackToTop = useCallback(() => {
     const container = containerRef.current;
-    if (container) {
-      container.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    if (container) container.scrollTo({ top: 0, behavior: "smooth" });
     currentIndexRef.current = 0;
     setCurrentIndex(0);
     onIndexChange?.(0, items.length);
@@ -192,14 +234,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
 
   if (items.length === 0) {
     return (
-      <div style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#525252",
-        fontSize: "15px",
-      }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#525252", fontSize: "15px" }}>
         No stories yet. Check back soon.
       </div>
     );
@@ -228,14 +263,11 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
         )}
       </AnimatePresence>
 
-      {/* Scroll container */}
+      {/* Scroll container — touch events handled via non-passive DOM listeners above */}
       <div
         ref={containerRef}
         className="scrollbar-none"
         onScroll={handleScroll}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
         style={{
           height: "100%",
           overflowY: "scroll",
@@ -247,24 +279,11 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
         } as React.CSSProperties}
       >
         {items.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              flex: "0 0 100%",
-              scrollSnapAlign: "start",
-              scrollSnapStop: "always",
-            }}
-          >
+          <div key={item.id} style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
             <NewsCard item={item} onSave={onSave} />
           </div>
         ))}
-
-        {/* Completion card — final scroll stop */}
-        <div style={{
-          flex: "0 0 100%",
-          scrollSnapAlign: "start",
-          scrollSnapStop: "always",
-        }}>
+        <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
           <CompletionCard
             readCount={items.length}
             onBackToTop={handleBackToTop}
@@ -282,21 +301,12 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave, onHorizonta
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 4, x: "-50%", transition: { duration: 0.3 } }}
             style={{
-              position: "absolute",
-              bottom: 80,
-              left: "50%",
-              background: "rgba(255,255,255,0.10)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              color: "#a3a3a3",
-              padding: "6px 16px",
-              borderRadius: "20px",
-              fontSize: "12px",
-              fontWeight: 500,
-              zIndex: 50,
-              whiteSpace: "nowrap",
-              border: "1px solid rgba(255,255,255,0.10)",
-              pointerEvents: "none",
+              position: "absolute", bottom: 80, left: "50%",
+              background: "rgba(255,255,255,0.10)", backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)", color: "#a3a3a3",
+              padding: "6px 16px", borderRadius: "20px", fontSize: "12px",
+              fontWeight: 500, zIndex: 50, whiteSpace: "nowrap",
+              border: "1px solid rgba(255,255,255,0.10)", pointerEvents: "none",
             }}
           >
             Feed Updated

@@ -293,17 +293,15 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         </button>
       </div>
 
-      {/* Content — bottom-anchored so text sits near footer, no mid-card gap */}
+      {/* Content */}
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-end",
-          padding: "10px 20px 12px",
+          padding: "10px 20px 8px",
           overflow: "hidden",
           minHeight: 0,
-          gap: "6px",
         }}
       >
         {/* Category + time */}
@@ -312,6 +310,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
+            marginBottom: "6px",
             flexShrink: 0,
           }}
         >
@@ -364,6 +363,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
             lineHeight: 1.3,
             color: "#E8E4DE",
             margin: 0,
+            marginBottom: "8px",
             letterSpacing: "0",
             textDecoration: "none",
             display: "block",
@@ -384,6 +384,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
           const body = lead ? full.slice(firstDot + 2) : full;
           return (
             <div style={{
+              flex: 1,
+              minHeight: 0,
               overflow: "hidden",
               display: "flex",
               flexDirection: "column",
@@ -422,6 +424,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         <div
           style={{
             paddingTop: "8px",
+            marginTop: "auto",
             borderTop: "1px solid rgba(255, 255, 255, 0.04)",
             display: "flex",
             justifyContent: "space-between",

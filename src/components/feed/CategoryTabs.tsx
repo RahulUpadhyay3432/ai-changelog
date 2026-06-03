@@ -31,7 +31,7 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
         display: "flex",
         gap: "6px",
         overflowX: "auto",
-        padding: "6px 16px 10px",
+        padding: "6px 16px 6px",
         flexShrink: 0,
         borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
       }}

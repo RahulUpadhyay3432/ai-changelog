@@ -195,8 +195,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
         position: "relative",
       }}
     >
-      {/* Hero — slightly taller for cinematic feel */}
-      <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
+      {/* Hero */}
+      <div style={{ position: "relative", flex: "0 0 32%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -390,8 +390,8 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
               display: "flex",
               flexDirection: "column",
               gap: "6px",
-              maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+              maskImage: "linear-gradient(to bottom, black 88%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 88%, transparent 100%)",
             }}>
               {lead && (
                 <p style={{

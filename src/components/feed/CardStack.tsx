@@ -11,7 +11,7 @@ import posthog from "posthog-js";
 interface CardStackProps {
   items: NewsItem[];
   onIndexChange?: (index: number, total: number) => void;
-  onRefresh?: () => Promise<void>;
+  onRefresh?: () => Promise<number>; // returns new item count
   onSave?: (id: string) => void;
 }
 
@@ -127,20 +127,19 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
       setIsRefreshing(true);
       const countBefore = itemsLenRef.current;
       try {
-        await onRefresh();
-        const newCount = itemsLenRef.current;
+        // onRefresh returns the new item count — don't rely on itemsLenRef
+        // which only updates after React re-renders (too late to read here)
+        const newCount = await onRefresh();
         posthog.capture("feed_refreshed", {
           stories_before: countBefore,
           stories_after: newCount,
           new_stories: Math.max(0, newCount - countBefore),
         });
-        // Only show "Feed Updated" if there are actually new stories
         if (newCount > countBefore) {
           if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
           setShowToast(true);
           toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
         } else {
-          // Already caught up — show the "You're up to date" toast instead
           if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
           setCaughtUpToast(true);
           caughtUpTimerRef.current = setTimeout(() => setCaughtUpToast(false), 2000);
@@ -156,7 +155,7 @@ export function CardStack({ items, onIndexChange, onRefresh, onSave }: CardStack
     if (!onRefresh) return;
     prevLenBeforeRefreshRef.current = itemsLenRef.current;
     refreshingForCompletionRef.current = true;
-    await onRefresh();
+    await onRefresh(); // return value handled by the items.length useEffect
   }, [onRefresh]);
 
   const handleBackToTop = useCallback(() => {

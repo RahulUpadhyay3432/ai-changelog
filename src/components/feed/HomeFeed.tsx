@@ -68,15 +68,19 @@ export function HomeFeed() {
     setActiveCategory(slug);
   }, [activeCategory]);
 
-  const handleRefresh = useCallback(async () => {
+  const handleRefresh = useCallback(async (): Promise<number> => {
     // 1. Immediately reload from DB — shows anything the cron already ingested
     //    since the page was loaded. Fast (< 1s), always useful.
     const items = await fetchNewsItems(activeCategory).catch(() => [] as typeof stories);
     if (items.length > 0) setStories(items);
 
-    // 2. Also kick off a background pipeline run so the *next* pull gets fresher data.
+    // 2. Kick off a background pipeline run so the *next* pull gets fresher data.
     //    Fire-and-forget — the pipeline takes 30–120 s, can't be awaited inline.
     fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
+
+    // Return new count so CardStack can show the correct toast without waiting
+    // for React to re-render and update itemsLenRef (which is always too late).
+    return items.length > 0 ? items.length : stories.length;
   }, [activeCategory, stories]);
 
   return (

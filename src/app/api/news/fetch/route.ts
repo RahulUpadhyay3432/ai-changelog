@@ -30,6 +30,9 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://blogs.microsoft.com/feed/",                             defaultCategory: "big-tech",       sourceName: "Microsoft Blog" },
   { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",       sourceName: "Microsoft AI" },
   { url: "https://www.microsoft.com/en-us/research/feed/",                defaultCategory: "research",       sourceName: "Microsoft Research" },
+  // Azure blog has no public RSS — use Azure service updates as a real-time signal
+  // for GA launches, previews, and feature releases (incl. Discovery, Foundry, etc.)
+  { url: "https://www.microsoft.com/releasecommunications/api/v2/azure/rss", defaultCategory: "big-tech",     sourceName: "Azure Updates" },
   { url: "https://engineering.fb.com/feed/",                              defaultCategory: "ai-models",      sourceName: "Meta Engineering" },
   { url: "https://aws.amazon.com/blogs/machine-learning/feed/",           defaultCategory: "infrastructure", sourceName: "AWS ML Blog" },
   { url: "https://blogs.nvidia.com/blog/category/generative-ai/feed/",   defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },

@@ -21,11 +21,13 @@
 .column {
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
+  height: var(--app-h, 100dvh); /* JS sets --app-h to true window.innerHeight */
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Both safe areas handled here so every flex child gets exact visible height */
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   position: relative;
 }
 
@@ -34,8 +36,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* Must match BottomNav height so content never hides behind it */
-  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  /* No padding here — column handles it, so flex:1 children get exact height */
 }
 
 /* Side panels — hidden on mobile */

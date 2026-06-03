@@ -3,6 +3,7 @@ import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
+import { AppHeightSetter } from "@/components/AppHeightSetter";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -54,6 +55,7 @@ export default function RootLayout({
               '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
           }}
         >
+          <AppHeightSetter />
           <ServiceWorkerRegistrar />
           {children}
         </body>

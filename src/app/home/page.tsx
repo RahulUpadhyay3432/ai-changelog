@@ -71,13 +71,13 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Overlay 1: drag hint — centered, loops every 7s */}
+            {/* Overlay 1: scroll hint — centered, loops every 7s */}
             <div className={styles.scrollHintOverlay}>
               <div className={styles.scrollHintPill}>
                 <svg className={styles.hintArrow} width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
                   <path d="M6 2v8M3 7l3 3 3-3"/>
                 </svg>
-                Drag to browse
+                Scroll to browse
               </div>
             </div>
 
@@ -205,7 +205,7 @@ export default function LandingPage() {
       {/* FOOTER */}
       <footer className={styles.footer}>
         <span className={styles.footerMark}>kapyn</span>
-        <span className={styles.footerNote}>kapyn.vercel.app/home</span>
+        <span className={styles.footerNote}>kapyn.app/home</span>
       </footer>
 
     </div>

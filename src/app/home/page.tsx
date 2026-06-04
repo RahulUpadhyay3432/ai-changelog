@@ -40,7 +40,7 @@ export default function LandingPage() {
           </h1>
 
           <p className={styles.heroSub}>
-            AI moves fast. A new model dropped, a startup raised $100M, and a policy changed — all since yesterday. Kapyn gives you every story that matters, distilled to 30 seconds, with AI-written analysis so you always know the real impact.
+            Every AI and tech story that matters — distilled to 30 seconds by AI, delivered as a swipeable feed. No noise, no paywall.
           </p>
 
           <div className={styles.qrSection}>
@@ -179,24 +179,13 @@ export default function LandingPage() {
             <div className={styles.pwaSub}>Works like native on iOS, Android, and desktop. No App Store required.</div>
           </div>
           <div className={styles.pwaBtns}>
-            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M7 1v8M4 6l3 3 3-3M2.5 11h9" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              iOS Safari
-            </Link>
-            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <path d="M7 1v8M4 6l3 3 3-3M2.5 11h9" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Android
-            </Link>
-            <Link href="https://kapyn.app" className={styles.btnGhost} target="_blank">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <rect x="1.5" y="2.5" width="11" height="9" rx="1.5"/>
-                <path d="M1.5 6h11" strokeLinecap="round"/>
-              </svg>
-              Desktop
+            <Link href="https://kapyn.app" className={styles.navCta} target="_blank">
+              Open App
+              <span className={styles.arrowCircle}>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                  <path d="M1.5 6.5L6.5 1.5M6.5 1.5H3M6.5 1.5V5" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
             </Link>
           </div>
         </div>

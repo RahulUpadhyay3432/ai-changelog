@@ -82,12 +82,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
-    /* Match the nav/app background so iOS chrome below viewport blends seamlessly */
-    background-color: #0a0a0a;
   }
   html {
     overscroll-behavior: none;
-    background-color: #0a0a0a;
   }
 }
 

@@ -32,34 +32,15 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
 }
 
 // ── "All" feed ranking ───────────────────────────────────────────────────────
-// Score = recencyScore (0–48, dominant) + categoryBonus (0–6, gentle tilt).
-// Recency dominates so genuinely new news always surfaces regardless of
-// category; the bonus only decides ties between equally-fresh items. A second
-// de-clustering pass then caps consecutive same-category cards so the top is a
-// mix, not a wall of one category.
-//
-// NOTE: these bonuses are a heuristic for "what most readers want". Once enough
-// read/save events accumulate, replace them with real engagement weights.
-const CATEGORY_BONUS: Record<string, number> = {
-  "ai-models":      6,
-  "startups":       5,
-  "big-tech":       4,
-  "dev-tools":      3,
-  "research":       2,
-  "infrastructure": 1,
-  "policy":         1,
-  "funding-ma":     1,
-  "open-source":    1,
-};
-
-const RECENCY_WINDOW_H = 48; // matches the feed's 48h cutoff
-const MAX_CONSECUTIVE = 2;   // no more than N same-category cards in a row
+// Pure recency: newest items first, no category weighting at all. A light
+// de-clustering pass then caps consecutive same-category cards so a high-volume
+// category (e.g. AI) can't form a solid wall at the top — but order otherwise
+// follows publish time exactly.
+const MAX_CONSECUTIVE = 2; // no more than N same-category cards in a row
 
 function rankScore(item: NewsItem): number {
-  const ageHours = (Date.now() - new Date(item.publishedAt).getTime()) / 3_600_000;
-  const recency = Math.max(0, RECENCY_WINDOW_H - ageHours);
-  const bonus = CATEGORY_BONUS[item.categorySlug] ?? 2;
-  return recency + bonus;
+  // Newest first — strictly by publish time.
+  return new Date(item.publishedAt).getTime();
 }
 
 // Greedy re-rank: keep items in score order, but whenever placing the next item

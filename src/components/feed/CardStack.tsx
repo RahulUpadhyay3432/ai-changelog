@@ -21,6 +21,19 @@ const PTR_THRESHOLD = 64;
 // How many px of movement before we commit to a direction
 const DIRECTION_LOCK_THRESHOLD = 8;
 
+// Run non-visual work (analytics, localStorage) after paint so it never blocks
+// the scroll-snap frame — keeps card-to-card transitions smooth.
+function deferIdle(fn: () => void) {
+  if (typeof window === "undefined") return;
+  const ric = (
+    window as typeof window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void;
+    }
+  ).requestIdleCallback;
+  if (ric) ric(fn, { timeout: 500 });
+  else setTimeout(fn, 0);
+}
+
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
   onHorizontalDrag, onHorizontalDragEnd,
@@ -183,17 +196,21 @@ export function CardStack({
     setCurrentIndex(index);
     if (index < items.length) {
       onIndexChange?.(index, items.length);
-      updateStreak();
-      const prevItem = items[prev] ?? items[0];
-      posthog.capture("story_swiped", {
-        direction: index > prev ? "next" : "previous",
-        story_id: prevItem?.id,
-        story_title: prevItem?.title,
-        category: prevItem?.categorySlug,
-        position: prev,
-        total: items.length,
-      });
+      // Haptic stays immediate so it feels tied to the snap.
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
+      // Streak write + analytics are deferred off the snap frame.
+      const prevItem = items[prev] ?? items[0];
+      deferIdle(() => {
+        updateStreak();
+        posthog.capture("story_swiped", {
+          direction: index > prev ? "next" : "previous",
+          story_id: prevItem?.id,
+          story_title: prevItem?.title,
+          category: prevItem?.categorySlug,
+          position: prev,
+          total: items.length,
+        });
+      });
     }
   }, [items, onIndexChange]);
 
@@ -204,6 +221,22 @@ export function CardStack({
     setCurrentIndex(0);
     onIndexChange?.(0, items.length);
   }, [items.length, onIndexChange]);
+
+  // ─── Preload upcoming hero images ────────────────────────────────────────
+  // Off-screen <img> tags are deprioritised by the browser, so the next card's
+  // image often isn't downloaded yet when the user swipes to it — causing a
+  // visible delay. Warm the cache for the next few cards whenever the position
+  // changes; by the time they're swiped into view the image is already loaded.
+  const PRELOAD_AHEAD = 3;
+  useEffect(() => {
+    for (let i = currentIndex + 1; i <= currentIndex + PRELOAD_AHEAD; i++) {
+      const url = items[i]?.imageUrl;
+      if (!url) continue;
+      const img = new window.Image();
+      img.decoding = "async";
+      img.src = url;
+    }
+  }, [currentIndex, items]);
 
   if (items.length === 0) {
     return (

@@ -17,6 +17,22 @@ import posthog from "posthog-js";
 const SWIPE_DISTANCE = 72;
 const SWIPE_VELOCITY = 400;
 
+// Warm the browser cache for a feed's first few hero images so they're already
+// downloaded before the user swipes into that category. Module-level dedupe set
+// avoids re-requesting the same URL across category switches.
+const warmedImageUrls = new Set<string>();
+function warmImages(items: NewsItem[], count = 3) {
+  if (typeof window === "undefined") return;
+  for (let i = 0; i < Math.min(count, items.length); i++) {
+    const url = items[i]?.imageUrl;
+    if (!url || warmedImageUrls.has(url)) continue;
+    warmedImageUrls.add(url);
+    const img = new window.Image();
+    img.decoding = "async";
+    img.src = url;
+  }
+}
+
 export function HomeFeed() {
   const searchParams = useSearchParams();
   const initialCategory = (searchParams.get("category") ?? "all") as CategorySlug;
@@ -29,26 +45,49 @@ export function HomeFeed() {
   const storiesLenRef = useRef(0); // stable ref so handleRefresh doesn't capture stale stories
   useEffect(() => { storiesLenRef.current = stories.length; }, [stories.length]);
 
+  // Per-session cache of each category's resolved feed, so a sideways swipe to
+  // an already-prefetched category is instant (no re-fetch, images pre-warmed).
+  const feedCache = useRef<Map<string, NewsItem[]>>(new Map());
+
   // Real-time drag position — drives the card x transform without re-renders
   const dragX = useMotionValue(0);
   const dragVelocity = useVelocity(dragX);
   const isAnimating = useRef(false);
 
+  // Resolve a category's feed: cache → Supabase → mock fallback. Caches result.
+  const resolveFeed = useCallback(async (slug: CategorySlug): Promise<NewsItem[]> => {
+    const cached = feedCache.current.get(slug);
+    if (cached) return cached;
+    const items = await fetchNewsItems(slug).catch(() => [] as NewsItem[]);
+    const base =
+      items.length > 0
+        ? items
+        : MOCK_STORIES.filter((s) => slug === "all" || s.categorySlug === slug);
+    feedCache.current.set(slug, base);
+    return base;
+  }, []);
+
+  // Background-prefetch the categories on either side of the active tab and warm
+  // their first hero images — so swiping sideways lands on a ready feed.
+  const prefetchAdjacent = useCallback((slug: CategorySlug) => {
+    const idx = CATEGORY_TABS.findIndex((t) => t.slug === slug);
+    const neighbors = [CATEGORY_TABS[idx - 1]?.slug, CATEGORY_TABS[idx + 1]?.slug]
+      .filter(Boolean) as CategorySlug[];
+    for (const n of neighbors) {
+      resolveFeed(n).then(warmImages).catch(() => {});
+    }
+  }, [resolveFeed]);
+
   useEffect(() => {
     if (!hasLoadedOnce.current) setInitialLoading(true);
+    let cancelled = false;
 
     const loadFeed = async () => {
-      const [items, pinnedStory] = await Promise.all([
-        fetchNewsItems(activeCategory).catch(() => [] as NewsItem[]),
+      const [base, pinnedStory] = await Promise.all([
+        resolveFeed(activeCategory),
         storyId ? fetchNewsItemById(storyId).catch(() => null) : Promise.resolve(null),
       ]);
-
-      const base =
-        items.length > 0
-          ? items
-          : MOCK_STORIES.filter(
-              (s) => activeCategory === "all" || s.categorySlug === activeCategory
-            );
+      if (cancelled) return;
 
       if (pinnedStory) {
         const deduped = base.filter((s) => s.id !== pinnedStory.id);
@@ -59,10 +98,14 @@ export function HomeFeed() {
       } else {
         setStories(base);
       }
+
+      warmImages(base);
+      prefetchAdjacent(activeCategory);
     };
 
     loadFeed()
       .catch(() => {
+        if (cancelled) return;
         setStories(
           MOCK_STORIES.filter(
             (s) => activeCategory === "all" || s.categorySlug === activeCategory
@@ -70,10 +113,13 @@ export function HomeFeed() {
         );
       })
       .finally(() => {
+        if (cancelled) return;
         setInitialLoading(false);
         hasLoadedOnce.current = true;
       });
-  }, [activeCategory, storyId]);
+
+    return () => { cancelled = true; };
+  }, [activeCategory, storyId, resolveFeed, prefetchAdjacent]);
 
   const handleCategoryChange = useCallback((slug: CategorySlug) => {
     posthog.capture("category_changed", { category: slug, previous_category: activeCategory });
@@ -82,7 +128,11 @@ export function HomeFeed() {
 
   const handleRefresh = useCallback(async (): Promise<number> => {
     const items = await fetchNewsItems(activeCategory).catch(() => [] as NewsItem[]);
-    if (items.length > 0) setStories(items);
+    if (items.length > 0) {
+      feedCache.current.set(activeCategory, items);
+      setStories(items);
+      warmImages(items);
+    }
     fetch("/api/news/trigger", { method: "POST" }).catch(() => {});
     // Use ref for fallback — avoids stale closure on stories and removes it from deps
     return items.length > 0 ? items.length : storiesLenRef.current;

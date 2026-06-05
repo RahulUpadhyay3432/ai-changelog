@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Bookmark, Share2, Check } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
@@ -106,11 +106,12 @@ function cleanText(text: string): string {
     .trim();
 }
 
-export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
+function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
   const [copied, setCopied] = useState(false);
   const [sharePressed, setSharePressed] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
   const timeAgo = formatTimeAgo(item.publishedAt);
 
@@ -204,20 +205,25 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     >
       {/* Hero — slightly taller for cinematic feel */}
       <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
-        {item.imageUrl ? (
+        {/* Branded gradient sits underneath as a placeholder so there's never a
+            black flash while the hero image loads — the image fades in on top. */}
+        <CardHeroBackground categorySlug={item.categorySlug} />
+        {item.imageUrl && (
           <img
             src={item.imageUrl}
             alt=""
+            decoding="async"
+            onLoad={() => setImgLoaded(true)}
             style={{
               position: "absolute",
               inset: 0,
               width: "100%",
               height: "100%",
               objectFit: "cover",
+              opacity: imgLoaded ? 1 : 0,
+              transition: "opacity 0.3s ease",
             }}
           />
-        ) : (
-          <CardHeroBackground categorySlug={item.categorySlug} />
         )}
 
         {/* Gradient fade into content */}
@@ -492,3 +498,7 @@ export function NewsCard({ item, onSave, isSaved = false }: NewsCardProps) {
     </div>
   );
 }
+
+// Memoized so a scroll-position change in CardStack doesn't re-render every card
+// in the stack — only cards whose props actually change re-render.
+export const NewsCard = memo(NewsCardInner);

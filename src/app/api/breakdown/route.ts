@@ -94,28 +94,38 @@ Rules:
 // predictable). Fallback: Gemini. Nemotron-550B was rejected — ~3.7 min/call.
 const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
 
+// Free-tier latency is variable (usually ~7s, but can spike). Abort if it runs
+// long so we fall back to Gemini fast instead of burning the whole budget and
+// 504-ing — the fallback otherwise only triggers on a hard error, not slowness.
+const OPENROUTER_TIMEOUT_MS = 14_000;
+
 async function callOpenRouter(prompt: string): Promise<string> {
   const key = process.env.OPENROUTER_API_KEY;
   if (!key) throw new Error("OPENROUTER_API_KEY missing");
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: OPENROUTER_MODEL,
-      // Nemotron is a reasoning model — needs headroom for hidden reasoning
-      // tokens plus the answer, or `content` comes back empty.
-      max_tokens: 800,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  if (!text) throw new Error("OpenRouter returned empty response");
-  return text;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        max_tokens: 800,
+        messages: [{ role: "user", content: prompt }],
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    const text = (data.choices?.[0]?.message?.content ?? "").trim();
+    if (!text) throw new Error("OpenRouter returned empty response");
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function callGemini(prompt: string): Promise<string> {

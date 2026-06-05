@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
 import { updateStreak } from "@/lib/storage";
+import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
 interface CardStackProps {
@@ -235,6 +236,18 @@ export function CardStack({
       const img = new window.Image();
       img.decoding = "async";
       img.src = url;
+    }
+  }, [currentIndex, items]);
+
+  // ─── Prefetch "Why it matters" breakdowns ────────────────────────────────
+  // The breakdown LLM call is slow (~10s). Warm it for the current card and the
+  // next couple as the user scrolls, so tapping "Why it matters" is instant.
+  // The cache dedupes, so each story is only ever generated once.
+  const BREAKDOWN_PREFETCH_AHEAD = 2;
+  useEffect(() => {
+    for (let i = currentIndex; i <= currentIndex + BREAKDOWN_PREFETCH_AHEAD; i++) {
+      const it = items[i];
+      if (it) prefetchBreakdown(it);
     }
   }, [currentIndex, items]);
 

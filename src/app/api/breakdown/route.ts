@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 // Allow enough time for the free model (~7s) plus a fallback hop.
 export const maxDuration = 30;
 
-// Per-IP rate limit: 10 requests per minute
+// Per-IP rate limit. Higher than a pure click-rate because the client prefetches
+// breakdowns for upcoming cards while scrolling.
 const ipMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_WINDOW_MS = 60_000;
-const RATE_LIMIT = 10;
+const RATE_LIMIT = 30;
 
 function getClientIp(req: NextRequest): string {
   return (

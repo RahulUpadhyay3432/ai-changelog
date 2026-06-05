@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import type { NewsItem } from "@/lib/types";
 import { getCategoryBySlug } from "@/lib/categories";
+import { fetchBreakdown as loadBreakdown, getCachedBreakdown } from "@/lib/breakdown-cache";
 
 interface BreakdownSheetProps {
   item: NewsItem;
@@ -14,30 +15,32 @@ interface BreakdownSheetProps {
 }
 
 function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }) {
-  const [explanation, setExplanation] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // If prefetched while scrolling, it's already cached → show instantly, no skeleton.
+  const cached = getCachedBreakdown(item.id);
+  const [explanation, setExplanation] = useState<string | null>(cached ?? null);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const category = getCategoryBySlug(item.categorySlug as never);
 
   const fetchBreakdown = useCallback(async () => {
+    const hit = getCachedBreakdown(item.id);
+    if (hit) {
+      setExplanation(hit);
+      setLoading(false);
+      setError(false);
+      return;
+    }
     setLoading(true);
     setError(false);
     setExplanation(null);
-    try {
-      const res = await fetch("/api/breakdown", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: item.title, summary: item.summary }),
-      });
-      if (!res.ok) throw new Error("API error");
-      const data = await res.json();
-      setExplanation(data.explanation);
-    } catch {
+    const result = await loadBreakdown(item);
+    if (result) {
+      setExplanation(result);
+    } else {
       setError(true);
-    } finally {
-      setLoading(false);
     }
-  }, [item.title, item.summary]);
+    setLoading(false);
+  }, [item]);
 
   useEffect(() => {
     fetchBreakdown();

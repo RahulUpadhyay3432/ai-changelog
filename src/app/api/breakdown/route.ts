@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 // Allow enough time for the free model (~7s) plus a fallback hop.
 export const maxDuration = 30;
@@ -52,8 +53,17 @@ export async function POST(req: NextRequest) {
   }
 
   const { title, summary } = body;
+  const id = typeof body.id === "string" ? body.id : null;
   if (!title.trim() || !summary.trim()) {
     return NextResponse.json({ error: "Missing title or summary" }, { status: 400 });
+  }
+
+  // DB cache: a real (non-mock) story may already have a stored breakdown —
+  // generated once on first view, then served instantly to everyone forever.
+  const cacheable = id !== null && !id.startsWith("mock-");
+  if (cacheable) {
+    const cached = await readCachedBreakdown(id);
+    if (cached) return NextResponse.json({ explanation: cached, cached: true });
   }
 
   const prompt = `You are explaining a tech/AI news story to someone smart but not a specialist. Be concise and direct.
@@ -82,11 +92,51 @@ Rules:
       text = await callGemini(prompt);
     }
     if (!text) throw new Error("Empty response from both providers");
+    // Persist so the next view (any user, any session) is instant. Best-effort,
+    // awaited so it completes before the serverless function freezes.
+    if (cacheable) await storeBreakdown(id, text);
     return NextResponse.json({ explanation: text });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("Breakdown API error:", message);
     return NextResponse.json({ error: "Failed to generate explanation" }, { status: 500 });
+  }
+}
+
+// ── DB cache (news_items.breakdown) ──────────────────────────────────────────
+function getDbClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Service role for writes; anon still allows the read if service key is unset.
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
+async function readCachedBreakdown(id: string): Promise<string | null> {
+  try {
+    const db = getDbClient();
+    if (!db) return null;
+    const { data, error } = await db
+      .from("news_items")
+      .select("breakdown")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) return null;
+    const b = data?.breakdown;
+    return typeof b === "string" && b.trim() ? b : null;
+  } catch {
+    return null;
+  }
+}
+
+async function storeBreakdown(id: string, breakdown: string): Promise<void> {
+  try {
+    const db = getDbClient();
+    if (!db) return;
+    await db.from("news_items").update({ breakdown }).eq("id", id);
+  } catch {
+    /* best-effort cache — never block the response on a write failure */
   }
 }
 

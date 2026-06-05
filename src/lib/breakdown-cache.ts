@@ -27,7 +27,7 @@ export function fetchBreakdown(item: Pick<NewsItem, "id" | "title" | "summary">)
       const res = await fetch("/api/breakdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: item.title, summary: item.summary }),
+        body: JSON.stringify({ id: item.id, title: item.title, summary: item.summary }),
       });
       if (!res.ok) return null;
       const data = await res.json();

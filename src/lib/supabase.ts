@@ -31,17 +31,64 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
   };
 }
 
-const CATEGORY_ORDER: Record<string, number> = {
-  "ai-models":    1,
-  "startups":     2,
-  "big-tech":     3,
-  "dev-tools":    4,
-  "research":     5,
-  "infrastructure": 6,
-  "policy":       6,
-  "funding-ma":   6,
-  "open-source":  7,
+// ── "All" feed ranking ───────────────────────────────────────────────────────
+// Score = recencyScore (0–48, dominant) + categoryBonus (0–6, gentle tilt).
+// Recency dominates so genuinely new news always surfaces regardless of
+// category; the bonus only decides ties between equally-fresh items. A second
+// de-clustering pass then caps consecutive same-category cards so the top is a
+// mix, not a wall of one category.
+//
+// NOTE: these bonuses are a heuristic for "what most readers want". Once enough
+// read/save events accumulate, replace them with real engagement weights.
+const CATEGORY_BONUS: Record<string, number> = {
+  "ai-models":      6,
+  "startups":       5,
+  "big-tech":       4,
+  "dev-tools":      3,
+  "research":       2,
+  "infrastructure": 1,
+  "policy":         1,
+  "funding-ma":     1,
+  "open-source":    1,
 };
+
+const RECENCY_WINDOW_H = 48; // matches the feed's 48h cutoff
+const MAX_CONSECUTIVE = 2;   // no more than N same-category cards in a row
+
+function rankScore(item: NewsItem): number {
+  const ageHours = (Date.now() - new Date(item.publishedAt).getTime()) / 3_600_000;
+  const recency = Math.max(0, RECENCY_WINDOW_H - ageHours);
+  const bonus = CATEGORY_BONUS[item.categorySlug] ?? 2;
+  return recency + bonus;
+}
+
+// Greedy re-rank: keep items in score order, but whenever placing the next item
+// would exceed MAX_CONSECUTIVE of the same category, pull up the highest-scoring
+// item of a different category instead. Falls back to score order when no other
+// category is available.
+function deClusterByCategory(sorted: NewsItem[]): NewsItem[] {
+  const pending = [...sorted];
+  const result: NewsItem[] = [];
+
+  while (pending.length > 0) {
+    let pickIdx = 0;
+
+    if (result.length >= MAX_CONSECUTIVE) {
+      const lastCat = result[result.length - 1].categorySlug;
+      const runIsMaxed = result
+        .slice(-MAX_CONSECUTIVE)
+        .every((x) => x.categorySlug === lastCat);
+      if (runIsMaxed) {
+        const alt = pending.findIndex((x) => x.categorySlug !== lastCat);
+        if (alt !== -1) pickIdx = alt;
+      }
+    }
+
+    result.push(pending.splice(pickIdx, 1)[0]);
+  }
+
+  return result;
+}
 
 export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
   const { data, error } = await supabase
@@ -74,12 +121,10 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
   const items = (data as DbNewsItem[]).map(dbToNewsItem);
 
   if (!categorySlug || categorySlug === "all") {
-    items.sort((a, b) => {
-      const wa = CATEGORY_ORDER[a.categorySlug] ?? 5;
-      const wb = CATEGORY_ORDER[b.categorySlug] ?? 5;
-      if (wa !== wb) return wa - wb;
-      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-    });
+    // Recency-dominant score (fresh news always reaches the top), then break up
+    // same-category runs so the feed reads as a mix instead of one big block.
+    items.sort((a, b) => rankScore(b) - rankScore(a));
+    return deClusterByCategory(items);
   }
 
   return items;

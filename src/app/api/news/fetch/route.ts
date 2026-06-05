@@ -294,6 +294,8 @@ async function callGemini(prompt: string): Promise<string> {
   return text;
 }
 
+const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
+
 async function callOpenRouter(prompt: string): Promise<string> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -302,8 +304,10 @@ async function callOpenRouter(prompt: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.0-flash-lite:free",
-      max_tokens: 400,
+      model: OPENROUTER_MODEL,
+      // Nemotron is a reasoning model — headroom for hidden reasoning tokens
+      // plus the answer, or `content` comes back empty.
+      max_tokens: 800,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -325,12 +329,13 @@ async function classifyAndSummarize(
   defaultCategory: CategorySlug
 ): Promise<ClassifyResult | null> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
+  // Primary: OpenRouter (Nemotron). Fallback: Gemini.
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callOpenRouter(prompt);
     return parseClassifyResponse(raw, defaultCategory);
   } catch {
     try {
-      const raw = await callOpenRouter(prompt);
+      const raw = await callGemini(prompt);
       return parseClassifyResponse(raw, defaultCategory);
     } catch {
       return null; // Both failed — skip item, never show raw content

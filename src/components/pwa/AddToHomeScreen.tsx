@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Share } from "lucide-react";
+import posthog from "posthog-js";
 
 const DISMISSED_KEY = "kapyn_aths_dismissed";
 
@@ -35,13 +36,16 @@ export function AddToHomeScreen() {
     } catch {
       // localStorage blocked
     }
-    // Small delay so it doesn't flash on first paint
-    const t = setTimeout(() => setVisible(true), 2500);
+    const t = setTimeout(() => {
+      setVisible(true);
+      posthog.capture("pwa_banner_shown");
+    }, 2500);
     return () => clearTimeout(t);
   }, []);
 
   const dismiss = () => {
     setVisible(false);
+    posthog.capture("pwa_banner_dismissed");
     try {
       localStorage.setItem(DISMISSED_KEY, "1");
     } catch {}

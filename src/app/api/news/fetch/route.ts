@@ -54,8 +54,15 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://simonwillison.net/atom/everything/",                    defaultCategory: "dev-tools",      sourceName: "Simon Willison" },
   { url: "https://github.blog/feed/",                                     defaultCategory: "open-source",    sourceName: "GitHub Blog" },
 
-  // ── Community signal — catches OSS/tools that go viral before press ───────
-  { url: "https://hnrss.org/frontpage",                                   defaultCategory: "dev-tools",      sourceName: "Hacker News" },
+  // ── Community signal — HN filtered to AI/ML/dev topics with 50+ points ──
+  // hnrss.org supports ?q= (title keyword filter) and ?points= (min upvotes).
+  // Without these params, HN frontpage includes diet science, philosophy, life
+  // advice — anything popular with programmers but not relevant to this feed.
+  { url: "https://hnrss.org/frontpage?q=AI+LLM+GPT+machine+learning+Claude+Anthropic+OpenAI+agent&points=50", defaultCategory: "dev-tools", sourceName: "Hacker News" },
+
+  // ── Additional coverage ───────────────────────────────────────────────────
+  { url: "https://www.theregister.com/headlines/ai.atom",                  defaultCategory: "ai-models",      sourceName: "The Register" },
+  { url: "https://changelog.com/news/feed",                                defaultCategory: "open-source",    sourceName: "Changelog" },
 ];
 
 type ParserItem = {
@@ -261,15 +268,33 @@ function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyRe
 
 /**
  * Detects summaries that must never reach the feed.
+ * Catches both exact sentinels (LOW_SIGNAL, OFF_TOPIC) and the prose
+ * variations the LLM sometimes writes instead of the sentinel word.
  */
 function isBadSummary(text: string): boolean {
   const t = text.trim();
   const lower = t.toLowerCase();
   return (
+    // Exact sentinels
     t === "LOW_SIGNAL" ||
     lower.startsWith("low_signal") ||
     t === "OFF_TOPIC" ||
     lower.startsWith("off_topic") ||
+    // Prose off-topic: LLM writes "This content is not related to AI..."
+    // instead of the OFF_TOPIC sentinel
+    lower.includes("not related to ai") ||
+    lower.includes("not related to ml") ||
+    lower.includes("not related to software") ||
+    lower.includes("not related to tech") ||
+    lower.includes("this content is not") ||
+    lower.includes("not about ai") ||
+    lower.includes("not about tech") ||
+    // Prompt-forbidden openers — when the LLM uses these it signals generic
+    // or off-topic content (the prompt explicitly bans them for real stories)
+    lower.startsWith("this article") ||
+    lower.startsWith("this post") ||
+    lower.startsWith("this blog") ||
+    // Leaked prompt / boilerplate
     lower.startsWith("write a ") ||
     lower.startsWith("the provided content") ||
     lower.includes("summarize this article") ||
@@ -549,10 +574,15 @@ export async function GET(request: NextRequest) {
 
   // ── Normal fetch ───────────────────────────────────────────────────────────
 
-  // Clean up leaked prompt strings
+  // Clean up leaked prompt strings and off-topic summaries already in DB
   await supabase.from("news_items").delete().ilike("summary", "Write a 40%");
   await supabase.from("news_items").delete().ilike("summary", "The provided content%");
   await supabase.from("news_items").delete().ilike("summary", "%summarize this article%");
+  await supabase.from("news_items").delete().ilike("summary", "This article%");
+  await supabase.from("news_items").delete().ilike("summary", "This post%");
+  await supabase.from("news_items").delete().ilike("summary", "This content is not%");
+  await supabase.from("news_items").delete().ilike("summary", "%not related to AI%");
+  await supabase.from("news_items").delete().ilike("summary", "%not related to tech%");
 
   // Remove stale items older than 48h
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();

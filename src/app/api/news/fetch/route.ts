@@ -5,6 +5,11 @@ import {
   fetchProductHuntPosts,
   type PHFeedItem,
 } from "@/lib/producthunt";
+import {
+  fetchGitHubTrendingRepos,
+  buildGitHubContent,
+  type GitHubRepo,
+} from "@/lib/github";
 import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
@@ -434,6 +439,24 @@ function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
   }));
 }
 
+// ─── GitHub feed items ────────────────────────────────────────────────────────
+
+function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
+  return repos.map((repo) => ({
+    // Title: "repo-name — one-line description" so cards are readable without
+    // the full summary. Falls back to just the repo name if no description.
+    title: repo.description
+      ? `${repo.name} — ${repo.description.slice(0, 120)}`
+      : repo.name,
+    sourceUrl: repo.htmlUrl,
+    sourceName: "GitHub",
+    defaultCategory: "open-source" as CategorySlug,
+    content: buildGitHubContent(repo),
+    publishedAt: repo.createdAt,
+    imageUrl: null,
+  }));
+}
+
 // ─── Insert pipeline ──────────────────────────────────────────────────────────
 
 const INSERT_CONCURRENCY = 4; // parallel LLM calls — stays within Gemini free quota
@@ -616,6 +639,15 @@ export async function GET(request: NextRequest) {
     await insertItems(phItems, supabase, results);
   } catch (err) {
     results.errors.push(`Product Hunt API: ${String(err)}`);
+  }
+
+  // GitHub trending — new AI/ML repos going viral in the last 48h
+  try {
+    const ghRepos = await fetchGitHubTrendingRepos(48);
+    const ghItems = githubReposToFeedItems(ghRepos);
+    await insertItems(ghItems, supabase, results);
+  } catch (err) {
+    results.errors.push(`GitHub API: ${String(err)}`);
   }
 
   // Track fetch completion server-side

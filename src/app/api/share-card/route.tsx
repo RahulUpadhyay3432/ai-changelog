@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 
 const W = 1080;
 const H = 1920;
-const PAD = 90;
 
 export async function GET() {
   const supabase = createClient(
@@ -23,14 +22,20 @@ export async function GET() {
     .order("published_at", { ascending: false })
     .limit(3);
 
-  const stories = data ?? [];
+  const stories = (data ?? []).slice(0, 3);
 
   const today = new Date().toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
-  const INNER_W = W - PAD * 2;
+  const categories = stories.map((s) =>
+    getCategoryBySlug(s.category_slug as CategorySlug)
+  );
+
+  const accent0 = categories[0]?.colorAccent ?? "#7c3aed";
+  const accent1 = categories[1]?.colorAccent ?? "#2563eb";
+  const accent2 = categories[2]?.colorAccent ?? "#0891b2";
 
   return new ImageResponse(
     (
@@ -38,215 +43,345 @@ export async function GET() {
         style={{
           width: W,
           height: H,
-          background: "#0a0a0a",
+          background: "#080808",
           display: "flex",
           flexDirection: "column",
-          padding: `100px ${PAD}px 90px`,
+          position: "relative",
           fontFamily: "sans-serif",
+          overflow: "hidden",
         }}
       >
-        {/* Header */}
+        {/* ── Background atmosphere ── */}
+
+        {/* Top-right glow — primary category */}
         <div
           style={{
+            position: "absolute",
+            top: -200,
+            right: -200,
+            width: 900,
+            height: 900,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${accent0}55 0%, ${accent0}18 40%, transparent 70%)`,
             display: "flex",
-            alignItems: "center",
-            gap: "28px",
-            marginBottom: "72px",
-            width: INNER_W,
           }}
-        >
-          <div
-            style={{
-              border: "2px solid rgba(255,255,255,0.22)",
-              borderRadius: "100px",
-              padding: "14px 32px",
-              fontSize: "28px",
-              fontWeight: 700,
-              color: "#E8E4DE",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              display: "flex",
-              flexShrink: 0,
-            }}
-          >
-            Today in AI
-          </div>
-          <span style={{ fontSize: "30px", color: "#525252", display: "flex" }}>
-            {today}
-          </span>
-        </div>
+        />
 
-        {/* Headline */}
-        <p
-          style={{
-            fontSize: "84px",
-            fontWeight: 800,
-            color: "#F0EDE8",
-            lineHeight: 1.1,
-            margin: "0 0 80px",
-            letterSpacing: "-0.03em",
-            width: INNER_W,
-            display: "flex",
-            flexWrap: "wrap",
-          }}
-        >
-          Top 3 AI stories you should know
-        </p>
-
-        {/* Stories */}
+        {/* Bottom-left glow — secondary */}
         <div
           style={{
+            position: "absolute",
+            bottom: 100,
+            left: -150,
+            width: 700,
+            height: 700,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${accent1}30 0%, ${accent2}12 45%, transparent 70%)`,
+            display: "flex",
+          }}
+        />
+
+        {/* Subtle horizontal scan lines for texture */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 4px)",
+            display: "flex",
+          }}
+        />
+
+        {/* ── Content ── */}
+        <div
+          style={{
+            position: "relative",
             display: "flex",
             flexDirection: "column",
-            width: INNER_W,
-            flex: 1,
+            height: "100%",
+            padding: "80px 72px 72px",
           }}
         >
-          {stories.map((story, i) => {
-            const category = getCategoryBySlug(
-              story.category_slug as CategorySlug
-            );
-            const title =
-              story.title.length > 68
-                ? story.title.slice(0, 65) + "..."
-                : story.title;
-
-            return (
-              <div
-                key={story.id}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "36px",
-                  paddingTop: i === 0 ? "0" : "52px",
-                  paddingBottom: "52px",
-                  borderBottom:
-                    i < stories.length - 1
-                      ? "1px solid rgba(255,255,255,0.07)"
-                      : "none",
-                  width: INNER_W,
-                }}
-              >
-                {/* Number */}
-                <div
-                  style={{
-                    width: "72px",
-                    height: "72px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.09)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "26px",
-                    fontWeight: 600,
-                    color: "#444",
-                    flexShrink: 0,
-                    marginTop: "6px",
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-
-                {/* Text content — constrained to remaining width */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "16px",
-                    width: INNER_W - 72 - 36,
-                    overflow: "hidden",
-                  }}
-                >
-                  {category && (
-                    <div
-                      style={{
-                        border: `1.5px solid ${category.colorAccent}`,
-                        borderRadius: "100px",
-                        padding: "7px 24px",
-                        fontSize: "22px",
-                        fontWeight: 700,
-                        color: category.colorAccent,
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                        display: "flex",
-                        width: "fit-content",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {category.name}
-                    </div>
-                  )}
-                  <p
-                    style={{
-                      fontSize: "38px",
-                      fontWeight: 500,
-                      color: "#E8E4DE",
-                      lineHeight: 1.3,
-                      margin: 0,
-                      letterSpacing: "-0.01em",
-                      display: "flex",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {title}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom branding */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "24px",
-            paddingTop: "44px",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            width: INNER_W,
-          }}
-        >
+          {/* Top bar */}
           <div
             style={{
-              width: "80px",
-              height: "80px",
-              background: "#181818",
-              borderRadius: "18px",
-              border: "1px solid rgba(255,255,255,0.08)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: "46px",
-              color: "#E8E4DE",
-              fontFamily: "serif",
-              flexShrink: 0,
+              justifyContent: "space-between",
+              marginBottom: "64px",
             }}
           >
-            k
+            {/* Wordmark */}
+            <span
+              style={{
+                fontSize: "38px",
+                fontWeight: 700,
+                color: "#E8E4DE",
+                letterSpacing: "-0.03em",
+                display: "flex",
+              }}
+            >
+              kapyn
+            </span>
+
+            {/* Date pill */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "100px",
+                padding: "10px 24px",
+              }}
+            >
+              <div
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: accent0,
+                  display: "flex",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "26px",
+                  fontWeight: 600,
+                  color: "#a3a3a3",
+                  letterSpacing: "0.02em",
+                  display: "flex",
+                }}
+              >
+                {today}
+              </span>
+            </div>
           </div>
-          <span
+
+          {/* Hero headline */}
+          <div style={{ marginBottom: "64px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <span
+              style={{
+                fontSize: "22px",
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#404040",
+                display: "flex",
+              }}
+            >
+              Today in AI
+            </span>
+            <p
+              style={{
+                fontSize: "80px",
+                fontWeight: 800,
+                color: "#F0EDE8",
+                lineHeight: 1.05,
+                margin: 0,
+                letterSpacing: "-0.04em",
+                display: "flex",
+                flexWrap: "wrap",
+              }}
+            >
+              3 stories worth knowing
+            </p>
+          </div>
+
+          {/* Story cards */}
+          <div
             style={{
-              fontSize: "48px",
-              fontWeight: 500,
-              color: "#E8E4DE",
-              letterSpacing: "-0.02em",
               display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              flex: 1,
             }}
           >
-            kapyn
-          </span>
-          <div style={{ flex: 1, display: "flex" }} />
-          <span
+            {stories.map((story, i) => {
+              const cat = categories[i];
+              const accent = cat?.colorAccent ?? "#7c3aed";
+              const colorLabel = cat?.colorLabel ?? "#c4b5fd";
+              const colorBg = cat?.colorBg ?? "#1a0533";
+              const title =
+                story.title.length > 72
+                  ? story.title.slice(0, 69) + "..."
+                  : story.title;
+
+              return (
+                <div
+                  key={story.id}
+                  style={{
+                    display: "flex",
+                    flex: 1,
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    background: `${colorBg}cc`,
+                    border: `1px solid ${accent}25`,
+                    position: "relative",
+                  }}
+                >
+                  {/* Left accent bar */}
+                  <div
+                    style={{
+                      width: "5px",
+                      background: accent,
+                      flexShrink: 0,
+                      display: "flex",
+                    }}
+                  />
+
+                  {/* Card glow */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: "60%",
+                      background: `linear-gradient(180deg, ${accent}12 0%, transparent 100%)`,
+                      display: "flex",
+                    }}
+                  />
+
+                  {/* Watermark number */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: -20,
+                      right: 24,
+                      fontSize: "160px",
+                      fontWeight: 900,
+                      color: `${accent}14`,
+                      lineHeight: 1,
+                      display: "flex",
+                      letterSpacing: "-0.05em",
+                    }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+
+                  {/* Content */}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      gap: "16px",
+                      padding: "32px 40px 32px 36px",
+                      position: "relative",
+                      flex: 1,
+                    }}
+                  >
+                    {/* Category badge */}
+                    {cat && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          width: "fit-content",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "7px",
+                            height: "7px",
+                            borderRadius: "50%",
+                            background: accent,
+                            flexShrink: 0,
+                            display: "flex",
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: "20px",
+                            fontWeight: 700,
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: colorLabel,
+                            display: "flex",
+                          }}
+                        >
+                          {cat.name}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Title */}
+                    <p
+                      style={{
+                        fontSize: "38px",
+                        fontWeight: 700,
+                        color: "#EEEBe6",
+                        lineHeight: 1.25,
+                        margin: 0,
+                        letterSpacing: "-0.02em",
+                        display: "flex",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {title}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Footer */}
+          <div
             style={{
-              fontSize: "28px",
-              color: "#383838",
               display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "40px",
+              paddingTop: "32px",
+              borderTop: "1px solid rgba(255,255,255,0.07)",
             }}
           >
-            kapyn.app
-          </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <span
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "#E8E4DE",
+                  letterSpacing: "-0.02em",
+                  display: "flex",
+                }}
+              >
+                kapyn.app
+              </span>
+              <span
+                style={{
+                  fontSize: "20px",
+                  color: "#383838",
+                  display: "flex",
+                }}
+              >
+                AI news, distilled to 30 seconds
+              </span>
+            </div>
+
+            {/* k icon */}
+            <div
+              style={{
+                width: "72px",
+                height: "72px",
+                background: "#161616",
+                borderRadius: "16px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "42px",
+                color: "#E8E4DE",
+                fontFamily: "serif",
+              }}
+            >
+              k
+            </div>
+          </div>
         </div>
       </div>
     ),

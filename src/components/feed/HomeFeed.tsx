@@ -220,7 +220,7 @@ export function HomeFeed() {
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "#0a0a0a" }}>
       {/* Top bar */}
       <div style={{
-        padding: "8px 16px 10px 20px",
+        padding: "2px 16px 6px 20px",
         flexShrink: 0,
         display: "flex",
         alignItems: "center",

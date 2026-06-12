@@ -1,6 +1,7 @@
 .outer {
   position: fixed;
   inset: 0;
+  height: 100%;
   overflow: hidden;
   background: #050505;
   /* Column direction so .column fills height, centred horizontally */
@@ -22,7 +23,9 @@
 .column {
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
+  /* 100% of the fixed full-screen .outer — avoids the 100dvh standalone-PWA
+     gap that leaves dead black space below the nav on iOS home-screen apps */
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;

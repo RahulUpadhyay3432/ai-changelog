@@ -104,7 +104,7 @@ export function InsightEntryCard({ insight }: InsightEntryCardProps) {
         aria-label="Share this insight"
         style={{
           position: "absolute",
-          top: "14px",
+          bottom: "16px",
           right: "14px",
           width: "38px",
           height: "38px",

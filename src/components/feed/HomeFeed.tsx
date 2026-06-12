@@ -2,15 +2,18 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, useMotionValue, useVelocity, animate } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "framer-motion";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
 import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
+import { fetchActiveInsight } from "@/lib/insights";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
-import type { CategorySlug, NewsItem } from "@/lib/types";
+import { getFeedHintShown, setFeedHintShown } from "@/lib/storage";
+import type { CategorySlug, NewsItem, Insight } from "@/lib/types";
+import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 
 // Minimum drag distance (px) or velocity (px/s) to commit a swipe
@@ -40,7 +43,10 @@ export function HomeFeed() {
 
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
+  const [insight, setInsight] = useState<Insight | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showFeedHint, setShowFeedHint] = useState(false);
+  const router = useRouter();
   const hasLoadedOnce = useRef(false);
   const storiesLenRef = useRef(0); // stable ref so handleRefresh doesn't capture stale stories
   useEffect(() => { storiesLenRef.current = stories.length; }, [stories.length]);
@@ -48,6 +54,26 @@ export function HomeFeed() {
   // Per-session cache of each category's resolved feed, so a sideways swipe to
   // an already-prefetched category is instant (no re-fetch, images pre-warmed).
   const feedCache = useRef<Map<string, NewsItem[]>>(new Map());
+
+  // Fetch insight once on mount — it's global, not per-category
+  useEffect(() => {
+    fetchActiveInsight().then(setInsight).catch(() => {});
+  }, []);
+
+  // Bust the "all" cache on every mount so feed prefs changes in Profile apply immediately
+  useEffect(() => {
+    feedCache.current.delete("all");
+  }, []);
+
+  // Feed customization hint — shows after 3s, repeats each visit until user taps it
+  useEffect(() => {
+    if (getFeedHintShown()) return;
+    const t = setTimeout(() => {
+      setShowFeedHint(true);
+      posthog.capture("feed_hint_shown");
+    }, 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Real-time drag position — drives the card x transform without re-renders
   const dragX = useMotionValue(0);
@@ -264,11 +290,46 @@ export function HomeFeed() {
               <CardStack
                 key={activeCategory}
                 items={stories}
+                insight={insight}
                 onRefresh={handleRefresh}
                 onHorizontalDrag={handleHorizontalDrag}
                 onHorizontalDragEnd={handleHorizontalDragEnd}
               />
             </motion.div>
+
+            {/* Feed customization hint — positioned inside relative container so top: 12px lands over the card */}
+            <AnimatePresence>
+              {showFeedHint && (
+                <motion.button
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  onClick={() => { setFeedHintShown(); setShowFeedHint(false); router.push("/profile"); }}
+                  style={{
+                    position: "absolute",
+                    top: "12px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 50,
+                    background: "rgba(17,17,17,0.95)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "20px",
+                    padding: "8px 16px",
+                    color: "#a3a3a3",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                  }}
+                >
+                  ✦ Customize your feed → Profile
+                </motion.button>
+              )}
+            </AnimatePresence>
           </>
         )}
       </div>

@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { NewsItem } from "./types";
+import { getFeedPrefs } from "./storage";
+import { CATEGORIES } from "./categories";
+
+const ALL_SLUGS = CATEGORIES.map((c) => c.slug);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -36,11 +40,24 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
 // de-clustering pass then caps consecutive same-category cards so a high-volume
 // category (e.g. AI) can't form a solid wall at the top — but order otherwise
 // follows publish time exactly.
-const MAX_CONSECUTIVE = 2; // no more than N same-category cards in a row
+const MAX_CONSECUTIVE = 2;  // no more than N same-category cards in a row
+const MAX_PER_SOURCE = 3;   // no source dominates the feed
 
 function rankScore(item: NewsItem): number {
   // Newest first — strictly by publish time.
   return new Date(item.publishedAt).getTime();
+}
+
+// Hard cap: keep only the most recent MAX_PER_SOURCE items from each source.
+// Runs before de-clustering so the input to deClusterByCategory is already diverse.
+function capBySource(sorted: NewsItem[]): NewsItem[] {
+  const counts: Record<string, number> = {};
+  return sorted.filter((item) => {
+    const n = counts[item.sourceName] ?? 0;
+    if (n >= MAX_PER_SOURCE) return false;
+    counts[item.sourceName] = n + 1;
+    return true;
+  });
 }
 
 // Greedy re-rank: keep items in score order, but whenever placing the next item
@@ -94,6 +111,13 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
 
   if (categorySlug && categorySlug !== "all") {
     query = query.eq("category_slug", categorySlug);
+  } else {
+    // Apply user's feed preferences — only filter when they've selected specific topics
+    // null or empty = no preference = show everything
+    const prefs = getFeedPrefs();
+    if (prefs !== null && prefs.length > 0 && prefs.length < ALL_SLUGS.length) {
+      query = query.in("category_slug", prefs);
+    }
   }
 
   const { data, error } = await query;
@@ -102,10 +126,8 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
   const items = (data as DbNewsItem[]).map(dbToNewsItem);
 
   if (!categorySlug || categorySlug === "all") {
-    // Recency-dominant score (fresh news always reaches the top), then break up
-    // same-category runs so the feed reads as a mix instead of one big block.
     items.sort((a, b) => rankScore(b) - rankScore(a));
-    return deClusterByCategory(items);
+    return deClusterByCategory(capBySource(items));
   }
 
   return items;

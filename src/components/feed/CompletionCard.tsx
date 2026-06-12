@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Flame } from "lucide-react";
 import posthog from "posthog-js";
-import { getStreak } from "@/lib/storage";
+import { getStreak, getFeedHintShown, setFeedHintShown } from "@/lib/storage";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
+import { useRouter } from "next/navigation";
 
 interface CompletionCardProps {
   readCount: number;
@@ -20,10 +21,15 @@ export function CompletionCard({
 }: CompletionCardProps) {
   const [streak, setStreak] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showFeedHint, setShowFeedHint] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setStreak(getStreak());
     posthog.capture("feed_completed", { read_count: readCount });
+    if (!getFeedHintShown()) {
+      setShowFeedHint(true);
+    }
   }, [readCount]);
 
   const baseDelay = 0.35;
@@ -189,6 +195,34 @@ export function CompletionCard({
           >
             Back to top →
           </button>
+
+          {/* One-time feed customisation hint */}
+          <AnimatePresence>
+            {showFeedHint && (
+              <motion.button
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: baseDelay + 0.7, duration: 0.4, ease: "easeOut" }}
+                onClick={() => { setFeedHintShown(); router.push("/profile"); }}
+                style={{
+                  marginTop: "20px",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: "20px",
+                  color: "#525252",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  padding: "8px 18px",
+                  letterSpacing: "0.01em",
+                  pointerEvents: "auto",
+                }}
+              >
+                Customize your feed in Profile →
+              </motion.button>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 

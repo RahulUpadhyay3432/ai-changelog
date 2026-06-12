@@ -33,3 +33,17 @@ export interface NewsItem {
   publishedAt: string;
   isSaved?: boolean;
 }
+
+export interface InsightSlide {
+  imageUrl: string; // complete card image — design, title, and text all baked in
+}
+
+export interface Insight {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  coverImageUrl: string | null;
+  accentColor: string;
+  slides: InsightSlide[];
+  publishedAt: string;
+}

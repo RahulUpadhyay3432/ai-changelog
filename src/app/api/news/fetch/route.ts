@@ -23,7 +23,7 @@ const VALID_SLUGS: CategorySlug[] = [
   "funding-ma", "big-tech", "infrastructure", "policy",
 ];
 
-const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string }[] = [
+const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string; maxItems?: number }[] = [
   // ── Model labs — first-party announcements ────────────────────────────────
   { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",      sourceName: "OpenAI Blog" },
   // Note: Anthropic has no public RSS — covered via TechCrunch/The Decoder
@@ -35,9 +35,8 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://blogs.microsoft.com/feed/",                             defaultCategory: "big-tech",       sourceName: "Microsoft Blog" },
   { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",       sourceName: "Microsoft AI" },
   { url: "https://www.microsoft.com/en-us/research/feed/",                defaultCategory: "research",       sourceName: "Microsoft Research" },
-  // Azure blog has no public RSS — use Azure service updates as a real-time signal
-  // for GA launches, previews, and feature releases (incl. Discovery, Foundry, etc.)
-  { url: "https://www.microsoft.com/releasecommunications/api/v2/azure/rss", defaultCategory: "big-tech",     sourceName: "Azure Updates" },
+  // Azure service updates feed removed — it's an ops feed for Azure teams, not a news feed.
+  // Major Azure AI announcements (OpenAI GA, Foundry, etc.) are covered by Microsoft AI Blog.
   { url: "https://engineering.fb.com/feed/",                              defaultCategory: "ai-models",      sourceName: "Meta Engineering" },
   { url: "https://aws.amazon.com/blogs/machine-learning/feed/",           defaultCategory: "infrastructure", sourceName: "AWS ML Blog" },
   { url: "https://blogs.nvidia.com/blog/category/generative-ai/feed/",   defaultCategory: "infrastructure", sourceName: "NVIDIA AI" },
@@ -243,6 +242,7 @@ SUMMARY RULES:
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
 - NEVER start with "This article", "This release", or "This post"
 - If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
+- If it is a retirement/deprecation notice for a niche cloud service most AI developers wouldn't know (e.g. "Azure Form Recognizer v2 retiring"): write LOW_SIGNAL. But if it affects a widely-used API or platform (e.g. "OpenAI deprecates GPT-3 API"): cover it normally
 - If the content is NOT about AI, ML, software, developer tools, tech startups, or the tech industry: write OFF_TOPIC
 
 Respond in EXACTLY this format — no extra text before or after:
@@ -392,7 +392,7 @@ async function fetchRSSFeed(
 ): Promise<FeedItem[]> {
   const parsed = await parser.parseURL(feed.url);
 
-  const rawItems = (parsed.items ?? []).slice(0, 20).map((item) => {
+  const rawItems = (parsed.items ?? []).slice(0, feed.maxItems ?? 10).map((item) => {
     const rawContent =
       item.contentSnippet ?? item.content ?? item.summary ?? item.description ?? "";
     const content = rawContent.trim() || (item.title ?? "");

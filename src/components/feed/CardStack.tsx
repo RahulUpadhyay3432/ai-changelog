@@ -1,16 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
+import { InsightEntryCard } from "./InsightEntryCard";
+import { InsightSlideshow } from "./InsightSlideshow";
+import { NotificationCard } from "./NotificationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
-import type { NewsItem } from "@/lib/types";
+import type { NewsItem, Insight } from "@/lib/types";
 import { updateStreak } from "@/lib/storage";
+import { shouldShowNotifCard } from "@/lib/notifications";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
 interface CardStackProps {
   items: NewsItem[];
+  insight?: Insight | null;
   onIndexChange?: (index: number, total: number) => void;
   onRefresh?: () => Promise<number>;
   onSave?: (id: string) => void;
@@ -18,12 +23,19 @@ interface CardStackProps {
   onHorizontalDragEnd?: (dx: number) => void;
 }
 
+// Inject notification card after this many news items
+const NOTIF_AFTER = 5;
+// Inject insight card after this many news items
+const INSIGHT_AFTER = 7;
+
 const PTR_THRESHOLD = 64;
-// How many px of movement before we commit to a direction
 const DIRECTION_LOCK_THRESHOLD = 8;
 
-// Run non-visual work (analytics, localStorage) after paint so it never blocks
-// the scroll-snap frame — keeps card-to-card transitions smooth.
+type FeedEntry =
+  | { type: "news"; item: NewsItem; newsIdx: number }
+  | { type: "insight"; insight: Insight }
+  | { type: "notification" };
+
 function deferIdle(fn: () => void) {
   if (typeof window === "undefined") return;
   const ric = (
@@ -36,14 +48,16 @@ function deferIdle(fn: () => void) {
 }
 
 export function CardStack({
-  items, onIndexChange, onRefresh, onSave,
+  items, insight, onIndexChange, onRefresh, onSave,
   onHorizontalDrag, onHorizontalDragEnd,
 }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [insightOpen, setInsightOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [caughtUpToast, setCaughtUpToast] = useState(false);
   const [ptrPull, setPtrPull] = useState(0);
+  const [showNotifCard, setShowNotifCard] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
@@ -52,23 +66,37 @@ export function CardStack({
   const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemsLenRef = useRef(items.length);
 
-  // Touch tracking refs — shared between the locked-direction useEffect
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const touchCurrentX = useRef(0);
   const touchCurrentY = useRef(0);
-  // "none" → "horizontal" | "vertical" — locked on first significant movement
   const gestureLock = useRef<"none" | "horizontal" | "vertical">("none");
 
-  // Keep callback refs fresh so the non-passive listener never captures stale closures
   const onHorizontalDragRef = useRef(onHorizontalDrag);
   const onHorizontalDragEndRef = useRef(onHorizontalDragEnd);
   const onRefreshRef = useRef(onRefresh);
   useEffect(() => { onHorizontalDragRef.current = onHorizontalDrag; }, [onHorizontalDrag]);
   useEffect(() => { onHorizontalDragEndRef.current = onHorizontalDragEnd; }, [onHorizontalDragEnd]);
   useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
-
   useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
+
+  // Check client-side whether to show the notification card
+  useEffect(() => {
+    setShowNotifCard(shouldShowNotifCard());
+  }, []);
+
+  // ─── Build mixed feed ────────────────────────────────────────────────────
+  const hasInsight = !!insight && items.length > INSIGHT_AFTER;
+
+  const feedEntries = useMemo<FeedEntry[]>(() => {
+    const result: FeedEntry[] = [];
+    for (let i = 0; i < items.length; i++) {
+      if (showNotifCard && i === NOTIF_AFTER) result.push({ type: "notification" });
+      if (hasInsight && i === INSIGHT_AFTER) result.push({ type: "insight", insight: insight! });
+      result.push({ type: "news", item: items[i], newsIdx: i });
+    }
+    return result;
+  }, [items, insight, hasInsight, showNotifCard]);
 
   useEffect(() => {
     updateStreak();
@@ -78,13 +106,7 @@ export function CardStack({
     };
   }, []);
 
-
-  // ─── Non-passive touch listeners ────────────────────────────────────────────
-  // React attaches all synthetic touch events as `passive: true`, which means
-  // e.preventDefault() is a no-op and the browser scrolls vertically even during
-  // a horizontal swipe. We bypass React here and attach directly to the DOM with
-  // { passive: false } so we can call preventDefault() the moment we lock to
-  // horizontal — killing all vertical scroll for that gesture.
+  // ─── Non-passive touch listeners ─────────────────────────────────────────
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -104,20 +126,17 @@ export function CardStack({
       const dx = touchCurrentX.current - touchStartX.current;
       const dy = touchCurrentY.current - touchStartY.current;
 
-      // Lock direction on first significant movement
       if (gestureLock.current === "none") {
         if (Math.abs(dx) >= DIRECTION_LOCK_THRESHOLD || Math.abs(dy) >= DIRECTION_LOCK_THRESHOLD) {
           gestureLock.current = Math.abs(dx) >= Math.abs(dy) ? "horizontal" : "vertical";
         }
-        return; // Wait until direction is decided
+        return;
       }
 
       if (gestureLock.current === "horizontal") {
-        // Prevent vertical scroll — this is the key line that makes it crisp
         e.preventDefault();
         onHorizontalDragRef.current?.(dx);
       } else {
-        // Vertical: handle pull-to-refresh indicator only
         if (container.scrollTop <= 4 && dy > 0) {
           setPtrPull(Math.min(dy * 0.6, PTR_THRESHOLD * 1.2));
         }
@@ -136,7 +155,6 @@ export function CardStack({
         return;
       }
 
-      // Vertical: pull-to-refresh
       if (
         lock === "vertical" &&
         container.scrollTop <= 4 &&
@@ -170,8 +188,6 @@ export function CardStack({
       }
     };
 
-    // passive: true  → browser can optimise scroll (we never preventDefault here)
-    // passive: false → we may preventDefault; required for horizontal lock
     container.addEventListener("touchstart", onTouchStart, { passive: true });
     container.addEventListener("touchmove",  onTouchMove,  { passive: false });
     container.addEventListener("touchend",   onTouchEnd,   { passive: true });
@@ -181,26 +197,27 @@ export function CardStack({
       container.removeEventListener("touchmove",  onTouchMove);
       container.removeEventListener("touchend",   onTouchEnd);
     };
-  }, []); // Empty — all callbacks accessed via refs
+  }, []);
 
-  // ─── Scroll handler (vertical story tracking) ────────────────────────────
+  // ─── Scroll handler ───────────────────────────────────────────────────────
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
     const index = Math.min(
       Math.round(container.scrollTop / container.clientHeight),
-      items.length
+      feedEntries.length
     );
     if (index === currentIndexRef.current) return;
     const prev = currentIndexRef.current;
     currentIndexRef.current = index;
     setCurrentIndex(index);
-    if (index < items.length) {
-      onIndexChange?.(index, items.length);
-      // Haptic stays immediate so it feels tied to the snap.
+
+    const entry = feedEntries[index];
+    if (entry?.type === "news") {
+      onIndexChange?.(entry.newsIdx, items.length);
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
-      // Streak write + analytics are deferred off the snap frame.
-      const prevItem = items[prev] ?? items[0];
+      const prevEntry = feedEntries[prev];
+      const prevItem = prevEntry?.type === "news" ? prevEntry.item : items[0];
       deferIdle(() => {
         updateStreak();
         posthog.capture("story_swiped", {
@@ -213,7 +230,7 @@ export function CardStack({
         });
       });
     }
-  }, [items, onIndexChange]);
+  }, [feedEntries, items, onIndexChange]);
 
   const handleBackToTop = useCallback(() => {
     const container = containerRef.current;
@@ -223,33 +240,29 @@ export function CardStack({
     onIndexChange?.(0, items.length);
   }, [items.length, onIndexChange]);
 
-  // ─── Preload upcoming hero images ────────────────────────────────────────
-  // Off-screen <img> tags are deprioritised by the browser, so the next card's
-  // image often isn't downloaded yet when the user swipes to it — causing a
-  // visible delay. Warm the cache for the next few cards whenever the position
-  // changes; by the time they're swiped into view the image is already loaded.
+  // ─── Preload upcoming hero images ─────────────────────────────────────────
   const PRELOAD_AHEAD = 3;
   useEffect(() => {
     for (let i = currentIndex + 1; i <= currentIndex + PRELOAD_AHEAD; i++) {
-      const url = items[i]?.imageUrl;
+      const entry = feedEntries[i];
+      if (entry?.type !== "news") continue;
+      const url = entry.item.imageUrl;
       if (!url) continue;
       const img = new window.Image();
       img.decoding = "async";
       img.src = url;
     }
-  }, [currentIndex, items]);
+  }, [currentIndex, feedEntries]);
 
-  // ─── Prefetch "Why it matters" breakdowns ────────────────────────────────
-  // The breakdown LLM call is slow (~10s). Warm it for the current card and the
-  // next couple as the user scrolls, so tapping "Why it matters" is instant.
-  // The cache dedupes, so each story is only ever generated once.
+  // ─── Prefetch "Why it matters" breakdowns ─────────────────────────────────
   const BREAKDOWN_PREFETCH_AHEAD = 2;
   useEffect(() => {
     for (let i = currentIndex; i <= currentIndex + BREAKDOWN_PREFETCH_AHEAD; i++) {
-      const it = items[i];
-      if (it) prefetchBreakdown(it);
+      const entry = feedEntries[i];
+      if (entry?.type !== "news") continue;
+      prefetchBreakdown(entry.item);
     }
-  }, [currentIndex, items]);
+  }, [currentIndex, feedEntries]);
 
   if (items.length === 0) {
     return (
@@ -282,7 +295,7 @@ export function CardStack({
         )}
       </AnimatePresence>
 
-      {/* Scroll container — touch events handled via non-passive DOM listeners above */}
+      {/* Scroll container */}
       <div
         ref={containerRef}
         className="scrollbar-none"
@@ -297,11 +310,36 @@ export function CardStack({
           flexDirection: "column",
         } as React.CSSProperties}
       >
-        {items.map((item) => (
-          <div key={item.id} style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
-            <NewsCard item={item} onSave={onSave} />
-          </div>
-        ))}
+        {feedEntries.map((entry, feedIdx) => {
+          if (entry.type === "notification") {
+            return (
+              <div
+                key="notif-card"
+                style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+              >
+                <NotificationCard onDone={() => setShowNotifCard(false)} />
+              </div>
+            );
+          }
+          if (entry.type === "insight") {
+            return (
+              <div
+                key="insight-entry"
+                style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+              >
+                <InsightEntryCard insight={entry.insight} onTap={() => setInsightOpen(true)} />
+              </div>
+            );
+          }
+          return (
+            <div
+              key={entry.item.id}
+              style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+            >
+              <NewsCard item={entry.item} onSave={onSave} />
+            </div>
+          );
+        })}
         <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
           <CompletionCard
             readCount={items.length}
@@ -331,6 +369,15 @@ export function CardStack({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Insight slideshow overlay */}
+      {insight && (
+        <InsightSlideshow
+          insight={insight}
+          open={insightOpen}
+          onClose={() => setInsightOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -223,3 +223,34 @@ export function setPushDismissed(): void {
   if (!isBrowser) return;
   localStorage.setItem("kapyn_push_dismissed", "true");
 }
+
+// ==========================================
+// Feed Preferences
+// ==========================================
+
+const FEED_PREFS_KEY = "kapyn_feed_prefs";
+const FEED_HINT_KEY = "kapyn_feed_hint_v2";
+
+// null = never configured (show all). Array = user's chosen slugs.
+export function getFeedPrefs(): string[] | null {
+  if (!isBrowser) return null;
+  try {
+    const raw = localStorage.getItem(FEED_PREFS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+export function setFeedPrefs(slugs: string[]): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(FEED_PREFS_KEY, JSON.stringify(slugs)); } catch {}
+}
+
+export function getFeedHintShown(): boolean {
+  if (!isBrowser) return false;
+  return localStorage.getItem(FEED_HINT_KEY) === "1";
+}
+
+export function setFeedHintShown(): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(FEED_HINT_KEY, "1"); } catch {}
+}

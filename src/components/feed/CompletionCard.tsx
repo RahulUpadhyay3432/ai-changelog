@@ -204,7 +204,7 @@ export function CompletionCard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: baseDelay + 0.7, duration: 0.4, ease: "easeOut" }}
-                onClick={() => { setFeedHintShown(); router.push("/profile"); }}
+                onClick={() => router.push("/profile")}
                 style={{
                   marginTop: "20px",
                   background: "rgba(255,255,255,0.03)",

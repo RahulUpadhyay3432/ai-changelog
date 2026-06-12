@@ -335,7 +335,7 @@ export function HomeFeed() {
                   >
                     {/* Main tap area */}
                     <button
-                      onClick={() => { setFeedHintShown(); setShowFeedHint(false); router.push("/profile"); }}
+                      onClick={() => { setShowFeedHint(false); router.push("/profile"); }}
                       style={{
                         flex: 1,
                         background: "none",

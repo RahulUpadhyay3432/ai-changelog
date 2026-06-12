@@ -229,7 +229,10 @@ export function setPushDismissed(): void {
 // ==========================================
 
 const FEED_PREFS_KEY = "kapyn_feed_prefs";
-const FEED_HINT_KEY = "kapyn_feed_hint_v2";
+// Hint is dismissed permanently only via the ✕ button.
+// Going to Profile does NOT dismiss it — the hint hides naturally once the
+// user has selected ≥1 category (getFeedPrefs().length > 0).
+const FEED_HINT_DISMISSED_KEY = "kapyn_feed_hint_dismissed_v1";
 
 // null = never configured (show all). Array = user's chosen slugs.
 export function getFeedPrefs(): string[] | null {
@@ -245,12 +248,19 @@ export function setFeedPrefs(slugs: string[]): void {
   try { localStorage.setItem(FEED_PREFS_KEY, JSON.stringify(slugs)); } catch {}
 }
 
+// Returns true if hint should be hidden (user dismissed with ✕, or has prefs set)
 export function getFeedHintShown(): boolean {
   if (!isBrowser) return false;
-  return localStorage.getItem(FEED_HINT_KEY) === "1";
+  if (localStorage.getItem(FEED_HINT_DISMISSED_KEY) === "1") return true;
+  try {
+    const raw = localStorage.getItem(FEED_PREFS_KEY);
+    const prefs: string[] | null = raw ? JSON.parse(raw) : null;
+    return prefs !== null && prefs.length > 0;
+  } catch { return false; }
 }
 
+// Only call this from the ✕ dismiss button — not from navigating to Profile
 export function setFeedHintShown(): void {
   if (!isBrowser) return;
-  try { localStorage.setItem(FEED_HINT_KEY, "1"); } catch {}
+  try { localStorage.setItem(FEED_HINT_DISMISSED_KEY, "1"); } catch {}
 }

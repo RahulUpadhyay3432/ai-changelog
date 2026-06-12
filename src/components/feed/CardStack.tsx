@@ -3,7 +3,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
 import { InsightEntryCard } from "./InsightEntryCard";
-import { InsightSlideshow } from "./InsightSlideshow";
 import { NotificationCard } from "./NotificationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
@@ -52,7 +51,6 @@ export function CardStack({
   onHorizontalDrag, onHorizontalDragEnd,
 }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [insightOpen, setInsightOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [caughtUpToast, setCaughtUpToast] = useState(false);
@@ -327,7 +325,7 @@ export function CardStack({
                 key="insight-entry"
                 style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
               >
-                <InsightEntryCard insight={entry.insight} onTap={() => setInsightOpen(true)} />
+                <InsightEntryCard insight={entry.insight} />
               </div>
             );
           }
@@ -370,14 +368,6 @@ export function CardStack({
         )}
       </AnimatePresence>
 
-      {/* Insight slideshow overlay */}
-      {insight && (
-        <InsightSlideshow
-          insight={insight}
-          open={insightOpen}
-          onClose={() => setInsightOpen(false)}
-        />
-      )}
     </div>
   );
 }

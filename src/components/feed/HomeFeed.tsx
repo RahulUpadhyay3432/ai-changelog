@@ -297,37 +297,87 @@ export function HomeFeed() {
               />
             </motion.div>
 
-            {/* Feed customization hint — positioned inside relative container so top: 12px lands over the card */}
+            {/* Feed customization hint */}
             <AnimatePresence>
               {showFeedHint && (
-                <motion.button
-                  initial={{ opacity: 0, y: -8 }}
+                <motion.div
+                  initial={{ opacity: 0, y: -12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  onClick={() => { setFeedHintShown(); setShowFeedHint(false); router.push("/profile"); }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
                   style={{
                     position: "absolute",
-                    top: "12px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
+                    top: "14px",
+                    left: 0,
+                    right: 0,
+                    display: "flex",
+                    justifyContent: "center",
                     zIndex: 50,
-                    background: "rgba(17,17,17,0.95)",
-                    backdropFilter: "blur(16px)",
-                    WebkitBackdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "20px",
-                    padding: "8px 16px",
-                    color: "#a3a3a3",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                    padding: "0 20px",
+                    pointerEvents: "none",
                   }}
                 >
-                  ✦ Customize your feed → Profile
-                </motion.button>
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: "380px",
+                      background: "rgba(15,15,15,0.96)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "16px",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      pointerEvents: "auto",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {/* Main tap area */}
+                    <button
+                      onClick={() => { setFeedHintShown(); setShowFeedHint(false); router.push("/profile"); }}
+                      style={{
+                        flex: 1,
+                        background: "none",
+                        border: "none",
+                        padding: "14px 16px",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "3px",
+                      }}
+                    >
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#e5e5e5", letterSpacing: "-0.01em" }}>
+                        ✦ Customize your feed
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#525252", fontWeight: 400 }}>
+                        Pick the topics you care about → Profile
+                      </span>
+                    </button>
+                    {/* Dismiss */}
+                    <button
+                      onClick={() => { setFeedHintShown(); setShowFeedHint(false); }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        borderLeft: "1px solid rgba(255,255,255,0.06)",
+                        padding: "0 16px",
+                        height: "100%",
+                        minHeight: "52px",
+                        cursor: "pointer",
+                        color: "#404040",
+                        fontSize: "18px",
+                        lineHeight: 1,
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </>

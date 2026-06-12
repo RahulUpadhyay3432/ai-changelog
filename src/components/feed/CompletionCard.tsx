@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Flame, Share2 } from "lucide-react";
 import posthog from "posthog-js";
+import { ShareCardSheet } from "./ShareCardSheet";
 import { getStreak, getFeedHintShown, setFeedHintShown } from "@/lib/storage";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 import { useRouter } from "next/navigation";
@@ -22,34 +23,8 @@ export function CompletionCard({
   const [streak, setStreak] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFeedHint, setShowFeedHint] = useState(false);
-  const [sharing, setSharing] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
   const router = useRouter();
-
-  const handleShare = useCallback(async () => {
-    setSharing(true);
-    posthog.capture("share_card_tapped");
-    try {
-      const res = await fetch("/api/share-card");
-      const blob = await res.blob();
-      const file = new File([blob], "kapyn-today.png", { type: "image/png" });
-
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Today in AI — Kapyn" });
-        posthog.capture("share_card_shared");
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "kapyn-today.png";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch {
-      // user cancelled or share failed — ignore
-    } finally {
-      setSharing(false);
-    }
-  }, []);
 
   useEffect(() => {
     setStreak(getStreak());
@@ -192,26 +167,27 @@ export function CompletionCard({
           }}
         >
           <button
-            onClick={handleShare}
-            disabled={sharing}
+            onClick={() => {
+              posthog.capture("share_card_tapped");
+              setShowShareCard(true);
+            }}
             style={{
-              background: sharing ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.07)",
+              background: "rgba(255,255,255,0.07)",
               border: "1px solid rgba(255,255,255,0.14)",
               borderRadius: "20px",
-              color: sharing ? "#525252" : "#E8E4DE",
+              color: "#E8E4DE",
               fontSize: "13px",
               fontWeight: 600,
-              cursor: sharing ? "default" : "pointer",
+              cursor: "pointer",
               padding: "10px 22px",
               letterSpacing: "0.01em",
               display: "flex",
               alignItems: "center",
               gap: "7px",
-              transition: "all 0.2s ease",
             }}
           >
             <Share2 size={14} strokeWidth={2.5} />
-            {sharing ? "Generating…" : "Share today's top 3"}
+            Share today&apos;s top 3
           </button>
 
           <button
@@ -277,6 +253,7 @@ export function CompletionCard({
       </div>
 
       <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
+      <ShareCardSheet open={showShareCard} onClose={() => setShowShareCard(false)} />
 
       {/* "Still all caught up" toast */}
       <AnimatePresence>

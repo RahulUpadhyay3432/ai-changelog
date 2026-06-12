@@ -11,9 +11,16 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const APP_URL = "https://kapyn.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
+  verification: {
+    google: "vwiJeZYbR-J6Se91wicz3KZlpXtY8_YlWTxuZ7gRfjc",
+  },
   title: "Kapyn — What happened in AI today",
-  description: "The calm intelligence layer for AI",
+  description:
+    "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -26,6 +33,20 @@ export const metadata: Metadata = {
       { url: "/api/icon/512", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/api/icon/180", sizes: "180x180", type: "image/png" }],
+  },
+  openGraph: {
+    title: "Kapyn — What happened in AI today",
+    description:
+      "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
+    url: APP_URL,
+    siteName: "Kapyn",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kapyn — What happened in AI today",
+    description:
+      "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
   },
 };
 

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { CATEGORIES } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const categoryUrls: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
+    url: `https://kapyn.app/categories/${c.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  }));
+
   return [
     {
       url: "https://kapyn.app",
@@ -39,8 +47,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: "https://kapyn.app/categories",
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.5,
+      priority: 0.4,
     },
+    ...categoryUrls,
     ...storyUrls,
   ];
 }

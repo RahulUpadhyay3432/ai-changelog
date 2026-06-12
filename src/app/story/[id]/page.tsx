@@ -65,20 +65,46 @@ export default async function StoryPage({ params }: Props) {
 
   const redirectTo = story ? `${APP_URL}/?story=${id}` : APP_URL;
 
+  const storyUrl = story ? `${APP_URL}/story/${story.id}` : null;
   const jsonLd = story
     ? {
         "@context": "https://schema.org",
         "@type": "NewsArticle",
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": storyUrl,
+        },
         headline: story.title,
         description: story.summary,
+        articleSection: category?.name ?? story.categorySlug,
         datePublished: story.publishedAt,
-        url: `${APP_URL}/story/${story.id}`,
+        dateModified: story.publishedAt,
+        inLanguage: "en",
+        isAccessibleForFree: true,
+        url: storyUrl,
+        image: story.imageUrl
+          ? { "@type": "ImageObject", url: story.imageUrl }
+          : {
+              "@type": "ImageObject",
+              url: `${APP_URL}/story/${story.id}/opengraph-image`,
+              width: 1200,
+              height: 630,
+            },
+        author: {
+          "@type": "Organization",
+          name: story.sourceName,
+        },
         publisher: {
           "@type": "Organization",
           name: "Kapyn",
           url: APP_URL,
+          logo: {
+            "@type": "ImageObject",
+            url: `${APP_URL}/api/icon/192`,
+            width: 192,
+            height: 192,
+          },
         },
-        ...(story.imageUrl ? { image: story.imageUrl } : {}),
       }
     : null;
 

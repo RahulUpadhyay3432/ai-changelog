@@ -56,47 +56,23 @@ export function InsightEntryCard({ insight }: InsightEntryCardProps) {
         userSelect: "none",
       }}
     >
-      {/* Blurred fill — soft continuation of the image behind the letterbox
-          gaps, so any aspect-ratio mismatch reads as depth, not black bars */}
+      {/* Full-bleed image. Card slot is ~2:3 — supply a 2:3 image so cover
+          fills edge-to-edge with no crop and no letterbox. Keep the headline
+          and the kapyn.app watermark inside the central safe zone. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={insight.coverImageUrl}
-        alt=""
-        aria-hidden="true"
+        alt={insight.title}
         style={{
           position: "absolute",
           inset: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          filter: "blur(28px) brightness(0.5)",
-          transform: "scale(1.15)",
+          objectPosition: "center",
+          display: "block",
         }}
       />
-
-      {/* Sharp, complete image — never cropped. The bottom inset keeps the
-          baked-in watermark clear of the bottom nav. */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          paddingBottom: "18px",
-          boxSizing: "border-box",
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={insight.coverImageUrl}
-          alt={insight.title}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            objectPosition: "center",
-            display: "block",
-          }}
-        />
-      </div>
 
       {/* Share — the only interactive element on the card */}
       <button

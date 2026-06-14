@@ -13,6 +13,12 @@ import {
 import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
+import { isBadSummary } from "@/lib/quality";
+import {
+  canonicalize,
+  parseExtractedEntities,
+  type ExtractedEntity,
+} from "@/lib/entities";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -245,9 +251,15 @@ SUMMARY RULES:
 - If it is a retirement/deprecation notice for a niche cloud service most AI developers wouldn't know (e.g. "Azure Form Recognizer v2 retiring"): write LOW_SIGNAL. But if it affects a widely-used API or platform (e.g. "OpenAI deprecates GPT-3 API"): cover it normally
 - If the content is NOT about AI, ML, software, developer tools, tech startups, or the tech industry: write OFF_TOPIC
 
+ENTITY EXTRACTION:
+- After the summary, list up to 6 specific named entities this story is actually ABOUT — models, tools, companies, techniques, or concepts (e.g. GPT-5, vLLM, Anthropic, RAG, mixture of experts).
+- Only real subjects, not passing mentions. Use the most common canonical name. Skip generic words (AI, software, model, technology, startup).
+- Output a compact JSON array on one line. If none, output [].
+
 Respond in EXACTLY this format — no extra text before or after:
 CATEGORY: <slug>
 SUMMARY: <2-3 sentences or LOW_SIGNAL>
+ENTITIES: [{"name":"<name>","type":"<model|tool|company|technique|concept>"}]
 
 Title: ${title}
 Content: ${content.slice(0, 2000)}`;
@@ -256,11 +268,17 @@ Content: ${content.slice(0, 2000)}`;
 interface ClassifyResult {
   category: CategorySlug;
   summary: string; // "LOW_SIGNAL" triggers isBadSummary
+  entities: ExtractedEntity[];
 }
 
 function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyResult {
-  const categoryMatch = text.match(/^CATEGORY:\s*(\S+)/m);
-  const summaryMatch = text.match(/^SUMMARY:\s*([\s\S]+)/m);
+  const categoryMatch = text.match(/CATEGORY:\s*(\S+)/);
+  // Summary runs from "SUMMARY:" up to the ENTITIES marker (or end of text), so
+  // the entities JSON never leaks into the summary body. The boundary tolerates
+  // the LLM putting ENTITIES on the same line (no preceding newline) — it just
+  // has to be followed by the opening "[".
+  const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)(?:\s*ENTITIES:\s*\[|\s*$)/);
+  const entitiesMatch = text.match(/ENTITIES:\s*(\[[\s\S]*?\])/);
 
   const rawSlug = categoryMatch?.[1]?.trim() ?? "";
   const category: CategorySlug = VALID_SLUGS.includes(rawSlug as CategorySlug)
@@ -268,47 +286,11 @@ function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyRe
     : fallback;
 
   const summary = summaryMatch?.[1]?.trim() ?? "";
-  return { category, summary };
+  const entities = parseExtractedEntities(entitiesMatch?.[1]);
+  return { category, summary, entities };
 }
 
-/**
- * Detects summaries that must never reach the feed.
- * Catches both exact sentinels (LOW_SIGNAL, OFF_TOPIC) and the prose
- * variations the LLM sometimes writes instead of the sentinel word.
- */
-function isBadSummary(text: string): boolean {
-  const t = text.trim();
-  const lower = t.toLowerCase();
-  return (
-    // Exact sentinels
-    t === "LOW_SIGNAL" ||
-    lower.startsWith("low_signal") ||
-    t === "OFF_TOPIC" ||
-    lower.startsWith("off_topic") ||
-    // Prose off-topic: LLM writes "This content is not related to AI..."
-    // instead of the OFF_TOPIC sentinel
-    lower.includes("not related to ai") ||
-    lower.includes("not related to ml") ||
-    lower.includes("not related to software") ||
-    lower.includes("not related to tech") ||
-    lower.includes("this content is not") ||
-    lower.includes("not about ai") ||
-    lower.includes("not about tech") ||
-    // Prompt-forbidden openers — when the LLM uses these it signals generic
-    // or off-topic content (the prompt explicitly bans them for real stories)
-    lower.startsWith("this article") ||
-    lower.startsWith("this post") ||
-    lower.startsWith("this blog") ||
-    // Leaked prompt / boilerplate
-    lower.startsWith("write a ") ||
-    lower.startsWith("the provided content") ||
-    lower.includes("summarize this article") ||
-    /^release:\s/i.test(t) ||
-    /\btags:\s*[\w,\s]+$/.test(t) ||
-    /refs\s+\S+#\d+/i.test(t) ||
-    /^v?\d+\.\d+[\w.]*\s*[-–]\s*/i.test(t)
-  );
-}
+// isBadSummary now lives in @/lib/quality (shared with the knowledge generator).
 
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
@@ -461,10 +443,81 @@ function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
 
 const INSERT_CONCURRENCY = 4; // parallel LLM calls — stays within Gemini free quota
 
+type IngestResults = {
+  inserted: number;
+  skipped: number;
+  lowSignal: number;
+  entitiesUpserted: number;
+  mentionsLinked: number;
+  errors: string[];
+};
+
+// Mirror an inserted story into the durable story_archive (insert-or-ignore on
+// source_url) and return the canonical archive id. news_items rotates every 48h
+// but the archive never does — so the knowledge graph and /digest keep working.
+// For a re-seen URL the existing archive id is returned (NOT overwritten), which
+// is why we can't use a replacing upsert here.
+async function mirrorToArchive(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  id: string,
+  item: FeedItem,
+  summary: string,
+  category: CategorySlug
+): Promise<string | null> {
+  await supabase.from("story_archive").upsert(
+    {
+      id,
+      title: item.title,
+      summary,
+      source_url: item.sourceUrl,
+      source_name: item.sourceName,
+      category_slug: category,
+      image_url: item.imageUrl,
+      published_at: item.publishedAt,
+    },
+    { onConflict: "source_url", ignoreDuplicates: true }
+  );
+  const { data } = await supabase
+    .from("story_archive")
+    .select("id")
+    .eq("source_url", item.sourceUrl)
+    .single();
+  return data?.id ?? null;
+}
+
+// Canonicalise + atomically upsert each extracted entity and its mention via the
+// kb_upsert_entity_mention RPC. Dedupes within a story by slug.
+async function linkEntities(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  storyId: string,
+  entities: ExtractedEntity[],
+  results: IngestResults
+): Promise<void> {
+  const seen = new Set<string>();
+  for (const e of entities) {
+    const c = canonicalize(e.name, e.type);
+    if (!c || seen.has(c.slug)) continue;
+    seen.add(c.slug);
+    const { error } = await supabase.rpc("kb_upsert_entity_mention", {
+      p_slug: c.slug,
+      p_name: c.canonicalName,
+      p_type: c.entityType,
+      p_alias: c.alias,
+      p_story_id: storyId,
+    });
+    if (error) {
+      results.errors.push(`Entity "${c.slug}": ${error.message}`);
+    } else {
+      results.entitiesUpserted++;
+      results.mentionsLinked++;
+    }
+  }
+}
+
 async function insertItems(
   items: FeedItem[],
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  results: { inserted: number; skipped: number; lowSignal: number; errors: string[] }
+  results: IngestResults
 ) {
   const validItems = items.filter(i => i.title && i.sourceUrl);
   if (validItems.length === 0) return;
@@ -487,20 +540,38 @@ async function insertItems(
       results.errors.push(`LLM failed for "${item.title}" — skipped`);
       return;
     }
-    const { category, summary } = result;
+    const { category, summary, entities } = result;
     if (isBadSummary(summary)) { results.lowSignal++; return; }
 
-    const { error } = await supabase.from("news_items").insert({
-      title: item.title,
-      summary,
-      source_url: item.sourceUrl,
-      source_name: item.sourceName,
-      category_slug: category,
-      published_at: item.publishedAt,
-      image_url: item.imageUrl,
-    });
-    if (error) results.errors.push(`Insert "${item.title}": ${error.message}`);
-    else results.inserted++;
+    const { data: inserted, error } = await supabase
+      .from("news_items")
+      .insert({
+        title: item.title,
+        summary,
+        source_url: item.sourceUrl,
+        source_name: item.sourceName,
+        category_slug: category,
+        published_at: item.publishedAt,
+        image_url: item.imageUrl,
+      })
+      .select("id")
+      .single();
+    if (error || !inserted) {
+      results.errors.push(`Insert "${item.title}": ${error?.message ?? "no row"}`);
+      return;
+    }
+    results.inserted++;
+
+    // Knowledge-graph enrichment is best-effort: a failure here must NEVER
+    // affect the news insert above, so it's isolated in its own try/catch.
+    try {
+      const archiveId = await mirrorToArchive(supabase, inserted.id, item, summary, category);
+      if (archiveId && entities.length > 0) {
+        await linkEntities(supabase, archiveId, entities, results);
+      }
+    } catch (err) {
+      results.errors.push(`KB enrich "${item.title}": ${String(err)}`);
+    }
   };
 
   for (let i = 0; i < newItems.length; i += INSERT_CONCURRENCY) {
@@ -595,6 +666,33 @@ export async function GET(request: NextRequest) {
     return Response.json({ migrated });
   }
 
+  // ── Archive backfill — one-off: seed story_archive from current news_items ──
+  // Run once after the migration so concept pages have history before the next
+  // 48h delete. Idempotent (insert-or-ignore on source_url).
+  if (mode === "archive-backfill") {
+    const { data: items } = await supabase
+      .from("news_items")
+      .select("id, title, summary, source_url, source_name, category_slug, image_url, published_at");
+    let archived = 0;
+    for (const row of items ?? []) {
+      const { error } = await supabase.from("story_archive").upsert(
+        {
+          id: row.id,
+          title: row.title,
+          summary: row.summary,
+          source_url: row.source_url,
+          source_name: row.source_name,
+          category_slug: row.category_slug,
+          image_url: row.image_url,
+          published_at: row.published_at,
+        },
+        { onConflict: "source_url", ignoreDuplicates: true }
+      );
+      if (!error) archived++;
+    }
+    return Response.json({ archived, scanned: (items ?? []).length });
+  }
+
   // ── Normal fetch ───────────────────────────────────────────────────────────
 
   // Clean up leaked prompt strings and off-topic summaries already in DB
@@ -616,7 +714,10 @@ export async function GET(request: NextRequest) {
   await supabase.from("news_items").update({ category_slug: "funding-ma" }).eq("category_slug", "funding");
   await supabase.from("news_items").update({ category_slug: "startups"   }).eq("category_slug", "producthunt");
 
-  const results = { inserted: 0, skipped: 0, lowSignal: 0, errors: [] as string[] };
+  const results: IngestResults = {
+    inserted: 0, skipped: 0, lowSignal: 0,
+    entitiesUpserted: 0, mentionsLinked: 0, errors: [],
+  };
 
   // RSS feeds — parallel fetch
   const rssSettled = await Promise.allSettled(
@@ -659,6 +760,8 @@ export async function GET(request: NextRequest) {
       inserted: results.inserted,
       skipped: results.skipped,
       low_signal: results.lowSignal,
+      entities_upserted: results.entitiesUpserted,
+      mentions_linked: results.mentionsLinked,
       errors: results.errors.length,
     },
   });

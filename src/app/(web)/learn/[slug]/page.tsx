@@ -9,10 +9,9 @@ import {
   getStoriesForEntity,
   getEntitiesBySlugs,
 } from "@/lib/knowledge";
+import styles from "./learn.module.css";
 
 const APP_URL = "https://kapyn.app";
-const ACCENT = "#7c3aed";
-const ACCENT_LABEL = "#c4b5fd";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -25,6 +24,14 @@ interface Props {
 // so requesting one here 404s (no duplicate content).
 function isLearnType(t: EntityType): boolean {
   return t === "technique" || t === "concept";
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 // Prebuild the curated seed concepts at build time (no DB dependency); every
@@ -108,163 +115,73 @@ export default async function LearnPage({ params }: Props) {
   ];
 
   return (
-    <>
+    <article className={styles.article}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <Link
-        href="/explore"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 2,
-          color: "#525252",
-          fontSize: 13,
-          textDecoration: "none",
-          marginBottom: 24,
-        }}
-      >
+      <Link href="/explore" className={styles.back}>
         <ChevronLeft size={14} strokeWidth={2.5} />
         Explore
       </Link>
 
-      <span
-        style={{
-          display: "inline-block",
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: ACCENT_LABEL,
-          background: `${ACCENT}15`,
-          border: `1px solid ${ACCENT}30`,
-          padding: "3px 10px",
-          borderRadius: 100,
-          marginBottom: 16,
-        }}
-      >
-        {entity.entityType}
-      </span>
+      <div>
+        <span className={styles.eyebrow}>{entity.entityType}</span>
+      </div>
 
-      <h1
-        style={{
-          fontSize: "clamp(30px, 5vw, 44px)",
-          fontWeight: 600,
-          color: "#E8E4DE",
-          lineHeight: 1.15,
-          margin: "0 0 20px",
-          letterSpacing: "-0.02em",
-        }}
-      >
-        {entity.canonicalName}
-      </h1>
+      <h1 className={styles.title}>{entity.canonicalName}</h1>
 
-      {lead && (
-        <p style={{ fontSize: 19, lineHeight: 1.6, color: "#d4d4d4", margin: "0 0 32px" }}>
-          {lead}
-        </p>
-      )}
+      {lead && <p className={styles.deck}>{lead}</p>}
+
+      <hr className={styles.rule} />
 
       {sections.map((s) =>
         s.body ? (
-          <section key={s.heading} style={{ marginBottom: 28 }}>
-            <h2
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: ACCENT_LABEL,
-                margin: "0 0 8px",
-              }}
-            >
-              {s.heading}
-            </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: "#b4b4b4", margin: 0 }}>{s.body}</p>
+          <section key={s.heading} className={styles.section}>
+            <h2 className={styles.sectionHeading}>{s.heading}</h2>
+            <p className={styles.body}>{s.body}</p>
           </section>
         ) : null
       )}
 
       {stories.length > 0 && (
-        <section style={{ marginTop: 40 }}>
-          <h2
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "#737373",
-              margin: "0 0 12px",
-            }}
-          >
-            In the news
-          </h2>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            {stories.map((story) => (
-              <Link
-                key={story.id}
-                href={`/story/${story.id}`}
-                style={{
-                  textDecoration: "none",
-                  display: "block",
-                  padding: "14px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
-                <div style={{ fontSize: 15, fontWeight: 600, color: "#E8E4DE", lineHeight: 1.4, marginBottom: 4 }}>
-                  {story.title}
-                </div>
-                <div style={{ fontSize: 12, color: "#525252" }}>
-                  {story.sourceName} ·{" "}
-                  {new Date(story.publishedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </div>
-              </Link>
-            ))}
-          </div>
+        <section className={styles.metaBlock}>
+          <h2 className={styles.metaHeading}>In the news</h2>
+          {stories.map((story) => (
+            <Link key={story.id} href={`/story/${story.id}`} className={styles.storyLink}>
+              <div className={styles.storyTitle}>{story.title}</div>
+              <div className={styles.storyMeta}>
+                {story.sourceName} · {formatDate(story.publishedAt)}
+              </div>
+            </Link>
+          ))}
         </section>
       )}
 
       {related.length > 0 && (
-        <section style={{ marginTop: 40 }}>
-          <h2
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "#737373",
-              margin: "0 0 12px",
-            }}
-          >
-            Related
-          </h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <section className={styles.metaBlock}>
+          <h2 className={styles.metaHeading}>Related</h2>
+          <div className={styles.chips}>
             {related.map((r) => (
-              <Link
-                key={r.slug}
-                href={entityHref(r)}
-                style={{
-                  fontSize: 14,
-                  color: "#d4d4d4",
-                  textDecoration: "none",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 100,
-                  padding: "6px 14px",
-                }}
-              >
+              <Link key={r.slug} href={entityHref(r)} className={styles.chip}>
                 {r.canonicalName}
               </Link>
             ))}
           </div>
         </section>
       )}
-    </>
+
+      {/* Provenance — the trust signal AI chat structurally cannot offer. */}
+      {explainer && (
+        <p className={styles.provenance}>
+          Auto-generated from Kapyn&apos;s news stream
+          {stories.length > 0
+            ? ` · grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
+            : ""}
+          {` · updated ${formatDate(explainer.updatedAt)}`}
+        </p>
+      )}
+    </article>
   );
 }

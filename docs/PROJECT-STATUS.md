@@ -2,6 +2,8 @@
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
 > **Last updated:** 2026-06-15
+>
+> **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` before any UI/product work.
 
 ---
 

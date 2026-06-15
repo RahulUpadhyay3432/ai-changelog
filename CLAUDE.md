@@ -2,6 +2,13 @@
 
 # Kapyn — Project Context for Claude Code
 
+> **🚀 Starting a new session? Read in this order:**
+> 1. This file + `AGENTS.md` (auto-loaded) — what Kapyn is + conventions.
+> 2. **`docs/PROJECT-STATUS.md`** — current state, open PRs, and the immediate next action. **Always read first.**
+> 3. **`docs/design-foundations.md`** — the product/design brief; read before any UI, product, or strategy work.
+>
+> Then say "continue from the status doc" and pick up where the last session left off.
+
 ## What Kapyn is
 A mobile-first PWA delivering AI/tech news as swipeable 30-second dispatches — Inshorts-style — for engineers, founders, and operators who need to stay current without the noise.
 

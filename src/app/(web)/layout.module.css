@@ -1,5 +1,6 @@
 /* Full-width reading layout for the public knowledge base. Deliberately NOT the
-   phone frame — these pages are for desktop reading + SEO. */
+   phone frame — these pages are for desktop reading + SEO. Header/footer are
+   full-bleed; their inner content + the main column align to a 1200px container. */
 
 .shell {
   min-height: 100dvh;
@@ -13,14 +14,19 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
   background: rgba(10, 10, 10, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 248, 235, 0.07);
+}
+
+.headerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
 }
 
 .wordmark {
@@ -34,7 +40,7 @@
 
 .nav {
   display: flex;
-  gap: 20px;
+  gap: 22px;
   align-items: center;
 }
 
@@ -44,30 +50,48 @@
   text-decoration: none;
   transition: color 0.15s ease;
 }
-
 .navLink:hover {
   color: #f5f5f5;
 }
 
+/* Strengthened app CTA in the header — the persistent blog→app conversion link. */
+.navCta {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8e4de;
+  text-decoration: none;
+  border: 1px solid rgba(255, 248, 235, 0.18);
+  border-radius: 100px;
+  padding: 7px 16px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.navCta:hover {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
 .main {
   width: 100%;
-  max-width: 760px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 40px 24px 64px;
+  padding: 48px 24px 72px;
   flex: 1;
   box-sizing: border-box;
 }
 
 .footer {
   border-top: 1px solid rgba(255, 248, 235, 0.07);
+}
+
+.footerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   padding: 32px 24px 48px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-width: 760px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
   font-size: 13px;
   color: #737373;
 }

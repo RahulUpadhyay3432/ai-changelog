@@ -52,6 +52,18 @@ export default async function ExplorePage() {
           ))}
         </div>
       )}
+
+      <section className={styles.cta}>
+        <div className={styles.ctaText}>
+          <h2 className={styles.ctaTitle}>Read it as it happens</h2>
+          <p className={styles.ctaPitch}>
+            Kapyn turns AI &amp; tech news into 30-second swipes — every day, no paywall.
+          </p>
+        </div>
+        <Link href="/" className={styles.ctaButton}>
+          Open Kapyn →
+        </Link>
+      </section>
     </>
   );
 }

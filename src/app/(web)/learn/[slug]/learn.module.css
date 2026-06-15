@@ -1,13 +1,99 @@
 /* Reading craft for /learn concept pages — see docs/design-foundations.md §6/§7.
-   Editorial deceleration on dark: 18px / 1.7 / ~68ch measure, warm off-white text,
-   one accent (KB purple), depth via surface-stepping + warm-tinted borders. */
+   Desktop: glossary nav | reading column | app-CTA rail. Collapses to a single
+   centered reading column on tablet/mobile. */
 
-.article {
-  max-width: 680px; /* ~68ch at 18px — Bringhurst optimal, capped even with dark space to spare */
-  margin: 0 auto;
+/* ── Desktop 3-column shell ──────────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 280px;
+  gap: 48px;
+  align-items: start;
 }
 
-/* ── Back link ──────────────────────────────────────────────────────────── */
+/* Left: glossary nav (browse/jump between concepts) */
+.glossaryNav {
+  position: sticky;
+  top: 84px;
+  align-self: start;
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
+}
+.navLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #737373;
+  margin: 0 0 12px;
+}
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.navItem,
+.navItemActive {
+  display: block;
+  font-size: 14px;
+  line-height: 1.35;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.navItem {
+  color: #8a857c;
+}
+.navItem:hover {
+  color: #e8e4de;
+  background: rgba(255, 248, 235, 0.04);
+}
+.navItemActive {
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.1);
+  border-left-color: #7c3aed;
+  font-weight: 600;
+}
+
+/* Center: reading column (grid sizes it; ~660px ≈ 68ch at 18px) */
+.article {
+  min-width: 0;
+}
+
+/* Right: sticky app-CTA rail (the blog→app conversion unit) */
+.rail {
+  align-self: start;
+}
+.railSticky {
+  position: sticky;
+  top: 84px;
+}
+
+/* Mobile-only app CTA, shown below the article when the rail is hidden */
+.mobileCta {
+  display: none;
+  margin-top: 44px;
+}
+
+@media (max-width: 1080px) {
+  .shell {
+    grid-template-columns: minmax(0, 680px);
+    justify-content: center;
+  }
+  .glossaryNav,
+  .rail {
+    display: none;
+  }
+  .mobileCta {
+    display: block;
+  }
+}
+
+/* ── Back link ───────────────────────────────────────────────────────────── */
 .back {
   display: inline-flex;
   align-items: center;
@@ -38,11 +124,11 @@
 }
 
 .title {
-  font-size: clamp(34px, 6vw, 52px);
-  font-weight: 700; /* dramatic weight contrast vs 400 body — the hierarchy carrier */
+  font-size: clamp(34px, 5vw, 50px);
+  font-weight: 700;
   color: #e8e4de;
   line-height: 1.08;
-  letter-spacing: -0.03em; /* tighten at large sizes — default tracking reads cheap */
+  letter-spacing: -0.03em;
   margin: 0 0 20px;
 }
 
@@ -54,7 +140,6 @@
   margin: 0 0 14px;
 }
 
-/* Signature hairline — accent fades to nothing. The one decorative moment. */
 .rule {
   height: 1px;
   border: 0;
@@ -67,11 +152,10 @@
   );
 }
 
-/* ── Reading sections (Why it matters / How it works / What's happening now) ─ */
+/* ── Reading sections ────────────────────────────────────────────────────── */
 .section {
-  margin-top: 44px; /* space above a heading ≈ 3× space below — grouping signal */
+  margin-top: 44px;
 }
-
 .sectionHeading {
   font-size: 20px;
   font-weight: 700;
@@ -80,19 +164,17 @@
   letter-spacing: -0.01em;
   margin: 0 0 12px;
 }
-
 .body {
   font-size: 18px;
-  line-height: 1.7; /* dark backgrounds need extra leading to track lines */
+  line-height: 1.7;
   color: #c9c3b7;
   margin: 0;
 }
 
-/* ── Meta sections (In the news / Related) — small-caps labels, not headings ─ */
+/* ── Meta sections (In the news / Related) ───────────────────────────────── */
 .metaBlock {
   margin-top: 48px;
 }
-
 .metaHeading {
   font-size: 12px;
   font-weight: 700;
@@ -101,8 +183,6 @@
   color: #737373;
   margin: 0 0 8px;
 }
-
-/* In the news — provenance-forward story cards */
 .storyLink {
   display: block;
   text-decoration: none;
@@ -132,7 +212,6 @@
   color: #8a857c;
 }
 
-/* Related — concept chips */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -154,7 +233,7 @@
   background: rgba(124, 58, 237, 0.08);
 }
 
-/* ── Provenance footer — the anti-AI-slop trust signal (the moat) ─────────── */
+/* ── Provenance footer ───────────────────────────────────────────────────── */
 .provenance {
   margin-top: 56px;
   padding-top: 18px;

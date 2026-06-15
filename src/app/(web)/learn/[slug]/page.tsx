@@ -8,7 +8,9 @@ import {
   getPublishedExplainer,
   getStoriesForEntity,
   getEntitiesBySlugs,
+  getLearnEntities,
 } from "@/lib/knowledge";
+import { AppCta } from "@/components/web/AppCta";
 import styles from "./learn.module.css";
 
 const APP_URL = "https://kapyn.app";
@@ -70,9 +72,10 @@ export default async function LearnPage({ params }: Props) {
   const entity = await getEntityBySlug(slug);
   if (!entity || !isLearnType(entity.entityType)) notFound();
 
-  const [explainer, stories] = await Promise.all([
+  const [explainer, stories, glossary] = await Promise.all([
     getPublishedExplainer(entity.id),
     getStoriesForEntity(entity.id, 8),
+    getLearnEntities(200),
   ]);
 
   // Never render an empty shell.
@@ -115,73 +118,104 @@ export default async function LearnPage({ params }: Props) {
   ];
 
   return (
-    <article className={styles.article}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <>
+      <div className={styles.shell}>
+        <nav className={styles.glossaryNav} aria-label="All concepts">
+          <div className={styles.navLabel}>Glossary</div>
+          <ul className={styles.navList}>
+            {glossary.map((g) => (
+              <li key={g.slug}>
+                <Link
+                  href={entityHref(g)}
+                  className={g.slug === entity.slug ? styles.navItemActive : styles.navItem}
+                >
+                  {g.canonicalName}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      <Link href="/explore" className={styles.back}>
-        <ChevronLeft size={14} strokeWidth={2.5} />
-        Explore
-      </Link>
+        <article className={styles.article}>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
 
-      <div>
-        <span className={styles.eyebrow}>{entity.entityType}</span>
+          <Link href="/explore" className={styles.back}>
+            <ChevronLeft size={14} strokeWidth={2.5} />
+            Explore
+          </Link>
+
+          <div>
+            <span className={styles.eyebrow}>{entity.entityType}</span>
+          </div>
+
+          <h1 className={styles.title}>{entity.canonicalName}</h1>
+
+          {lead && <p className={styles.deck}>{lead}</p>}
+
+          <hr className={styles.rule} />
+
+          {sections.map((s) =>
+            s.body ? (
+              <section key={s.heading} className={styles.section}>
+                <h2 className={styles.sectionHeading}>{s.heading}</h2>
+                <p className={styles.body}>{s.body}</p>
+              </section>
+            ) : null
+          )}
+
+          {stories.length > 0 && (
+            <section className={styles.metaBlock}>
+              <h2 className={styles.metaHeading}>In the news</h2>
+              {stories.map((story) => (
+                <Link key={story.id} href={`/story/${story.id}`} className={styles.storyLink}>
+                  <div className={styles.storyTitle}>{story.title}</div>
+                  <div className={styles.storyMeta}>
+                    {story.sourceName} · {formatDate(story.publishedAt)}
+                  </div>
+                </Link>
+              ))}
+            </section>
+          )}
+
+          {related.length > 0 && (
+            <section className={styles.metaBlock}>
+              <h2 className={styles.metaHeading}>Related</h2>
+              <div className={styles.chips}>
+                {related.map((r) => (
+                  <Link key={r.slug} href={entityHref(r)} className={styles.chip}>
+                    {r.canonicalName}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Provenance — the trust signal AI chat structurally cannot offer. */}
+          {explainer && (
+            <p className={styles.provenance}>
+              Auto-generated from Kapyn&apos;s news stream
+              {stories.length > 0
+                ? ` · grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
+                : ""}
+              {` · updated ${formatDate(explainer.updatedAt)}`}
+            </p>
+          )}
+        </article>
+
+        <aside className={styles.rail}>
+          <div className={styles.railSticky}>
+            <AppCta />
+          </div>
+        </aside>
       </div>
 
-      <h1 className={styles.title}>{entity.canonicalName}</h1>
-
-      {lead && <p className={styles.deck}>{lead}</p>}
-
-      <hr className={styles.rule} />
-
-      {sections.map((s) =>
-        s.body ? (
-          <section key={s.heading} className={styles.section}>
-            <h2 className={styles.sectionHeading}>{s.heading}</h2>
-            <p className={styles.body}>{s.body}</p>
-          </section>
-        ) : null
-      )}
-
-      {stories.length > 0 && (
-        <section className={styles.metaBlock}>
-          <h2 className={styles.metaHeading}>In the news</h2>
-          {stories.map((story) => (
-            <Link key={story.id} href={`/story/${story.id}`} className={styles.storyLink}>
-              <div className={styles.storyTitle}>{story.title}</div>
-              <div className={styles.storyMeta}>
-                {story.sourceName} · {formatDate(story.publishedAt)}
-              </div>
-            </Link>
-          ))}
-        </section>
-      )}
-
-      {related.length > 0 && (
-        <section className={styles.metaBlock}>
-          <h2 className={styles.metaHeading}>Related</h2>
-          <div className={styles.chips}>
-            {related.map((r) => (
-              <Link key={r.slug} href={entityHref(r)} className={styles.chip}>
-                {r.canonicalName}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Provenance — the trust signal AI chat structurally cannot offer. */}
-      {explainer && (
-        <p className={styles.provenance}>
-          Auto-generated from Kapyn&apos;s news stream
-          {stories.length > 0
-            ? ` · grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
-            : ""}
-          {` · updated ${formatDate(explainer.updatedAt)}`}
-        </p>
-      )}
-    </article>
+      {/* Mobile: app CTA below the article (rail is hidden on small screens). */}
+      <div className={styles.mobileCta}>
+        <AppCta />
+      </div>
+    </>
   );
 }

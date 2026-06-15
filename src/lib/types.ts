@@ -32,6 +32,9 @@ export interface NewsItem {
   categorySlug: CategorySlug;
   publishedAt: string;
   isSaved?: boolean;
+  // Knowledge-graph entities this story mentions (populated lazily for in-feed
+  // chips in M2; optional so nothing breaks where it's absent).
+  entities?: { slug: string; name: string; type: string }[];
 }
 
 export interface InsightSlide {

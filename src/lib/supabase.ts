@@ -89,14 +89,24 @@ function deClusterByCategory(sorted: NewsItem[]): NewsItem[] {
 }
 
 export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("news_items")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) return null;
-  return dbToNewsItem(data as DbNewsItem);
+  if (data) return dbToNewsItem(data as DbNewsItem);
+
+  // Fallback to the durable archive: news_items rotates after 48h, but
+  // /story/[id] links from concept pages must keep resolving forever.
+  const { data: archived } = await supabase
+    .from("story_archive")
+    .select("id, title, summary, source_url, source_name, category_slug, image_url, published_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!archived) return null;
+  return dbToNewsItem({ ...(archived as Omit<DbNewsItem, "created_at">), created_at: "" } as DbNewsItem);
 }
 
 export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {

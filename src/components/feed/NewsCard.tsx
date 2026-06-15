@@ -15,6 +15,10 @@ interface NewsCardProps {
   isSaved?: boolean;
 }
 
+// The card summary is generated at ingestion by this model (api/news/fetch).
+// Hardcoded for the attribution label (true for the vast majority of stories).
+const SUMMARY_MODEL = "Gemini 2.5 Flash Lite";
+
 function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
   const category = getCategoryBySlug(categorySlug as never);
   const accent = category?.colorAccent ?? "#333";
@@ -396,16 +400,34 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           const lead = isShortTitle && firstDot > 0 && firstDot < 120 ? full.slice(0, firstDot + 1) : null;
           const body = lead ? full.slice(firstDot + 2) : full;
           return (
-            <div style={{
-              flex: 1,
-              minHeight: 0,
-              overflow: "hidden",
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-              maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
-            }}>
+            <a
+              href={item.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                posthog.capture("story_link_clicked", {
+                  story_id: item.id,
+                  story_title: item.title,
+                  category: item.categorySlug,
+                  source_name: item.sourceName,
+                  url: item.sourceUrl,
+                  from: "summary",
+                });
+              }}
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                textDecoration: "none",
+                color: "inherit",
+                maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+                WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+              }}
+            >
               {lead && (
                 <p style={{
                   fontSize: "clamp(14px, 1.85dvh, 17px)",
@@ -429,7 +451,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
               }}>
                 {body}
               </p>
-            </div>
+            </a>
           );
         })()}
 
@@ -451,17 +473,22 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           alignItems: "center",
         }}
       >
-        <span
-          style={{
-            fontSize: "10px",
-            color: "#444",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-          }}
-        >
-          {item.sourceName}
-        </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
+          <span
+            style={{
+              fontSize: "10px",
+              color: "#444",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+            }}
+          >
+            {item.sourceName}
+          </span>
+          <span style={{ fontSize: "9px", color: "#555", fontWeight: 500 }}>
+            AI summary · {SUMMARY_MODEL}
+          </span>
+        </div>
         <button
           onClick={(e) => {
             e.stopPropagation();

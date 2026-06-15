@@ -85,9 +85,11 @@
 
 From friends who used the app a few days ("pretty good… good app to read during transport" — a real qualitative retention signal). Triaged by effort:
 
-**Quick wins (low effort, high alignment):**
-- **Tag AI summaries with source + model** ("generated from this source using this model"). Aligns with the design-foundations "grounded, never generated-feeling" principle; we already do this on `/learn` pages (provenance line) — extend to feed summaries / breakdown.
-- **Tap the summary → open the full source article.** Currently the card doesn't link out to `source_url`; add it.
+**Quick wins — ✅ SHIPPED (PR #8, 2026-06-15):**
+- ✅ **Tag AI summaries with source + model** — card footer now shows "AI summary · Gemini 2.5 Flash Lite" + source name.
+- ✅ **Tap the summary → open the full source article** — summary is now a link to `source_url` (title already was).
+
+Also shipped (PR #7): ✅ removed the notification + insight (Elon) cards from the feed.
 
 **Medium bets (personalization / retention):**
 - **Search** the news/corpus (relates to Ask Kapyn).

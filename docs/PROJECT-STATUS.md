@@ -9,14 +9,15 @@
 
 ## 👉 RIGHT NOW — the next action
 
-**M1 is SHIPPED to production** (PRs #3 + #4 merged, 2026-06-15). `/learn/*` + `/explore` are now live on www.kapyn.app.
+**M1 + SEO discovery surfaces are SHIPPED and live.** `/learn/*`, `/explore`, `/llms.txt`, `/feed.xml` all live (served on www.kapyn.app). Sitemap confirmed in GSC (Status: Success, 208 discovered). PRs #3, #4, #5 merged.
 
-Next, in order:
-1. **Submit the sitemap to Google Search Console** *(founder action — the gate for ALL SEO/LLM visibility; nothing gets indexed until this is done).* search.google.com/search-console → add/verify property `kapyn.app` → Sitemaps → submit `sitemap.xml`.
-2. **SEO / LLM-visibility build:** `llms.txt` + RSS feed + a syndication-draft generator (auto-produce Medium/Substack/dev.to posts from each explainer, with `rel=canonical` back to Kapyn).
-3. **Quick-win user feedback** (see "User feedback" below): source+model attribution on AI summaries; tap summary → open the full source article.
+**Next — pick one to build:**
+- **Syndication-draft generator** — auto-produce Medium/Substack/dev.to posts from each explainer (with `rel=canonical` back to Kapyn). Completes the "show up everywhere" distribution toolkit.
+- **Two quick-win feedback fixes** — source+model attribution on AI summaries; tap summary → open full source article.
 
-**Housekeeping (not urgent):** rotate the temporary `CRON_SECRET` (`kapyntest123`) to a strong value (`openssl rand -hex 32`); verify the daily cron authenticates (routes check `x-cron-secret`/`?secret` — confirm Vercel's cron requests match).
+**Recommended founder action (SEO cleanliness, not urgent):** in Vercel → Settings → Domains, set **`kapyn.app` as the PRIMARY domain.** Right now the apex 307-redirects to `www`, but all canonicals/sitemap/llms.txt use the apex — making the apex primary aligns the served domain with the canonical tags.
+
+**Housekeeping (not urgent):** rotate the temporary `CRON_SECRET` (`kapyntest123`) to a strong value (`openssl rand -hex 32`); verify the daily cron authenticates.
 
 ---
 
@@ -54,12 +55,15 @@ Next, in order:
 - ✅ Ran the SQL migration in Supabase (2026-06-15).
 - ✅ Ran KB generation — all 15 seed concept pages published with explainers (2026-06-15).
 - ✅ Merged PR #3 + #4 to production — `/learn` + `/explore` live on www.kapyn.app (2026-06-15).
+- ✅ Shipped `/llms.txt` + `/feed.xml` for AI/LLM + RSS discovery (PR #5, 2026-06-15) — both serving 200.
+- ✅ Sitemap confirmed in Google Search Console — Status: Success, 208 pages discovered (2026-06-15).
 
 ---
 
 ## ⏳ Pending — dashboard actions (only the founder can do these)
 
-- [ ] **Submit sitemap to Google Search Console** (gates all indexing — do this).
+- [x] ✅ Submit sitemap to Google Search Console — done (Status: Success).
+- [ ] Set **`kapyn.app` as the PRIMARY domain** in Vercel (apex currently 307-redirects to www; canonicals use apex).
 - [ ] Set Upstash env vars `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` in Vercel (until then rate limiting uses the weak in-memory fallback). Free DB at console.upstash.com, or Vercel Marketplace integration.
 - [ ] Set a **Gemini billing cap + budget alert** (Google Cloud Console) — the denial-of-wallet backstop.
 - [ ] Rotate `CRON_SECRET` from `kapyntest123` to a strong value.

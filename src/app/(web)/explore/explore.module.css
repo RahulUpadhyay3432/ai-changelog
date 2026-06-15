@@ -1,17 +1,19 @@
-/* The /explore hub — the internal-link distributor + the "glossary" front door.
-   See docs/design-foundations.md §6. */
+/* /explore — editorial glossary index. Serif headline, warm-neutral palette,
+   refined card materiality, warm-white CTA (no AI-purple). */
 
 .hero {
-  margin: 0 0 40px;
+  margin: 0 0 48px;
+  max-width: 640px;
 }
 
 .title {
-  font-size: clamp(32px, 6vw, 48px);
-  font-weight: 700;
-  color: #e8e4de;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  margin: 0 0 14px;
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  font-size: clamp(40px, 6vw, 60px);
+  font-weight: 500;
+  color: #f3efe8;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
 }
 
 .deck {
@@ -19,89 +21,95 @@
   line-height: 1.6;
   color: #a8a29a;
   margin: 0;
-  max-width: 560px;
+  max-width: 540px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }
 
 .card {
   display: block;
   text-decoration: none;
-  padding: 20px 22px;
-  border-radius: 16px;
-  background: #111110;
-  border: 1px solid rgba(255, 248, 235, 0.07);
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  cursor: pointer;
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: #131211;
+  border: 1px solid rgba(255, 248, 235, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 235, 0.04);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease,
+    background 0.2s ease;
 }
 .card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(124, 58, 237, 0.4);
-  background: #15140f;
+  transform: translateY(-3px);
+  border-color: rgba(255, 248, 235, 0.16);
+  background: #181614;
 }
 
 .cardName {
-  font-size: 16px;
+  font-size: 16.5px;
   font-weight: 600;
-  color: #e8e4de;
+  color: #f0ece4;
   letter-spacing: -0.01em;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
 .cardDesc {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.55;
   color: #8a857c;
 }
 
 .empty {
-  color: #78736b;
+  color: #6f6a62;
   font-size: 15px;
 }
 
-/* Blog→app conversion banner below the glossary grid. */
+/* Blog→app conversion banner */
 .cta {
-  margin-top: 48px;
+  margin-top: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 28px;
   flex-wrap: wrap;
-  background: #111110;
-  border: 1px solid rgba(255, 248, 235, 0.08);
-  border-radius: 18px;
-  padding: 28px 32px;
+  background: #131211;
+  border: 1px solid rgba(255, 248, 235, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 235, 0.04);
+  border-radius: 22px;
+  padding: 32px 36px;
 }
 .ctaText {
-  max-width: 560px;
+  max-width: 580px;
 }
 .ctaTitle {
-  font-size: 22px;
-  font-weight: 700;
-  color: #e8e4de;
-  letter-spacing: -0.02em;
-  margin: 0 0 6px;
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 500;
+  color: #f3efe8;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
 }
 .ctaPitch {
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: #a8a29a;
   margin: 0;
 }
 .ctaButton {
   flex-shrink: 0;
-  background: #7c3aed;
-  color: #ffffff;
+  background: #ece7df;
+  color: #14110d;
   text-decoration: none;
   font-size: 15px;
   font-weight: 600;
-  padding: 12px 22px;
-  border-radius: 12px;
-  transition: background 0.15s ease;
+  padding: 13px 24px;
+  border-radius: 100px;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 .ctaButton:hover {
-  background: #6d28d9;
+  background: #ffffff;
+  transform: translateY(-1px);
 }

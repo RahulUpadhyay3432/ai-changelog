@@ -2,19 +2,15 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
-import { InsightEntryCard } from "./InsightEntryCard";
-import { NotificationCard } from "./NotificationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
-import type { NewsItem, Insight } from "@/lib/types";
+import type { NewsItem } from "@/lib/types";
 import { updateStreak } from "@/lib/storage";
-import { shouldShowNotifCard } from "@/lib/notifications";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
 interface CardStackProps {
   items: NewsItem[];
-  insight?: Insight | null;
   onIndexChange?: (index: number, total: number) => void;
   onRefresh?: () => Promise<number>;
   onSave?: (id: string) => void;
@@ -22,18 +18,10 @@ interface CardStackProps {
   onHorizontalDragEnd?: (dx: number) => void;
 }
 
-// Inject notification card after this many news items
-const NOTIF_AFTER = 5;
-// Inject insight card after this many news items
-const INSIGHT_AFTER = 7;
-
 const PTR_THRESHOLD = 64;
 const DIRECTION_LOCK_THRESHOLD = 8;
 
-type FeedEntry =
-  | { type: "news"; item: NewsItem; newsIdx: number }
-  | { type: "insight"; insight: Insight }
-  | { type: "notification" };
+type FeedEntry = { type: "news"; item: NewsItem; newsIdx: number };
 
 function deferIdle(fn: () => void) {
   if (typeof window === "undefined") return;
@@ -47,7 +35,7 @@ function deferIdle(fn: () => void) {
 }
 
 export function CardStack({
-  items, insight, onIndexChange, onRefresh, onSave,
+  items, onIndexChange, onRefresh, onSave,
   onHorizontalDrag, onHorizontalDragEnd,
 }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,7 +43,6 @@ export function CardStack({
   const [showToast, setShowToast] = useState(false);
   const [caughtUpToast, setCaughtUpToast] = useState(false);
   const [ptrPull, setPtrPull] = useState(0);
-  const [showNotifCard, setShowNotifCard] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
@@ -78,23 +65,11 @@ export function CardStack({
   useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
   useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
 
-  // Check client-side whether to show the notification card
-  useEffect(() => {
-    setShowNotifCard(shouldShowNotifCard());
-  }, []);
-
-  // ─── Build mixed feed ────────────────────────────────────────────────────
-  const hasInsight = !!insight && items.length > INSIGHT_AFTER;
-
-  const feedEntries = useMemo<FeedEntry[]>(() => {
-    const result: FeedEntry[] = [];
-    for (let i = 0; i < items.length; i++) {
-      if (showNotifCard && i === NOTIF_AFTER) result.push({ type: "notification" });
-      if (hasInsight && i === INSIGHT_AFTER) result.push({ type: "insight", insight: insight! });
-      result.push({ type: "news", item: items[i], newsIdx: i });
-    }
-    return result;
-  }, [items, insight, hasInsight, showNotifCard]);
+  // ─── Build feed (news only) ──────────────────────────────────────────────
+  const feedEntries = useMemo<FeedEntry[]>(
+    () => items.map((item, i) => ({ type: "news", item, newsIdx: i })),
+    [items]
+  );
 
   useEffect(() => {
     updateStreak();
@@ -211,11 +186,10 @@ export function CardStack({
     setCurrentIndex(index);
 
     const entry = feedEntries[index];
-    if (entry?.type === "news") {
+    if (entry) {
       onIndexChange?.(entry.newsIdx, items.length);
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
-      const prevEntry = feedEntries[prev];
-      const prevItem = prevEntry?.type === "news" ? prevEntry.item : items[0];
+      const prevItem = feedEntries[prev]?.item ?? items[0];
       deferIdle(() => {
         updateStreak();
         posthog.capture("story_swiped", {
@@ -243,8 +217,7 @@ export function CardStack({
   useEffect(() => {
     for (let i = currentIndex + 1; i <= currentIndex + PRELOAD_AHEAD; i++) {
       const entry = feedEntries[i];
-      if (entry?.type !== "news") continue;
-      const url = entry.item.imageUrl;
+      const url = entry?.item.imageUrl;
       if (!url) continue;
       const img = new window.Image();
       img.decoding = "async";
@@ -257,7 +230,7 @@ export function CardStack({
   useEffect(() => {
     for (let i = currentIndex; i <= currentIndex + BREAKDOWN_PREFETCH_AHEAD; i++) {
       const entry = feedEntries[i];
-      if (entry?.type !== "news") continue;
+      if (!entry) continue;
       prefetchBreakdown(entry.item);
     }
   }, [currentIndex, feedEntries]);
@@ -308,36 +281,14 @@ export function CardStack({
           flexDirection: "column",
         } as React.CSSProperties}
       >
-        {feedEntries.map((entry, feedIdx) => {
-          if (entry.type === "notification") {
-            return (
-              <div
-                key="notif-card"
-                style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
-              >
-                <NotificationCard onDone={() => setShowNotifCard(false)} />
-              </div>
-            );
-          }
-          if (entry.type === "insight") {
-            return (
-              <div
-                key="insight-entry"
-                style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
-              >
-                <InsightEntryCard insight={entry.insight} />
-              </div>
-            );
-          }
-          return (
-            <div
-              key={entry.item.id}
-              style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
-            >
-              <NewsCard item={entry.item} onSave={onSave} />
-            </div>
-          );
-        })}
+        {feedEntries.map((entry) => (
+          <div
+            key={entry.item.id}
+            style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+          >
+            <NewsCard item={entry.item} onSave={onSave} />
+          </div>
+        ))}
         <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
           <CompletionCard
             readCount={items.length}

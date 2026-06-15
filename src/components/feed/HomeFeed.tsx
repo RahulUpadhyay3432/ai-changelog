@@ -8,11 +8,10 @@ import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
 import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
-import { fetchActiveInsight } from "@/lib/insights";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
 import { getFeedHintShown, setFeedHintShown } from "@/lib/storage";
-import type { CategorySlug, NewsItem, Insight } from "@/lib/types";
+import type { CategorySlug, NewsItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 
@@ -43,7 +42,6 @@ export function HomeFeed() {
 
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
-  const [insight, setInsight] = useState<Insight | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [showFeedHint, setShowFeedHint] = useState(false);
   const router = useRouter();
@@ -54,11 +52,6 @@ export function HomeFeed() {
   // Per-session cache of each category's resolved feed, so a sideways swipe to
   // an already-prefetched category is instant (no re-fetch, images pre-warmed).
   const feedCache = useRef<Map<string, NewsItem[]>>(new Map());
-
-  // Fetch insight once on mount — it's global, not per-category
-  useEffect(() => {
-    fetchActiveInsight().then(setInsight).catch(() => {});
-  }, []);
 
   // Bust the "all" cache on every mount so feed prefs changes in Profile apply immediately
   useEffect(() => {
@@ -290,7 +283,6 @@ export function HomeFeed() {
               <CardStack
                 key={activeCategory}
                 items={stories}
-                insight={insight}
                 onRefresh={handleRefresh}
                 onHorizontalDrag={handleHorizontalDrag}
                 onHorizontalDragEnd={handleHorizontalDragEnd}

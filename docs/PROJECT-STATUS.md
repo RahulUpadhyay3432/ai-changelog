@@ -9,14 +9,14 @@
 
 ## 👉 RIGHT NOW — the next action
 
-**Run knowledge-base generation, then verify the `/learn` pages look good, then merge.**
+**Visually review the populated `/learn` pages, then decide on merging PR #3 and #4.**
 
-```
-GET  https://<preview-url>/api/knowledge/generate?secret=YOUR_CRON_SECRET
-```
-This fills the seed concept pages with real explainers (definition / why it matters / how it works). Requires `SUPABASE_SERVICE_ROLE_KEY` set in Vercel (route hard-fails without it).
+Generation has been run — all 15 seed concept pages are published with explainers. Open and eyeball on the preview:
+- `/explore`, `/learn/rag`, `/learn/agents`, `/learn/embeddings`
 
-After it runs → open `/learn/rag`, `/learn/embeddings`, `/learn/agents` on the preview and confirm the sections + provenance line render. Then proceed to merging (see Immediate Next Steps).
+If they look good → merge **PR #4** (rate limiting, independent) and **PR #3** (KB + craft) to `main`. After PR #3 merges, `/learn` + `/explore` go live on www.kapyn.app — submit the sitemap to Google Search Console.
+
+**Housekeeping (not urgent):** `CRON_SECRET` was reset to a weak temporary value during setup — rotate it to a strong value (`openssl rand -hex 32`) in Vercel when convenient. Also verify the **daily cron actually authenticates** (the routes check an `x-cron-secret`/`?secret`; confirm Vercel's cron requests match).
 
 ---
 
@@ -54,6 +54,7 @@ After it runs → open `/learn/rag`, `/learn/embeddings`, `/learn/agents` on the
 
 ### User actions completed
 - ✅ Ran the SQL migration in Supabase (2026-06-15).
+- ✅ Ran knowledge-base generation (2026-06-15) — all 15 seed concept pages published with explainers; verified `/learn/rag` renders sections + provenance.
 
 ---
 

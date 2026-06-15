@@ -1,46 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 // Allow enough time for the free model (~7s) plus a fallback hop.
 export const maxDuration = 30;
 
-// Per-IP rate limit. Higher than a pure click-rate because the client prefetches
-// breakdowns for upcoming cards while scrolling.
-const ipMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_WINDOW_MS = 60_000;
+// Per-IP limit. Higher than a pure click-rate because the client prefetches
+// breakdowns for upcoming cards while scrolling. Enforced via Upstash so it
+// holds across serverless instances (an in-memory Map does not).
 const RATE_LIMIT = 30;
+const RATE_WINDOW_SECONDS = 60;
 
-function getClientIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    req.headers.get("x-real-ip") ??
-    "unknown"
-  );
-}
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = ipMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    ipMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return false;
-  }
-  if (entry.count >= RATE_LIMIT) return true;
-  entry.count++;
-  return false;
-}
-
-// Prune stale entries every 5 minutes to avoid memory leak
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of ipMap.entries()) {
-    if (now > entry.resetAt) ipMap.delete(ip);
-  }
-}, 5 * 60_000);
+// Each uncached breakdown spends an LLM call, so cap input size: a request with a
+// huge title/summary would amplify token cost per call. Real Kapyn copy is a
+// short headline + 2-3 sentence summary, so these are generous.
+const MAX_TITLE = 300;
+const MAX_SUMMARY = 2000;
 
 export async function POST(req: NextRequest) {
-  const ip = getClientIp(req);
-  if (isRateLimited(ip)) {
+  const ip = clientIp(req.headers);
+  const { ok } = await rateLimit({
+    key: `breakdown:${ip}`,
+    limit: RATE_LIMIT,
+    windowSeconds: RATE_WINDOW_SECONDS,
+  });
+  if (!ok) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },
       { status: 429 }
@@ -56,6 +40,9 @@ export async function POST(req: NextRequest) {
   const id = typeof body.id === "string" ? body.id : null;
   if (!title.trim() || !summary.trim()) {
     return NextResponse.json({ error: "Missing title or summary" }, { status: 400 });
+  }
+  if (title.length > MAX_TITLE || summary.length > MAX_SUMMARY) {
+    return NextResponse.json({ error: "Title or summary too long" }, { status: 400 });
   }
 
   // DB cache: a real (non-mock) story may already have a stored breakdown —

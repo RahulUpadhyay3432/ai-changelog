@@ -73,6 +73,17 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   // ── Additional coverage ───────────────────────────────────────────────────
   { url: "https://www.theregister.com/headlines/ai.atom",                  defaultCategory: "ai-models",      sourceName: "The Register" },
   { url: "https://changelog.com/news/feed",                                defaultCategory: "open-source",    sourceName: "Changelog" },
+
+  // ── India ─────────────────────────────────────────────────────────────────
+  // The Western feeds above only catch Indian AI news when they happen to cover
+  // it (e.g. Sarvam via TechCrunch). These close that gap. The Google News query
+  // is the "miss nothing" net: AI-scoped via the query, India-scoped via gl/ceid,
+  // pulling every outlet incl. ones with no RSS (Analytics India Magazine, NDTV,
+  // Forbes India). The direct feeds add clean attribution + images for the two
+  // verticals that matter most (startups/funding, enterprise AI).
+  { url: "https://news.google.com/rss/search?q=(%22artificial%20intelligence%22%20OR%20AI%20OR%20LLM%20OR%20%22generative%20AI%22)%20(India%20OR%20Indian)%20when:3d&hl=en-IN&gl=IN&ceid=IN:en", defaultCategory: "startups", sourceName: "India AI", maxItems: 12 },
+  { url: "https://cio.economictimes.indiatimes.com/rss/artificial-intelligence", defaultCategory: "big-tech",  sourceName: "ET CIO" },
+  { url: "https://inc42.com/feed/",                                        defaultCategory: "startups",       sourceName: "Inc42", maxItems: 8 },
 ];
 
 type ParserItem = {

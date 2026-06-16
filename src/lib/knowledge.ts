@@ -204,3 +204,78 @@ export async function getLearnEntities(limit = 60): Promise<Entity[]> {
     .limit(limit);
   return (data ?? []).map((r) => toEntity(r as EntityRow));
 }
+
+// ─── Radar ───────────────────────────────────────────────────────────────────
+
+export interface RadarItem {
+  entity: Entity;
+  latestStory: ArchivedStory | null;
+  isNew: boolean; // first_seen_at within last 7 days
+}
+
+// Value-filtering funnel for the Radar tab: model/tool/company entities that
+// are recent (mentioned within recencyDays), credible (≥ minMentions), and
+// ranked by freshness + traction. Returns items with their most recent archived
+// story so the caller can use the summary as a value-line without a new LLM call.
+export async function getRadarFeed(
+  recencyDays = 14,
+  minMentions = 2,
+  limit = 40
+): Promise<RadarItem[]> {
+  const cutoff = new Date(Date.now() - recencyDays * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data: entityRows } = await supabase
+    .from("entities")
+    .select(ENTITY_COLS + ", first_seen_at")
+    .in("entity_type", ["model", "tool", "company"])
+    .eq("status", "active")
+    .gte("last_mentioned_at", cutoff)
+    .gte("mention_count", minMentions)
+    .order("last_mentioned_at", { ascending: false, nullsFirst: false })
+    .order("mention_count", { ascending: false })
+    .limit(limit);
+
+  if (!entityRows || entityRows.length === 0) return [];
+
+  type EntityWithDate = EntityRow & { first_seen_at: string | null };
+  const entityData = (entityRows as EntityWithDate[]).map((r) => ({
+    entity: toEntity(r),
+    firstSeenAt: r.first_seen_at ?? "",
+  }));
+
+  const entityIds = entityData.map((e) => e.entity.id);
+
+  // Find the latest story per entity — one call, pick first occurrence per entity_id.
+  const { data: mentionRows } = await supabase
+    .from("entity_mentions")
+    .select("entity_id, story_id, created_at")
+    .in("entity_id", entityIds)
+    .order("created_at", { ascending: false })
+    .limit(entityIds.length * 10);
+
+  const latestStoryByEntity = new Map<string, string>();
+  for (const m of (mentionRows ?? []) as { entity_id: string; story_id: string }[]) {
+    if (!latestStoryByEntity.has(m.entity_id)) {
+      latestStoryByEntity.set(m.entity_id, m.story_id);
+    }
+  }
+
+  const storyIds = [...new Set(latestStoryByEntity.values())];
+  const storiesById = new Map<string, ArchivedStory>();
+  if (storyIds.length > 0) {
+    const { data: storyRows } = await supabase
+      .from("story_archive")
+      .select(STORY_COLS)
+      .in("id", storyIds);
+    for (const s of (storyRows ?? []).map((r) => toStory(r as StoryRow))) {
+      storiesById.set(s.id, s);
+    }
+  }
+
+  return entityData.map(({ entity, firstSeenAt }) => ({
+    entity,
+    latestStory: storiesById.get(latestStoryByEntity.get(entity.id) ?? "") ?? null,
+    isNew: !!firstSeenAt && firstSeenAt >= sevenDaysAgo,
+  }));
+}

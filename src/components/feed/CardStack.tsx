@@ -226,7 +226,7 @@ export function CardStack({
   }, [currentIndex, feedEntries]);
 
   // ─── Prefetch "Why it matters" breakdowns ─────────────────────────────────
-  const BREAKDOWN_PREFETCH_AHEAD = 2;
+  const BREAKDOWN_PREFETCH_AHEAD = 1;
   useEffect(() => {
     for (let i = currentIndex; i <= currentIndex + BREAKDOWN_PREFETCH_AHEAD; i++) {
       const entry = feedEntries[i];

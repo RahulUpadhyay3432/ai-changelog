@@ -1,23 +1,22 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-06-15
+> **Last updated:** 2026-06-16
 >
-> **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` before any UI/product work.
+> **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` + `docs/market-research.md` before any product/UI work.
 
 ---
 
-## 👉 RIGHT NOW — the next action
+## 👉 RIGHT NOW — the ONE open decision (everything hinges on this)
 
-**M1 + SEO discovery surfaces are SHIPPED and live.** `/learn/*`, `/explore`, `/llms.txt`, `/feed.xml` all live (served on www.kapyn.app). Sitemap confirmed in GSC (Status: Success, 208 discovered). PRs #3, #4, #5 merged.
+**Decide Kapyn's strategic direction**, because it gates almost everything below:
 
-**Next — pick one to build:**
-- **Syndication-draft generator** — auto-produce Medium/Substack/dev.to posts from each explainer (with `rel=canonical` back to Kapyn). Completes the "show up everywhere" distribution toolkit.
-- **Two quick-win feedback fixes** — source+model attribution on AI summaries; tap summary → open full source article.
+- **Option A — stay the calm AI-news app** (current live product: swipeable 30s news + the `/learn` knowledge base).
+- **Option B — pivot to "the trusted companion for people building with AI" (vibe coders / AI builders).** Sharper, higher-pain, more differentiated. See `docs/market-research.md` for the full landscape.
 
-**Recommended founder action (SEO cleanliness, not urgent):** in Vercel → Settings → Domains, set **`kapyn.app` as the PRIMARY domain.** Right now the apex 307-redirects to `www`, but all canonicals/sitemap/llms.txt use the apex — making the apex primary aligns the served domain with the canonical tags.
+**Where we landed (not yet committed):** the *problem* in Option B is real and huge (quantified in market research). The naive "build a vibe-coding security scanner SaaS" is a **trap** (lane filling fast + the "Ignorance-Risk Paradox" = people won't pay to prevent risks they don't perceive). The **viable** version for Kapyn is the **content/trust/no-paywall companion** that proactively surfaces *"what you didn't know to ask"* (security, cost, orchestration, what-changed) — sitting on Kapyn's existing DNA. **But validate with ~5 real builders before committing** (do they return to a destination, or just ask AI / run a $9 scanner?).
 
-**Housekeeping (not urgent):** rotate the temporary `CRON_SECRET` (`kapyntest123`) to a strong value (`openssl rand -hex 32`); verify the daily cron authenticates.
+**Recommended next action:** run that validation (5 builder conversations), then commit to A or B. *Don't build more product surface until this is decided* — the design, the right-swipe space, and the big feedback items all change shape based on it.
 
 ---
 
@@ -26,104 +25,84 @@
 | Branch | PR | What | Status |
 |---|---|---|---|
 | `main` | — | Production → www.kapyn.app | Live |
-| `feat/knowledge-base-m1` | [#3](https://github.com/RahulUpadhyay3432/ai-changelog/pull/3) | Knowledge base M1 + design craft pass | ✅ **Merged** 2026-06-15 |
-| `fix/api-rate-limiting` | [#4](https://github.com/RahulUpadhyay3432/ai-changelog/pull/4) | API rate limiting (Upstash) + input cap | ✅ **Merged** 2026-06-15 |
-
-**Live:** `/learn/*` + `/explore` are on production → e.g. `https://www.kapyn.app/explore`, `https://www.kapyn.app/learn/rag`.
-
----
-
-## ✅ Done
-
-### Knowledge base M1 (PR #3 — merged)
-- 5 durable Supabase tables (`entities`, `story_archive`, `entity_mentions`, `entity_explainers`, `digests`) + RLS + atomic upsert RPC — see `supabase/migrations/0001_knowledge_base.sql`.
-- Entity extraction piggybacked on the existing ingestion LLM call (zero extra cost).
-- Auto-generation route with self-critique + publish gating (`/api/knowledge/generate`, daily cron).
-- Public reading pages: `/learn/[slug]` (concept explainers) + `/explore` (glossary hub), SSG/ISR, SEO + `DefinedTerm` JSON-LD.
-- Sitemap + `/story/[id]` now read the durable `story_archive` (survives the 48h news rotation).
-- Gemini adversarial review — 5 of 6 findings applied.
-
-### Design foundations + craft pass (PR #3 — merged)
-- `docs/design-foundations.md` — first-principles brief (16-platform teardown): the news→concept→comprehension white space, the literacy-map retention thesis, 7 design principles, implementation-ready craft spec.
-- `/learn` + `/explore` elevated to that spec (typography, rhythm, hover craft, provenance trust line).
-
-### API hardening (PR #4 — merged)
-- `src/lib/ratelimit.ts` — shared Upstash sliding-window limiter (graceful in-memory fallback until env vars set).
-- `/api/breakdown` + `/api/news/trigger` moved onto it; breakdown input size capped.
-
-### Milestones completed
-- ✅ Ran the SQL migration in Supabase (2026-06-15).
-- ✅ Ran KB generation — all 15 seed concept pages published with explainers (2026-06-15).
-- ✅ Merged PR #3 + #4 to production — `/learn` + `/explore` live on www.kapyn.app (2026-06-15).
-- ✅ Shipped `/llms.txt` + `/feed.xml` for AI/LLM + RSS discovery (PR #5, 2026-06-15) — both serving 200.
-- ✅ Sitemap confirmed in Google Search Console — Status: Success, 208 pages discovered (2026-06-15).
+| `feat/knowledge-base-m1` | [#3](https://github.com/RahulUpadhyay3432/ai-changelog/pull/3) | KB M1 + craft pass | ✅ Merged |
+| `fix/api-rate-limiting` | [#4](https://github.com/RahulUpadhyay3432/ai-changelog/pull/4) | Rate limiting (Upstash) + input cap | ✅ Merged |
+| `feat/seo-llms-rss` | [#5](https://github.com/RahulUpadhyay3432/ai-changelog/pull/5) | `/llms.txt` + `/feed.xml` | ✅ Merged |
+| `fix/remove-feed-cards` | [#7](https://github.com/RahulUpadhyay3432/ai-changelog/pull/7) | Removed notification + Elon/insight cards from feed | ✅ Merged |
+| `fix/feedback-quickwins` | [#8](https://github.com/RahulUpadhyay3432/ai-changelog/pull/8) | Tap-summary→source + model attribution | ✅ Merged |
+| `feat/desktop-layout` | [#6](https://github.com/RahulUpadhyay3432/ai-changelog/pull/6) | Desktop 3-col `/learn` + `/explore` + AppCta + **editorial-serif redesign** | ⚠️ **OPEN, NOT merged — design rejected by founder, needs reference-driven redo (see Design status)** |
 
 ---
 
-## ⏳ Pending — dashboard actions (only the founder can do these)
+## ✅ Shipped & live (production = www.kapyn.app)
+- **Knowledge base M1**: `/learn/[slug]` + `/explore`, 5 durable Supabase tables, auto-generation cron with self-critique gating, sitemap + JSON-LD. All 15 seed concepts published. Migration run.
+- **SEO/LLM discovery**: `/llms.txt` + `/feed.xml` live; sitemap confirmed in Google Search Console (Success, 208 pages).
+- **API hardening**: Upstash rate limiting + input cap on `/api/breakdown` + `/api/news/trigger` (`src/lib/ratelimit.ts`).
+- **Feed cleanup**: removed the notification-prompt card + the Elon/insight card; feed is now news-only.
+- **Feedback quick wins**: tap summary → opens source article; card footer shows "AI summary · Gemini 2.5 Flash Lite" + source.
 
-- [x] ✅ Submit sitemap to Google Search Console — done (Status: Success).
-- [ ] Set **`kapyn.app` as the PRIMARY domain** in Vercel (apex currently 307-redirects to www; canonicals use apex).
-- [ ] Set Upstash env vars `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` in Vercel (until then rate limiting uses the weak in-memory fallback). Free DB at console.upstash.com, or Vercel Marketplace integration.
-- [ ] Set a **Gemini billing cap + budget alert** (Google Cloud Console) — the denial-of-wallet backstop.
+---
+
+## 🧭 Strategic context (the thinking behind the open decision)
+
+- **Value > UI.** UI is copyable; value is not. We spent hours polishing chrome on *commodity* content ("what is RAG" = available everywhere). That, not the visuals, is the real "I won't come back" problem.
+- **The "just ask AI" objection (the central risk):** AI chat owns *answers*. So Kapyn's value cannot be "look up answers." It must be **the question you didn't know to ask + trust it's right/current + a curated POV + proactive** — things AI chat structurally can't be (it's reactive, non-committal, ephemeral, sometimes confidently wrong). AI's proliferation is the *tailwind* (more builders shipping with hidden risks).
+- **Market research verdict (`docs/market-research.md`):** "partially taken." Security-scanner lane filling (UNPWNED, Vibe App Scanner, GitGuardian/Codacy). The *trusted content/companion* position is open. Demand is massive (r/vibecoding ~559k weekly; 65% of vibe-coded apps have security defects; $12k surprise bills; CVE-2025-48757). But the **Ignorance-Risk Paradox** kills a paid-prevention SaaS → Kapyn's edge is a **content/brand/no-paywall** play, monetized via audience, not fear-insurance.
+
+---
+
+## 🎨 Design status (IMPORTANT — read before any UI work)
+- **The `/learn` + `/explore` redesign on PR #6 was rejected** — looked "fine but generic / wouldn't return." Root cause: **I designed from text descriptions, not visual references** (web search was blocked during research, so I worked from specs, not screenshots). Lesson: **never design without real reference images.**
+- **There IS a full design-skill library at `.agents/skills/`** (`high-end-visual-design`, `impeccable` [craft/polish/typography refs], `web-design-guidelines`, `design-taste-frontend`) + `.continue/skills/ui-ux-pro-max` (has a `scripts/search.py --design-system` generator). **USE THESE.** They were missed initially.
+- **Reference screenshots saved to `/home/rahul/kapyn-design-references/`** (7 PNGs: linear, anthropic, every, vercel, stripe-docs, brilliant; stripe-press blank). **Lesson: those were the WRONG adjacency** (SaaS/product/docs sites). The right references are **exploration/understanding destinations** (where people go to learn/explore/solve): AI newsletters, Wikipedia/Investopedia, Perplexity, etc. — NOT product landing pages.
+- **Screenshot capability exists:** `/snap/bin/chromium --headless=new --screenshot=...` works (write to `/home/rahul/...`, NOT `/tmp` — snap has a private `/tmp`). Use `dangerouslyDisableSandbox` for network.
+- **Next design step:** founder sends (or we capture) references from the *right adjacency*, then redesign `/learn`+`/explore` to MATCH a chosen reference — and run it through the `.agents` design skills. Don't guess.
+
+---
+
+## 🔁 Retention plan (value-first)
+Honest principle: **retention follows value, not mechanics** (Inshorts/Artifact had push+streaks+great UX and died on commodity value). The 3 direction-independent, cheap moves to do meanwhile:
+1. **Measure** — set up a PostHog retention report (D1/D7/D30, return cadence). Currently flying blind (~2–20 DAU).
+2. **A trigger** — an owned re-engagement channel: daily/weekly **email brief** (durable; works regardless of pivot) or activate the dormant **push** (built; needs VAPID + a new opt-in spot since the in-feed prompt was removed).
+3. **Investment** — start logging **read-history** in localStorage → foundation for the **personal literacy/learning map** (the durable retention mechanic; also a friend's request).
+- **Do NOT** build guilt-gamification (off-brand for "calm intelligence").
+
+---
+
+## 🗺️ Backlog / ideas
+- **Right-swipe space** (gesture currently unused): make it the **"understand & grow / Your AI"** surface — your literacy map + explore + saved + (later) Ask Kapyn; optionally contextual (swipe-right-on-story → the concept behind it). **Do NOT copy Inshorts' cluttered tab-soup + word game.** Direction-dependent (becomes "your builds" if Option B).
+- **Parked feedback (direction-dependent):** search, more/mute topics, **account sync** (= auth + backend — don't build until strategy decided).
+- **Personal AI-literacy map** — highest-leverage retention mechanic (design-foundations §4).
+- **M2** `/tools/[slug]` + in-feed entity chips · **M3** `/digest/[date]` · **M4** light `/admin` · **Ask Kapyn** (RAG; needs rate-limit + billing cap first).
+
+---
+
+## ⏳ Pending — founder dashboard actions
+- [ ] Set **`kapyn.app` as PRIMARY domain** in Vercel (apex 307-redirects to www; canonicals use apex).
+- [ ] Set Upstash env vars (`UPSTASH_REDIS_REST_URL` + `_TOKEN`) — else rate limiting uses weak in-memory fallback.
+- [ ] Set a **Gemini billing cap** (Google Cloud) — denial-of-wallet backstop.
 - [ ] Rotate `CRON_SECRET` from `kapyntest123` to a strong value.
-- [ ] (Optional) Enable Vercel Firewall.
 
 ---
 
-## ▶️ Immediate next steps (ordered)
-
-1. **Submit sitemap to GSC** (founder; gates SEO/LLM visibility).
-2. **Build `llms.txt` + RSS feed** (helps GEO + syndication).
-3. **Build the syndication-draft generator** (Medium/Substack/dev.to from explainers).
-4. **Ship the two quick-win feedback items** (summary attribution; tap-to-open-source).
-5. Wire Upstash + Gemini billing cap so rate limiting bites in prod.
-
----
-
-## 🗣️ User feedback (early users — 2026-06-15)
-
-From friends who used the app a few days ("pretty good… good app to read during transport" — a real qualitative retention signal). Triaged by effort:
-
-**Quick wins — ✅ SHIPPED (PR #8, 2026-06-15):**
-- ✅ **Tag AI summaries with source + model** — card footer now shows "AI summary · Gemini 2.5 Flash Lite" + source name.
-- ✅ **Tap the summary → open the full source article** — summary is now a link to `source_url` (title already was).
-
-Also shipped (PR #7): ✅ removed the notification + insight (Elon) cards from the feed.
-
-**Medium bets (personalization / retention):**
-- **Search** the news/corpus (relates to Ask Kapyn).
-- **Read history** (relates directly to the literacy-map retention mechanic in design-foundations §4).
-- **More topics + mute topics** (topic granularity + filtering).
-
-**Strategic decision needed:**
-- **Account sync / cross-device** — explicitly requested; would make it "a good app to read during transport." Requires auth, which is currently out of scope (localStorage only). Recurring ask → worth a real prioritization decision.
-
----
-
-## 🗺️ Roadmap / backlog
-
-- **Personal AI-literacy map** — highest-leverage retention mechanic (design-foundations §4). Collect which concepts a user reads (localStorage) before building UI. (Overlaps with "read history" feedback.)
-- **M2** — `/tools/[slug]` pages (models/companies) + in-feed entity chips.
-- **M3** — daily digest archive at `/digest/[date]` (the dated "blog" format; only the empty `digests` table exists today).
-- **M4** — light `/admin` for content QA (publish/unpublish/edit explainers).
-- **Ask Kapyn** (RAG chat) — high value; reintroduces per-request LLM cost/DoS → needs full rate-limit + billing-cap treatment first.
+## ⚙️ Working notes (cost + tooling)
+- **Model tiering** to control cost: **Sonnet** for routine coding/edits; **Opus** (plain, not `[1m]`) only for planning/architecture/review/hard judgment. Drop `[1m]` unless huge context needed.
+- **Offload to GPT/Gemini Deep Research:** market research, content drafts, isolated/well-specified tasks. **Keep in Claude:** repo-aware build, integration, review, taste.
+- Local `next build` **OOMs** this machine (closes the editor) — rely on the Vercel build gate; use `tsc --noEmit` / `eslint <file>` for local checks.
 
 ---
 
 ## 🔐 Security posture (quick reference)
-
-- **The blog / knowledge base is inherently safe** — static (SSG/ISR), CDN-cached, cron-generated. Hammering `/learn/*` hits the cache, not the DB/LLM. Keep it static; do NOT add per-request dynamic/LLM endpoints to it.
-- **LLM endpoints** (`/api/breakdown`) are the denial-of-wallet surface → rate-limited (PR #4) + input-capped. Billing cap is the backstop (pending).
-- **On Vercel, DoS = denial-of-wallet + downstream exhaustion**, not a crashed server (it auto-scales).
-- **Public anon key** lets anyone read public Supabase tables directly — cheap reads of public data; relevant when Ask Kapyn ships.
+- The KB/blog is inherently safe — static (SSG/ISR), CDN-cached, cron-generated. Keep it static.
+- LLM endpoints (`/api/breakdown`) are the denial-of-wallet surface → rate-limited + capped; billing cap pending.
+- Public anon key allows direct reads of public Supabase tables — acceptable (public data).
 
 ---
 
 ## 📎 Key files & references
-
-- `docs/design-foundations.md` — the design/product brief (read before any UI work).
-- `supabase/migrations/0001_knowledge_base.sql` — the KB schema (already run).
-- `CLAUDE.md` / `AGENTS.md` — project conventions (Next.js 16 has breaking changes — read its docs before writing Next code).
-- `outreach/linkedin-outreach.md` — LinkedIn outreach drafts.
-- Repo: `RahulUpadhyay3432/ai-changelog`. Deploy: Vercel. Project dir: `/tmp/ai-changelog`.
+- `docs/design-foundations.md` — design/product brief (read before UI).
+- `docs/market-research.md` — vibe-coder/AI-builder competitive landscape + synthesis.
+- `/home/rahul/kapyn-design-references/` — saved reference screenshots (note: wrong adjacency — recapture exploration destinations).
+- `.agents/skills/` + `.continue/skills/ui-ux-pro-max` — design skills (USE THEM).
+- `supabase/migrations/0001_knowledge_base.sql` — KB schema (run).
+- Repo: `RahulUpadhyay3432/ai-changelog`. Deploy: Vercel. Dir: `/tmp/ai-changelog` (⚠️ `/tmp` wipes on reboot — everything important is pushed to GitHub).

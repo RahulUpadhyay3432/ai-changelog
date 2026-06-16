@@ -5,7 +5,7 @@ import { CompletionCard } from "./CompletionCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
-import { updateStreak } from "@/lib/storage";
+import { updateStreak, recordRead } from "@/lib/storage";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
@@ -192,6 +192,7 @@ export function CardStack({
       const prevItem = feedEntries[prev]?.item ?? items[0];
       deferIdle(() => {
         updateStreak();
+        if (prevItem) recordRead(prevItem);
         posthog.capture("story_swiped", {
           direction: index > prev ? "next" : "previous",
           story_id: prevItem?.id,

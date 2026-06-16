@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { User, Bell, Bookmark, Flame, Sparkles, MessageSquare, Check } from "lucide-react";
-import { getSavedStories, getStreak, getFeedPrefs, setFeedPrefs } from "@/lib/storage";
-import { CATEGORIES } from "@/lib/categories";
+import { getSavedStories, getStreak, getFeedPrefs, setFeedPrefs, getReadHistory } from "@/lib/storage";
+import { CATEGORIES, getCategoryBySlug } from "@/lib/categories";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 import posthog from "posthog-js";
 
@@ -16,6 +16,9 @@ export default function ProfilePage() {
   const [showFeedback, setShowFeedback] = useState(false);
   // enabled slugs — null until loaded (avoids flash)
   const [enabledSlugs, setEnabledSlugs] = useState<string[] | null>(null);
+  const [topCategories, setTopCategories] = useState<{ slug: string; count: number }[]>([]);
+  const [readTotal, setReadTotal] = useState(0);
+  const [quietestSlug, setQuietestSlug] = useState<string | null>(null);
 
   useEffect(() => {
     setSavedCount(getSavedStories().length);
@@ -29,6 +32,23 @@ export default function ProfilePage() {
     } else {
       setEnabledSlugs(raw ?? []);
     }
+
+    // Compute read-history summary
+    const history = getReadHistory();
+    setReadTotal(history.length);
+    const counts: Record<string, number> = {};
+    for (const r of history) {
+      if (r.categorySlug === "all") continue;
+      counts[r.categorySlug] = (counts[r.categorySlug] ?? 0) + 1;
+    }
+    const sorted = Object.entries(counts)
+      .map(([slug, count]) => ({ slug, count }))
+      .sort((a, b) => b.count - a.count);
+    setTopCategories(sorted.slice(0, 3));
+    // Find a real category the user hasn't read at all
+    const unread = CATEGORIES.find((c) => !counts[c.slug]);
+    setQuietestSlug(unread?.slug ?? null);
+
     setIsLoading(false);
   }, []);
 
@@ -158,6 +178,89 @@ export default function ProfilePage() {
           <span style={{ fontSize: "11px", color: streakCount > 0 ? "#ea580c" : "#737373", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Streak
           </span>
+        </div>
+      </div>
+
+      {/* Your AI */}
+      <div style={{ marginBottom: "28px" }}>
+        <p
+          style={{
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#525252",
+            margin: "0 0 10px",
+            padding: "0 24px",
+          }}
+        >
+          Your AI
+        </p>
+        <div
+          style={{
+            background: "#111111",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
+            borderBottom: "1px solid rgba(255,255,255,0.04)",
+            padding: "16px 20px",
+          }}
+        >
+          {readTotal === 0 ? (
+            <p style={{ margin: 0, fontSize: "14px", color: "#525252", lineHeight: 1.5 }}>
+              Start reading to build your map.
+            </p>
+          ) : (
+            <>
+              <p style={{ margin: "0 0 14px", fontSize: "14px", color: "#a3a3a3", lineHeight: 1.5 }}>
+                You&apos;ve read{" "}
+                <span style={{ color: "#f5f5f5", fontWeight: 600 }}>{readTotal}</span>{" "}
+                {readTotal === 1 ? "dispatch" : "dispatches"} across{" "}
+                <span style={{ color: "#f5f5f5", fontWeight: 600 }}>{topCategories.length}</span> of 9 areas.
+              </p>
+              {topCategories.length > 0 && (
+                <div style={{ marginBottom: "12px" }}>
+                  <p style={{ margin: "0 0 8px", fontSize: "11px", color: "#525252", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Top areas
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {topCategories.map(({ slug, count }) => {
+                      const cat = getCategoryBySlug(slug as Parameters<typeof getCategoryBySlug>[0]);
+                      if (!cat) return null;
+                      return (
+                        <div
+                          key={slug}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: "20px",
+                            border: `1px solid ${cat.colorAccent}55`,
+                            background: `${cat.colorAccent}14`,
+                            color: cat.colorLabel,
+                            fontSize: "13px",
+                            fontWeight: 500,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
+                        >
+                          {cat.name}
+                          <span style={{ fontSize: "11px", opacity: 0.6 }}>{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {quietestSlug && (() => {
+                const cat = getCategoryBySlug(quietestSlug as Parameters<typeof getCategoryBySlug>[0]);
+                if (!cat) return null;
+                return (
+                  <p style={{ margin: 0, fontSize: "12px", color: "#525252", lineHeight: 1.5 }}>
+                    You haven&apos;t explored{" "}
+                    <span style={{ color: "#737373" }}>{cat.name}</span> yet.
+                  </p>
+                );
+              })()}
+            </>
+          )}
         </div>
       </div>
 

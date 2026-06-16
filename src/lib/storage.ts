@@ -8,7 +8,10 @@ const KEYS = {
   PINNED_CATEGORIES: "ai_changelog_pinned_categories",
   STREAK_DATES: "ai_changelog_streak_dates",
   LAST_VISIT: "kapyn_last_visit",
+  READ_HISTORY: "kapyn_read_history",
 };
+
+const READ_HISTORY_CAP = 500;
 
 // ==========================================
 // Last Visit Timestamp
@@ -198,6 +201,38 @@ export function updateStreak(): void {
   } catch (e) {
     console.error("Error updating streak:", e);
   }
+}
+
+// ==========================================
+// Read History
+// ==========================================
+
+export interface ReadRecord {
+  id: string;
+  categorySlug: NewsItem["categorySlug"];
+  at: string; // ISO date string
+}
+
+export function getReadHistory(): ReadRecord[] {
+  if (!isBrowser) return [];
+  try {
+    const raw = localStorage.getItem(KEYS.READ_HISTORY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function recordRead(item: NewsItem): void {
+  if (!isBrowser) return;
+  try {
+    const history = getReadHistory();
+    if (history.some((r) => r.id === item.id)) return;
+    history.push({ id: item.id, categorySlug: item.categorySlug, at: new Date().toISOString() });
+    // Keep only the most recent entries
+    if (history.length > READ_HISTORY_CAP) history.splice(0, history.length - READ_HISTORY_CAP);
+    localStorage.setItem(KEYS.READ_HISTORY, JSON.stringify(history));
+  } catch {}
 }
 
 // ==========================================

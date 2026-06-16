@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getRadarFeed } from "@/lib/knowledge";
 
-export const runtime = "nodejs";
 export const maxDuration = 15;
 
 // Debug endpoint — dumps the radar entity feed as JSON so we can eyeball data
@@ -9,7 +8,7 @@ export const maxDuration = 15;
 //
 // Hit: GET /api/radar-gate
 // Query params: days=14&min=2&limit=40 (all optional)
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const days = parseInt(url.searchParams.get("days") ?? "14", 10);
   const min = parseInt(url.searchParams.get("min") ?? "2", 10);

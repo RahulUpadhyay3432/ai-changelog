@@ -204,3 +204,19 @@ export async function getLearnEntities(limit = 60): Promise<Entity[]> {
     .limit(limit);
   return (data ?? []).map((r) => toEntity(r as EntityRow));
 }
+
+// Radar entities — the named models, tools, and companies moving in AI right
+// now. Ordered by most-recent activity first, then traction (mention_count).
+// This is the "what's new in the things you build with" feed, the mirror of
+// getLearnEntities (which serves the evergreen concept glossary).
+export async function getRadarEntities(limit = 60): Promise<Entity[]> {
+  const { data } = await supabase
+    .from("entities")
+    .select(ENTITY_COLS)
+    .in("entity_type", ["model", "tool", "company"])
+    .eq("status", "active")
+    .order("last_mentioned_at", { ascending: false, nullsFirst: false })
+    .order("mention_count", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => toEntity(r as EntityRow));
+}

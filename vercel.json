@@ -15,6 +15,10 @@
     {
       "path": "/api/radar/value-lines",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/radar/tools",
+      "schedule": "0 */6 * * *"
     }
   ]
 }

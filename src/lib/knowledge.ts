@@ -325,6 +325,54 @@ export async function getRadarCards(recencyDays = 21, minMentions = 2, limit = 4
   return all.filter((it) => !!it.valueLine && it.valueLine.trim().length > 0).slice(0, limit);
 }
 
+// ─── Radar tools (GitHub trending + Product Hunt) ────────────────────────────
+// Structured tool sources whose value-line is the maker's own description — the
+// trustworthy half of "Discover" (no LLM, no drift). Populated by /api/radar/tools.
+
+export interface RadarTool {
+  source: "github" | "producthunt";
+  name: string;
+  valueLine: string;
+  url: string;
+  meta: string | null;
+  score: number;
+  topics: string[];
+  lastSeenAt: string;
+}
+
+interface RadarToolRow {
+  source: string;
+  name: string;
+  value_line: string;
+  url: string;
+  meta: string | null;
+  score: number;
+  topics: string[] | null;
+  last_seen_at: string;
+}
+
+export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
+  const { data } = await supabase
+    .from("radar_tools")
+    .select("source, name, value_line, url, meta, score, topics, last_seen_at")
+    .order("last_seen_at", { ascending: false })
+    .order("score", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => {
+    const row = r as RadarToolRow;
+    return {
+      source: row.source as RadarTool["source"],
+      name: row.name,
+      valueLine: row.value_line,
+      url: row.url,
+      meta: row.meta,
+      score: row.score,
+      topics: row.topics ?? [],
+      lastSeenAt: row.last_seen_at,
+    };
+  });
+}
+
 // Whole-word, case-insensitive check that a story headline names an entity —
 // boundaries so "Meta" doesn't match "metadata" and "AI" doesn't match "train".
 function titleNamesEntity(title: string, name: string): boolean {

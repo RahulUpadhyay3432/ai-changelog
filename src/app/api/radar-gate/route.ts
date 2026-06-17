@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getRadarFeed } from "@/lib/knowledge";
+import { getRadarFeed, getRadarTools } from "@/lib/knowledge";
 
 export const maxDuration = 15;
 
@@ -14,11 +14,10 @@ export async function GET(req: NextRequest) {
   const min = parseInt(url.searchParams.get("min") ?? "2", 10);
   const limit = parseInt(url.searchParams.get("limit") ?? "40", 10);
 
-  const items = await getRadarFeed(
-    isNaN(days) ? 14 : days,
-    isNaN(min) ? 2 : min,
-    isNaN(limit) ? 40 : limit
-  );
+  const [items, tools] = await Promise.all([
+    getRadarFeed(isNaN(days) ? 14 : days, isNaN(min) ? 2 : min, isNaN(limit) ? 40 : limit),
+    getRadarTools(30),
+  ]);
 
   const formatted = items.map((item, i) => ({
     rank: i + 1,
@@ -40,7 +39,19 @@ export async function GET(req: NextRequest) {
   }));
 
   return NextResponse.json(
-    { count: formatted.length, params: { days, min, limit }, items: formatted },
+    {
+      count: formatted.length,
+      params: { days, min, limit },
+      items: formatted,
+      toolsCount: tools.length,
+      tools: tools.map((t) => ({
+        source: t.source,
+        name: t.name,
+        valueLine: t.valueLine,
+        meta: t.meta,
+        url: t.url,
+      })),
+    },
     { headers: { "Cache-Control": "no-store" } }
   );
 }

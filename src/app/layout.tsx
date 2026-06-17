@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Space_Grotesk } from "next/font/google";
+import { Space_Grotesk, Newsreader } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
@@ -8,6 +8,16 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500"],
   variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+// Editorial serif for story headlines — designed for news, gives a "trusted
+// publication" voice instead of the generic system-sans default.
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-editorial",
   display: "swap",
 });
 
@@ -65,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${newsreader.variable}`}>
       <PostHogProvider>
         <body
           style={{

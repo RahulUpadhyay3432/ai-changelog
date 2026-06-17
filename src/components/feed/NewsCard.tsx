@@ -3,7 +3,7 @@
 import { useState, useEffect, memo } from "react";
 import {
   Bookmark, Share2, Check, Sparkles,
-  Brain, Terminal, GitBranch, Rocket, FlaskConical, Banknote, Building2, Server, Scale,
+  Brain, Terminal, GitBranch, Rocket, Telescope, Banknote, Building2, Server, Scale,
   type LucideIcon,
 } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
@@ -30,7 +30,7 @@ const CATEGORY_ICON: Record<string, LucideIcon> = {
   "dev-tools": Terminal,
   "open-source": GitBranch,
   startups: Rocket,
-  research: FlaskConical,
+  research: Telescope,
   "funding-ma": Banknote,
   "big-tech": Building2,
   infrastructure: Server,

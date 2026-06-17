@@ -4,7 +4,7 @@
 // to call from public (web) pages and the sitemap.
 
 import { createClient } from "@supabase/supabase-js";
-import type { EntityType } from "./entities";
+import { isGenericEntityName, type EntityType } from "./entities";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -242,14 +242,20 @@ export async function getRadarFeed(
 
   if (!entityRows || entityRows.length === 0) return [];
 
-  const entityData = entityRows.map((r) => {
-    const row = r as EntityRow & { first_seen_at: string | null };
-    return { entity: toEntity(row), firstSeenAt: row.first_seen_at ?? "" };
-  });
+  // Drop generic junk ("LLM", "AI tool") that's already sitting in the DB —
+  // the canonicalize denylist stops new ones, this cleans existing rows.
+  const entityData = entityRows
+    .map((r) => {
+      const row = r as EntityRow & { first_seen_at: string | null };
+      return { entity: toEntity(row), firstSeenAt: row.first_seen_at ?? "" };
+    })
+    .filter(({ entity }) => !isGenericEntityName(entity.canonicalName));
 
+  if (entityData.length === 0) return [];
   const entityIds = entityData.map((e) => e.entity.id);
 
-  // Find the latest story per entity — one call, pick first occurrence per entity_id.
+  // Pull recent mentions per entity (already newest-first). Keep up to 10 story
+  // candidates each so we can pick the one that's actually ABOUT the entity.
   const { data: mentionRows } = await supabase
     .from("entity_mentions")
     .select("entity_id, story_id, created_at")
@@ -257,29 +263,47 @@ export async function getRadarFeed(
     .order("created_at", { ascending: false })
     .limit(entityIds.length * 10);
 
-  const latestStoryByEntity = new Map<string, string>();
+  const storyIdsByEntity = new Map<string, string[]>();
   for (const m of mentionRows ?? []) {
     const row = m as { entity_id: string; story_id: string };
-    if (!latestStoryByEntity.has(row.entity_id)) {
-      latestStoryByEntity.set(row.entity_id, row.story_id);
-    }
+    const list = storyIdsByEntity.get(row.entity_id) ?? [];
+    if (list.length < 10) list.push(row.story_id);
+    storyIdsByEntity.set(row.entity_id, list);
   }
 
-  const storyIds = [...new Set(latestStoryByEntity.values())];
+  const allStoryIds = [...new Set([...storyIdsByEntity.values()].flat())];
   const storiesById = new Map<string, ArchivedStory>();
-  if (storyIds.length > 0) {
+  if (allStoryIds.length > 0) {
     const { data: storyRows } = await supabase
       .from("story_archive")
       .select(STORY_COLS)
-      .in("id", storyIds);
+      .in("id", allStoryIds);
     for (const s of (storyRows ?? []).map((r) => toStory(r as StoryRow))) {
       storiesById.set(s.id, s);
     }
   }
 
+  // Value-line story: prefer the most recent story whose HEADLINE names the
+  // entity (it's genuinely about it) — fall back to the most recent mention.
+  const pickStory = (entity: Entity): ArchivedStory | null => {
+    const stories = (storyIdsByEntity.get(entity.id) ?? [])
+      .map((id) => storiesById.get(id))
+      .filter((s): s is ArchivedStory => !!s);
+    if (stories.length === 0) return null;
+    return stories.find((s) => titleNamesEntity(s.title, entity.canonicalName)) ?? stories[0];
+  };
+
   return entityData.map(({ entity, firstSeenAt }) => ({
     entity,
-    latestStory: storiesById.get(latestStoryByEntity.get(entity.id) ?? "") ?? null,
+    latestStory: pickStory(entity),
     isNew: !!firstSeenAt && firstSeenAt >= sevenDaysAgo,
   }));
+}
+
+// Whole-word, case-insensitive check that a story headline names an entity —
+// boundaries so "Meta" doesn't match "metadata" and "AI" doesn't match "train".
+function titleNamesEntity(title: string, name: string): boolean {
+  if (!title || !name) return false;
+  const escaped = name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i").test(title.toLowerCase());
 }

@@ -122,21 +122,47 @@ export function slugify(name: string): string {
     .slice(0, 60);
 }
 
+// Generic nouns the extractor sometimes emits as "entities" — never specific
+// enough for the radar or a /tools page (a card reading "LLM" or "AI tool" is
+// noise). Dropped at ingestion (canonicalize) and filtered at read time
+// (getRadarFeed) so rows already in the DB are cleaned too. Deliberately does
+// NOT include seed concepts like "agents"/"rag" — those are real /learn pages.
+export const GENERIC_ENTITY_DENYLIST = new Set<string>([
+  "ai", "a.i.", "artificial intelligence",
+  "ml", "machine learning",
+  "llm", "llms", "large language model", "large language models",
+  "genai", "gen ai", "generative ai",
+  "model", "models", "ai model", "ai models", "language model", "language models",
+  "tool", "tools", "ai tool", "ai tools",
+  "app", "apps", "ai app", "ai apps", "ai mode",
+  "assistant", "assistants", "ai assistant", "ai assistants",
+  "chatbot", "chatbots", "api", "apis", "sdk",
+  "software", "platform", "technology", "framework", "startup", "startups",
+]);
+
+export function isGenericEntityName(name: string): boolean {
+  return GENERIC_ENTITY_DENYLIST.has(name.trim().toLowerCase());
+}
+
 /**
  * Map a raw extracted entity to a stable canonical form. Returns null when the
- * name can't produce a usable slug (e.g. all punctuation) — caller skips it.
+ * name can't produce a usable slug (e.g. all punctuation) or is a generic,
+ * non-specific term — caller skips it.
  */
 export function canonicalize(rawName: string, rawType?: EntityType): CanonicalEntity | null {
   const trimmed = rawName.trim();
   if (!trimmed) return null;
   const alias = trimmed.toLowerCase();
 
-  // Known alias hit → use its canonical slug/name/type.
+  // Known alias hit → use its canonical slug/name/type (wins over the denylist).
   const knownSlug = ALIAS_INDEX[alias] ?? ALIAS_INDEX[slugify(trimmed)];
   if (knownSlug && KNOWN[knownSlug]) {
     const info = KNOWN[knownSlug];
     return { slug: knownSlug, canonicalName: info.name, entityType: info.type, alias };
   }
+
+  // Generic noun, not a real named entity → drop it.
+  if (GENERIC_ENTITY_DENYLIST.has(alias)) return null;
 
   const slug = slugify(trimmed);
   if (!slug) return null;

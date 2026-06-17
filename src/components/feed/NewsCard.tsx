@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { Bookmark, Share2, Check, Sparkles } from "lucide-react";
+import {
+  Bookmark, Share2, Check, Sparkles,
+  Brain, Terminal, GitBranch, Rocket, FlaskConical, Banknote, Building2, Server, Scale,
+  type LucideIcon,
+} from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
-import { OPTIC, OPTIC_SOFT, OPTIC_BORDER } from "@/lib/brand";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
 import { isStorySaved, saveStory, removeStory } from "@/lib/storage";
@@ -20,55 +23,62 @@ interface NewsCardProps {
 // Hardcoded for the attribution label (true for the vast majority of stories).
 const SUMMARY_MODEL = "Gemini 2.5 Flash Lite";
 
-// Fiber-optic light motif — the Kapany identity. One warm light source + thin
-// luminous strands (light through fiber), replacing the generic AI grid+nodes.
-function CardHeroBackground() {
+// One representative mark per category — turns an image-less story into an
+// intentional, consistent "cover" instead of an empty gradient.
+const CATEGORY_ICON: Record<string, LucideIcon> = {
+  "ai-models": Brain,
+  "dev-tools": Terminal,
+  "open-source": GitBranch,
+  startups: Rocket,
+  research: FlaskConical,
+  "funding-ma": Banknote,
+  "big-tech": Building2,
+  infrastructure: Server,
+  policy: Scale,
+};
+
+function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
+  const category = getCategoryBySlug(categorySlug as never);
+  const accent = category?.colorAccent ?? "#333";
+  const bg = category?.colorBg ?? "#111";
+  const label = category?.colorLabel ?? "#888";
+  const Icon = CATEGORY_ICON[categorySlug] ?? Sparkles;
+
   return (
-    <div style={{ position: "absolute", inset: 0, background: "#0a0a0a", overflow: "hidden" }}>
-      {/* Warm optic light from the upper-right */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: `radial-gradient(ellipse at 60% 38%, ${accent}55 0%, ${bg} 70%)`,
+        overflow: "hidden",
+      }}
+    >
+      {/* Ambient glow */}
       <div
         style={{
           position: "absolute",
-          inset: 0,
-          background: `radial-gradient(125% 90% at 72% -10%, ${OPTIC}26 0%, rgba(10,10,10,0) 55%)`,
-        }}
-      />
-      {/* Soft focal bloom */}
-      <div
-        style={{
-          position: "absolute",
-          top: "8%",
-          right: "12%",
-          width: "240px",
-          height: "240px",
+          top: "18%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "300px",
+          height: "300px",
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${OPTIC}33 0%, transparent 70%)`,
-          filter: "blur(44px)",
+          background: `radial-gradient(circle, ${accent}45 0%, transparent 70%)`,
+          filter: "blur(48px)",
         }}
       />
-      {/* Luminous fiber strands */}
+      {/* Large faint category mark — the branded "cover" */}
       <div
         style={{
           position: "absolute",
-          top: "38%",
-          left: "-10%",
-          right: "-10%",
-          height: "1px",
-          background: `linear-gradient(90deg, transparent, ${OPTIC}73 45%, ${OPTIC} 60%, transparent)`,
-          boxShadow: `0 0 14px ${OPTIC}66`,
+          right: "-6%",
+          top: "50%",
+          transform: "translateY(-50%) rotate(-8deg)",
+          opacity: 0.12,
         }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "62%",
-          left: "-10%",
-          right: "-10%",
-          height: "1px",
-          background: `linear-gradient(90deg, transparent, ${OPTIC}40 55%, transparent)`,
-          opacity: 0.7,
-        }}
-      />
+      >
+        <Icon size={168} strokeWidth={1.2} color={label} />
+      </div>
     </div>
   );
 }
@@ -187,7 +197,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
       <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
         {/* Branded gradient sits underneath as a placeholder so there's never a
             black flash while the hero image loads — the image fades in on top. */}
-        <CardHeroBackground />
+        <CardHeroBackground categorySlug={item.categorySlug} />
         {item.imageUrl && (
           <img
             src={item.imageUrl}
@@ -351,14 +361,13 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           }}
           className="news-title-link"
           style={{
-            fontFamily: "var(--font-editorial), Georgia, 'Times New Roman', serif",
-            fontSize: "clamp(23px, 3.1dvh, 29px)",
+            fontSize: "clamp(20px, 2.8dvh, 26px)",
             fontWeight: 500,
-            lineHeight: 1.22,
-            color: "#F3EFE9",
+            lineHeight: 1.3,
+            color: "#E8E4DE",
             margin: 0,
             marginBottom: "8px",
-            letterSpacing: "-0.01em",
+            letterSpacing: "0",
             textDecoration: "none",
             display: "block",
             flexShrink: 0,
@@ -481,13 +490,15 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             display: "flex",
             alignItems: "center",
             gap: "5px",
-            background: OPTIC_SOFT,
-            border: `1px solid ${OPTIC_BORDER}`,
+            background: category ? `${category.colorAccent}2e` : "rgba(255,255,255,0.10)",
+            border: category
+              ? `1px solid ${category.colorAccent}66`
+              : "1px solid rgba(255,255,255,0.2)",
             borderRadius: "20px",
             padding: "6px 13px",
             fontSize: "13px",
             fontWeight: 600,
-            color: OPTIC,
+            color: category?.colorLabel ?? "#d4d4d4",
             cursor: "pointer",
             letterSpacing: "0.01em",
           }}

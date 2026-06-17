@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, TrendingUp, Bookmark, User } from "lucide-react";
-import { OPTIC } from "@/lib/brand";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", Icon: Home },
@@ -43,7 +42,7 @@ export function BottomNav() {
               alignItems: "center",
               gap: "2px",
               padding: "4px 14px",
-              color: active ? OPTIC : "#404040",
+              color: active ? "#e8e8e8" : "#404040",
               textDecoration: "none",
               transition: "color 120ms ease, opacity 120ms ease",
             }}

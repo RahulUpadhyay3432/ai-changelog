@@ -1,7 +1,7 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-06-16 — *entity radar shipped to preview + 2 builder validations (both → B); read-history built then reconsidered.*
+> **Last updated:** 2026-06-17 — *4/5 builder validations now in (all → B, on actionability); radar vision expanded to a 7-trigger first-principles frame (Discover/Protect/Decide), brief rewritten; radar gate run (conditional pass); breakdown cost fixed; builder UI feedback shipped.*
 >
 > **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` + `docs/market-research.md` before any product/UI work.
 
@@ -17,6 +17,12 @@
 **Where we landed (not yet committed):** the *problem* in Option B is real and huge (quantified in market research). The naive "build a vibe-coding security scanner SaaS" is a **trap** (lane filling fast + the "Ignorance-Risk Paradox" = people won't pay to prevent risks they don't perceive). The **viable** version for Kapyn is the **content/trust/no-paywall companion** that proactively surfaces *"what you didn't know to ask"* (security, cost, orchestration, what-changed) — sitting on Kapyn's existing DNA. **But validate with ~5 real builders before committing** (do they return to a destination, or just ask AI / run a $9 scanner?).
 
 **Recommended next action:** run that validation (5 builder conversations), then commit to A or B. *Don't build more product surface until this is decided* — the design, the right-swipe space, and the big feedback items all change shape based on it.
+
+### 📍 Movement (2026-06-17 session) — 4/5 builders → B; radar vision expanded + de-risked
+- **4 of ~5 builder validations now in, all converging on the same axis: actionability** ("does this news let me *do* something / is it useful," not "what happened"). The 4th builder (Instagram) explicitly named story *curation/actionability* as the biggest differentiation opportunity — same point the other three made in different words. **One more conversation to formally commit, but the signal is now strong.**
+- **Radar vision expanded from "entity radar" → a full *space* that packs all valuable things for an AI builder.** Derived from first principles: a builder lives with a *gap* between "best way to build with AI" and "how I build now"; the radar surfaces every event that changes that gap — the **7 triggers** (new / better-way / risk / cheaper / consensus / **deprecation** / **decision**). Two were missing from the old brief (deprecation + decision support) and are now added. Organized as verbs: **Discover · Protect · Decide · Learn · Cheaper.** The distinctive bet is **Protect** (vibe-coding security + deprecation alerts — the layer no AI news app has). **`docs/radar-feature.md` fully rewritten around this.** Sharpest v1 = **Discover + Protect.**
+- **Radar gate run** (`/api/radar-gate`, headless, ₹0): 40 entities, names mostly sharp, good volume/mix → **conditional pass.** Three ₹0 data fixes identified before UI: suppress the broken `isNew` badge (first_seen_at = ingestion date, not launch), headline-match the value-line story (~20% currently describe the wrong entity), denylist junk + merge version fragments. **Next concrete step.**
+- **Shipped this session:** breakdown ("why it matters") **cost fix** (missing `news_items.breakdown` column added → DB cache now works, near-zero LLM cost after warmup; prefetch trimmed 3→2) + **builder UI feedback** (tappable "Why it matters" w/ Sparkles icon, all Unicode arrows → Lucide SVG, iOS `100dvh` viewport fix). All on `main`, build green.
 
 ### 📍 Movement (2026-06-16 session) — leaning B, now with evidence + a live probe
 - **2 of ~5 builder validations are in, both pointing at B** (unsolicited Instagram feedback — see Strategic context). One asked, unprompted, to *"follow OpenAI, Anthropic, Agents, Open Source"* + personalization + weekly recap. The other validated the concept and will share Kapyn to a dev broadcast channel. **Still need ~3 more conversations** before formally committing — and these are enthusiasm + idea-lists, *soft* signal, not proven willingness-to-return.

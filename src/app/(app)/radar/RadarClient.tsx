@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Cpu, Briefcase, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
@@ -76,26 +76,33 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", color: GOLD }}>{children}</span>;
 }
 
-// ─── Hero (double-bezel featured card → opens the sheet) ─────────────────────
-interface HeroData { eyebrow: string; thing: RadarThing; imageUrl: string | null }
+// ─── Hero deck (swipeable; ends on "Caught up") ──────────────────────────────
+type HeroCard =
+  | { kind: "thing"; eyebrow: string; thing: RadarThing; imageUrl: string | null }
+  | { kind: "closer"; count: number };
 
-function Hero({ hero, onOpen }: { hero: HeroData; onOpen: (t: RadarThing) => void }) {
-  const t = hero.thing;
+const CARD_W = "84%";
+
+function HeroCardThing({ card, onOpen }: { card: Extract<HeroCard, { kind: "thing" }>; onOpen: (t: RadarThing) => void }) {
+  const t = card.thing;
   return (
-    <button onClick={() => onOpen(t)} className="radar-hero" style={{ display: "block", width: "100%", textAlign: "left", margin: "0 0 28px", padding: "0 20px", background: "none", border: "none", cursor: "pointer" }}>
+    <button onClick={() => onOpen(t)} className="radar-hero" style={{ flex: `0 0 ${CARD_W}`, scrollSnapAlign: "start", display: "block", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
       <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ position: "relative", height: "188px", borderRadius: "22px", overflow: "hidden", background: "#101010", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.12)" }}>
-          {hero.imageUrl ? (
-            <img src={hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.85)" }} />
+        <div style={{ position: "relative", height: "196px", borderRadius: "22px", overflow: "hidden", background: "#101010", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.12)" }}>
+          {card.imageUrl ? (
+            <img src={card.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.85)" }} />
           ) : (
-            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(125% 95% at 72% -10%, ${GOLD}30 0%, #0a0a0a 58%)` }} />
+            <>
+              <div style={{ position: "absolute", inset: 0, background: `radial-gradient(125% 95% at 72% -10%, ${GOLD}30 0%, #0a0a0a 58%)` }} />
+              <span style={{ position: "absolute", top: "16px", left: "18px" }}><FaceMark face={t.face} size={40} /></span>
+            </>
           )}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.96) 18%, rgba(8,8,8,0.35) 55%, rgba(8,8,8,0.1) 100%)" }} />
           <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 18px" }}>
-            <Eyebrow>{hero.eyebrow}</Eyebrow>
-            <h2 style={{ fontFamily: SG, fontSize: "22px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{t.name}</h2>
-            <p style={{ fontSize: "14px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "92%" }}>{t.valueLine}</p>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
+            <Eyebrow>{card.eyebrow}</Eyebrow>
+            <h2 style={{ fontFamily: SG, fontSize: "21px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{t.name}</h2>
+            <p style={{ fontSize: "13.5px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "94%", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.valueLine}</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "11px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 {t.metric && <MetricChip>{t.metric}</MetricChip>}
                 {t.recency && <span style={{ fontSize: "12px", color: "#a7a39d" }}>{t.recency}</span>}
@@ -108,6 +115,54 @@ function Hero({ hero, onOpen }: { hero: HeroData; onOpen: (t: RadarThing) => voi
         </div>
       </div>
     </button>
+  );
+}
+
+function HeroCardCloser() {
+  return (
+    <div style={{ flex: `0 0 ${CARD_W}`, scrollSnapAlign: "start" }}>
+      <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ position: "relative", height: "196px", borderRadius: "22px", overflow: "hidden", background: `radial-gradient(120% 100% at 50% 0%, ${GOLD}1f 0%, #0d0d0d 60%)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 26px", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.10)" }}>
+          <span style={{ width: "44px", height: "44px", borderRadius: "100px", background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}>
+            <Check size={22} color={GOLD} strokeWidth={2.4} />
+          </span>
+          <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 600, color: "#f5f3ef", margin: 0, letterSpacing: "-0.02em" }}>You&apos;re caught up</h2>
+          <p style={{ fontSize: "13.5px", color: "#a7a39d", lineHeight: 1.45, margin: "7px 0 14px", maxWidth: "260px" }}>That&apos;s what moved in your world today. Nothing else worth your time.</p>
+          <Link href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: "#0a0a0a", background: GOLD, borderRadius: "100px", padding: "9px 16px", textDecoration: "none" }}>
+            Open your Toolkit <ArrowUpRight size={15} strokeWidth={2.3} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Dots({ count, active }: { count: number; active: number }) {
+  return (
+    <div style={{ display: "flex", gap: "6px", justifyContent: "center", marginTop: "14px" }}>
+      {Array.from({ length: count }).map((_, i) => (
+        <span key={i} style={{ width: i === active ? "18px" : "6px", height: "6px", borderRadius: "100px", background: i === active ? GOLD : "rgba(255,255,255,0.16)", transition: "width 0.25s ease, background 0.25s ease" }} />
+      ))}
+    </div>
+  );
+}
+
+function HeroDeck({ cards, onOpen }: { cards: HeroCard[]; onOpen: (t: RadarThing) => void }) {
+  const [active, setActive] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const onScroll = () => {
+    const el = ref.current;
+    if (!el || !el.firstElementChild) return;
+    const step = (el.firstElementChild as HTMLElement).offsetWidth + 12;
+    setActive(Math.round(el.scrollLeft / step));
+  };
+  return (
+    <div style={{ margin: "0 0 26px" }}>
+      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "flex", gap: "12px", overflowX: "auto", scrollSnapType: "x mandatory", padding: "0 20px", scrollPaddingLeft: "20px" }}>
+        {cards.map((c, i) => (c.kind === "thing" ? <HeroCardThing key={i} card={c} onOpen={onOpen} /> : <HeroCardCloser key={i} />))}
+      </div>
+      {cards.length > 1 && <Dots count={cards.length} active={Math.min(active, cards.length - 1)} />}
+    </div>
   );
 }
 
@@ -159,49 +214,82 @@ function Section({ eyebrow, sub, variant, things, onOpen }: SectionData & { onOp
   );
 }
 
-// ─── Hero + section arrangement per lens ─────────────────────────────────────
-function pickHero(lens: RadarLens, data: RadarData): HeroData | null {
+// ─── Hero cards + section arrangement per lens ───────────────────────────────
+function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
+  const cards: HeroCard[] = [];
+  const used = new Set<string>();
   const byTraction = [...data.entities].sort((a, b) => b.entity.mentionCount - a.entity.mentionCount);
   const modelsTools = byTraction.filter((e) => e.entity.entityType === "model" || e.entity.entityType === "tool");
-  const pool = lens === "builder" ? [...modelsTools, ...byTraction] : byTraction;
-  const choice = pool.find((e) => e.latestStory?.imageUrl) ?? pool[0];
-  if (!choice) return null;
-  return {
-    eyebrow: lens === "builder" ? "Moving in your world" : lens === "founder" ? "What's moving" : "Big right now",
-    thing: entThing(choice),
-    imageUrl: choice.latestStory?.imageUrl ?? null,
-  };
+
+  // 1. The big move — top-traction (prefer one with an image)
+  const bigPool = lens === "builder" ? [...modelsTools, ...byTraction] : byTraction;
+  const big = bigPool.find((e) => e.latestStory?.imageUrl) ?? bigPool[0];
+  if (big) {
+    const t = entThing(big);
+    used.add(t.id);
+    cards.push({ kind: "thing", eyebrow: lens === "founder" ? "What's moving" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
+  }
+
+  // 2. New & worth a look — freshest launch
+  const newTool = data.tools[0];
+  if (newTool) {
+    const t = toolThing(newTool);
+    if (!used.has(t.id)) { used.add(t.id); cards.push({ kind: "thing", eyebrow: "New & worth a look", thing: t, imageUrl: null }); }
+  }
+
+  // 3. For you — a lens-relevant pick
+  let pick: { thing: RadarThing; img: string | null; eyebrow: string } | null = null;
+  if (lens === "builder") {
+    const cur = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
+    if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "For your stack" };
+  } else if (lens === "founder") {
+    const co = byTraction.find((e) => e.entity.entityType === "company" && !used.has(`entity:${e.entity.id}`));
+    if (co) pick = { thing: entThing(co), img: co.latestStory?.imageUrl ?? null, eyebrow: "Worth an opinion" };
+  } else {
+    const cur = data.essentials.find((e) => e.source === "curated" && e.meta === "Models & chat");
+    if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "Start here" };
+  }
+  if (pick && !used.has(pick.thing.id)) {
+    used.add(pick.thing.id);
+    cards.push({ kind: "thing", eyebrow: pick.eyebrow, thing: pick.thing, imageUrl: pick.img });
+  }
+
+  // 4. Caught up — the closer (always last)
+  cards.push({ kind: "closer", count: cards.length });
+  return cards;
 }
 
-function buildSections(lens: RadarLens, data: RadarData, heroId: string | null): SectionData[] {
+function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): SectionData[] {
   const curated = data.essentials.filter((e) => e.source === "curated");
   const canon = data.essentials.filter((e) => e.source === "github");
   const byCat = (cat: string) => curated.filter((e) => e.meta === cat);
   const byTraction = [...data.entities].sort((a, b) => b.entity.mentionCount - a.entity.mentionCount);
   const modelsTools = byTraction.filter((e) => e.entity.entityType === "model" || e.entity.entityType === "tool");
-  const dropHero = (things: RadarThing[]) => things.filter((t) => t.id !== heroId);
 
+  let raw: SectionData[];
   if (lens === "builder") {
-    return [
+    raw = [
       { key: "stack", eyebrow: "For your stack", sub: "Coding, inference & data tools", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference"), ...byCat("Data & RAG"), ...byCat("Agents & automation")].map(essThing) },
       { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 10).map(toolThing) },
-      { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: dropHero(modelsTools.slice(0, 10).map(entThing)) },
+      { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
       { key: "oss", eyebrow: "Popular open-source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
-  }
-  if (lens === "founder") {
-    return [
-      { key: "moving", eyebrow: "What's moving", sub: "Companies & models gaining traction", variant: "list", things: dropHero(byTraction.slice(0, 10).map(entThing)) },
+  } else if (lens === "founder") {
+    raw = [
+      { key: "moving", eyebrow: "What's moving", sub: "Companies & models gaining traction", variant: "list", things: byTraction.slice(0, 10).map(entThing) },
       { key: "new", eyebrow: "New launches", sub: "Worth a look", variant: "rail", things: data.tools.slice(0, 8).map(toolThing) },
       { key: "opinion", eyebrow: "Worth an opinion", sub: "The tools shaping the space", variant: "rail", things: byCat("Models & chat").map(essThing) },
     ];
+  } else {
+    raw = [
+      { key: "start", eyebrow: "Start here", sub: "The AI tools everyone's using", variant: "rail", things: byCat("Models & chat").map(essThing) },
+      { key: "big", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
+      { key: "toolkit", eyebrow: "Build your toolkit", sub: "When you're ready to go deeper", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference")].map(essThing) },
+      { key: "notable", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
+    ];
   }
-  return [
-    { key: "start", eyebrow: "Start here", sub: "The AI tools everyone's using", variant: "rail", things: byCat("Models & chat").map(essThing) },
-    { key: "big", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: dropHero(byTraction.slice(0, 6).map(entThing)) },
-    { key: "toolkit", eyebrow: "Build your toolkit", sub: "When you're ready to go deeper", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference")].map(essThing) },
-    { key: "notable", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
-  ];
+  // De-dup: nothing in the hero deck repeats in the lists below.
+  return raw.map((s) => ({ ...s, things: s.things.filter((t) => !heroIds.has(t.id)) }));
 }
 
 // ─── Lens chooser (2 headline + "Just exploring") ────────────────────────────
@@ -274,8 +362,9 @@ export function RadarClient(data: RadarData) {
   if (!ready) return <div style={{ height: "100%", background: "#0a0a0a" }} />;
   if (!lens) return <LensChooser onChoose={choose} />;
 
-  const hero = pickHero(lens, data);
-  const sections = buildSections(lens, data, hero?.thing.id ?? null);
+  const heroCards = buildHeroCards(lens, data);
+  const heroIds = new Set(heroCards.flatMap((c) => (c.kind === "thing" ? [c.thing.id] : [])));
+  const sections = buildSections(lens, data, heroIds);
 
   return (
     <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "28px" }}>
@@ -310,7 +399,7 @@ export function RadarClient(data: RadarData) {
         {/* Lens content */}
         <AnimatePresence mode="wait">
           <motion.div key={lens} variants={V.block} initial="hidden" animate="show" exit="exit">
-            {hero && <motion.div variants={V.hero}><Hero hero={hero} onOpen={onOpen} /></motion.div>}
+            <motion.div variants={V.hero}><HeroDeck cards={heroCards} onOpen={onOpen} /></motion.div>
             {sections.map((s) => (
               <motion.div key={s.key} variants={V.item}><Section {...s} onOpen={onOpen} /></motion.div>
             ))}

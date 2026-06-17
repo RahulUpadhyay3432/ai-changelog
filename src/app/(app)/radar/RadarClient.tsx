@@ -163,7 +163,15 @@ export function RadarClient(data: RadarData) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setLens(getRadarLens());
+    // ?lens= deep-link override (also persists the choice) — lets you share a
+    // specific lens, and falls back to the stored one otherwise.
+    const override = new URLSearchParams(window.location.search).get("lens");
+    if (override === "builder" || override === "founder" || override === "curious") {
+      setRadarLens(override);
+      setLens(override);
+    } else {
+      setLens(getRadarLens());
+    }
     setReady(true);
   }, []);
 

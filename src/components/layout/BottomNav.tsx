@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, TrendingUp, Radar, Bookmark, User } from "lucide-react";
 
-const NAV_ITEMS = [
+const GLOBAL_NAV = [
   { href: "/", label: "Home", Icon: Home },
   { href: "/trending", label: "Trending", Icon: TrendingUp },
   { href: "/radar", label: "Radar", Icon: Radar },
@@ -12,8 +12,18 @@ const NAV_ITEMS = [
   { href: "/profile", label: "Profile", Icon: User },
 ] as const;
 
+// Radar is its own space — entering it swaps the nav to Radar-specific
+// sections (Today / Toolkit) plus an exit back to the main app.
+const RADAR_NAV = [
+  { href: "/radar", label: "Today", Icon: Radar },
+  { href: "/radar/toolkit", label: "Toolkit", Icon: Bookmark },
+  { href: "/", label: "Home", Icon: Home },
+] as const;
+
 export function BottomNav() {
   const pathname = usePathname();
+  const inRadar = pathname === "/radar" || pathname.startsWith("/radar/");
+  const items = inRadar ? RADAR_NAV : GLOBAL_NAV;
 
   return (
     <nav
@@ -31,7 +41,7 @@ export function BottomNav() {
         zIndex: 50,
       }}
     >
-      {NAV_ITEMS.map(({ href, label, Icon }) => {
+      {items.map(({ href, label, Icon }) => {
         const active = pathname === href;
         return (
           <Link

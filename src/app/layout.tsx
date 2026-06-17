@@ -6,7 +6,7 @@ import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["500"],
+  weight: ["400", "500", "600"],
   variable: "--font-space-grotesk",
   display: "swap",
 });

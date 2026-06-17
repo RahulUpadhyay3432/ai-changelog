@@ -317,12 +317,22 @@ export async function getRadarFeed(
   }));
 }
 
+// Entities that are extracted but aren't really AI/tech subjects — they get a
+// generated value-line but read as off-topic on the radar. Dropped at read time.
+const RADAR_ENTITY_DENYLIST = new Set<string>([
+  "spacex", "tesla", "amazon", "facebook", "whatsapp", "instagram", "walmart",
+  "netflix", "disney", "uber", "starlink",
+]);
+
 // Radar cards for the UI: only entities with a generated, grounded value line
-// (held-back / ungenerated entities don't ship a card). Over-fetches then
-// filters, so the caller still gets up to `limit` grounded cards.
+// (held-back / ungenerated entities don't ship a card), minus off-topic names.
+// Over-fetches then filters, so the caller still gets up to `limit` grounded cards.
 export async function getRadarCards(recencyDays = 21, minMentions = 2, limit = 40): Promise<RadarItem[]> {
   const all = await getRadarFeed(recencyDays, minMentions, Math.max(limit * 2, 60));
-  return all.filter((it) => !!it.valueLine && it.valueLine.trim().length > 0).slice(0, limit);
+  return all
+    .filter((it) => !!it.valueLine && it.valueLine.trim().length > 0)
+    .filter((it) => !RADAR_ENTITY_DENYLIST.has(it.entity.canonicalName.trim().toLowerCase()))
+    .slice(0, limit);
 }
 
 // ─── Radar tools (GitHub trending + Product Hunt) ────────────────────────────

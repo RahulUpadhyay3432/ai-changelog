@@ -7,9 +7,9 @@ import { Cpu, Briefcase, Compass, Bell, Check, ArrowRight, ArrowUpRight, type Lu
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
-import { formatTimeAgo } from "@/lib/mock-data";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, type Face, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, type RadarThing } from "./radar-shared";
+import { toolThing, essThing, canonThing, entThing } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 const GRAIN =
@@ -31,45 +31,6 @@ const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "founder", label: "Founder", Icon: Briefcase },
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
-
-// ─── Mappers: source objects → the normalized RadarThing ─────────────────────
-function toolThing(t: RadarTool): RadarThing {
-  return {
-    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine,
-    face: t.source === "producthunt" ? "producthunt" : "github",
-    metric: t.meta, typeLabel: t.source === "producthunt" ? "Product Hunt" : "GitHub",
-    category: null, url: t.url, recency: null, storyTitle: null, storySource: null,
-  };
-}
-function essThing(t: RadarTool): RadarThing {
-  return {
-    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "essential",
-    metric: null, typeLabel: null, category: t.meta ?? "Essentials",
-    url: t.url, recency: null, storyTitle: null, storySource: null,
-  };
-}
-function canonThing(t: RadarTool): RadarThing {
-  return {
-    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "github",
-    metric: t.meta, typeLabel: "Open source", category: "Open source",
-    url: t.url, recency: null, storyTitle: null, storySource: null,
-  };
-}
-function entThing(e: RadarItem): RadarThing {
-  const n = e.entity.mentionCount;
-  const et = e.entity.entityType;
-  return {
-    id: `entity:${e.entity.id}`, kind: "entity", name: e.entity.canonicalName, valueLine: e.valueLine ?? "",
-    face: (["model", "tool", "company"].includes(et) ? et : "concept") as Face,
-    metric: `${n} ${n === 1 ? "source" : "sources"}`,
-    typeLabel: et.charAt(0).toUpperCase() + et.slice(1),
-    category: et === "model" ? "Models" : et === "tool" ? "Tools" : et === "company" ? "Companies" : "Concepts",
-    url: e.latestStory?.sourceUrl ?? null,
-    recency: e.latestStory?.publishedAt ? formatTimeAgo(e.latestStory.publishedAt) : null,
-    storyTitle: e.latestStory?.title ?? null,
-    storySource: e.latestStory?.sourceName ?? null,
-  };
-}
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 function Eyebrow({ children }: { children: React.ReactNode }) {

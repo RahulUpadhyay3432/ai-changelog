@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, Radar, Bookmark, User } from "lucide-react";
+import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid } from "lucide-react";
 
 const GLOBAL_NAV = [
   { href: "/", label: "Home", Icon: Home },
@@ -16,6 +16,7 @@ const GLOBAL_NAV = [
 // sections (Today / Toolkit) plus an exit back to the main app.
 const RADAR_NAV = [
   { href: "/radar", label: "Today", Icon: Radar },
+  { href: "/radar/browse", label: "Browse", Icon: LayoutGrid },
   { href: "/radar/toolkit", label: "Toolkit", Icon: Bookmark },
   { href: "/", label: "Home", Icon: Home },
 ] as const;

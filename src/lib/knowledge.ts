@@ -95,6 +95,10 @@ function toStory(row: StoryRow): ArchivedStory {
 
 const ENTITY_COLS =
   "id, slug, canonical_name, entity_type, short_desc, mention_count, last_mentioned_at, is_seed";
+// Literal (not ENTITY_COLS + "...") so PostgREST infers the row type — a widened
+// string makes .select() return GenericStringError and breaks the cast.
+const RADAR_ENTITY_COLS =
+  "id, slug, canonical_name, entity_type, short_desc, mention_count, last_mentioned_at, is_seed, first_seen_at";
 const STORY_COLS =
   "id, title, summary, source_url, source_name, category_slug, image_url, published_at";
 
@@ -227,7 +231,7 @@ export async function getRadarFeed(
 
   const { data: entityRows } = await supabase
     .from("entities")
-    .select(ENTITY_COLS + ", first_seen_at")
+    .select(RADAR_ENTITY_COLS)
     .in("entity_type", ["model", "tool", "company"])
     .eq("status", "active")
     .gte("last_mentioned_at", cutoff)

@@ -149,6 +149,17 @@
   opacity: 0.65;
 }
 
+/* "Why it matters" — make the affordance unmistakable on tap/hover */
+.why-matters-btn {
+  transition: transform 0.12s ease, filter 0.15s ease;
+}
+.why-matters-btn:hover {
+  filter: brightness(1.18);
+}
+.why-matters-btn:active {
+  transform: scale(0.95);
+}
+
 /* Action button tap feedback — scale bounce */
 @keyframes btn-bounce {
   0%   { transform: scale(1); }

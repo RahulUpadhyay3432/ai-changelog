@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "framer-motion";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
@@ -248,13 +249,14 @@ export function HomeFeed() {
               <div style={{
                 position: "absolute", inset: 0,
                 display: "flex", alignItems: "center", justifyContent: "flex-end",
-                paddingRight: "24px",
+                gap: "6px", paddingRight: "24px",
                 background: "#0a0a0a",
                 color: "#333",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em",
                 textTransform: "uppercase",
               }}>
-                ← {tabs[tabIdx - 1].label}
+                <ChevronLeft size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+                {tabs[tabIdx - 1].label}
               </div>
             )}
             {/* Next category peek — visible when dragging left */}
@@ -262,13 +264,14 @@ export function HomeFeed() {
               <div style={{
                 position: "absolute", inset: 0,
                 display: "flex", alignItems: "center", justifyContent: "flex-start",
-                paddingLeft: "24px",
+                gap: "6px", paddingLeft: "24px",
                 background: "#0a0a0a",
                 color: "#333",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em",
                 textTransform: "uppercase",
               }}>
-                {tabs[tabIdx + 1].label} →
+                {tabs[tabIdx + 1].label}
+                <ChevronRight size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
               </div>
             )}
 
@@ -340,11 +343,12 @@ export function HomeFeed() {
                         gap: "3px",
                       }}
                     >
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#e5e5e5", letterSpacing: "-0.01em" }}>
-                        ✦ Customize your feed
+                      <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#e5e5e5", letterSpacing: "-0.01em" }}>
+                        <Sparkles size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                        Customize your feed
                       </span>
                       <span style={{ fontSize: "12px", color: "#525252", fontWeight: 400 }}>
-                        Pick the topics you care about → Profile
+                        Pick the topics you care about in Profile
                       </span>
                     </button>
                     {/* Dismiss */}

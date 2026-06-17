@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { Bookmark, Share2, Check } from "lucide-react";
+import { Bookmark, Share2, Check, Sparkles } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
@@ -499,20 +499,25 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
               category: item.categorySlug,
             });
           }}
+          className="why-matters-btn"
           style={{
-            background: category ? `${category.colorAccent}18` : "rgba(255,255,255,0.06)",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            background: category ? `${category.colorAccent}2e` : "rgba(255,255,255,0.10)",
             border: category
-              ? `1px solid ${category.colorAccent}30`
-              : "1px solid rgba(255,255,255,0.1)",
+              ? `1px solid ${category.colorAccent}66`
+              : "1px solid rgba(255,255,255,0.2)",
             borderRadius: "20px",
-            padding: "3px 10px",
+            padding: "6px 13px",
             fontSize: "13px",
             fontWeight: 600,
-            color: category?.colorLabel ?? "#a3a3a3",
+            color: category?.colorLabel ?? "#d4d4d4",
             cursor: "pointer",
             letterSpacing: "0.01em",
           }}
         >
+          <Sparkles size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           Why it matters
         </button>
       </div>

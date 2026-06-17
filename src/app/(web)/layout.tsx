@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import styles from "./layout.module.css";
 
 // Nested layout for the (web) route group — sits under the root layout (html/
@@ -14,8 +15,13 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
           <Link href="/explore" className={styles.navLink}>
             Explore
           </Link>
-          <Link href="/" className={styles.navLink}>
-            Open app ↗
+          <Link
+            href="/"
+            className={styles.navLink}
+            style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}
+          >
+            Open app
+            <ArrowUpRight size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
           </Link>
         </nav>
       </header>

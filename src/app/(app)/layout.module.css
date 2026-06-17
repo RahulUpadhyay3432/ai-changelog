@@ -1,13 +1,27 @@
 .outer {
   position: fixed;
-  inset: 0;
-  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* In a browser tab, dvh tracks the visible area as the iOS toolbars show/
+     hide — so the bottom nav never hides behind Safari's toolbar (the "renders
+     at ~90% height" bug). 100vh is the fallback for older engines. */
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: #050505;
   /* Column direction so .column fills height, centred horizontally */
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Installed PWA (home-screen app) has no browser toolbars, so dvh can leave a
+   dead-space gap below the nav. height:100% is the proven value there. */
+@media (display-mode: standalone) {
+  .outer {
+    height: 100%;
+  }
 }
 
 .phoneShell {

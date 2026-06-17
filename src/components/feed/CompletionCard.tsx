@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Flame, Share2 } from "lucide-react";
+import { Check, Flame, Share2, ArrowUp, ChevronRight } from "lucide-react";
 import posthog from "posthog-js";
 import { ShareCardSheet } from "./ShareCardSheet";
 import { getStreak, getFeedHintShown, setFeedHintShown } from "@/lib/storage";
@@ -209,6 +209,9 @@ export function CompletionCard({
           <button
             onClick={onBackToTop}
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
               background: "none",
               border: "none",
               color: "#4a4a4a",
@@ -219,7 +222,8 @@ export function CompletionCard({
               letterSpacing: "0.01em",
             }}
           >
-            Back to top →
+            Back to top
+            <ArrowUp size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
 
           {/* One-time feed customisation hint */}
@@ -232,6 +236,9 @@ export function CompletionCard({
                 transition={{ delay: baseDelay + 0.7, duration: 0.4, ease: "easeOut" }}
                 onClick={() => router.push("/profile")}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
                   marginTop: "20px",
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.07)",
@@ -245,7 +252,8 @@ export function CompletionCard({
                   pointerEvents: "auto",
                 }}
               >
-                Customize your feed in Profile →
+                Customize your feed in Profile
+                <ChevronRight size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
               </motion.button>
             )}
           </AnimatePresence>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Bookmark, Flame, Sparkles, MessageSquare, Check } from "lucide-react";
+import { User, Bell, Bookmark, Flame, Sparkles, MessageSquare, Check, ChevronRight } from "lucide-react";
 import { getSavedStories, getStreak, getFeedPrefs, setFeedPrefs } from "@/lib/storage";
 import { CATEGORIES } from "@/lib/categories";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
@@ -296,7 +296,7 @@ export default function ProfilePage() {
               <MessageSquare size={16} color="#a3a3a3" strokeWidth={2} />
               <span>Share feedback</span>
             </div>
-            <span style={{ fontSize: "16px", color: "#525252" }}>→</span>
+            <ChevronRight size={16} color="#525252" strokeWidth={2} style={{ flexShrink: 0 }} />
           </button>
         </div>
       </div>

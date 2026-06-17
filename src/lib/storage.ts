@@ -8,7 +8,33 @@ const KEYS = {
   PINNED_CATEGORIES: "ai_changelog_pinned_categories",
   STREAK_DATES: "ai_changelog_streak_dates",
   LAST_VISIT: "kapyn_last_visit",
+  RADAR_LENS: "kapyn_radar_lens",
 };
+
+// ==========================================
+// Radar lens (Builder / Founder / Curious) — persona self-segmentation
+// ==========================================
+export type RadarLens = "builder" | "founder" | "curious";
+const RADAR_LENSES: RadarLens[] = ["builder", "founder", "curious"];
+
+export function getRadarLens(): RadarLens | null {
+  if (!isBrowser) return null;
+  try {
+    const v = localStorage.getItem(KEYS.RADAR_LENS);
+    return v && (RADAR_LENSES as string[]).includes(v) ? (v as RadarLens) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setRadarLens(lens: RadarLens): void {
+  if (!isBrowser) return;
+  try {
+    localStorage.setItem(KEYS.RADAR_LENS, lens);
+  } catch {
+    /* ignore */
+  }
+}
 
 // ==========================================
 // Last Visit Timestamp

@@ -24,7 +24,12 @@ function getAdmin(): SupabaseClient {
 }
 
 function cleanLine(s: string): string {
-  return s.replace(/\s+/g, " ").trim().slice(0, 160);
+  // Strip emoji/pictographs (calm brand: no emoji in content), then tidy.
+  return s
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 160);
 }
 
 function compact(n: number): string {

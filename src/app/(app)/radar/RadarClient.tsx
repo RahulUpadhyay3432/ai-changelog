@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, ArrowUpRight,
-  Cpu, Briefcase,
+  Cpu, Briefcase, Compass, Bell, Check, ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
+import { formatTimeAgo } from "@/lib/mock-data";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
@@ -31,10 +33,10 @@ const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIco
   { id: "builder", label: "Builder", tagline: "I build with AI", Icon: Cpu },
   { id: "founder", label: "Founder / Operator", tagline: "I run a product or business", Icon: Briefcase },
 ];
-const PILLS: { id: RadarLens; label: string }[] = [
-  { id: "builder", label: "Builder" },
-  { id: "founder", label: "Founder" },
-  { id: "curious", label: "Exploring" },
+const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
+  { id: "builder", label: "Builder", Icon: Cpu },
+  { id: "founder", label: "Founder", Icon: Briefcase },
+  { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
 // ─── Faces (monochrome type/source icons — consistent, calm, no favicons) ─────
@@ -61,7 +63,7 @@ function FaceMark({ face }: { face: Face }) {
 // ─── Data shapes ─────────────────────────────────────────────────────────────
 interface RowData { key: string; name: string; valueLine: string; metric?: string | null; face: Face; href?: string | null }
 interface SectionData { key: string; eyebrow: string; sub: string; variant: "list" | "rail"; rows: RowData[] }
-interface HeroData { eyebrow: string; name: string; valueLine: string; metric: string; imageUrl: string | null; href: string | null }
+interface HeroData { eyebrow: string; name: string; valueLine: string; metric: string; recency: string | null; imageUrl: string | null; href: string | null }
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -86,7 +88,10 @@ function Hero({ hero }: { hero: HeroData }) {
         <h2 style={{ fontFamily: SG, fontSize: "22px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{hero.name}</h2>
         <p style={{ fontSize: "14px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "92%" }}>{hero.valueLine}</p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
-          <MetricChip>{hero.metric}</MetricChip>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <MetricChip>{hero.metric}</MetricChip>
+            {hero.recency && <span style={{ fontSize: "12px", color: "#a7a39d" }}>{hero.recency}</span>}
+          </div>
           <span style={{ width: "32px", height: "32px", borderRadius: "100px", background: "rgba(255,255,255,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ArrowUpRight size={16} color="#f5f3ef" strokeWidth={2} />
           </span>
@@ -196,6 +201,7 @@ function pickHero(lens: RadarLens, data: RadarData): HeroData | null {
     name: choice.entity.canonicalName,
     valueLine: choice.valueLine ?? "",
     metric: `${n} ${n === 1 ? "source" : "sources"}`,
+    recency: choice.latestStory?.publishedAt ? formatTimeAgo(choice.latestStory.publishedAt) : null,
     imageUrl: choice.latestStory?.imageUrl ?? null,
     href: choice.latestStory?.sourceUrl ?? null,
   };
@@ -234,24 +240,35 @@ function buildSections(lens: RadarLens, data: RadarData, heroKey: string | null)
 
 // ─── Lens chooser (model B: 2 headline + "Just exploring") ───────────────────
 function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
+  const [sel, setSel] = useState<RadarLens | null>(null);
   return (
     <div className="scrollbar-none" style={{ height: "100%", overflowY: "auto", background: "#0a0a0a", display: "flex", flexDirection: "column", justifyContent: "center", padding: "32px 24px" }}>
-      <h1 style={{ fontFamily: SG, fontSize: "25px", fontWeight: 600, color: "#f5f5f5", margin: 0, letterSpacing: "-0.02em" }}>Tune your radar</h1>
-      <p style={{ fontSize: "14px", color: "#737373", margin: "7px 0 26px", lineHeight: 1.5 }}>What brings you to Kapyn? We&apos;ll lead with what matters to you.</p>
+      <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.16em", color: GOLD, textTransform: "uppercase" }}>Tune your radar</span>
+      <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: "8px 0 0", letterSpacing: "-0.02em", lineHeight: 1.15 }}>How do you move through AI?</h1>
+      <p style={{ fontSize: "14px", color: "#737373", margin: "8px 0 26px", lineHeight: 1.5 }}>Your lens shapes what Kapyn surfaces first. You can change it anytime.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {HEADLINE.map(({ id, label, tagline, Icon }) => (
-          <button key={id} onClick={() => onChoose(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
-            <span style={{ flexShrink: 0, width: "42px", height: "42px", borderRadius: "11px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon size={20} color={GOLD} strokeWidth={1.8} />
-            </span>
-            <span>
-              <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ededed" }}>{label}</span>
-              <span style={{ display: "block", fontSize: "13px", color: "#737373", marginTop: "2px" }}>{tagline}</span>
-            </span>
-          </button>
-        ))}
+        {HEADLINE.map(({ id, label, tagline, Icon }) => {
+          const active = sel === id;
+          return (
+            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(232,178,92,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
+              <span style={{ flexShrink: 0, width: "42px", height: "42px", borderRadius: "11px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon size={20} color={GOLD} strokeWidth={1.8} />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ededed" }}>{label}</span>
+                <span style={{ display: "block", fontSize: "13px", color: "#8a8a8a", marginTop: "2px", lineHeight: 1.4 }}>{tagline}</span>
+              </span>
+              <span style={{ flexShrink: 0, width: "20px", height: "20px", borderRadius: "100px", border: `1.5px solid ${active ? GOLD : "rgba(255,255,255,0.18)"}`, background: active ? GOLD : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {active && <Check size={12} color="#0a0a0a" strokeWidth={3} />}
+              </span>
+            </button>
+          );
+        })}
       </div>
-      <button onClick={() => onChoose("curious")} style={{ marginTop: "22px", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#8a8a8a", fontSize: "13.5px", cursor: "pointer", padding: "8px" }}>
+      <button onClick={() => sel && onChoose(sel)} disabled={!sel} style={{ marginTop: "20px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#0a0a0a", background: sel ? GOLD : "rgba(255,255,255,0.10)", border: "none", borderRadius: "14px", padding: "15px", cursor: sel ? "pointer" : "default", opacity: sel ? 1 : 0.55, transition: "background 0.2s ease, opacity 0.2s ease" }}>
+        Enter your Radar <ArrowRight size={17} strokeWidth={2.3} />
+      </button>
+      <button onClick={() => onChoose("curious")} style={{ marginTop: "14px", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#8a8a8a", fontSize: "13.5px", cursor: "pointer", padding: "8px" }}>
         Just exploring <ArrowUpRight size={14} strokeWidth={2} style={{ transform: "rotate(45deg)" }} />
       </button>
     </div>
@@ -296,19 +313,25 @@ export function RadarClient(data: RadarData) {
 
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Header */}
-        <div style={{ padding: "24px 24px 14px" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: 0, letterSpacing: "-0.03em" }}>Radar</h1>
-          <p style={{ fontSize: "13px", color: "#737373", margin: "4px 0 0", lineHeight: 1.5 }}>What is new and worth knowing in AI — tuned to you.</p>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "24px 24px 14px" }}>
+          <div>
+            <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.16em", color: GOLD, textTransform: "uppercase" }}>Kapyn</span>
+            <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: "2px 0 0", letterSpacing: "-0.03em" }}>Radar</h1>
+            <p style={{ fontSize: "13px", color: "#737373", margin: "4px 0 0", lineHeight: 1.5 }}>What is new and worth knowing in AI — tuned to you.</p>
+          </div>
+          <Link href="/profile" aria-label="Settings & notifications" style={{ flexShrink: 0, marginTop: "2px", width: "38px", height: "38px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Bell size={17} color="#a3a3a3" strokeWidth={1.8} />
+          </Link>
         </div>
 
         {/* Lens switcher */}
         <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 18px", overflowX: "auto" }}>
-          {PILLS.map(({ id, label }) => {
+          {PILLS.map(({ id, label, Icon }) => {
             const active = id === lens;
             return (
-              <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "6px 15px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "6px 14px", cursor: "pointer", whiteSpace: "nowrap" }}>
                 {active && <motion.span layoutId="lensPill" transition={lensIndicatorSpring} style={{ position: "absolute", inset: 0, background: GOLD, borderRadius: "100px", zIndex: 0 }} />}
-                <span style={{ position: "relative", zIndex: 1 }}>{label}</span>
+                <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: "5px" }}><Icon size={13} strokeWidth={2.2} />{label}</span>
               </button>
             );
           })}

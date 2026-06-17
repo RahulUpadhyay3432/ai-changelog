@@ -232,17 +232,16 @@ export async function getRadarFeed(
     .eq("status", "active")
     .gte("last_mentioned_at", cutoff)
     .gte("mention_count", minMentions)
-    .order("last_mentioned_at", { ascending: false, nullsFirst: false })
+    .order("last_mentioned_at", { ascending: false })
     .order("mention_count", { ascending: false })
     .limit(limit);
 
   if (!entityRows || entityRows.length === 0) return [];
 
-  type EntityWithDate = EntityRow & { first_seen_at: string | null };
-  const entityData = (entityRows as EntityWithDate[]).map((r) => ({
-    entity: toEntity(r),
-    firstSeenAt: r.first_seen_at ?? "",
-  }));
+  const entityData = entityRows.map((r) => {
+    const row = r as EntityRow & { first_seen_at: string | null };
+    return { entity: toEntity(row), firstSeenAt: row.first_seen_at ?? "" };
+  });
 
   const entityIds = entityData.map((e) => e.entity.id);
 
@@ -255,9 +254,10 @@ export async function getRadarFeed(
     .limit(entityIds.length * 10);
 
   const latestStoryByEntity = new Map<string, string>();
-  for (const m of (mentionRows ?? []) as { entity_id: string; story_id: string }[]) {
-    if (!latestStoryByEntity.has(m.entity_id)) {
-      latestStoryByEntity.set(m.entity_id, m.story_id);
+  for (const m of mentionRows ?? []) {
+    const row = m as { entity_id: string; story_id: string };
+    if (!latestStoryByEntity.has(row.entity_id)) {
+      latestStoryByEntity.set(row.entity_id, row.story_id);
     }
   }
 

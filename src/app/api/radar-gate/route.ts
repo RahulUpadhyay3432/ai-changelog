@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
     mentions: item.entity.mentionCount,
     lastSeen: item.entity.lastMentionedAt,
     isNew: item.isNew,
+    valueLine: item.valueLine,
+    grounded: !!item.valueLine,
     latestStory: item.latestStory
       ? {
           title: item.latestStory.title,

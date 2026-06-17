@@ -98,7 +98,7 @@ const ENTITY_COLS =
 // Literal (not ENTITY_COLS + "...") so PostgREST infers the row type — a widened
 // string makes .select() return GenericStringError and breaks the cast.
 const RADAR_ENTITY_COLS =
-  "id, slug, canonical_name, entity_type, short_desc, mention_count, last_mentioned_at, is_seed, first_seen_at";
+  "id, slug, canonical_name, entity_type, short_desc, mention_count, last_mentioned_at, is_seed, first_seen_at, value_line, value_line_story_id, value_line_at";
 const STORY_COLS =
   "id, title, summary, source_url, source_name, category_slug, image_url, published_at";
 
@@ -215,6 +215,9 @@ export interface RadarItem {
   entity: Entity;
   latestStory: ArchivedStory | null;
   isNew: boolean; // first_seen_at within last 7 days
+  valueLine: string | null; // generated "what this lets you do" line (null = held / ungenerated)
+  valueLineStoryId: string | null; // story the line was generated from
+  valueLineAt: string | null; // when last evaluated (null = never tried)
 }
 
 // Value-filtering funnel for the Radar tab: model/tool/company entities that
@@ -246,8 +249,19 @@ export async function getRadarFeed(
   // the canonicalize denylist stops new ones, this cleans existing rows.
   const entityData = entityRows
     .map((r) => {
-      const row = r as EntityRow & { first_seen_at: string | null };
-      return { entity: toEntity(row), firstSeenAt: row.first_seen_at ?? "" };
+      const row = r as EntityRow & {
+        first_seen_at: string | null;
+        value_line: string | null;
+        value_line_story_id: string | null;
+        value_line_at: string | null;
+      };
+      return {
+        entity: toEntity(row),
+        firstSeenAt: row.first_seen_at ?? "",
+        valueLine: row.value_line,
+        valueLineStoryId: row.value_line_story_id,
+        valueLineAt: row.value_line_at,
+      };
     })
     .filter(({ entity }) => !isGenericEntityName(entity.canonicalName));
 
@@ -293,11 +307,22 @@ export async function getRadarFeed(
     return stories.find((s) => titleNamesEntity(s.title, entity.canonicalName)) ?? stories[0];
   };
 
-  return entityData.map(({ entity, firstSeenAt }) => ({
+  return entityData.map(({ entity, firstSeenAt, valueLine, valueLineStoryId, valueLineAt }) => ({
     entity,
     latestStory: pickStory(entity),
     isNew: !!firstSeenAt && firstSeenAt >= sevenDaysAgo,
+    valueLine,
+    valueLineStoryId,
+    valueLineAt,
   }));
+}
+
+// Radar cards for the UI: only entities with a generated, grounded value line
+// (held-back / ungenerated entities don't ship a card). Over-fetches then
+// filters, so the caller still gets up to `limit` grounded cards.
+export async function getRadarCards(recencyDays = 21, minMentions = 2, limit = 40): Promise<RadarItem[]> {
+  const all = await getRadarFeed(recencyDays, minMentions, Math.max(limit * 2, 60));
+  return all.filter((it) => !!it.valueLine && it.valueLine.trim().length > 0).slice(0, limit);
 }
 
 // Whole-word, case-insensitive check that a story headline names an entity —

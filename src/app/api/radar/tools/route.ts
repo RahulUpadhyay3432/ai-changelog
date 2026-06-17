@@ -4,6 +4,7 @@ import { fetchGitHubTrendingRepos, fetchTopAIRepos } from "@/lib/github";
 import { fetchProductHuntPosts } from "@/lib/producthunt";
 import { slugify } from "@/lib/entities";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
+import { isAuthorizedCron } from "@/lib/cron-auth";
 
 // Pulls the radar tool sources into radar_tools. Each value-line is the maker's
 // OWN description/tagline (or our curated copy) — no LLM, no drift. Two layers:
@@ -51,9 +52,7 @@ interface ToolRow {
 }
 
 export async function GET(request: NextRequest) {
-  const secret =
-    request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCron(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {

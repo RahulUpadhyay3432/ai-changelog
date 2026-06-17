@@ -14,6 +14,8 @@ import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
+import { isAuthorizedCron } from "@/lib/cron-auth";
+import { isSafePublicUrl } from "@/lib/url-guard";
 import {
   canonicalize,
   parseExtractedEntities,
@@ -160,7 +162,9 @@ function extractMeta(html: string, property: string, nameAttr = "property"): str
 }
 
 async function fetchPageMeta(url: string): Promise<PageMeta> {
-  if (!url) return { imageUrl: null, description: null, title: null };
+  // SSRF guard: only fetch public http(s) URLs from third-party feed content —
+  // never internal/private/loopback/link-local addresses.
+  if (!url || !isSafePublicUrl(url)) return { imageUrl: null, description: null, title: null };
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
@@ -593,10 +597,7 @@ async function insertItems(
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
-  const secret =
-    request.headers.get("x-cron-secret") ??
-    request.nextUrl.searchParams.get("secret");
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCron(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import { createClient } from "@supabase/supabase-js";
+import { isAuthorizedCron } from "@/lib/cron-auth";
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT!,
@@ -10,8 +11,7 @@ webpush.setVapidDetails(
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isAuthorizedCron(req)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

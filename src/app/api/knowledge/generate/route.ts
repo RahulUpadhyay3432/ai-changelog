@@ -10,6 +10,7 @@ import {
 } from "@/lib/knowledge-prompt";
 import { isBadExplainerSection } from "@/lib/quality";
 import { canonicalize } from "@/lib/entities";
+import { isAuthorizedCron } from "@/lib/cron-auth";
 import { revalidatePath } from "next/cache";
 
 // Batch generation needs headroom: ~2 LLM calls/entity at ~7s each, bounded
@@ -232,9 +233,7 @@ async function processEntity(admin: SupabaseClient, entity: EntityRow, results: 
 }
 
 export async function GET(request: NextRequest) {
-  const secret =
-    request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCron(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   // A writer cron is useless (and wastes LLM calls) without the service role key.

@@ -37,6 +37,50 @@ export function setRadarLens(lens: RadarLens): void {
 }
 
 // ==========================================
+// Radar saved tools — the "Toolkit" knowledge base (auto-filed by category)
+// ==========================================
+const RADAR_SAVED_KEY = "kapyn_radar_saved_tools";
+
+export interface SavedRadarTool {
+  id: string;
+  name: string;
+  valueLine: string;
+  category: string | null;
+  face: string;
+  url: string | null;
+  savedAt: string;
+}
+
+export function getSavedRadarTools(): SavedRadarTool[] {
+  if (!isBrowser) return [];
+  try {
+    const raw = localStorage.getItem(RADAR_SAVED_KEY);
+    return raw ? (JSON.parse(raw) as SavedRadarTool[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function isRadarToolSaved(id: string): boolean {
+  if (!isBrowser) return false;
+  return getSavedRadarTools().some((t) => t.id === id);
+}
+
+// Toggle save; returns the new saved state (true = now saved).
+export function toggleRadarTool(tool: SavedRadarTool): boolean {
+  if (!isBrowser) return false;
+  try {
+    const saved = getSavedRadarTools();
+    const exists = saved.some((t) => t.id === tool.id);
+    const next = exists ? saved.filter((t) => t.id !== tool.id) : [tool, ...saved];
+    localStorage.setItem(RADAR_SAVED_KEY, JSON.stringify(next));
+    return !exists;
+  } catch {
+    return false;
+  }
+}
+
+// ==========================================
 // Last Visit Timestamp
 // ==========================================
 

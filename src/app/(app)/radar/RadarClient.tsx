@@ -1,24 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, ArrowUpRight,
-  Cpu, Briefcase, Compass, Bell, Check, ArrowRight,
-  type LucideIcon,
-} from "lucide-react";
+import { Cpu, Briefcase, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import { formatTimeAgo } from "@/lib/mock-data";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
+import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, type Face, type RadarThing } from "./radar-shared";
+import { RadarDetailSheet } from "./RadarDetailSheet";
 
-// ─── Tokens ──────────────────────────────────────────────────────────────────
-const GOLD = "#E8B25C";
-const GOLD_SOFT = "rgba(232,178,92,0.12)";
-const GOLD_BORDER = "rgba(232,178,92,0.28)";
-const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
@@ -28,7 +21,7 @@ interface RadarData {
   essentials: RadarTool[];
 }
 
-// ─── Lenses (model B: Builder + Founder headline; "exploring" = curious) ──────
+// ─── Lenses (Builder + Founder headline; "Exploring" = curious) ───────────────
 const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", tagline: "I build with AI", Icon: Cpu },
   { id: "founder", label: "Founder / Operator", tagline: "I run a product or business", Icon: Briefcase },
@@ -39,114 +32,114 @@ const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
-// ─── Faces (monochrome type/source icons — consistent, calm, no favicons) ─────
-type Face = "model" | "tool" | "company" | "concept" | "github" | "producthunt" | "essential";
-const FACE_ICON: Record<Face, LucideIcon> = {
-  model: Brain,
-  tool: Wrench,
-  company: Building2,
-  concept: Lightbulb,
-  github: Code2,
-  producthunt: Rocket,
-  essential: Sparkles,
-};
-
-function FaceMark({ face }: { face: Face }) {
-  const Icon = FACE_ICON[face] ?? Sparkles;
-  return (
-    <span style={{ flexShrink: 0, width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Icon size={18} color="#9a9a9a" strokeWidth={1.7} />
-    </span>
-  );
+// ─── Mappers: source objects → the normalized RadarThing ─────────────────────
+function toolThing(t: RadarTool): RadarThing {
+  return {
+    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine,
+    face: t.source === "producthunt" ? "producthunt" : "github",
+    metric: t.meta, typeLabel: t.source === "producthunt" ? "Product Hunt" : "GitHub",
+    category: null, url: t.url, recency: null, storyTitle: null, storySource: null,
+  };
 }
-
-// ─── Data shapes ─────────────────────────────────────────────────────────────
-interface RowData { key: string; name: string; valueLine: string; metric?: string | null; face: Face; href?: string | null }
-interface SectionData { key: string; eyebrow: string; sub: string; variant: "list" | "rail"; rows: RowData[] }
-interface HeroData { eyebrow: string; name: string; valueLine: string; metric: string; recency: string | null; imageUrl: string | null; href: string | null }
+function essThing(t: RadarTool): RadarThing {
+  return {
+    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "essential",
+    metric: null, typeLabel: null, category: t.meta ?? "Essentials",
+    url: t.url, recency: null, storyTitle: null, storySource: null,
+  };
+}
+function canonThing(t: RadarTool): RadarThing {
+  return {
+    id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "github",
+    metric: t.meta, typeLabel: "Open source", category: "Open source",
+    url: t.url, recency: null, storyTitle: null, storySource: null,
+  };
+}
+function entThing(e: RadarItem): RadarThing {
+  const n = e.entity.mentionCount;
+  const et = e.entity.entityType;
+  return {
+    id: `entity:${e.entity.id}`, kind: "entity", name: e.entity.canonicalName, valueLine: e.valueLine ?? "",
+    face: (["model", "tool", "company"].includes(et) ? et : "concept") as Face,
+    metric: `${n} ${n === 1 ? "source" : "sources"}`,
+    typeLabel: et.charAt(0).toUpperCase() + et.slice(1),
+    category: et === "model" ? "Models" : et === "tool" ? "Tools" : et === "company" ? "Companies" : "Concepts",
+    url: e.latestStory?.sourceUrl ?? null,
+    recency: e.latestStory?.publishedAt ? formatTimeAgo(e.latestStory.publishedAt) : null,
+    storyTitle: e.latestStory?.title ?? null,
+    storySource: e.latestStory?.sourceName ?? null,
+  };
+}
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", color: GOLD }}>{children}</span>;
 }
-function MetricChip({ children }: { children: React.ReactNode }) {
-  return <span style={{ flexShrink: 0, fontSize: "12px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, borderRadius: "100px", padding: "3px 9px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{children}</span>;
-}
 
-// ─── Hero (double-bezel featured card) ───────────────────────────────────────
-function Hero({ hero }: { hero: HeroData }) {
-  const inner = (
-    <div style={{ position: "relative", height: "188px", borderRadius: "22px", overflow: "hidden", background: "#101010", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.12)" }}>
-      {hero.imageUrl ? (
-        <img src={hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.85)" }} />
-      ) : (
-        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(125% 95% at 72% -10%, ${GOLD}30 0%, #0a0a0a 58%)` }} />
-      )}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.96) 18%, rgba(8,8,8,0.35) 55%, rgba(8,8,8,0.1) 100%)" }} />
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 18px" }}>
-        <Eyebrow>{hero.eyebrow}</Eyebrow>
-        <h2 style={{ fontFamily: SG, fontSize: "22px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{hero.name}</h2>
-        <p style={{ fontSize: "14px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "92%" }}>{hero.valueLine}</p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <MetricChip>{hero.metric}</MetricChip>
-            {hero.recency && <span style={{ fontSize: "12px", color: "#a7a39d" }}>{hero.recency}</span>}
+// ─── Hero (double-bezel featured card → opens the sheet) ─────────────────────
+interface HeroData { eyebrow: string; thing: RadarThing; imageUrl: string | null }
+
+function Hero({ hero, onOpen }: { hero: HeroData; onOpen: (t: RadarThing) => void }) {
+  const t = hero.thing;
+  return (
+    <button onClick={() => onOpen(t)} className="radar-hero" style={{ display: "block", width: "100%", textAlign: "left", margin: "0 0 28px", padding: "0 20px", background: "none", border: "none", cursor: "pointer" }}>
+      <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ position: "relative", height: "188px", borderRadius: "22px", overflow: "hidden", background: "#101010", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.12)" }}>
+          {hero.imageUrl ? (
+            <img src={hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.85)" }} />
+          ) : (
+            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(125% 95% at 72% -10%, ${GOLD}30 0%, #0a0a0a 58%)` }} />
+          )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.96) 18%, rgba(8,8,8,0.35) 55%, rgba(8,8,8,0.1) 100%)" }} />
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 18px" }}>
+            <Eyebrow>{hero.eyebrow}</Eyebrow>
+            <h2 style={{ fontFamily: SG, fontSize: "22px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{t.name}</h2>
+            <p style={{ fontSize: "14px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "92%" }}>{t.valueLine}</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                {t.metric && <MetricChip>{t.metric}</MetricChip>}
+                {t.recency && <span style={{ fontSize: "12px", color: "#a7a39d" }}>{t.recency}</span>}
+              </div>
+              <span style={{ width: "32px", height: "32px", borderRadius: "100px", background: "rgba(255,255,255,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <ArrowUpRight size={16} color="#f5f3ef" strokeWidth={2} />
+              </span>
+            </div>
           </div>
-          <span style={{ width: "32px", height: "32px", borderRadius: "100px", background: "rgba(255,255,255,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ArrowUpRight size={16} color="#f5f3ef" strokeWidth={2} />
-          </span>
         </div>
       </div>
-    </div>
-  );
-  const shell: React.CSSProperties = { display: "block", margin: "0 20px 28px", padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none" };
-  return hero.href ? (
-    <a href={hero.href} target="_blank" rel="noopener noreferrer" style={shell} className="radar-hero">{inner}</a>
-  ) : (
-    <div style={shell}>{inner}</div>
+    </button>
   );
 }
 
-// ─── Row (faced, hairline divider, right metric) ─────────────────────────────
-function Row({ name, valueLine, metric, face, href }: Omit<RowData, "key">) {
-  const inner = (
-    <>
-      <FaceMark face={face} />
+// ─── Row + RailCard (buttons → open the sheet) ───────────────────────────────
+function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
+  return (
+    <button onClick={() => onOpen(thing)} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "inherit" }}>
+      <FaceMark face={thing.face} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: "15px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em" }}>{name}</span>
-        <p style={{ fontSize: "14px", fontWeight: 450, color: "#9a9a9a", lineHeight: 1.4, margin: "2px 0 0" }}>{valueLine}</p>
+        <span style={{ fontSize: "15px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em" }}>{thing.name}</span>
+        <p style={{ fontSize: "14px", fontWeight: 450, color: "#9a9a9a", lineHeight: 1.4, margin: "2px 0 0" }}>{thing.valueLine}</p>
       </div>
-      {metric && <MetricChip>{metric}</MetricChip>}
-    </>
-  );
-  const style: React.CSSProperties = { display: "flex", alignItems: "center", gap: "12px", padding: "13px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)", textDecoration: "none", color: "inherit" };
-  return href ? (
-    <a href={href} target="_blank" rel="noopener noreferrer" style={style} className="radar-row">{inner}</a>
-  ) : (
-    <div style={style}>{inner}</div>
+      {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
+    </button>
   );
 }
 
-// ─── Rail (horizontal browse cards, varied width + peek) ─────────────────────
-function RailCard({ row, wide }: { row: RowData; wide: boolean }) {
-  const inner = (
-    <>
-      <FaceMark face={row.face} />
-      <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#ededed", margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{row.name}</span>
-      <p style={{ fontSize: "13px", color: "#9a9a9a", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{row.valueLine}</p>
-      {row.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{row.metric}</MetricChip></span>}
-    </>
-  );
-  const style: React.CSSProperties = { flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "14px", textDecoration: "none", color: "inherit" };
-  return row.href ? (
-    <a href={row.href} target="_blank" rel="noopener noreferrer" style={style} className="radar-railcard">{inner}</a>
-  ) : (
-    <div style={style}>{inner}</div>
+function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; onOpen: (t: RadarThing) => void }) {
+  return (
+    <button onClick={() => onOpen(thing)} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
+      <FaceMark face={thing.face} />
+      <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#ededed", margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
+      <p style={{ fontSize: "13px", color: "#9a9a9a", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
+      {thing.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{thing.metric}</MetricChip></span>}
+    </button>
   );
 }
 
-function Section({ eyebrow, sub, variant, rows }: SectionData) {
-  if (rows.length === 0) return null;
+interface SectionData { key: string; eyebrow: string; sub: string; variant: "list" | "rail"; things: RadarThing[] }
+
+function Section({ eyebrow, sub, variant, things, onOpen }: SectionData & { onOpen: (t: RadarThing) => void }) {
+  if (things.length === 0) return null;
   return (
     <section style={{ marginBottom: "30px" }}>
       <div style={{ padding: "0 24px", marginBottom: "12px" }}>
@@ -155,37 +148,15 @@ function Section({ eyebrow, sub, variant, rows }: SectionData) {
       </div>
       {variant === "rail" ? (
         <div className="scrollbar-none radar-rail" style={{ display: "flex", gap: "12px", padding: "0 24px", overflowX: "auto", scrollSnapType: "x proximity" }}>
-          {rows.map((r, i) => <RailCard key={r.key} row={r} wide={i === 0} />)}
+          {things.map((t, i) => <RailCard key={t.id} thing={t} wide={i === 0} onOpen={onOpen} />)}
         </div>
       ) : (
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          {rows.map(({ key, ...rest }) => <Row key={key} {...rest} />)}
+          {things.map((t) => <Row key={t.id} thing={t} onOpen={onOpen} />)}
         </div>
       )}
     </section>
   );
-}
-
-// ─── Mappers ─────────────────────────────────────────────────────────────────
-function toolRow(t: RadarTool): RowData {
-  return { key: `t-${t.url}`, name: t.name, valueLine: t.valueLine, metric: t.meta, face: t.source === "producthunt" ? "producthunt" : "github", href: t.url };
-}
-function essRow(t: RadarTool): RowData {
-  return { key: `e-${t.url}`, name: t.name, valueLine: t.valueLine, metric: null, face: "essential", href: t.url };
-}
-function canonRow(t: RadarTool): RowData {
-  return { key: `c-${t.url}`, name: t.name, valueLine: t.valueLine, metric: t.meta, face: "github", href: t.url };
-}
-function entRow(e: RadarItem): RowData {
-  const n = e.entity.mentionCount;
-  return {
-    key: `en-${e.entity.id}`,
-    name: e.entity.canonicalName,
-    valueLine: e.valueLine ?? "",
-    metric: `${n} ${n === 1 ? "source" : "sources"}`,
-    face: (["model", "tool", "company"].includes(e.entity.entityType) ? e.entity.entityType : "concept") as Face,
-    href: e.latestStory?.sourceUrl ?? null,
-  };
 }
 
 // ─── Hero + section arrangement per lens ─────────────────────────────────────
@@ -195,50 +166,45 @@ function pickHero(lens: RadarLens, data: RadarData): HeroData | null {
   const pool = lens === "builder" ? [...modelsTools, ...byTraction] : byTraction;
   const choice = pool.find((e) => e.latestStory?.imageUrl) ?? pool[0];
   if (!choice) return null;
-  const n = choice.entity.mentionCount;
   return {
     eyebrow: lens === "builder" ? "Moving in your world" : lens === "founder" ? "What's moving" : "Big right now",
-    name: choice.entity.canonicalName,
-    valueLine: choice.valueLine ?? "",
-    metric: `${n} ${n === 1 ? "source" : "sources"}`,
-    recency: choice.latestStory?.publishedAt ? formatTimeAgo(choice.latestStory.publishedAt) : null,
+    thing: entThing(choice),
     imageUrl: choice.latestStory?.imageUrl ?? null,
-    href: choice.latestStory?.sourceUrl ?? null,
   };
 }
 
-function buildSections(lens: RadarLens, data: RadarData, heroKey: string | null): SectionData[] {
+function buildSections(lens: RadarLens, data: RadarData, heroId: string | null): SectionData[] {
   const curated = data.essentials.filter((e) => e.source === "curated");
   const canon = data.essentials.filter((e) => e.source === "github");
   const byCat = (cat: string) => curated.filter((e) => e.meta === cat);
   const byTraction = [...data.entities].sort((a, b) => b.entity.mentionCount - a.entity.mentionCount);
   const modelsTools = byTraction.filter((e) => e.entity.entityType === "model" || e.entity.entityType === "tool");
-  const dropHero = (rows: RowData[]) => rows.filter((r) => r.key !== heroKey);
+  const dropHero = (things: RadarThing[]) => things.filter((t) => t.id !== heroId);
 
   if (lens === "builder") {
     return [
-      { key: "stack", eyebrow: "For your stack", sub: "Coding, inference & data tools", variant: "rail", rows: [...byCat("AI coding"), ...byCat("Inference"), ...byCat("Data & RAG"), ...byCat("Agents & automation")].map(essRow) },
-      { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", rows: data.tools.slice(0, 10).map(toolRow) },
-      { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", rows: dropHero(modelsTools.slice(0, 10).map(entRow)) },
-      { key: "oss", eyebrow: "Popular open-source", sub: "Most-starred, still maintained", variant: "list", rows: canon.slice(0, 8).map(canonRow) },
+      { key: "stack", eyebrow: "For your stack", sub: "Coding, inference & data tools", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference"), ...byCat("Data & RAG"), ...byCat("Agents & automation")].map(essThing) },
+      { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 10).map(toolThing) },
+      { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: dropHero(modelsTools.slice(0, 10).map(entThing)) },
+      { key: "oss", eyebrow: "Popular open-source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
   }
   if (lens === "founder") {
     return [
-      { key: "moving", eyebrow: "What's moving", sub: "Companies & models gaining traction", variant: "list", rows: dropHero(byTraction.slice(0, 10).map(entRow)) },
-      { key: "new", eyebrow: "New launches", sub: "Worth a look", variant: "rail", rows: data.tools.slice(0, 8).map(toolRow) },
-      { key: "opinion", eyebrow: "Worth an opinion", sub: "The tools shaping the space", variant: "rail", rows: byCat("Models & chat").map(essRow) },
+      { key: "moving", eyebrow: "What's moving", sub: "Companies & models gaining traction", variant: "list", things: dropHero(byTraction.slice(0, 10).map(entThing)) },
+      { key: "new", eyebrow: "New launches", sub: "Worth a look", variant: "rail", things: data.tools.slice(0, 8).map(toolThing) },
+      { key: "opinion", eyebrow: "Worth an opinion", sub: "The tools shaping the space", variant: "rail", things: byCat("Models & chat").map(essThing) },
     ];
   }
   return [
-    { key: "start", eyebrow: "Start here", sub: "The AI tools everyone's using", variant: "rail", rows: byCat("Models & chat").map(essRow) },
-    { key: "big", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", rows: dropHero(byTraction.slice(0, 6).map(entRow)) },
-    { key: "toolkit", eyebrow: "Build your toolkit", sub: "When you're ready to go deeper", variant: "rail", rows: [...byCat("AI coding"), ...byCat("Inference")].map(essRow) },
-    { key: "notable", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", rows: data.tools.slice(0, 6).map(toolRow) },
+    { key: "start", eyebrow: "Start here", sub: "The AI tools everyone's using", variant: "rail", things: byCat("Models & chat").map(essThing) },
+    { key: "big", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: dropHero(byTraction.slice(0, 6).map(entThing)) },
+    { key: "toolkit", eyebrow: "Build your toolkit", sub: "When you're ready to go deeper", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference")].map(essThing) },
+    { key: "notable", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
   ];
 }
 
-// ─── Lens chooser (model B: 2 headline + "Just exploring") ───────────────────
+// ─── Lens chooser (2 headline + "Just exploring") ────────────────────────────
 function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
   const [sel, setSel] = useState<RadarLens | null>(null);
   return (
@@ -279,6 +245,7 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
 export function RadarClient(data: RadarData) {
   const [lens, setLens] = useState<RadarLens | null>(null);
   const [ready, setReady] = useState(false);
+  const [detail, setDetail] = useState<RadarThing | null>(null);
   const reduced = !!useReducedMotion();
   const V = radarVariants(reduced);
 
@@ -299,16 +266,19 @@ export function RadarClient(data: RadarData) {
     posthog.capture("radar_lens_selected", { lens: l });
   };
 
+  const onOpen = (t: RadarThing) => {
+    setDetail(t);
+    posthog.capture("radar_detail_opened", { id: t.id, kind: t.kind });
+  };
+
   if (!ready) return <div style={{ height: "100%", background: "#0a0a0a" }} />;
   if (!lens) return <LensChooser onChoose={choose} />;
 
   const hero = pickHero(lens, data);
-  const heroKey = hero ? `en-${data.entities.find((e) => e.entity.canonicalName === hero.name)?.entity.id ?? ""}` : null;
-  const sections = buildSections(lens, data, heroKey);
+  const sections = buildSections(lens, data, hero?.thing.id ?? null);
 
   return (
     <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "28px" }}>
-      {/* Grain overlay */}
       <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
 
       <div style={{ position: "relative", zIndex: 2 }}>
@@ -340,13 +310,15 @@ export function RadarClient(data: RadarData) {
         {/* Lens content */}
         <AnimatePresence mode="wait">
           <motion.div key={lens} variants={V.block} initial="hidden" animate="show" exit="exit">
-            {hero && <motion.div variants={V.hero}><Hero hero={hero} /></motion.div>}
+            {hero && <motion.div variants={V.hero}><Hero hero={hero} onOpen={onOpen} /></motion.div>}
             {sections.map((s) => (
-              <motion.div key={s.key} variants={V.item}><Section {...s} /></motion.div>
+              <motion.div key={s.key} variants={V.item}><Section {...s} onOpen={onOpen} /></motion.div>
             ))}
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }

@@ -67,17 +67,18 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
           filter: "blur(48px)",
         }}
       />
-      {/* Large faint category mark — the branded "cover" */}
+      {/* Large faint category mark — the branded "cover", fully in frame */}
       <div
         style={{
           position: "absolute",
-          right: "-6%",
+          right: "22px",
           top: "50%",
-          transform: "translateY(-50%) rotate(-8deg)",
-          opacity: 0.12,
+          transform: "translateY(-50%)",
+          opacity: 0.16,
+          display: "flex",
         }}
       >
-        <Icon size={168} strokeWidth={1.2} color={label} />
+        <Icon size={132} strokeWidth={1.3} color={label} />
       </div>
     </div>
   );

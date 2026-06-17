@@ -134,6 +134,68 @@ export async function fetchGitHubTrendingRepos(hoursBack = 48): Promise<GitHubRe
     }));
 }
 
+// ── Essentials canon — most-starred, still-maintained AI repos ───────────────
+// Unlike fetchGitHubTrendingRepos (created in last 48h), this surfaces the
+// established open-source canon (LangChain, Ollama, vLLM, …) for the radar's
+// "Essentials" layer. The pushed:> filter drops abandoned high-star zombies.
+const CANON_MIN_STARS = 3000;
+const CANON_MAINTAINED_DAYS = 180;
+const CANON_MAX_TOTAL = 20;
+
+async function searchTopRepos(topicQ: string, pushedSince: string): Promise<GHSearchItem[]> {
+  const q = `${topicQ} stars:>=${CANON_MIN_STARS} pushed:>${pushedSince}`;
+  const url = `${GH_API}?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=10`;
+  const res = await fetch(url, { headers: getHeaders() });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`GitHub API ${res.status} for canon "${topicQ}": ${body.slice(0, 200)}`);
+  }
+  const data = (await res.json()) as GHSearchResponse;
+  if (data.message) throw new Error(`GitHub API error: ${data.message}`);
+  return data.items ?? [];
+}
+
+/**
+ * Fetch the established, still-maintained open-source AI canon by total stars.
+ * Powers the radar "Essentials" layer (evergreen, not time-sensitive).
+ */
+export async function fetchTopAIRepos(): Promise<GitHubRepo[]> {
+  const pushedSince = new Date(Date.now() - CANON_MAINTAINED_DAYS * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+
+  const settled = await Promise.allSettled(
+    TOPIC_QUERIES.map(({ q }) => searchTopRepos(q, pushedSince))
+  );
+
+  const seen = new Set<string>();
+  const repos: GHSearchItem[] = [];
+  for (const result of settled) {
+    if (result.status !== "fulfilled") continue;
+    for (const item of result.value) {
+      if (!seen.has(item.html_url)) {
+        seen.add(item.html_url);
+        repos.push(item);
+      }
+    }
+  }
+
+  return repos
+    .sort((a, b) => b.stargazers_count - a.stargazers_count)
+    .slice(0, CANON_MAX_TOTAL)
+    .map((r) => ({
+      name: r.name,
+      fullName: r.full_name,
+      description: r.description ?? null,
+      htmlUrl: r.html_url,
+      stars: r.stargazers_count,
+      language: r.language ?? null,
+      topics: r.topics ?? [],
+      createdAt: r.created_at,
+      owner: r.owner.login,
+    }));
+}
+
 /**
  * Build the content string passed to classifyAndSummarize.
  * Packs in everything the LLM needs: description, stars (social proof),

@@ -330,7 +330,7 @@ export async function getRadarCards(recencyDays = 21, minMentions = 2, limit = 4
 // trustworthy half of "Discover" (no LLM, no drift). Populated by /api/radar/tools.
 
 export interface RadarTool {
-  source: "github" | "producthunt";
+  source: "github" | "producthunt" | "curated";
   name: string;
   valueLine: string;
   url: string;
@@ -351,26 +351,45 @@ interface RadarToolRow {
   last_seen_at: string;
 }
 
+function toRadarTool(r: unknown): RadarTool {
+  const row = r as RadarToolRow;
+  return {
+    source: row.source as RadarTool["source"],
+    name: row.name,
+    valueLine: row.value_line,
+    url: row.url,
+    meta: row.meta,
+    score: row.score,
+    topics: row.topics ?? [],
+    lastSeenAt: row.last_seen_at,
+  };
+}
+
+const RADAR_TOOL_COLS = "source, name, value_line, url, meta, score, topics, last_seen_at";
+
+// "What's new" — GitHub created-last-48h + Product Hunt, freshest/most-traction first.
 export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
   const { data } = await supabase
     .from("radar_tools")
-    .select("source, name, value_line, url, meta, score, topics, last_seen_at")
+    .select(RADAR_TOOL_COLS)
+    .eq("kind", "trending")
     .order("last_seen_at", { ascending: false })
     .order("score", { ascending: false })
     .limit(limit);
-  return (data ?? []).map((r) => {
-    const row = r as RadarToolRow;
-    return {
-      source: row.source as RadarTool["source"],
-      name: row.name,
-      valueLine: row.value_line,
-      url: row.url,
-      meta: row.meta,
-      score: row.score,
-      topics: row.topics ?? [],
-      lastSeenAt: row.last_seen_at,
-    };
-  });
+  return (data ?? []).map(toRadarTool);
+}
+
+// "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),
+// accessible-first (sort_rank), then by traction.
+export async function getRadarEssentials(limit = 40): Promise<RadarTool[]> {
+  const { data } = await supabase
+    .from("radar_tools")
+    .select(RADAR_TOOL_COLS)
+    .eq("kind", "essential")
+    .order("sort_rank", { ascending: true })
+    .order("score", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map(toRadarTool);
 }
 
 // Whole-word, case-insensitive check that a story headline names an entity —

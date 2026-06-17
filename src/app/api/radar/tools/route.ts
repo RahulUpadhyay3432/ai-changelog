@@ -1,13 +1,19 @@
 import type { NextRequest } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { fetchGitHubTrendingRepos } from "@/lib/github";
+import { fetchGitHubTrendingRepos, fetchTopAIRepos } from "@/lib/github";
 import { fetchProductHuntPosts } from "@/lib/producthunt";
+import { slugify } from "@/lib/entities";
+import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 
-// Pulls GitHub trending + Product Hunt into radar_tools. Each item's value-line
-// is the maker's OWN description/tagline — no LLM, no drift. Cron-triggered
-// (see vercel.json); degrades gracefully if one source fails.
+// Pulls the radar tool sources into radar_tools. Each value-line is the maker's
+// OWN description/tagline (or our curated copy) — no LLM, no drift. Two layers:
+//   trending  — GitHub created-last-48h + Product Hunt (what's new)
+//   essential — most-starred maintained AI repos + a curated closed-tools list
+// Cron-triggered (see vercel.json); degrades gracefully if a source fails.
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+const CANON_SORT_RANK = 1000; // essentials: curated (by list order) first, canon after
 
 function getAdmin(): SupabaseClient {
   return createClient(
@@ -26,7 +32,7 @@ function compact(n: number): string {
 }
 
 interface ToolRow {
-  source: "github" | "producthunt";
+  source: "github" | "producthunt" | "curated";
   external_id: string;
   name: string;
   value_line: string;
@@ -34,6 +40,8 @@ interface ToolRow {
   meta: string | null;
   score: number;
   topics: string[];
+  kind: "trending" | "essential";
+  sort_rank: number;
   last_seen_at: string;
 }
 
@@ -51,11 +59,13 @@ export async function GET(request: NextRequest) {
   const rows: ToolRow[] = [];
   const errors: string[] = [];
 
-  const [gh, ph] = await Promise.allSettled([
+  const [gh, ph, canon] = await Promise.allSettled([
     fetchGitHubTrendingRepos(48),
     fetchProductHuntPosts(48),
+    fetchTopAIRepos(),
   ]);
 
+  // ── Trending: GitHub created-last-48h ──
   if (gh.status === "fulfilled") {
     for (const r of gh.value) {
       // No self-description → can't ship a trustworthy value-line, skip it.
@@ -69,6 +79,8 @@ export async function GET(request: NextRequest) {
         meta: [`${compact(r.stars)} stars`, r.language].filter(Boolean).join(" · "),
         score: r.stars,
         topics: r.topics ?? [],
+        kind: "trending",
+        sort_rank: 0,
         last_seen_at: now,
       });
     }
@@ -76,6 +88,7 @@ export async function GET(request: NextRequest) {
     errors.push(`github: ${String(gh.reason).slice(0, 120)}`);
   }
 
+  // ── Trending: Product Hunt ──
   if (ph.status === "fulfilled") {
     for (const p of ph.value) {
       const line = (p.tagline?.trim() || p.description?.trim()) ?? "";
@@ -89,6 +102,8 @@ export async function GET(request: NextRequest) {
         meta: `${compact(p.votesCount)} upvotes`,
         score: p.votesCount,
         topics: p.topics ?? [],
+        kind: "trending",
+        sort_rank: 0,
         last_seen_at: now,
       });
     }
@@ -96,9 +111,48 @@ export async function GET(request: NextRequest) {
     errors.push(`producthunt: ${String(ph.reason).slice(0, 120)}`);
   }
 
+  // ── Essentials: open-source canon (most-starred, maintained) ──
+  if (canon.status === "fulfilled") {
+    for (const r of canon.value) {
+      if (!r.description || !r.description.trim()) continue;
+      rows.push({
+        source: "github",
+        external_id: `canon:${r.fullName}`, // namespaced so it never collides with the trending row
+        name: r.name,
+        value_line: cleanLine(r.description),
+        url: r.htmlUrl,
+        meta: [`${compact(r.stars)} stars`, r.language].filter(Boolean).join(" · "),
+        score: r.stars,
+        topics: r.topics ?? [],
+        kind: "essential",
+        sort_rank: CANON_SORT_RANK,
+        last_seen_at: now,
+      });
+    }
+  } else {
+    errors.push(`canon: ${String(canon.reason).slice(0, 120)}`);
+  }
+
+  // ── Essentials: curated closed-tools list (accessible-first by list order) ──
+  CURATED_ESSENTIALS.forEach((t, i) => {
+    rows.push({
+      source: "curated",
+      external_id: slugify(t.name),
+      name: t.name,
+      value_line: cleanLine(t.valueLine),
+      url: t.url,
+      meta: t.category,
+      score: 0,
+      topics: [],
+      kind: "essential",
+      sort_rank: i, // 0..N — keeps the accessible-first ordering
+      last_seen_at: now,
+    });
+  });
+
   let upserted = 0;
   if (rows.length > 0) {
-    // first_seen_at omitted → kept on conflict; last_seen_at/value_line/score refresh.
+    // first_seen_at omitted → kept on conflict; the rest refresh.
     const { error } = await getAdmin()
       .from("radar_tools")
       .upsert(rows, { onConflict: "source,external_id" });
@@ -107,8 +161,14 @@ export async function GET(request: NextRequest) {
   }
 
   return Response.json({
-    github: gh.status === "fulfilled" ? gh.value.length : 0,
-    producthunt: ph.status === "fulfilled" ? ph.value.length : 0,
+    trending: {
+      github: gh.status === "fulfilled" ? gh.value.length : 0,
+      producthunt: ph.status === "fulfilled" ? ph.value.length : 0,
+    },
+    essential: {
+      canon: canon.status === "fulfilled" ? canon.value.length : 0,
+      curated: CURATED_ESSENTIALS.length,
+    },
     upserted,
     errors,
   });

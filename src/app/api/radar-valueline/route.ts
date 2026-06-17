@@ -24,7 +24,7 @@ Rules:
 - Verb-first where natural. Concrete and specific.
 - No hype, no exclamation marks, no marketing adjectives.
 - Do not restate the headline; extract the value.
-- If the context is too thin to say something specific and genuinely useful, reply with exactly: INSUFFICIENT
+- Reply with exactly INSUFFICIENT if the context is too thin, OR if it is merely news ABOUT the entity (funding, partnerships, spending, hiring, valuation) rather than a capability, tool, or release a developer can actually use.
 
 Good examples:
 - Serves 70B models on one consumer GPU — cuts inference cost
@@ -48,27 +48,28 @@ export async function GET(req: NextRequest) {
   // Only entities that have a source story can get a value line.
   const feed = (await getRadarFeed(21, 2, 40)).filter((it) => it.latestStory).slice(0, limit);
 
-  const items = await Promise.all(
-    feed.map(async (it) => {
-      const story = it.latestStory!;
-      const base = {
-        name: it.entity.canonicalName,
-        type: it.entity.entityType,
-        source: { title: story.title, summary: story.summary },
-      };
-      try {
-        const { text, model } = await callLLM(
-          valueLinePrompt(it.entity.canonicalName, it.entity.entityType, story.title, story.summary),
-          80
-        );
-        const line = text.replace(/^value line:\s*/i, "").replace(/^[-*"]\s*/, "").trim();
-        const held = /^insufficient$/i.test(line) || line.length === 0;
-        return { ...base, valueLine: held ? null : line, held, model };
-      } catch (err) {
-        return { ...base, valueLine: null, held: true, model: "error", error: String(err).slice(0, 120) };
-      }
-    })
-  );
+  // Sequential, not Promise.all — concurrent bursts trip the free-tier rate
+  // limit, and production generates one-at-a-time during ingestion anyway.
+  const items: Array<Record<string, unknown>> = [];
+  for (const it of feed) {
+    const story = it.latestStory!;
+    const base = {
+      name: it.entity.canonicalName,
+      type: it.entity.entityType,
+      source: { title: story.title, summary: story.summary },
+    };
+    try {
+      const { text, model } = await callLLM(
+        valueLinePrompt(it.entity.canonicalName, it.entity.entityType, story.title, story.summary),
+        80
+      );
+      const line = text.replace(/^value line:\s*/i, "").replace(/^[-*"]\s*/, "").trim();
+      const held = /^insufficient$/i.test(line) || line.length === 0;
+      items.push({ ...base, valueLine: held ? null : line, held, model });
+    } catch (err) {
+      items.push({ ...base, valueLine: null, held: true, model: "error", error: String(err).slice(0, 120) });
+    }
+  }
 
   const shipped = items.filter((it) => !it.held).length;
   return NextResponse.json(

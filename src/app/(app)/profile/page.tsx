@@ -5,7 +5,10 @@ import { User, Bell, Bookmark, Flame, Sparkles, MessageSquare, Check, ChevronRig
 import { getSavedStories, getStreak, getFeedPrefs, setFeedPrefs } from "@/lib/storage";
 import { CATEGORIES } from "@/lib/categories";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
+import { subscribeToNotifications } from "@/lib/notifications";
 import posthog from "posthog-js";
+
+type NotifState = "unsupported" | "default" | "granted" | "denied" | "busy";
 
 const ALL_SLUGS = CATEGORIES.map((c) => c.slug);
 
@@ -16,6 +19,7 @@ export default function ProfilePage() {
   const [showFeedback, setShowFeedback] = useState(false);
   // enabled slugs — null until loaded (avoids flash)
   const [enabledSlugs, setEnabledSlugs] = useState<string[] | null>(null);
+  const [notifState, setNotifState] = useState<NotifState>("unsupported");
 
   useEffect(() => {
     setSavedCount(getSavedStories().length);
@@ -30,7 +34,38 @@ export default function ProfilePage() {
       setEnabledSlugs(raw ?? []);
     }
     setIsLoading(false);
+
+    // Push support + current permission. If already granted, re-sync the
+    // subscription (idempotent) so the server always has a live endpoint.
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      "PushManager" in window &&
+      "serviceWorker" in navigator
+    ) {
+      const perm = Notification.permission as "default" | "granted" | "denied";
+      setNotifState(perm);
+      if (perm === "granted") void subscribeToNotifications();
+    }
   }, []);
+
+  const handleEnableNotifs = async () => {
+    if (notifState !== "default") return; // granted/denied/unsupported aren't actionable here
+    setNotifState("busy");
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        setNotifState(perm as "default" | "denied");
+        posthog.capture("notifications_enabled", { success: false, permission: perm });
+        return;
+      }
+      const ok = await subscribeToNotifications();
+      setNotifState(ok ? "granted" : "default");
+      posthog.capture("notifications_enabled", { success: ok, permission: perm });
+    } catch {
+      setNotifState("default");
+    }
+  };
 
   const toggleCategory = (slug: string) => {
     setEnabledSlugs((prev) => {
@@ -252,7 +287,8 @@ export default function ProfilePage() {
           }}
         >
           <button
-            disabled
+            onClick={handleEnableNotifs}
+            disabled={notifState !== "default"}
             style={{
               width: "100%",
               display: "flex",
@@ -262,18 +298,42 @@ export default function ProfilePage() {
               background: "none",
               border: "none",
               borderBottom: "1px solid rgba(255,255,255,0.04)",
-              cursor: "default",
-              color: "#737373",
+              cursor: notifState === "default" ? "pointer" : "default",
+              color: notifState === "granted" ? "#a3a3a3" : "#737373",
               fontSize: "15px",
               fontWeight: 500,
-              opacity: 0.7,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <Bell size={16} color="#525252" strokeWidth={2} />
-              <span>Notifications</span>
+              <Bell
+                size={16}
+                color={notifState === "granted" ? "#4ade80" : "#525252"}
+                strokeWidth={2}
+              />
+              <span>Daily AI brief</span>
             </div>
-            <span style={{ fontSize: "11px", fontWeight: 600, color: "#525252", letterSpacing: "0.04em" }}>SOON</span>
+            {(() => {
+              switch (notifState) {
+                case "granted":
+                  return (
+                    <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", fontWeight: 600, color: "#4ade80", letterSpacing: "0.02em" }}>
+                      <Check size={13} strokeWidth={3} color="#4ade80" /> On
+                    </span>
+                  );
+                case "busy":
+                  return <span style={{ fontSize: "12px", fontWeight: 600, color: "#525252" }}>…</span>;
+                case "denied":
+                  return <span style={{ fontSize: "11px", fontWeight: 600, color: "#525252", letterSpacing: "0.04em" }}>BLOCKED</span>;
+                case "default":
+                  return (
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#60a5fa", letterSpacing: "0.01em" }}>
+                      Turn on
+                    </span>
+                  );
+                default:
+                  return <span style={{ fontSize: "11px", fontWeight: 600, color: "#525252", letterSpacing: "0.04em" }}>N/A</span>;
+              }
+            })()}
           </button>
 
           <button

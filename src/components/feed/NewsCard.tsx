@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { Bookmark, Share2, Check, Sparkles } from "lucide-react";
+import {
+  Bookmark, Share2, Check, Sparkles,
+  Brain, Terminal, GitBranch, Rocket, Telescope, Banknote, Building2, Server, Scale,
+  type LucideIcon,
+} from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/types";
@@ -19,17 +23,33 @@ interface NewsCardProps {
 // Hardcoded for the attribution label (true for the vast majority of stories).
 const SUMMARY_MODEL = "Gemini 2.5 Flash Lite";
 
+// One representative mark per category — turns an image-less story into an
+// intentional, consistent "cover" instead of an empty gradient.
+const CATEGORY_ICON: Record<string, LucideIcon> = {
+  "ai-models": Brain,
+  "dev-tools": Terminal,
+  "open-source": GitBranch,
+  startups: Rocket,
+  research: Telescope,
+  "funding-ma": Banknote,
+  "big-tech": Building2,
+  infrastructure: Server,
+  policy: Scale,
+};
+
 function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
   const category = getCategoryBySlug(categorySlug as never);
   const accent = category?.colorAccent ?? "#333";
   const bg = category?.colorBg ?? "#111";
+  const label = category?.colorLabel ?? "#888";
+  const Icon = CATEGORY_ICON[categorySlug] ?? Sparkles;
 
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
-        background: `radial-gradient(ellipse at 60% 40%, ${accent}55 0%, ${bg} 65%)`,
+        background: `radial-gradient(ellipse at 60% 38%, ${accent}55 0%, ${bg} 70%)`,
         overflow: "hidden",
       }}
     >
@@ -37,62 +57,29 @@ function CardHeroBackground({ categorySlug }: { categorySlug: string }) {
       <div
         style={{
           position: "absolute",
-          top: "20%",
+          top: "18%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "280px",
-          height: "280px",
+          width: "300px",
+          height: "300px",
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${accent}40 0%, transparent 70%)`,
-          filter: "blur(40px)",
+          background: `radial-gradient(circle, ${accent}45 0%, transparent 70%)`,
+          filter: "blur(48px)",
         }}
       />
-      {/* Grid overlay */}
-      <svg
-        style={{ position: "absolute", inset: 0, opacity: 0.04 }}
-        width="100%"
-        height="100%"
+      {/* Large faint category mark — the branded "cover", fully in frame */}
+      <div
+        style={{
+          position: "absolute",
+          right: "22px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          opacity: 0.16,
+          display: "flex",
+        }}
       >
-        <defs>
-          <pattern
-            id={`grid-${categorySlug}`}
-            width="32"
-            height="32"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M 32 0 L 0 0 0 32"
-              fill="none"
-              stroke="white"
-              strokeWidth="1"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#grid-${categorySlug})`} />
-      </svg>
-      {/* Floating nodes */}
-      {[
-        { x: "20%", y: "30%", r: 3, o: 0.5 },
-        { x: "45%", y: "55%", r: 5, o: 0.4 },
-        { x: "70%", y: "25%", r: 2, o: 0.6 },
-        { x: "80%", y: "60%", r: 4, o: 0.3 },
-        { x: "35%", y: "70%", r: 3, o: 0.5 },
-      ].map((node, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: node.x,
-            top: node.y,
-            width: node.r * 2,
-            height: node.r * 2,
-            borderRadius: "50%",
-            background: accent,
-            opacity: node.o,
-            boxShadow: `0 0 ${node.r * 4}px ${accent}`,
-          }}
-        />
-      ))}
+        <Icon size={132} strokeWidth={1.3} color={label} />
+      </div>
     </div>
   );
 }

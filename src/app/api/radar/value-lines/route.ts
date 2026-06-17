@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { callLLM } from "@/lib/llm";
 import { getRadarFeed } from "@/lib/knowledge";
 import { valueLinePrompt, parseValueLine } from "@/lib/radar";
+import { isAuthorizedCron } from "@/lib/cron-auth";
 
 // Generates the radar value-line for entities that need one, then caches it on
 // the entity. Cron-triggered right after ingestion (see fetch-news.yml). Cost
@@ -28,9 +29,7 @@ function getAdmin(): SupabaseClient {
 }
 
 export async function GET(request: NextRequest) {
-  const secret =
-    request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCron(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {

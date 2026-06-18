@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2 } from "lucide-react";
 import posthog from "posthog-js";
-import { getSavedRadarTools, type SavedRadarTool } from "@/lib/storage";
+import { getSavedRadarTools, getRadarNotes, setRadarNotes, type SavedRadarTool } from "@/lib/storage";
 import { FaceMark, GOLD, GOLD_SOFT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
@@ -27,9 +27,10 @@ export function ToolkitClient() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [detail, setDetail] = useState<RadarThing | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [notes, setNotes] = useState("");
 
   const refresh = useCallback(() => setSaved(getSavedRadarTools()), []);
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => { refresh(); setNotes(getRadarNotes()); }, [refresh]);
 
   const flash = (m: string) => { setToast(m); window.setTimeout(() => setToast(null), 1600); };
 
@@ -91,6 +92,30 @@ export function ToolkitClient() {
         <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45 }}>
           {empty ? "Your saved AI tools, filed by category." : `${saved.length} saved · filed by category.`}
         </p>
+      </div>
+
+      {/* Notes workspace — always visible */}
+      <div style={{ padding: "0 24px 20px" }}>
+        <textarea
+          value={notes}
+          onChange={(e) => { setNotes(e.target.value); setRadarNotes(e.target.value); }}
+          placeholder="Notes, ideas, things to try…"
+          rows={4}
+          style={{
+            width: "100%",
+            background: "#111111",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: "12px",
+            padding: "12px 14px",
+            color: "#ededed",
+            fontSize: "14px",
+            lineHeight: 1.6,
+            resize: "vertical",
+            outline: "none",
+            fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+            boxSizing: "border-box",
+          }}
+        />
       </div>
 
       {empty ? (

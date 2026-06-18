@@ -12,16 +12,22 @@ const KEYS = {
 };
 
 // ==========================================
-// Radar lens (Builder / Founder / Curious) — persona self-segmentation
+// Radar lens (Builder / Vibe Coder / Exploring) — persona self-segmentation
 // ==========================================
-export type RadarLens = "builder" | "founder" | "curious";
-const RADAR_LENSES: RadarLens[] = ["builder", "founder", "curious"];
+export type RadarLens = "builder" | "vibe" | "curious";
+const RADAR_LENSES: RadarLens[] = ["builder", "vibe", "curious"];
 
 export function getRadarLens(): RadarLens | null {
   if (!isBrowser) return null;
   try {
     const v = localStorage.getItem(KEYS.RADAR_LENS);
-    return v && (RADAR_LENSES as string[]).includes(v) ? (v as RadarLens) : null;
+    if (!v) return null;
+    // Migrate "founder" → "vibe" silently
+    if (v === "founder") {
+      localStorage.setItem(KEYS.RADAR_LENS, "vibe");
+      return "vibe";
+    }
+    return (RADAR_LENSES as string[]).includes(v) ? (v as RadarLens) : null;
   } catch {
     return null;
   }
@@ -34,6 +40,21 @@ export function setRadarLens(lens: RadarLens): void {
   } catch {
     /* ignore */
   }
+}
+
+// ==========================================
+// Radar notes — freeform workspace scratch pad
+// ==========================================
+const RADAR_NOTES_KEY = "kapyn_radar_notes";
+
+export function getRadarNotes(): string {
+  if (!isBrowser) return "";
+  return localStorage.getItem(RADAR_NOTES_KEY) ?? "";
+}
+
+export function setRadarNotes(text: string): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(RADAR_NOTES_KEY, text); } catch {}
 }
 
 // ==========================================

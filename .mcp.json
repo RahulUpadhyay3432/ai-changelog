@@ -2,7 +2,7 @@
   "mcpServers": {
     "magic": {
       "command": "npx",
-      "args": ["-y", "@21st-dev/magic@latest"],
+      "args": ["-y", "@21st-dev/magic@latest", "API_KEY=${MAGIC_API_KEY}"],
       "env": {
         "API_KEY": "${MAGIC_API_KEY}"
       }

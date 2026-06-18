@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Cpu, Briefcase, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { Cpu, Terminal, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
@@ -21,14 +21,14 @@ interface RadarData {
   essentials: RadarTool[];
 }
 
-// ─── Lenses (Builder + Founder headline; "Exploring" = curious) ───────────────
+// ─── Lenses (Builder + Vibe Coder headline; "Exploring" = curious) ────────────
 const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", tagline: "I build with AI", Icon: Cpu },
-  { id: "founder", label: "Founder / Operator", tagline: "I run a product or business", Icon: Briefcase },
+  { id: "vibe", label: "Vibe Coder", tagline: "I build and ship by directing AI tools", Icon: Terminal },
 ];
 const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", Icon: Cpu },
-  { id: "founder", label: "Founder", Icon: Briefcase },
+  { id: "vibe", label: "Vibe Coder", Icon: Terminal },
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
@@ -51,6 +51,10 @@ const CARD_W = "84%";
 
 function HeroCardThing({ card, onOpen }: { card: Extract<HeroCard, { kind: "thing" }>; onOpen: (t: RadarThing) => void }) {
   const t = card.thing;
+  // When an entity has a real news story, lead with the story (the move), not the entity name.
+  const isStoryLed = t.kind === "entity" && !!t.storyTitle;
+  const headline = isStoryLed ? t.storyTitle! : t.name;
+
   return (
     <button onClick={() => onOpen(t)} className="radar-hero" style={{ flex: `0 0 ${CARD_W}`, scrollSnapAlign: "start", display: "block", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
       <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -66,7 +70,10 @@ function HeroCardThing({ card, onOpen }: { card: Extract<HeroCard, { kind: "thin
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.96) 18%, rgba(8,8,8,0.35) 55%, rgba(8,8,8,0.1) 100%)" }} />
           <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 18px" }}>
             <Eyebrow>{card.eyebrow}</Eyebrow>
-            <h2 style={{ fontFamily: SG, fontSize: "21px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: "5px 0 4px", textWrap: "balance" }}>{t.name}</h2>
+            {isStoryLed && (
+              <span style={{ display: "inline-block", marginTop: "5px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>{t.name}</span>
+            )}
+            <h2 style={{ fontFamily: SG, fontSize: "21px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: isStoryLed ? "3px 0 4px" : "5px 0 4px", textWrap: "balance" }}>{headline}</h2>
             <p style={{ fontSize: "13.5px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "94%", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.valueLine}</p>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "11px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -193,7 +200,7 @@ function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
   if (big) {
     const t = entThing(big);
     used.add(t.id);
-    cards.push({ kind: "thing", eyebrow: lens === "founder" ? "What's moving" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
+    cards.push({ kind: "thing", eyebrow: lens === "vibe" ? "What just moved" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
   }
 
   // 2. New & worth a look — freshest launch
@@ -208,9 +215,9 @@ function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
   if (lens === "builder") {
     const cur = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
     if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "For your stack" };
-  } else if (lens === "founder") {
-    const co = byTraction.find((e) => e.entity.entityType === "company" && !used.has(`entity:${e.entity.id}`));
-    if (co) pick = { thing: entThing(co), img: co.latestStory?.imageUrl ?? null, eyebrow: "Worth an opinion" };
+  } else if (lens === "vibe") {
+    const codingTool = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
+    if (codingTool) pick = { thing: essThing(codingTool), img: null, eyebrow: "Try this" };
   } else {
     const cur = data.essentials.find((e) => e.source === "curated" && e.meta === "Models & chat");
     if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "Start here" };
@@ -240,11 +247,12 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
       { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
       { key: "oss", eyebrow: "Popular open-source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
-  } else if (lens === "founder") {
+  } else if (lens === "vibe") {
     raw = [
-      { key: "moving", eyebrow: "What's moving", sub: "Companies & models gaining traction", variant: "list", things: byTraction.slice(0, 10).map(entThing) },
-      { key: "new", eyebrow: "New launches", sub: "Worth a look", variant: "rail", things: data.tools.slice(0, 8).map(toolThing) },
-      { key: "opinion", eyebrow: "Worth an opinion", sub: "The tools shaping the space", variant: "rail", things: byCat("Models & chat").map(essThing) },
+      { key: "workflow", eyebrow: "For your workflow", sub: "AI coding, agents & automation tools", variant: "rail", things: [...byCat("AI coding"), ...byCat("Agents & automation"), ...byCat("Inference")].map(essThing) },
+      { key: "shipped", eyebrow: "Just shipped", sub: "New tools from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 10).map(toolThing) },
+      { key: "models", eyebrow: "Models worth knowing", sub: "What's moving in AI right now", variant: "list", things: modelsTools.slice(0, 8).map(entThing) },
+      { key: "oss", eyebrow: "Open source spotlight", sub: "Most-starred, still active", variant: "list", things: canon.slice(0, 6).map(canonThing) },
     ];
   } else {
     raw = [
@@ -305,9 +313,10 @@ export function RadarClient(data: RadarData) {
 
   useEffect(() => {
     const override = new URLSearchParams(window.location.search).get("lens");
-    if (override === "builder" || override === "founder" || override === "curious") {
-      setRadarLens(override);
-      setLens(override);
+    if (override === "builder" || override === "vibe" || override === "curious" || override === "founder") {
+      const mapped: RadarLens = override === "founder" ? "vibe" : (override as RadarLens);
+      setRadarLens(mapped);
+      setLens(mapped);
     } else {
       setLens(getRadarLens());
     }

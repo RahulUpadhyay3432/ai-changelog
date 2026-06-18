@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, Copy, ChevronDown, Bookmark, ArrowRight } from "lucide-react";
+import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2 } from "lucide-react";
 import posthog from "posthog-js";
 import { getSavedRadarTools, type SavedRadarTool } from "@/lib/storage";
 import { FaceMark, GOLD, GOLD_SOFT, SG, type Face, type RadarThing } from "./radar-shared";
@@ -52,6 +52,20 @@ export function ToolkitClient() {
   const copyOne = async (s: SavedRadarTool) => {
     try { await navigator.clipboard.writeText(`${copyLine(s)} (via Kapyn Radar)`); flash("Copied"); } catch { flash("Couldn't copy"); }
   };
+  const shareAll = async () => {
+    const lines = saved.map(copyLine).join("\n");
+    const text = `My AI toolkit via Kapyn Radar:\n\n${lines}\n\nkapyn.app/radar/toolkit`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ text });
+        posthog.capture("radar_toolkit_share", { channel: "system", count: saved.length, scope: "all" });
+      } catch { /* user cancelled */ }
+      return;
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    posthog.capture("radar_toolkit_share", { channel: "whatsapp", count: saved.length, scope: "all" });
+  };
+
   const copyGroup = async (cat: string, items: SavedRadarTool[]) => {
     try {
       await navigator.clipboard.writeText(`${cat} — via Kapyn Radar\n\n${items.map(copyLine).join("\n")}`);
@@ -67,7 +81,14 @@ export function ToolkitClient() {
       {/* Header */}
       <div style={{ padding: "24px 24px 14px" }}>
         <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.16em", color: GOLD, textTransform: "uppercase" }}>Kapyn</span>
-        <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: "2px 0 0", letterSpacing: "-0.03em" }}>Toolkit</h1>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "2px" }}>
+          <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: 0, letterSpacing: "-0.03em" }}>Toolkit</h1>
+          {!empty && (
+            <button onClick={shareAll} aria-label="Share toolkit" style={{ width: "38px", height: "38px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <Share2 size={17} color="#a3a3a3" strokeWidth={1.8} />
+            </button>
+          )}
+        </div>
         <p style={{ fontSize: "13px", color: "#737373", margin: "4px 0 0", lineHeight: 1.5 }}>
           {empty ? "Your saved AI tools, filed by category." : `${saved.length} saved · filed by category.`}
         </p>

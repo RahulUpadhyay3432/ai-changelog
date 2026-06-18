@@ -5,6 +5,7 @@ import { TrendingUp, Sparkles, Flame } from "lucide-react";
 import posthog from "posthog-js";
 import type { TrendingStory } from "@/lib/trending";
 import { getCategoryBySlug } from "@/lib/categories";
+import { CoverImage } from "../radar/radar-shared";
 import { formatTimeAgo } from "@/lib/mock-data";
 import { BreakdownSheet } from "@/components/feed/BreakdownSheet";
 import type { CategorySlug } from "@/lib/types";
@@ -49,43 +50,69 @@ export function TrendingClient({ top, rest }: Props) {
               <Flame size={13} strokeWidth={2.4} /> Top 3 today
             </span>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "8px 20px 4px" }}>
-            {top.map((s, i) => {
-              const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
-              const accent = cat?.colorAccent ?? "#737373";
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => open(s, "top3")}
-                  style={{ position: "relative", display: "block", width: "100%", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px", padding: "16px 16px 14px", cursor: "pointer", color: "inherit", overflow: "hidden" }}
-                >
-                  {/* accent rail */}
-                  <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", background: accent }} />
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-                    {cat && (
-                      <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.colorLabel, background: `${accent}14`, border: `1px solid ${accent}22`, padding: "2px 8px", borderRadius: "100px" }}>
-                        {cat.name}
+          {/* Spotlight: rank #1 — image-led full-width */}
+          {top[0] && (() => {
+            const s = top[0];
+            const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
+            const accent = cat?.colorAccent ?? "#737373";
+            return (
+              <div style={{ padding: "4px 20px 0" }}>
+                <button onClick={() => open(s, "top3")} style={{ display: "block", width: "100%", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
+                  <CoverImage src={s.imageUrl} category={s.categorySlug as CategorySlug} height={160} radius={0} />
+                  <div style={{ padding: "14px 16px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>1</span>
+                      {cat && (
+                        <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.colorLabel, background: `${accent}14`, border: `1px solid ${accent}22`, padding: "2px 8px", borderRadius: "100px" }}>
+                          {cat.name}
+                        </span>
+                      )}
+                      {s.sources > 1 && (
+                        <span style={{ marginLeft: "auto", fontSize: "11px", fontWeight: 600, color: "#E8B25C", background: "rgba(232,178,92,0.12)", borderRadius: "100px", padding: "2px 8px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                          {s.sources} sources
+                        </span>
+                      )}
+                    </div>
+                    <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#E8E4DE", margin: 0, lineHeight: 1.3, letterSpacing: "-0.02em" }}>{s.title}</h2>
+                    <p style={{ fontSize: "13.5px", color: "#9a9a9a", lineHeight: 1.5, margin: "7px 0 0", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.summary}</p>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
+                      <span style={{ fontSize: "11.5px", color: "#6a6a6a" }}>{s.sourceName} · {formatTimeAgo(s.publishedAt)}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 600, color: accent }}>
+                        <Sparkles size={13} strokeWidth={2} /> Why it matters
                       </span>
-                    )}
-                    {s.sources > 1 && (
-                      <span style={{ marginLeft: "auto", fontSize: "11px", fontWeight: 600, color: "#E8B25C", background: "rgba(232,178,92,0.12)", borderRadius: "100px", padding: "2px 8px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
-                        {s.sources} sources
-                      </span>
-                    )}
-                  </div>
-                  <h2 style={{ fontSize: "16px", fontWeight: 600, color: "#E8E4DE", margin: 0, lineHeight: 1.34, letterSpacing: "-0.01em" }}>{s.title}</h2>
-                  <p style={{ fontSize: "13.5px", color: "#9a9a9a", lineHeight: 1.5, margin: "7px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.summary}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px" }}>
-                    <span style={{ fontSize: "11.5px", color: "#6a6a6a" }}>{s.sourceName} · {formatTimeAgo(s.publishedAt)}</span>
-                    <span style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 600, color: accent }}>
-                      <Sparkles size={13} strokeWidth={2} /> Why it matters
-                    </span>
+                    </div>
                   </div>
                 </button>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })()}
+
+          {/* Compact 2-col grid: ranks #2 and #3 */}
+          {top.length > 1 && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "10px 20px 4px" }}>
+              {top.slice(1, 3).map((s, idx) => {
+                const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
+                const accent = cat?.colorAccent ?? "#737373";
+                return (
+                  <button key={s.id} onClick={() => open(s, "top3")} style={{ display: "block", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
+                    <CoverImage src={s.imageUrl} category={s.categorySlug as CategorySlug} height={88} radius={0} />
+                    <div style={{ padding: "10px 12px 12px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "6px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{idx + 2}</span>
+                        {s.sources > 1 && (
+                          <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, color: "#E8B25C", background: "rgba(232,178,92,0.12)", borderRadius: "100px", padding: "1px 6px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{s.sources}×</span>
+                        )}
+                      </div>
+                      <h3 style={{ fontSize: "13.5px", fontWeight: 600, color: "#E8E4DE", margin: 0, lineHeight: 1.35, letterSpacing: "-0.01em", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.title}</h3>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "11px", fontWeight: 600, color: accent, marginTop: "8px" }}>
+                        <Sparkles size={11} strokeWidth={2} /> Why
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* ── More trending ──────────────────────────────────────────── */}
           {rest.length > 0 && (

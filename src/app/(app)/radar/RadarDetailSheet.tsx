@@ -56,7 +56,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
         transition={{ type: "spring", stiffness: 380, damping: 34 }}
         drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => { if (info.offset.y > 80) onClose(); }}
-        style={{ position: "relative", background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", maxHeight: "82dvh", display: "flex", flexDirection: "column" }}
+        style={{ position: "relative", background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", maxHeight: "94dvh", display: "flex", flexDirection: "column" }}
       >
         {/* Drag handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 6px", flexShrink: 0 }}>

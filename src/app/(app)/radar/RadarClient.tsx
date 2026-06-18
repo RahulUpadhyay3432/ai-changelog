@@ -8,7 +8,7 @@ import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
@@ -33,8 +33,13 @@ const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
 ];
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
+// Eyebrow: gold — for hero overlay context (image backdrop).
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", color: GOLD }}>{children}</span>;
+}
+// SectionKicker: muted — for section headers above rows/rails.
+function SectionKicker({ children }: { children: React.ReactNode }) {
+  return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, lineHeight: 1, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{children}</span>;
 }
 
 // ─── Hero deck (swipeable; ends on "Caught up") ──────────────────────────────
@@ -130,25 +135,25 @@ function HeroDeck({ cards, onOpen }: { cards: HeroCard[]; onOpen: (t: RadarThing
 // ─── Row + RailCard (buttons → open the sheet) ───────────────────────────────
 function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
   return (
-    <button onClick={() => onOpen(thing)} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "inherit" }}>
+    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "inherit" }}>
       <FaceMark face={thing.face} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: "15px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em" }}>{thing.name}</span>
         <p style={{ fontSize: "14px", fontWeight: 450, color: "#9a9a9a", lineHeight: 1.4, margin: "2px 0 0" }}>{thing.valueLine}</p>
       </div>
       {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
-    </button>
+    </motion.button>
   );
 }
 
 function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; onOpen: (t: RadarThing) => void }) {
   return (
-    <button onClick={() => onOpen(thing)} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
+    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
       <FaceMark face={thing.face} />
       <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#ededed", margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
       <p style={{ fontSize: "13px", color: "#9a9a9a", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
       {thing.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{thing.metric}</MetricChip></span>}
-    </button>
+    </motion.button>
   );
 }
 
@@ -159,7 +164,7 @@ function Section({ eyebrow, sub, variant, things, onOpen }: SectionData & { onOp
   return (
     <section style={{ marginBottom: "30px" }}>
       <div style={{ padding: "0 24px", marginBottom: "12px" }}>
-        <Eyebrow>{eyebrow}</Eyebrow>
+        <SectionKicker>{eyebrow}</SectionKicker>
         <p style={{ fontSize: "12.5px", color: "#5c5c5c", margin: "2px 0 0" }}>{sub}</p>
       </div>
       {variant === "rail" ? (

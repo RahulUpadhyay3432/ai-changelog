@@ -44,6 +44,8 @@ export function BottomNav() {
     >
       {items.map(({ href, label, Icon }) => {
         const active = pathname === href;
+        // Radar is the hero feature — its tab reads larger than the rest.
+        const isRadar = label === "Radar" || label === "Today";
         return (
           <Link
             key={href}
@@ -54,16 +56,16 @@ export function BottomNav() {
               alignItems: "center",
               gap: "2px",
               padding: "4px 14px",
-              color: active ? "#e8e8e8" : "#404040",
+              color: active ? "#e8e8e8" : isRadar ? "#8a8a8a" : "#404040",
               textDecoration: "none",
               transition: "color 120ms ease, opacity 120ms ease",
             }}
           >
-            <Icon size={19} strokeWidth={active ? 2.2 : 1.7} />
+            <Icon size={isRadar ? 25 : 19} strokeWidth={active ? 2.3 : isRadar ? 2 : 1.7} />
             <span
               style={{
-                fontSize: "9px",
-                fontWeight: active ? 600 : 400,
+                fontSize: isRadar ? "9.5px" : "9px",
+                fontWeight: active ? 600 : isRadar ? 600 : 400,
                 letterSpacing: "0.02em",
               }}
             >

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2 } from "lucide-react";
 import posthog from "posthog-js";
 import { getSavedRadarTools, type SavedRadarTool } from "@/lib/storage";
-import { FaceMark, GOLD, GOLD_SOFT, SG, type Face, type RadarThing } from "./radar-shared";
+import { FaceMark, GOLD, GOLD_SOFT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 function toThing(s: SavedRadarTool): RadarThing {
@@ -80,16 +80,15 @@ export function ToolkitClient() {
     <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "28px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 14px" }}>
-        <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.16em", color: GOLD, textTransform: "uppercase" }}>Kapyn</span>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "2px" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: 0, letterSpacing: "-0.03em" }}>Toolkit</h1>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: "#f5f3ef", margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Toolkit</h1>
           {!empty && (
-            <button onClick={shareAll} aria-label="Share toolkit" style={{ width: "38px", height: "38px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <Share2 size={17} color="#a3a3a3" strokeWidth={1.8} />
+            <button onClick={shareAll} aria-label="Share toolkit" style={{ flexShrink: 0, width: "40px", height: "40px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <Share2 size={18} color="#a3a3a3" strokeWidth={1.8} />
             </button>
           )}
         </div>
-        <p style={{ fontSize: "13px", color: "#737373", margin: "4px 0 0", lineHeight: 1.5 }}>
+        <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45 }}>
           {empty ? "Your saved AI tools, filed by category." : `${saved.length} saved · filed by category.`}
         </p>
       </div>

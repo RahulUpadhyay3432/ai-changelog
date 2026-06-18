@@ -16,13 +16,40 @@ const ENTITY_CATEGORY: Record<string, CategorySlug> = {
   technique: "research",
 };
 
+// Trending tools arrive with no curated category — so saving them all landed in
+// one "Saved" bucket. Derive a real builder-domain category from the source
+// topics (Product Hunt / GitHub), so saves file themselves. First match wins;
+// order matters (most specific → most generic).
+const TOPIC_CATEGORY: [RegExp, string][] = [
+  [/security|appsec|sast|secret|vuln|auth\b|authentication|compliance/i, "Security"],
+  [/agent|autonomous|crew|multi-?agent|orchestrat|workflow|automation|rpa/i, "Agents & automation"],
+  [/design|ui\b|ux\b|css|tailwind|component|front-?end|figma|website-builder|no-?code/i, "UI & design"],
+  [/rag\b|vector|embedding|database|postgres|semantic-search|retrieval|knowledge-base/i, "Data & RAG"],
+  [/inference|serving|gpu|deploy|hosting|fine-?tun/i, "Inference"],
+  [/eval|observability|monitoring|tracing|analytics|logging/i, "Eval & observability"],
+  [/voice|speech|image|video|audio|music|avatar|generative-art|text-to-/i, "Media"],
+  [/dev-?tool|developer-tools|sdk|cli\b|api\b|framework|library|productivity/i, "Dev tools"],
+  [/llm|language-model|gpt|chatbot|machine-learning|\bml\b|\bai\b|artificial-intelligence/i, "AI / Models"],
+];
+
+function categorizeTool(topics: string[], source: RadarTool["source"]): string {
+  for (const topic of topics) {
+    for (const [re, cat] of TOPIC_CATEGORY) {
+      if (re.test(topic)) return cat;
+    }
+  }
+  return source === "producthunt" ? "New on Product Hunt" : "New on GitHub";
+}
+
 // Trending GitHub / Product Hunt launch.
 export function toolThing(t: RadarTool): RadarThing {
   return {
     id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine,
     face: t.source === "producthunt" ? "producthunt" : "github",
     metric: t.meta, typeLabel: t.source === "producthunt" ? "Product Hunt" : "GitHub",
-    category: null, url: t.url, recency: null, storyTitle: null, storySource: null,
+    category: categorizeTool(t.topics, t.source), url: t.url, recency: null,
+    storyTitle: null, storySource: null,
+    description: t.description ?? null, topics: t.topics,
   };
 }
 
@@ -32,6 +59,7 @@ export function essThing(t: RadarTool): RadarThing {
     id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "essential",
     metric: null, typeLabel: null, category: t.meta ?? "Essentials",
     url: t.url, recency: null, storyTitle: null, storySource: null,
+    description: t.description ?? null, topics: t.topics,
   };
 }
 
@@ -42,6 +70,7 @@ export function canonThing(t: RadarTool): RadarThing {
     metric: t.meta, typeLabel: "Open source", category: "Open source",
     url: t.url, recency: null, storyTitle: null, storySource: null,
     categorySlug: "open-source",
+    description: t.description ?? null, topics: t.topics,
   };
 }
 

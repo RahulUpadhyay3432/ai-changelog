@@ -26,9 +26,16 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Cursor", valueLine: "AI-native editor that edits across your whole repo.", url: "https://cursor.com", category: "AI coding" },
   { name: "GitHub Copilot", valueLine: "Inline code completion and chat, inside your editor.", url: "https://github.com/features/copilot", category: "AI coding" },
   { name: "Claude Code", valueLine: "Agentic coding in your terminal — plans and edits across files.", url: "https://claude.com/claude-code", category: "AI coding" },
-  { name: "v0", valueLine: "Generate production React UIs from a prompt.", url: "https://v0.dev", category: "AI coding" },
   { name: "Lovable", valueLine: "Build and ship full web apps from a prompt.", url: "https://lovable.dev", category: "AI coding" },
   { name: "Windsurf", valueLine: "Agentic IDE that builds features end-to-end.", url: "https://windsurf.com", category: "AI coding" },
+  { name: "Bolt.new", valueLine: "Prompt full-stack web apps that run in the browser.", url: "https://bolt.new", category: "AI coding" },
+
+  // ── UI & design ──
+  { name: "v0", valueLine: "Generate production React UIs from a prompt.", url: "https://v0.dev", category: "UI & design" },
+  { name: "Figma", valueLine: "Design, prototype, and hand off interfaces in one canvas.", url: "https://figma.com", category: "UI & design" },
+  { name: "Framer", valueLine: "Design and publish responsive sites without code.", url: "https://framer.com", category: "UI & design" },
+  { name: "shadcn/ui", valueLine: "Accessible React components you copy in and own.", url: "https://ui.shadcn.com", category: "UI & design" },
+  { name: "21st.dev", valueLine: "Browse and generate React UI components from a prompt.", url: "https://21st.dev", category: "UI & design" },
 
   // ── Model access & inference ──
   { name: "OpenRouter", valueLine: "One API for hundreds of models, with fallback routing.", url: "https://openrouter.ai", category: "Inference" },
@@ -44,10 +51,24 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   // ── Agents & automation ──
   { name: "n8n", valueLine: "Wire AI into automated workflows, self-hostable.", url: "https://n8n.io", category: "Agents & automation" },
   { name: "Zapier", valueLine: "Connect AI to thousands of apps without code.", url: "https://zapier.com", category: "Agents & automation" },
+  { name: "Make", valueLine: "Visually automate work across apps and AI.", url: "https://make.com", category: "Agents & automation" },
+
+  // ── Orchestration (long-running & agent workflows) ──
+  { name: "LangGraph", valueLine: "Build stateful, multi-step agent workflows.", url: "https://langchain.com/langgraph", category: "Orchestration" },
+  { name: "Inngest", valueLine: "Run durable, event-driven background and AI workflows.", url: "https://inngest.com", category: "Orchestration" },
+  { name: "Trigger.dev", valueLine: "Write long-running background jobs and AI tasks in code.", url: "https://trigger.dev", category: "Orchestration" },
+  { name: "Temporal", valueLine: "Orchestrate reliable, long-running workflows as code.", url: "https://temporal.io", category: "Orchestration" },
+
+  // ── Security (ship it safely) ──
+  { name: "Snyk", valueLine: "Find and fix vulnerabilities in code and dependencies.", url: "https://snyk.io", category: "Security" },
+  { name: "Semgrep", valueLine: "Scan code for security bugs with fast static analysis.", url: "https://semgrep.dev", category: "Security" },
+  { name: "Socket", valueLine: "Catch malicious and risky open-source dependencies.", url: "https://socket.dev", category: "Security" },
+  { name: "Doppler", valueLine: "Manage secrets and environment config across your stack.", url: "https://doppler.com", category: "Security" },
 
   // ── Eval & observability ──
   { name: "LangSmith", valueLine: "Trace, test, and debug LLM apps in production.", url: "https://smith.langchain.com", category: "Eval & observability" },
   { name: "Helicone", valueLine: "Monitor LLM cost, latency, and usage in one dashboard.", url: "https://helicone.ai", category: "Eval & observability" },
+  { name: "Langfuse", valueLine: "Open-source tracing and evals for LLM apps.", url: "https://langfuse.com", category: "Eval & observability" },
 
   // ── Media (builder-relevant) ──
   { name: "ElevenLabs", valueLine: "Generate realistic AI voices and speech via API.", url: "https://elevenlabs.io", category: "Media" },

@@ -348,6 +348,7 @@ export interface RadarTool {
   score: number;
   topics: string[];
   lastSeenAt: string;
+  description: string | null; // longer body (e.g. the full Product Hunt description)
 }
 
 interface RadarToolRow {
@@ -359,6 +360,7 @@ interface RadarToolRow {
   score: number;
   topics: string[] | null;
   last_seen_at: string;
+  description?: string | null;
 }
 
 function toRadarTool(r: unknown): RadarTool {
@@ -372,33 +374,47 @@ function toRadarTool(r: unknown): RadarTool {
     score: row.score,
     topics: row.topics ?? [],
     lastSeenAt: row.last_seen_at,
+    description: row.description ?? null,
   };
 }
 
 const RADAR_TOOL_COLS = "source, name, value_line, url, meta, score, topics, last_seen_at";
+// `description` arrived in migration 0006 — request it, but degrade gracefully
+// so a deploy that lands before the migration still returns tools.
+const RADAR_TOOL_COLS_DESC = "source, name, value_line, url, meta, score, topics, last_seen_at, description";
+
+function columnMissing(message: string | undefined): boolean {
+  return !!message && /description/i.test(message);
+}
 
 // "What's new" — GitHub created-last-48h + Product Hunt, freshest/most-traction first.
 export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
-  const { data } = await supabase
-    .from("radar_tools")
-    .select(RADAR_TOOL_COLS)
-    .eq("kind", "trending")
-    .order("last_seen_at", { ascending: false })
-    .order("score", { ascending: false })
-    .limit(limit);
+  const run = (cols: string) =>
+    supabase
+      .from("radar_tools")
+      .select(cols)
+      .eq("kind", "trending")
+      .order("last_seen_at", { ascending: false })
+      .order("score", { ascending: false })
+      .limit(limit);
+  const first = await run(RADAR_TOOL_COLS_DESC);
+  const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
   return (data ?? []).map(toRadarTool);
 }
 
 // "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),
 // accessible-first (sort_rank), then by traction.
 export async function getRadarEssentials(limit = 40): Promise<RadarTool[]> {
-  const { data } = await supabase
-    .from("radar_tools")
-    .select(RADAR_TOOL_COLS)
-    .eq("kind", "essential")
-    .order("sort_rank", { ascending: true })
-    .order("score", { ascending: false })
-    .limit(limit);
+  const run = (cols: string) =>
+    supabase
+      .from("radar_tools")
+      .select(cols)
+      .eq("kind", "essential")
+      .order("sort_rank", { ascending: true })
+      .order("score", { ascending: false })
+      .limit(limit);
+  const first = await run(RADAR_TOOL_COLS_DESC);
+  const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
   return (data ?? []).map(toRadarTool);
 }
 

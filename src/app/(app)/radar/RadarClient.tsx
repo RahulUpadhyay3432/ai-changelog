@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Cpu, Terminal, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { Cpu, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
@@ -21,14 +21,13 @@ interface RadarData {
   essentials: RadarTool[];
 }
 
-// ─── Lenses (Builder + Vibe Coder headline; "Exploring" = curious) ────────────
+// ─── Lenses (Builder + Exploring) ─────────────────────────────────────────────
 const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIcon }[] = [
-  { id: "builder", label: "Builder", tagline: "I build with AI", Icon: Cpu },
-  { id: "vibe", label: "Vibe Coder", tagline: "I build and ship by directing AI tools", Icon: Terminal },
+  { id: "builder", label: "Builder", tagline: "I build with AI — code, agents, UI, infra", Icon: Cpu },
+  { id: "curious", label: "Just exploring", tagline: "Keep me current across AI, broadly", Icon: Compass },
 ];
 const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", Icon: Cpu },
-  { id: "vibe", label: "Vibe Coder", Icon: Terminal },
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
@@ -200,7 +199,7 @@ function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
   if (big) {
     const t = entThing(big);
     used.add(t.id);
-    cards.push({ kind: "thing", eyebrow: lens === "vibe" ? "What just moved" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
+    cards.push({ kind: "thing", eyebrow: lens === "curious" ? "What's moving" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
   }
 
   // 2. New & worth a look — freshest launch
@@ -215,9 +214,6 @@ function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
   if (lens === "builder") {
     const cur = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
     if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "For your stack" };
-  } else if (lens === "vibe") {
-    const codingTool = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
-    if (codingTool) pick = { thing: essThing(codingTool), img: null, eyebrow: "Try this" };
   } else {
     const cur = data.essentials.find((e) => e.source === "curated" && e.meta === "Models & chat");
     if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "Start here" };
@@ -241,18 +237,19 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
 
   let raw: SectionData[];
   if (lens === "builder") {
+    // Everything a builder reaches for, in the order they reach for it:
+    // write code → ship the UI → wire agents → pick models → store data →
+    // ship it safely → see what's new / moving / canonical.
     raw = [
-      { key: "stack", eyebrow: "For your stack", sub: "Coding, inference & data tools", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference"), ...byCat("Data & RAG"), ...byCat("Agents & automation")].map(essThing) },
-      { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 10).map(toolThing) },
+      { key: "coding", eyebrow: "Build with AI", sub: "AI coding tools & agentic editors", variant: "rail", things: byCat("AI coding").map(essThing) },
+      { key: "ui", eyebrow: "Ship the interface", sub: "UI, design & front-end generation", variant: "rail", things: byCat("UI & design").map(essThing) },
+      { key: "agents", eyebrow: "Agents & orchestration", sub: "Wire AI into workflows that run themselves", variant: "rail", things: [...byCat("Agents & automation"), ...byCat("Orchestration")].map(essThing) },
+      { key: "models", eyebrow: "Models & inference", sub: "Where to run the models you build on", variant: "rail", things: [...byCat("Models & chat"), ...byCat("Inference")].map(essThing) },
+      { key: "data", eyebrow: "Data & RAG", sub: "Give your app memory and retrieval", variant: "rail", things: byCat("Data & RAG").map(essThing) },
+      { key: "safe", eyebrow: "Ship it safely", sub: "Security, evals & observability", variant: "rail", things: [...byCat("Security"), ...byCat("Eval & observability")].map(essThing) },
+      { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 12).map(toolThing) },
       { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
-      { key: "oss", eyebrow: "Popular open-source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
-    ];
-  } else if (lens === "vibe") {
-    raw = [
-      { key: "workflow", eyebrow: "For your workflow", sub: "AI coding, agents & automation tools", variant: "rail", things: [...byCat("AI coding"), ...byCat("Agents & automation"), ...byCat("Inference")].map(essThing) },
-      { key: "shipped", eyebrow: "Just shipped", sub: "New tools from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 10).map(toolThing) },
-      { key: "models", eyebrow: "Models worth knowing", sub: "What's moving in AI right now", variant: "list", things: modelsTools.slice(0, 8).map(entThing) },
-      { key: "oss", eyebrow: "Open source spotlight", sub: "Most-starred, still active", variant: "list", things: canon.slice(0, 6).map(canonThing) },
+      { key: "oss", eyebrow: "Popular open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
   } else {
     raw = [
@@ -296,9 +293,6 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
       <button onClick={() => sel && onChoose(sel)} disabled={!sel} style={{ marginTop: "20px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#0a0a0a", background: sel ? GOLD : "rgba(255,255,255,0.10)", border: "none", borderRadius: "14px", padding: "15px", cursor: sel ? "pointer" : "default", opacity: sel ? 1 : 0.55, transition: "background 0.2s ease, opacity 0.2s ease" }}>
         Enter your Radar <ArrowRight size={17} strokeWidth={2.3} />
       </button>
-      <button onClick={() => onChoose("curious")} style={{ marginTop: "14px", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#8a8a8a", fontSize: "13.5px", cursor: "pointer", padding: "8px" }}>
-        Just exploring <ArrowUpRight size={14} strokeWidth={2} style={{ transform: "rotate(45deg)" }} />
-      </button>
     </div>
   );
 }
@@ -313,8 +307,9 @@ export function RadarClient(data: RadarData) {
 
   useEffect(() => {
     const override = new URLSearchParams(window.location.search).get("lens");
-    if (override === "builder" || override === "vibe" || override === "curious" || override === "founder") {
-      const mapped: RadarLens = override === "founder" ? "vibe" : (override as RadarLens);
+    if (override === "builder" || override === "curious" || override === "vibe" || override === "founder") {
+      // Retired lenses (vibe/founder) collapse into builder.
+      const mapped: RadarLens = override === "curious" ? "curious" : "builder";
       setRadarLens(mapped);
       setLens(mapped);
     } else {

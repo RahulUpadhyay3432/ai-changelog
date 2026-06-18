@@ -26,11 +26,15 @@ function getAdmin(): SupabaseClient {
 
 function cleanLine(s: string): string {
   // Strip emoji/pictographs (calm brand: no emoji in content), then tidy.
+  return cleanText(s).slice(0, 160);
+}
+
+// Same scrub as cleanLine, but for the longer detail-sheet body (no 160 cap).
+function cleanText(s: string): string {
   return s
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 160);
+    .trim();
 }
 
 function compact(n: number): string {
@@ -49,6 +53,7 @@ interface ToolRow {
   kind: "trending" | "essential";
   sort_rank: number;
   last_seen_at: string;
+  description: string | null; // longer body for the detail sheet (PH only today)
 }
 
 export async function GET(request: NextRequest) {
@@ -86,6 +91,7 @@ export async function GET(request: NextRequest) {
         kind: "trending",
         sort_rank: 0,
         last_seen_at: now,
+        description: null,
       });
     }
   } else {
@@ -97,6 +103,9 @@ export async function GET(request: NextRequest) {
     for (const p of ph.value) {
       const line = (p.tagline?.trim() || p.description?.trim()) ?? "";
       if (!line) continue;
+      // Keep the punchy tagline as the value-line; carry the fuller description
+      // for the detail sheet (the user asked for it). Drop if it just repeats.
+      const desc = p.description ? cleanText(p.description).slice(0, 600) : "";
       rows.push({
         source: "producthunt",
         external_id: p.sourceUrl, // PHFeedItem drops the id; the launch url is unique
@@ -109,6 +118,7 @@ export async function GET(request: NextRequest) {
         kind: "trending",
         sort_rank: 0,
         last_seen_at: now,
+        description: desc && desc !== cleanLine(line) ? desc : null,
       });
     }
   } else {
@@ -131,6 +141,7 @@ export async function GET(request: NextRequest) {
         kind: "essential",
         sort_rank: CANON_SORT_RANK,
         last_seen_at: now,
+        description: null,
       });
     }
   } else {
@@ -151,6 +162,7 @@ export async function GET(request: NextRequest) {
       kind: "essential",
       sort_rank: i, // 0..N — keeps the accessible-first ordering
       last_seen_at: now,
+      description: null,
     });
   });
 

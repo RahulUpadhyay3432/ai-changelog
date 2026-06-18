@@ -25,7 +25,10 @@ const TRENDING = "New & trending";
 const ORDER = [
   TRENDING,
   "Models", "Tools", "Companies",
-  "Models & chat", "AI coding", "Inference", "Data & RAG", "Agents & automation",
+  "Models & chat", "AI coding", "UI & design", "Agents & automation", "Orchestration",
+  "Inference", "Data & RAG", "Security", "Eval & observability", "Media",
+  "AI / Models", "Dev tools",
+  "New on GitHub", "New on Product Hunt",
   "Open source", "Concepts",
 ];
 const rank = (cat: string) => { const i = ORDER.indexOf(cat); return i === -1 ? ORDER.length : i; };
@@ -35,6 +38,10 @@ const CAT_SLUG: Record<string, CategorySlug | null> = {
   "Models": "ai-models", "Tools": "dev-tools", "Companies": "big-tech",
   "Models & chat": "ai-models", "AI coding": "dev-tools", "Inference": "infrastructure",
   "Data & RAG": "infrastructure", "Agents & automation": "ai-models",
+  "UI & design": "dev-tools", "Orchestration": "ai-models", "Security": "infrastructure",
+  "Eval & observability": "infrastructure", "Media": "ai-models",
+  "AI / Models": "ai-models", "Dev tools": "dev-tools",
+  "New on GitHub": "open-source", "New on Product Hunt": "startups",
   "Open source": "open-source", "Concepts": "research",
 };
 

@@ -216,4 +216,6 @@ export interface RadarThing {
   categorySlug?: CategorySlug | null; // drives the accent
   metricValue?: number | null; // raw number behind `metric`, for count-up
   subtype?: string | null; // "70B · open weights" / "stdio" / "arXiv"
+  description?: string | null; // longer body for the detail sheet (e.g. PH description)
+  topics?: string[]; // source topics → chips in the detail sheet
 }

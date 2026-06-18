@@ -12,20 +12,22 @@ const KEYS = {
 };
 
 // ==========================================
-// Radar lens (Builder / Vibe Coder / Exploring) — persona self-segmentation
+// Radar lens (Builder / Exploring) — persona self-segmentation
+// A "vibe coder" is a builder; a "founder" building with AI wants the same
+// moves — so both legacy ids collapse into "builder".
 // ==========================================
-export type RadarLens = "builder" | "vibe" | "curious";
-const RADAR_LENSES: RadarLens[] = ["builder", "vibe", "curious"];
+export type RadarLens = "builder" | "curious";
+const RADAR_LENSES: RadarLens[] = ["builder", "curious"];
 
 export function getRadarLens(): RadarLens | null {
   if (!isBrowser) return null;
   try {
     const v = localStorage.getItem(KEYS.RADAR_LENS);
     if (!v) return null;
-    // Migrate "founder" → "vibe" silently
-    if (v === "founder") {
-      localStorage.setItem(KEYS.RADAR_LENS, "vibe");
-      return "vibe";
+    // Migrate retired lenses ("founder", "vibe") → "builder" silently.
+    if (v === "founder" || v === "vibe") {
+      localStorage.setItem(KEYS.RADAR_LENS, "builder");
+      return "builder";
     }
     return (RADAR_LENSES as string[]).includes(v) ? (v as RadarLens) : null;
   } catch {

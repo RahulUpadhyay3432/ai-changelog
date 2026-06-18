@@ -1,14 +1,55 @@
 "use client";
 
 import { Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, type LucideIcon } from "lucide-react";
+import { getCategoryBySlug } from "@/lib/categories";
+import type { CategorySlug } from "@/lib/types";
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
-export const GOLD = "#E8B25C";
+export const GOLD = "#E8B25C"; // brand / wayfinding ONLY — never a data or content signal
 export const GOLD_SOFT = "rgba(232,178,92,0.12)";
 export const GOLD_BORDER = "rgba(232,178,92,0.28)";
 export const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
 
-// ─── Faces (monochrome type/source icons) ────────────────────────────────────
+// Warm surface ramp (replaces cold #111 / pure-black flatness).
+export const SURFACE = "#131210"; // raised card surface (warm)
+export const HAIRLINE = "rgba(255,255,255,0.07)"; // white-alpha only, never colored
+export const INNER_HIGHLIGHT = "inset 0 1px 0 rgba(255,255,255,0.07)";
+
+// Warm text ramp — the only greys used on dark.
+export const TEXT = {
+  primary: "#f5f3ef",
+  body: "#c2beb6",
+  muted: "#8f8b83",
+} as const;
+
+// Mobile type scale. One big jump (20px title vs 15px body) IS the hierarchy.
+export const TYPE = {
+  sectionTitle: { fontFamily: SG, fontSize: "20px", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.02em", color: TEXT.primary },
+  sectionKicker: { fontFamily: SG, fontSize: "12px", fontWeight: 700, lineHeight: 1, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted },
+  heroHeadline: { fontFamily: SG, fontSize: "24px", fontWeight: 600, lineHeight: 1.12, letterSpacing: "-0.02em", color: TEXT.primary },
+  itemTitle: { fontFamily: SG, fontSize: "16px", fontWeight: 600, lineHeight: 1.25, letterSpacing: "-0.01em", color: TEXT.primary },
+  body: { fontSize: "15px", fontWeight: 450, lineHeight: 1.45, color: TEXT.body },
+  meta: { fontSize: "13px", fontWeight: 500, lineHeight: 1.3, color: TEXT.muted },
+} as const;
+
+// ─── Category accent system (mirrors categories.ts — never re-declares hues) ──
+// fg = on-dark text/icon (WCAG-safe), bg = fills/tints, ring = borders + glow only.
+export interface Accent {
+  fg: string;
+  bg: string;
+  ring: string;
+}
+
+const NEUTRAL: Accent = { fg: TEXT.body, bg: "rgba(255,255,255,0.05)", ring: "rgba(255,255,255,0.16)" };
+
+export function accentFor(slug: CategorySlug | string | null | undefined): Accent {
+  if (!slug) return NEUTRAL;
+  const cat = getCategoryBySlug(slug as CategorySlug);
+  if (!cat) return NEUTRAL;
+  return { fg: cat.colorLabel, bg: cat.colorBg, ring: cat.colorAccent };
+}
+
+// ─── Faces (the icon-fallback layer; color comes from the mapped category) ────
 export type Face = "model" | "tool" | "company" | "concept" | "github" | "producthunt" | "essential";
 
 export const FACE_ICON: Record<Face, LucideIcon> = {
@@ -21,17 +62,137 @@ export const FACE_ICON: Record<Face, LucideIcon> = {
   essential: Sparkles,
 };
 
-export function FaceMark({ face, size = 38 }: { face: Face; size?: number }) {
+// Face → category, so a mark gets a real hue even when no categorySlug is set.
+const FACE_CATEGORY: Record<Face, CategorySlug> = {
+  model: "ai-models",
+  tool: "dev-tools",
+  company: "big-tech",
+  concept: "research",
+  github: "open-source",
+  producthunt: "startups",
+  essential: "startups",
+};
+
+export function accentForFace(face: Face): Accent {
+  return accentFor(FACE_CATEGORY[face]);
+}
+
+// The mark: real brand logo if we have one, else a category-TINTED monogram.
+// Never a flat grey box (the single highest-leverage recolor in the redesign).
+export function FaceMark({
+  face,
+  category,
+  logoUrl,
+  size = 40,
+}: {
+  face: Face;
+  category?: CategorySlug | null;
+  logoUrl?: string | null;
+  size?: number;
+}) {
+  const accent = category ? accentFor(category) : accentForFace(face);
   const Icon = FACE_ICON[face] ?? Sparkles;
+  const radius = Math.round(size * 0.28);
   return (
-    <span style={{ flexShrink: 0, width: `${size}px`, height: `${size}px`, borderRadius: `${Math.round(size * 0.26)}px`, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Icon size={Math.round(size * 0.47)} color="#9a9a9a" strokeWidth={1.7} />
+    <span
+      style={{
+        flexShrink: 0,
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: `${radius}px`,
+        background: accent.bg,
+        border: `1px solid ${accent.ring}33`,
+        boxShadow: INNER_HIGHLIGHT,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+      }}
+    >
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : (
+        <Icon size={Math.round(size * 0.47)} color={accent.fg} strokeWidth={1.8} />
+      )}
     </span>
   );
 }
 
-export function MetricChip({ children }: { children: React.ReactNode }) {
-  return <span style={{ flexShrink: 0, fontSize: "12px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, borderRadius: "100px", padding: "3px 9px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{children}</span>;
+// Cover image with a category-gradient fallback. Branches on falsy src BEFORE
+// mounting an <img> (an empty/null src does not reliably fire onError).
+export function CoverImage({
+  src,
+  category,
+  face,
+  height = 180,
+  radius = 18,
+  style,
+}: {
+  src?: string | null;
+  category?: CategorySlug | null;
+  face?: Face;
+  height?: number;
+  radius?: number;
+  style?: React.CSSProperties;
+}) {
+  const accent = category ? accentFor(category) : face ? accentForFace(face) : NEUTRAL;
+  const Icon = face ? FACE_ICON[face] ?? Sparkles : Sparkles;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: `${height}px`,
+        borderRadius: `${radius}px`,
+        overflow: "hidden",
+        background: "#0c0c0c",
+        ...style,
+      }}
+    >
+      {src ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt=""
+            loading="lazy"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.9)" }}
+          />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.94) 22%, rgba(8,8,8,0.1) 60%, transparent 100%)" }} />
+        </>
+      ) : (
+        <>
+          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(120% 90% at 70% -10%, ${accent.ring}40 0%, ${accent.bg} 45%, #0c0c0c 100%)` }} />
+          <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.5 }}>
+            <Icon size={Math.round(height * 0.26)} color={accent.fg} strokeWidth={1.4} />
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Metric chip. Defaults to gold for back-compat; pass a category fg to make the
+// metric carry taxonomy signal (the redesign default for data chips).
+export function MetricChip({ children, color = GOLD }: { children: React.ReactNode; color?: string }) {
+  return (
+    <span
+      style={{
+        flexShrink: 0,
+        fontSize: "12px",
+        fontWeight: 600,
+        color,
+        background: `${color}1f`,
+        borderRadius: "100px",
+        padding: "3px 9px",
+        fontVariantNumeric: "tabular-nums",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </span>
+  );
 }
 
 // ─── The normalized unit the radar + detail sheet share ──────────────────────
@@ -41,11 +202,18 @@ export interface RadarThing {
   name: string;
   valueLine: string;
   face: Face;
-  metric: string | null; // "12 sources" / "1.2k stars · Python"
+  metric: string | null; // display string e.g. "12 sources" / "1.2k stars · Python"
   typeLabel: string | null; // "GitHub" / "Product Hunt" / "model" / "company"
-  category: string | null; // auto-category for save
+  category: string | null; // auto-category for save (display bucket)
   url: string | null; // open-site target
   recency: string | null;
   storyTitle: string | null; // entities: the latest story behind it
   storySource: string | null;
+  // ── redesign fields (optional; older constructors omit them) ──
+  imageUrl?: string | null; // real cover (entities only, from latestStory)
+  logoUrl?: string | null; // curated brand logo (rare)
+  entityId?: string | null; // raw UUID (stop string-baking into id)
+  categorySlug?: CategorySlug | null; // drives the accent
+  metricValue?: number | null; // raw number behind `metric`, for count-up
+  subtype?: string | null; // "70B · open weights" / "stdio" / "arXiv"
 }

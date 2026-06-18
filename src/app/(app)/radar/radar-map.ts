@@ -3,8 +3,18 @@
 // the Browse catalog (BrowseClient) build their things the same way.
 
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
+import type { CategorySlug } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { Face, RadarThing } from "./radar-shared";
+
+// Knowledge-graph entity type → the category accent its mark wears.
+const ENTITY_CATEGORY: Record<string, CategorySlug> = {
+  model: "ai-models",
+  tool: "dev-tools",
+  company: "big-tech",
+  concept: "research",
+  technique: "research",
+};
 
 // Trending GitHub / Product Hunt launch.
 export function toolThing(t: RadarTool): RadarThing {
@@ -31,6 +41,7 @@ export function canonThing(t: RadarTool): RadarThing {
     id: t.url, kind: "tool", name: t.name, valueLine: t.valueLine, face: "github",
     metric: t.meta, typeLabel: "Open source", category: "Open source",
     url: t.url, recency: null, storyTitle: null, storySource: null,
+    categorySlug: "open-source",
   };
 }
 
@@ -48,5 +59,10 @@ export function entThing(e: RadarItem): RadarThing {
     recency: e.latestStory?.publishedAt ? formatTimeAgo(e.latestStory.publishedAt) : null,
     storyTitle: e.latestStory?.title ?? null,
     storySource: e.latestStory?.sourceName ?? null,
+    // redesign plumbing: the cover image was being dropped here.
+    imageUrl: e.latestStory?.imageUrl ?? null,
+    entityId: e.entity.id,
+    categorySlug: ENTITY_CATEGORY[et] ?? "research",
+    metricValue: n,
   };
 }

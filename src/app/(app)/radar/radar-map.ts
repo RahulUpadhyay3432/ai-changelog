@@ -32,7 +32,7 @@ const TOPIC_CATEGORY: [RegExp, string][] = [
   [/llm|language-model|gpt|chatbot|machine-learning|\bml\b|\bai\b|artificial-intelligence/i, "AI / Models"],
 ];
 
-function categorizeTool(topics: string[], source: RadarTool["source"]): string {
+export function categorizeTool(topics: string[], source: RadarTool["source"]): string {
   for (const topic of topics) {
     for (const [re, cat] of TOPIC_CATEGORY) {
       if (re.test(topic)) return cat;
@@ -40,6 +40,14 @@ function categorizeTool(topics: string[], source: RadarTool["source"]): string {
   }
   return source === "producthunt" ? "New on Product Hunt" : "New on GitHub";
 }
+
+// Preferred pill order for the "What's new" category filter (most builder-
+// relevant first). Categories not listed fall to the end, alphabetically.
+export const WHATS_NEW_CATEGORY_ORDER = [
+  "Agents & automation", "Security", "UI & design", "AI / Models",
+  "Data & RAG", "Inference", "Dev tools", "Media", "Eval & observability",
+  "New on GitHub", "New on Product Hunt",
+];
 
 // Trending GitHub / Product Hunt launch.
 export function toolThing(t: RadarTool): RadarThing {

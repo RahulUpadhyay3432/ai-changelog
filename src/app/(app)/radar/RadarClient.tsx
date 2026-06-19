@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Cpu, Compass, Bell, Check, ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
@@ -9,7 +9,7 @@ import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
 import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
-import { toolThing, essThing, canonThing, entThing } from "./radar-map";
+import { toolThing, essThing, canonThing, entThing, categorizeTool, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 const GRAIN =
@@ -39,6 +39,99 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 // SectionKicker: muted — for section headers above rows/rails.
 function SectionKicker({ children }: { children: React.ReactNode }) {
   return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, lineHeight: 1, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{children}</span>;
+}
+
+// ─── What's new (filter pills over one ranked feed) ──────────────────────────
+// The builder's first question: what shipped across GitHub & Product Hunt.
+// Two pill rows (source + category) filter one ranked list in place.
+const WN_SOURCES: { id: "all" | "github" | "producthunt"; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "github", label: "GitHub" },
+  { id: "producthunt", label: "Product Hunt" },
+];
+
+function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
+        color: active ? "#0a0a0a" : "#a3a3a3",
+        background: active ? GOLD : "rgba(255,255,255,0.04)",
+        border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
+        borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function WhatsNewRow({ thing, rank, onOpen }: { thing: RadarThing; rank: number; onOpen: (t: RadarThing) => void }) {
+  return (
+    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.985 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "11px 24px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "inherit" }}>
+      <span style={{ flexShrink: 0, width: "16px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.muted, fontVariantNumeric: "tabular-nums", textAlign: "center" }}>{rank}</span>
+      <FaceMark face={thing.face} size={36} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontSize: "15px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+        <span style={{ display: "block", fontSize: "13px", color: "#9a9a9a", lineHeight: 1.35, marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.valueLine}</span>
+      </div>
+      {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
+    </motion.button>
+  );
+}
+
+function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThing) => void }) {
+  const [source, setSource] = useState<"all" | "github" | "producthunt">("all");
+  const [cat, setCat] = useState<string>("All");
+
+  const tagged = useMemo(() => tools.map((t) => ({ tool: t, cat: categorizeTool(t.topics, t.source) })), [tools]);
+  const cats = useMemo(() => {
+    const present = new Set(tagged.map((w) => w.cat));
+    const ordered = WHATS_NEW_CATEGORY_ORDER.filter((c) => present.has(c));
+    const extra = [...present].filter((c) => !WHATS_NEW_CATEGORY_ORDER.includes(c)).sort();
+    return ["All", ...ordered, ...extra];
+  }, [tagged]);
+
+  const visible = useMemo(
+    () =>
+      tagged
+        .filter((w) => source === "all" || w.tool.source === source)
+        .filter((w) => cat === "All" || w.cat === cat)
+        .map((w) => w.tool),
+    [tagged, source, cat],
+  );
+
+  if (tools.length === 0) return null;
+
+  return (
+    <section style={{ marginBottom: "30px" }}>
+      <div style={{ padding: "0 24px", marginBottom: "12px" }}>
+        <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.02em" }}>What&apos;s new</h2>
+        <p style={{ fontSize: "12.5px", color: "#5c5c5c", margin: "3px 0 0" }}>Fresh from GitHub &amp; Product Hunt</p>
+      </div>
+
+      <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 10px", overflowX: "auto" }}>
+        {WN_SOURCES.map((s) => (
+          <Pill key={s.id} active={source === s.id} onClick={() => { setSource(s.id); posthog.capture("radar_whatsnew_source", { source: s.id }); }}>{s.label}</Pill>
+        ))}
+      </div>
+
+      <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 14px", overflowX: "auto" }}>
+        {cats.map((c) => (
+          <Pill key={c} active={cat === c} onClick={() => { setCat(c); posthog.capture("radar_whatsnew_category", { category: c }); }}>{c}</Pill>
+        ))}
+      </div>
+
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        {visible.length === 0 ? (
+          <p style={{ padding: "16px 24px", color: "#5c5c5c", fontSize: "13.5px" }}>Nothing new in this filter yet.</p>
+        ) : (
+          visible.slice(0, 20).map((tool, i) => <WhatsNewRow key={tool.url} thing={toolThing(tool)} rank={i + 1} onOpen={onOpen} />)
+        )}
+      </div>
+    </section>
+  );
 }
 
 // ─── Hero deck (swipeable; ends on "Caught up") ──────────────────────────────
@@ -247,7 +340,6 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
       { key: "models", eyebrow: "Models & inference", sub: "Where to run the models you build on", variant: "rail", things: [...byCat("Models & chat"), ...byCat("Inference")].map(essThing) },
       { key: "data", eyebrow: "Data & RAG", sub: "Give your app memory and retrieval", variant: "rail", things: byCat("Data & RAG").map(essThing) },
       { key: "safe", eyebrow: "Ship it safely", sub: "Security, evals & observability", variant: "rail", things: [...byCat("Security"), ...byCat("Eval & observability")].map(essThing) },
-      { key: "new", eyebrow: "New tools", sub: "Fresh from GitHub & Product Hunt", variant: "rail", things: data.tools.slice(0, 12).map(toolThing) },
       { key: "moving", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
       { key: "oss", eyebrow: "Popular open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
@@ -369,6 +461,9 @@ export function RadarClient(data: RadarData) {
         <AnimatePresence mode="wait">
           <motion.div key={lens} variants={V.block} initial="hidden" animate="show" exit="exit">
             <motion.div variants={V.hero}><HeroDeck cards={heroCards} onOpen={onOpen} /></motion.div>
+            {lens === "builder" && (
+              <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
+            )}
             {sections.map((s) => (
               <motion.div key={s.key} variants={V.item}><Section {...s} onOpen={onOpen} /></motion.div>
             ))}

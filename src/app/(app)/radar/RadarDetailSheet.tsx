@@ -5,12 +5,25 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Bookmark, Copy, ArrowUpRight, Check } from "lucide-react";
 import posthog from "posthog-js";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
 import { toggleRadarTool, isRadarToolSaved } from "@/lib/storage";
+import { getToolDepth } from "@/lib/radar-tool-depth";
+
+// One labelled depth block — gold kicker + warm body. Mirrors the /learn
+// section pattern (heading + paragraph) inside the dark sheet.
+function Field({ label, body }: { label: string; body: string }) {
+  return (
+    <section style={{ marginTop: "20px" }}>
+      <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>{label}</span>
+      <p style={{ fontSize: "14.5px", lineHeight: 1.6, color: TEXT.body, margin: "7px 0 0" }}>{body}</p>
+    </section>
+  );
+}
 
 function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
   const [saved, setSaved] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const depth = getToolDepth(thing.url);
 
   useEffect(() => {
     setSaved(isRadarToolSaved(thing.id));
@@ -86,8 +99,17 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
         {/* Content */}
         <div style={{ padding: "18px 20px 0", overflowY: "auto", flex: 1 }}>
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#cfcbc4", margin: 0 }}>{thing.valueLine}</p>
-          {thing.description && thing.description.trim() && thing.description.trim() !== thing.valueLine.trim() && (
-            <p style={{ fontSize: "14px", lineHeight: 1.6, color: "#a7a39d", margin: "12px 0 0" }}>{thing.description.trim()}</p>
+          {depth ? (
+            <>
+              <Field label="What it is" body={depth.whatItIs} />
+              <Field label="How it works" body={depth.howItWorks} />
+              <Field label="Who it's for" body={depth.whoItsFor} />
+              <Field label="Where it's used" body={depth.whereUsed} />
+            </>
+          ) : (
+            thing.description && thing.description.trim() && thing.description.trim() !== thing.valueLine.trim() && (
+              <p style={{ fontSize: "14px", lineHeight: 1.6, color: "#a7a39d", margin: "12px 0 0" }}>{thing.description.trim()}</p>
+            )
           )}
           {thing.topics && thing.topics.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "16px" }}>

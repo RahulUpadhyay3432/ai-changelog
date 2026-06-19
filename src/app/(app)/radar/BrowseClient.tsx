@@ -8,7 +8,7 @@ import posthog from "posthog-js";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
 import {
-  CoverImage, MetricChip,
+  FaceMark, MetricChip,
   GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
   type RadarThing,
 } from "./radar-shared";
@@ -56,7 +56,9 @@ interface BrowseData {
 
 const PRESS = { type: "spring" as const, stiffness: 440, damping: 28 };
 
-// ─── Visual card (image-led; no gray text list) ──────────────────────────────
+// ─── Logo-led card (matches the MCP / Skills cards — real brand logo, no stock
+//     covers). FaceMark renders the brand logo on a light chip, or nothing when
+//     none resolves; the type tag stays right-aligned either way. ────────────────
 function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: CategorySlug | null; onOpen: (t: RadarThing) => void }) {
   return (
     <motion.button
@@ -66,16 +68,19 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       style={{
         display: "flex", flexDirection: "column", textAlign: "left",
         background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px",
-        overflow: "hidden", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
+        padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
         minWidth: 0, width: "100%",
       }}
     >
-      <CoverImage src={thing.imageUrl} category={thing.categorySlug ?? catSlug} face={thing.face} height={94} radius={0} />
-      <div style={{ padding: "11px 12px 13px" }}>
-        <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
-        <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
-        {thing.metric && <span style={{ display: "block", marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px", minHeight: "20px" }}>
+        <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={36} />
+        {thing.typeLabel && (
+          <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
+        )}
       </div>
+      <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{thing.valueLine}</span>
+      {thing.metric && <span style={{ display: "block", marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
     </motion.button>
   );
 }

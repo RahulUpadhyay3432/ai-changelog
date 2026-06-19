@@ -7,10 +7,21 @@ import type { CategorySlug } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { Face, RadarThing } from "./radar-shared";
 
+// github.com first-path segments that are product/marketing pages, NOT user or
+// org logins — so we don't ask for a (non-existent) "features" / "marketplace"
+// avatar. These fall back to the GitHub domain favicon (the recognizable mark),
+// which is right for GitHub's own products like Copilot (github.com/features/copilot).
+const GH_RESERVED = new Set([
+  "features", "marketplace", "about", "pricing", "enterprise", "sponsors",
+  "topics", "collections", "explore", "readme", "security", "team", "solutions",
+  "resources", "customer-stories", "login", "join", "new", "settings", "apps",
+  "orgs", "organizations", "notifications", "contact", "site", "github",
+]);
+
 // Real brand logo for a tool, via the same-origin /api/favicon proxy (never
-// beacons the hostname from the client). GitHub repos use the org avatar; other
-// product sites use their favicon; PH launch URLs have no usable logo here (the
-// stored PH thumbnail is used instead).
+// beacons the hostname from the client). GitHub repos use the org avatar; GitHub
+// product pages and other sites use the domain favicon; PH launch URLs have no
+// usable logo here (the stored PH thumbnail is used instead).
 export function logoFor(url: string | null | undefined): string | null {
   if (!url) return null;
   try {
@@ -18,13 +29,75 @@ export function logoFor(url: string | null | undefined): string | null {
     const host = u.hostname.replace(/^www\./, "");
     if (host === "github.com") {
       const owner = u.pathname.split("/").filter(Boolean)[0];
-      return owner ? `/api/favicon?github=${encodeURIComponent(owner)}` : null;
+      // A real owner/org → its avatar; a reserved product path (or no path) →
+      // the GitHub mark itself, never a broken `?github=features` request.
+      if (owner && !GH_RESERVED.has(owner.toLowerCase())) {
+        return `/api/favicon?github=${encodeURIComponent(owner)}`;
+      }
+      return `/api/favicon?domain=github.com`;
     }
     if (host === "producthunt.com" || host.endsWith(".producthunt.com")) return null;
     return `/api/favicon?domain=${encodeURIComponent(host)}`;
   } catch {
     return null;
   }
+}
+
+// Well-known AI brand → official domain. Knowledge-graph entities (models, labs,
+// companies) only carry a *news-story* URL, so logoFor() on that would return the
+// publisher's favicon. Instead we match the entity's name to its brand domain and
+// use that favicon — a real logo. No match → null (no mark, never a stray image).
+// Order matters: most specific first. Edit freely; this is editorial.
+const BRAND_DOMAIN: [RegExp, string][] = [
+  [/\bchatgpt\b|\bopenai\b|\bgpt[-\s]?\d|\bgpt\b|\bo[134]\b|\bsora\b|\bcodex\b|\bdall[-\s]?e\b/i, "openai.com"],
+  [/\banthropic\b|\bclaude\b/i, "anthropic.com"],
+  [/\bgemini\b|\bdeepmind\b|\bgemma\b|\bveo\b|\bimagen\b|\bbard\b|\bgoogle\b/i, "google.com"],
+  [/\bllama\b|\bmeta\s?ai\b|\bmeta\b/i, "meta.com"],
+  [/\bmistral\b|\bmixtral\b|\bcodestral\b/i, "mistral.ai"],
+  [/\bgrok\b|\bxai\b|\bx\.ai\b/i, "x.ai"],
+  [/\bdeepseek\b/i, "deepseek.com"],
+  [/\bqwen\b|\balibaba\b/i, "qwen.ai"],
+  [/\bkimi\b|\bmoonshot\b/i, "moonshot.ai"],
+  [/\bcopilot\b|\bphi[-\s]?\d|\bmicrosoft\b|\bazure\b/i, "microsoft.com"],
+  [/\bnvidia\b|\bnemotron\b/i, "nvidia.com"],
+  [/\bcohere\b|\bcommand[-\s]?r\b/i, "cohere.com"],
+  [/\bperplexity\b/i, "perplexity.ai"],
+  [/\bhugging\s?face\b/i, "huggingface.co"],
+  [/\bstability\b|\bstable[-\s]?diffusion\b/i, "stability.ai"],
+  [/\bgithub\b/i, "github.com"],
+  [/\bvercel\b/i, "vercel.com"],
+  [/\bcursor\b/i, "cursor.com"],
+  [/\breplit\b/i, "replit.com"],
+  [/\bhubspot\b/i, "hubspot.com"],
+  [/\bnotion\b/i, "notion.so"],
+  [/\bfigma\b/i, "figma.com"],
+  [/\bslack\b/i, "slack.com"],
+  [/\btailscale\b/i, "tailscale.com"],
+  [/\bsupabase\b/i, "supabase.com"],
+  [/\bstripe\b/i, "stripe.com"],
+  [/\bnetflix\b/i, "netflix.com"],
+  [/\bamazon\b|\baws\b/i, "amazon.com"],
+  [/\bapple\b/i, "apple.com"],
+  [/\bsalesforce\b/i, "salesforce.com"],
+  [/\bibm\b|\bgranite\b/i, "ibm.com"],
+  [/\bsnowflake\b/i, "snowflake.com"],
+  [/\bdatabricks\b/i, "databricks.com"],
+  [/\boracle\b/i, "oracle.com"],
+  [/\bintel\b/i, "intel.com"],
+  [/\bamd\b/i, "amd.com"],
+  [/\bsamsung\b/i, "samsung.com"],
+  [/\btesla\b/i, "tesla.com"],
+  [/\buber\b/i, "uber.com"],
+  [/\bspotify\b/i, "spotify.com"],
+];
+
+// Brand logo for a knowledge-graph entity, matched by name (not its news URL).
+export function brandLogoFor(name: string | null | undefined): string | null {
+  if (!name) return null;
+  for (const [re, domain] of BRAND_DOMAIN) {
+    if (re.test(name)) return `/api/favicon?domain=${domain}`;
+  }
+  return null;
 }
 
 // Knowledge-graph entity type → the category accent its mark wears.
@@ -160,6 +233,9 @@ export function entThing(e: RadarItem): RadarThing {
     storySource: e.latestStory?.sourceName ?? null,
     // redesign plumbing: the cover image was being dropped here.
     imageUrl: e.latestStory?.imageUrl ?? null,
+    // Real brand logo from the entity's name (its URL is a news article, so
+    // logoFor() there would give the publisher's favicon, not the brand's).
+    logoUrl: brandLogoFor(e.entity.canonicalName),
     entityId: e.entity.id,
     categorySlug: ENTITY_CATEGORY[et] ?? "research",
     metricValue: n,

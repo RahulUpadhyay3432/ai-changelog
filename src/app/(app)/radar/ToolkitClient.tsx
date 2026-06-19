@@ -5,15 +5,18 @@ import Link from "next/link";
 import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2 } from "lucide-react";
 import posthog from "posthog-js";
 import { getSavedRadarTools, getRadarNotes, setRadarNotes, type SavedRadarTool } from "@/lib/storage";
-import { FaceMark, GOLD, GOLD_SOFT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
+import { FaceMark, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
+import { logoFor } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 function toThing(s: SavedRadarTool): RadarThing {
+  const isEntity = s.id.startsWith("entity:");
   return {
-    id: s.id, kind: s.id.startsWith("entity:") ? "entity" : "tool",
+    id: s.id, kind: isEntity ? "entity" : "tool",
     name: s.name, valueLine: s.valueLine, face: (s.face as Face) ?? "essential",
     metric: null, typeLabel: null, category: s.category, url: s.url,
     recency: null, storyTitle: null, storySource: null,
+    logoUrl: isEntity ? null : logoFor(s.url),
   };
 }
 
@@ -50,9 +53,6 @@ export function ToolkitClient() {
     return [...m.entries()];
   }, [filtered]);
 
-  const copyOne = async (s: SavedRadarTool) => {
-    try { await navigator.clipboard.writeText(`${copyLine(s)} (via Kapyn Radar)`); flash("Copied"); } catch { flash("Couldn't copy"); }
-  };
   const shareAll = async () => {
     const lines = saved.map(copyLine).join("\n");
     const text = `My AI toolkit via Kapyn Radar:\n\n${lines}\n\nkapyn.app/radar/toolkit`;
@@ -78,11 +78,11 @@ export function ToolkitClient() {
   const empty = saved.length === 0;
 
   return (
-    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "28px" }}>
+    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: CANVAS, paddingBottom: "28px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: "#f5f3ef", margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Toolkit</h1>
+          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Toolkit</h1>
           {!empty && (
             <button onClick={shareAll} aria-label="Share toolkit" style={{ flexShrink: 0, width: "40px", height: "40px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
               <Share2 size={18} color="#a3a3a3" strokeWidth={1.8} />
@@ -158,20 +158,13 @@ export function ToolkitClient() {
                   </button>
                 </div>
                 {!isCollapsed && (
-                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "0 24px" }}>
                     {items.map((s) => (
-                      <div key={s.id} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                        <button onClick={() => setDetail(toThing(s))} className="radar-row" style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: "12px", background: "transparent", border: "none", textAlign: "left", cursor: "pointer", padding: 0, color: "inherit" }}>
-                          <FaceMark face={(s.face as Face) ?? "essential"} size={34} />
-                          <span style={{ flex: 1, minWidth: 0 }}>
-                            <span style={{ display: "block", fontSize: "15px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em" }}>{s.name}</span>
-                            <span style={{ display: "block", fontSize: "13.5px", color: "#9a9a9a", lineHeight: 1.4, marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.valueLine}</span>
-                          </span>
-                        </button>
-                        <button onClick={() => copyOne(s)} aria-label="Copy" style={{ flexShrink: 0, width: "34px", height: "34px", borderRadius: "9px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                          <Copy size={15} color="#9a9a9a" strokeWidth={2} />
-                        </button>
-                      </div>
+                      <button key={s.id} onClick={() => setDetail(toThing(s))} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "12px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+                        <FaceMark face={(s.face as Face) ?? "essential"} logoUrl={toThing(s).logoUrl} size={32} />
+                        <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", marginTop: "9px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
+                        <span style={{ display: "-webkit-box", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{s.valueLine}</span>
+                      </button>
                     ))}
                   </div>
                 )}

@@ -350,6 +350,7 @@ export interface RadarTool {
   topics: string[];
   lastSeenAt: string;
   description: string | null; // longer body (e.g. the full Product Hunt description)
+  imageUrl: string | null; // product thumbnail (Product Hunt) — used as the logo
 }
 
 interface RadarToolRow {
@@ -362,6 +363,7 @@ interface RadarToolRow {
   topics: string[] | null;
   last_seen_at: string;
   description?: string | null;
+  image_url?: string | null;
 }
 
 function toRadarTool(r: unknown): RadarTool {
@@ -376,16 +378,17 @@ function toRadarTool(r: unknown): RadarTool {
     topics: row.topics ?? [],
     lastSeenAt: row.last_seen_at,
     description: row.description ?? null,
+    imageUrl: row.image_url ?? null,
   };
 }
 
 const RADAR_TOOL_COLS = "source, name, value_line, url, meta, score, topics, last_seen_at";
-// `description` arrived in migration 0006 — request it, but degrade gracefully
-// so a deploy that lands before the migration still returns tools.
-const RADAR_TOOL_COLS_DESC = "source, name, value_line, url, meta, score, topics, last_seen_at, description";
+// `description` (0006) + `image_url` (0007) — request them, but degrade
+// gracefully so a deploy that lands before a migration still returns tools.
+const RADAR_TOOL_COLS_DESC = "source, name, value_line, url, meta, score, topics, last_seen_at, description, image_url";
 
 function columnMissing(message: string | undefined): boolean {
-  return !!message && /description/i.test(message);
+  return !!message && /(description|image_url)/i.test(message);
 }
 
 // "What's new" — GitHub created-last-48h + Product Hunt, freshest/most-traction first.
@@ -449,6 +452,7 @@ const STATIC_ESSENTIALS: RadarTool[] = CURATED_ESSENTIALS.map((t) => ({
   topics: [],
   lastSeenAt: "",
   description: null,
+  imageUrl: null,
 }));
 
 // Whole-word, case-insensitive check that a story headline names an entity —

@@ -8,7 +8,7 @@ import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
@@ -31,6 +31,12 @@ const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
+// The top headline shuffles on each visit — a small delight.
+const HEADER_PHRASES = [
+  "Let's build", "Let's explore", "What's new today",
+  "Let's learn something", "Find your next tool", "What moved today",
+];
+
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 // Eyebrow: gold — for hero overlay context (image backdrop).
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -44,12 +50,6 @@ function SectionKicker({ children }: { children: React.ReactNode }) {
 // ─── What's new (filter pills over one ranked feed) ──────────────────────────
 // The builder's first question: what shipped across GitHub & Product Hunt.
 // Two pill rows (source + category) filter one ranked list in place.
-const WN_SOURCES: { id: "all" | "github" | "producthunt"; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "github", label: "GitHub" },
-  { id: "producthunt", label: "Product Hunt" },
-];
-
 // Real source brand marks — the user asked to see where each item came from.
 // (lucide dropped brand glyphs, so the GitHub mark is inlined.)
 function GitHubMark({ size = 15, color = TEXT.muted }: { size?: number; color?: string }) {
@@ -85,19 +85,16 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
-function WhatsNewRow({ thing, rank, onOpen }: { thing: RadarThing; rank: number; onOpen: (t: RadarThing) => void }) {
+function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
   return (
-    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.985 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "11px 24px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "inherit" }}>
-      <span style={{ flexShrink: 0, width: "16px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.muted, fontVariantNumeric: "tabular-nums", textAlign: "center" }}>{rank}</span>
-      <FaceMark face={thing.face} size={36} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ display: "block", fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
-        <span style={{ display: "block", fontSize: "13px", color: TEXT.muted, lineHeight: 1.35, marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.valueLine}</span>
+    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+        <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} size={34} />
+        <SourceMark face={thing.face} size={14} />
       </div>
-      <span style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-        {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
-        <SourceMark face={thing.face} />
-      </span>
+      <span style={{ fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{thing.valueLine}</span>
+      {thing.metric && <span style={{ marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
     </motion.button>
   );
 }
@@ -125,37 +122,27 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
 
   if (tools.length === 0) return null;
 
+  const setSrc = (s: "all" | "github" | "producthunt") => { setSource(s); posthog.capture("radar_whatsnew_source", { source: s }); };
+
   return (
     <section style={{ marginBottom: "30px" }}>
       <div style={{ padding: "0 24px", marginBottom: "12px" }}>
         <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.02em" }}>What&apos;s new</h2>
-        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>Fresh from GitHub, Product Hunt &amp; the MCP market</p>
+        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>Fresh from GitHub, the MCP market &amp; Product Hunt</p>
       </div>
 
-      {/* MCP market — its own categorized, star-ranked destination */}
-      <Link href="/radar/mcp" onClick={() => posthog.capture("radar_mcp_card_tapped")} style={{ display: "flex", alignItems: "center", gap: "12px", margin: "0 24px 14px", padding: "13px 14px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", textDecoration: "none", color: "inherit" }}>
-        <span style={{ flexShrink: 0, width: "38px", height: "38px", borderRadius: "10px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Plug size={18} color={GOLD} strokeWidth={2} />
-        </span>
-        <span style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: TEXT.primary }}>MCP market</span>
-          <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, marginTop: "1px" }}>Connect your AI to your tools — top servers by category</span>
-        </span>
-        <ArrowUpRight size={17} color={TEXT.muted} strokeWidth={2} />
-      </Link>
-
+      {/* Source pills: All · GitHub · MCP market (→ its own view) · Product Hunt */}
       <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 10px", overflowX: "auto" }}>
-        {WN_SOURCES.map((s) => {
-          const active = source === s.id;
-          return (
-            <Pill key={s.id} active={active} onClick={() => { setSource(s.id); posthog.capture("radar_whatsnew_source", { source: s.id }); }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                {s.id !== "all" && <SourceMark face={s.id} size={13} color={active ? "#0a0a0a" : TEXT.body} />}
-                {s.label}
-              </span>
-            </Pill>
-          );
-        })}
+        <Pill active={source === "all"} onClick={() => setSrc("all")}>All</Pill>
+        <Pill active={source === "github"} onClick={() => setSrc("github")}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><SourceMark face="github" size={13} color={source === "github" ? "#0a0a0a" : TEXT.body} />GitHub</span>
+        </Pill>
+        <Link href="/radar/mcp" onClick={() => posthog.capture("radar_mcp_pill_tapped")} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "6px 13px", whiteSpace: "nowrap", textDecoration: "none" }}>
+          <Plug size={13} strokeWidth={2.2} /> MCP market
+        </Link>
+        <Pill active={source === "producthunt"} onClick={() => setSrc("producthunt")}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><SourceMark face="producthunt" size={13} />Product Hunt</span>
+        </Pill>
       </div>
 
       <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 14px", overflowX: "auto" }}>
@@ -164,13 +151,13 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
         ))}
       </div>
 
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        {visible.length === 0 ? (
-          <p style={{ padding: "16px 24px", color: "#5c5c5c", fontSize: "13.5px" }}>Nothing new in this filter yet.</p>
-        ) : (
-          visible.slice(0, 20).map((tool, i) => <WhatsNewRow key={tool.url} thing={toolThing(tool)} rank={i + 1} onOpen={onOpen} />)
-        )}
-      </div>
+      {visible.length === 0 ? (
+        <p style={{ padding: "8px 24px", color: TEXT.muted, fontSize: "13.5px" }}>Nothing new in this filter yet.</p>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 0" }}>
+          {visible.slice(0, 20).map((tool) => <WhatsNewCard key={tool.url} thing={toolThing(tool)} onOpen={onOpen} />)}
+        </div>
+      )}
     </section>
   );
 }
@@ -276,7 +263,7 @@ function HeroDeck({ cards, onOpen }: { cards: HeroCard[]; onOpen: (t: RadarThing
 function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
   return (
     <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: `1px solid ${HAIRLINE}`, cursor: "pointer", color: "inherit" }}>
-      <FaceMark face={thing.face} category={thing.categorySlug} />
+      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em" }}>{thing.name}</span>
         <p style={{ fontSize: "14px", fontWeight: 450, color: TEXT.body, lineHeight: 1.4, margin: "2px 0 0" }}>{thing.valueLine}</p>
@@ -289,7 +276,7 @@ function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => 
 function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; onOpen: (t: RadarThing) => void }) {
   return (
     <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
-      <FaceMark face={thing.face} category={thing.categorySlug} />
+      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} />
       <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
       <p style={{ fontSize: "13px", color: TEXT.body, lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
       {thing.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{thing.metric}</MetricChip></span>}
@@ -401,23 +388,36 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
 }
 
 // ─── Category quick-nav — the "where are the categories" answer ──────────────
-// A flat-wrapped chip map of every populated section; tapping scrolls to it.
+// One swipeable row of bigger chips + a scroll-progress bar so it reads as
+// scrollable and doesn't eat vertical space.
 function CategoryNav({ sections }: { sections: SectionData[] }) {
   const items = sections.filter((s) => s.things.length > 0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+  const onScroll = () => {
+    const el = ref.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setProgress(max > 0 ? el.scrollLeft / max : 0);
+  };
   if (items.length === 0) return null;
   const jump = (key: string) => {
     document.getElementById(`sec-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
     posthog.capture("radar_category_jump", { key });
   };
   return (
-    <div style={{ padding: "0 24px 22px" }}>
-      <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>Browse by</span>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "11px" }}>
+    <div style={{ padding: "0 0 22px" }}>
+      <span style={{ display: "block", padding: "0 24px", fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>Browse by</span>
+      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "flex", gap: "9px", marginTop: "11px", padding: "0 24px", overflowX: "auto" }}>
         {items.map((s) => (
-          <button key={s.key} onClick={() => jump(s.key)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "13px", fontWeight: 500, color: TEXT.body, background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "7px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
-            {s.emoji && <span style={{ fontSize: "13px" }}>{s.emoji}</span>}{s.eyebrow}
+          <button key={s.key} onClick={() => jump(s.key)} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 500, color: TEXT.body, background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "9px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
+            {s.emoji && <span style={{ fontSize: "14px" }}>{s.emoji}</span>}{s.eyebrow}
           </button>
         ))}
+      </div>
+      {/* Scroll-progress bar — signals "swipe me" */}
+      <div style={{ margin: "12px 24px 0", height: "3px", borderRadius: "3px", background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
+        <div style={{ width: "34%", height: "100%", borderRadius: "3px", background: "rgba(255,255,255,0.28)", transform: `translateX(${progress * 196}%)`, transition: "transform 0.05s linear" }} />
       </div>
     </div>
   );
@@ -462,6 +462,9 @@ export function RadarClient(data: RadarData) {
   const [lens, setLens] = useState<RadarLens | null>(null);
   const [ready, setReady] = useState(false);
   const [detail, setDetail] = useState<RadarThing | null>(null);
+  // Default to the first phrase so SSR + first client render match; a fresh
+  // delightful one is picked on mount (each visit).
+  const [headline, setHeadline] = useState(HEADER_PHRASES[0]);
   const reduced = !!useReducedMotion();
   const V = radarVariants(reduced);
 
@@ -475,6 +478,7 @@ export function RadarClient(data: RadarData) {
     } else {
       setLens(getRadarLens());
     }
+    setHeadline(HEADER_PHRASES[Math.floor(Math.random() * HEADER_PHRASES.length)]);
     setReady(true);
   }, []);
 
@@ -504,7 +508,7 @@ export function RadarClient(data: RadarData) {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "26px 24px 16px" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: "#f5f3ef", margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Radar</h1>
+            <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{headline}</h1>
             <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>What&apos;s new and worth knowing in AI, tuned to you.</p>
           </div>
           <Link href="/profile" aria-label="Settings & notifications" style={{ flexShrink: 0, marginTop: "2px", width: "38px", height: "38px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>

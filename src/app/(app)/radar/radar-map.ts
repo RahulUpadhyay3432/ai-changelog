@@ -7,6 +7,26 @@ import type { CategorySlug } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { Face, RadarThing } from "./radar-shared";
 
+// Real brand logo for a tool, via the same-origin /api/favicon proxy (never
+// beacons the hostname from the client). GitHub repos use the org avatar; other
+// product sites use their favicon; PH launch URLs have no usable logo here (the
+// stored PH thumbnail is used instead).
+export function logoFor(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
+    if (host === "github.com") {
+      const owner = u.pathname.split("/").filter(Boolean)[0];
+      return owner ? `/api/favicon?github=${encodeURIComponent(owner)}` : null;
+    }
+    if (host === "producthunt.com" || host.endsWith(".producthunt.com")) return null;
+    return `/api/favicon?domain=${encodeURIComponent(host)}`;
+  } catch {
+    return null;
+  }
+}
+
 // Knowledge-graph entity type → the category accent its mark wears.
 const ENTITY_CATEGORY: Record<string, CategorySlug> = {
   model: "ai-models",
@@ -90,6 +110,7 @@ export function toolThing(t: RadarTool): RadarThing {
     category: categorizeTool(t.topics, t.source), url: t.url, recency: null,
     storyTitle: null, storySource: null,
     description: t.description ?? null, topics: t.topics,
+    logoUrl: t.imageUrl ?? logoFor(t.url),
   };
 }
 
@@ -100,6 +121,7 @@ export function essThing(t: RadarTool): RadarThing {
     metric: null, typeLabel: null, category: t.meta ?? "Essentials",
     url: t.url, recency: null, storyTitle: null, storySource: null,
     description: t.description ?? null, topics: t.topics,
+    logoUrl: logoFor(t.url),
   };
 }
 
@@ -111,6 +133,7 @@ export function canonThing(t: RadarTool): RadarThing {
     url: t.url, recency: null, storyTitle: null, storySource: null,
     categorySlug: "open-source",
     description: t.description ?? null, topics: t.topics,
+    logoUrl: logoFor(t.url),
   };
 }
 

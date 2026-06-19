@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, type LucideIcon } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import type { CategorySlug } from "@/lib/types";
@@ -98,6 +99,10 @@ export function FaceMark({
   const accent = category ? accentFor(category) : accentForFace(face);
   const Icon = FACE_ICON[face] ?? Sparkles;
   const radius = Math.round(size * 0.28);
+  const [failed, setFailed] = useState(false);
+  // Show a real logo on a light chip (so dark/mono brand marks stay visible),
+  // and fall back to the category-tinted monogram if it fails to load.
+  const showLogo = !!logoUrl && !failed;
   return (
     <span
       style={{
@@ -105,8 +110,8 @@ export function FaceMark({
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: `${radius}px`,
-        background: accent.bg,
-        border: `1px solid ${accent.ring}33`,
+        background: showLogo ? "#faf9f7" : accent.bg,
+        border: showLogo ? "1px solid rgba(0,0,0,0.10)" : `1px solid ${accent.ring}33`,
         boxShadow: INNER_HIGHLIGHT,
         display: "flex",
         alignItems: "center",
@@ -114,9 +119,15 @@ export function FaceMark({
         overflow: "hidden",
       }}
     >
-      {logoUrl ? (
+      {showLogo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img
+          src={logoUrl!}
+          alt=""
+          loading="lazy"
+          onError={() => setFailed(true)}
+          style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
+        />
       ) : (
         <Icon size={Math.round(size * 0.47)} color={accent.fg} strokeWidth={1.8} />
       )}

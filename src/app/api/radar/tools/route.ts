@@ -54,6 +54,7 @@ interface ToolRow {
   sort_rank: number;
   last_seen_at: string;
   description: string | null; // longer body for the detail sheet (PH only today)
+  image_url: string | null; // product thumbnail (PH) — used as the logo
 }
 
 export async function GET(request: NextRequest) {
@@ -92,6 +93,7 @@ export async function GET(request: NextRequest) {
         sort_rank: 0,
         last_seen_at: now,
         description: null,
+        image_url: null,
       });
     }
   } else {
@@ -119,6 +121,7 @@ export async function GET(request: NextRequest) {
         sort_rank: 0,
         last_seen_at: now,
         description: desc && desc !== cleanLine(line) ? desc : null,
+        image_url: p.imageUrl ?? null,
       });
     }
   } else {
@@ -142,6 +145,7 @@ export async function GET(request: NextRequest) {
         sort_rank: CANON_SORT_RANK,
         last_seen_at: now,
         description: null,
+        image_url: null,
       });
     }
   } else {
@@ -163,6 +167,7 @@ export async function GET(request: NextRequest) {
       sort_rank: i, // 0..N — keeps the accessible-first ordering
       last_seen_at: now,
       description: null,
+      image_url: null,
     });
   });
 

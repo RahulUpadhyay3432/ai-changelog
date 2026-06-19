@@ -10,6 +10,7 @@ import {
   type McpServer, type McpCategory,
 } from "@/lib/radar-mcp";
 import { FaceMark, GOLD, GOLD_SOFT, CANVAS, HAIRLINE, SG, TEXT, type RadarThing } from "./radar-shared";
+import { logoFor } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 function mcpThing(s: McpServer): RadarThing {
@@ -18,6 +19,7 @@ function mcpThing(s: McpServer): RadarThing {
     metric: null, typeLabel: "MCP server", category: "MCP", url: s.url,
     recency: null, storyTitle: null, storySource: null,
     description: s.description, topics: [], categorySlug: MCP_CATEGORY_SLUG[s.category],
+    logoUrl: logoFor(s.url),
   };
 }
 
@@ -32,7 +34,7 @@ function ServerRow({ server, onOpen }: { server: McpServer; onOpen: (t: RadarThi
       className="radar-row"
       style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "12px 24px", background: "transparent", border: "none", borderBottom: `1px solid ${HAIRLINE}`, cursor: "pointer", color: "inherit" }}
     >
-      <FaceMark face="tool" category={MCP_CATEGORY_SLUG[server.category]} size={36} />
+      <FaceMark face="tool" category={MCP_CATEGORY_SLUG[server.category]} logoUrl={logoFor(server.url)} size={36} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "flex", alignItems: "center", gap: "7px" }}>
           <span style={{ fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{server.name}</span>

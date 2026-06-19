@@ -9,8 +9,8 @@ import { McpMarketClient, type McpMeta } from "../McpMarketClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "MCP market — Kapyn Radar",
-  description: "The most useful Model Context Protocol servers, by category.",
+  title: "MCP and skills — Kapyn Radar",
+  description: "The most useful MCP servers and AI skills, by category.",
 };
 
 export default async function McpMarketPage() {

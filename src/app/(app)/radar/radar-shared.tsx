@@ -111,35 +111,27 @@ export function accentForFace(face: Face): Accent {
   return accentFor(FACE_CATEGORY[face]);
 }
 
-// The mark: real brand logo if we have one, else a neutral first-letter monogram,
-// else a category-tinted face icon. (Monograms are kept grey so they don't fight
-// the colourful real logos sitting next to them.)
+// The mark: a real brand logo on a light chip, or NOTHING. When no logo resolves
+// (or it fails to load) we render no mark at all — no monogram, no icon, no box —
+// so logo-less cards (e.g. a Product Hunt product with no thumbnail) lead with
+// their name instead of a stray letter. Only the colourful real logos remain.
 export function FaceMark({
-  face,
-  category,
   logoUrl,
-  label,
   size = 40,
 }: {
-  face: Face;
+  // `face`, `category` and `label` are accepted (callers still pass them) but no
+  // longer drive any fallback — kept in the type so call sites need no change.
+  face?: Face;
   category?: CategorySlug | null;
   logoUrl?: string | null;
-  // When set and no logo resolves, render a first-letter monogram instead of the
-  // generic face icon — so a logo-less card reads as branded, not a stock rocket.
   label?: string | null;
   size?: number;
 }) {
-  const accent = category ? accentFor(category) : accentForFace(face);
-  const Icon = FACE_ICON[face] ?? Sparkles;
   const radius = Math.round(size * 0.28);
-  const monogram = label?.trim()?.[0]?.toUpperCase() ?? "";
   const [failed, setFailed] = useState(false);
-  // Show a real logo on a light chip (so dark/mono brand marks stay visible),
-  // and fall back to a monogram if it fails to load.
   const showLogo = !!logoUrl && !failed;
-  // Letter monograms stay NEUTRAL grey (the colourful real logos carry the hue);
-  // only the icon-fallback keeps the category tint.
-  const isMonogram = !showLogo && !!monogram;
+  // No logo → no mark at all (the deliberate "don't keep anything" choice).
+  if (!showLogo) return null;
   return (
     <span
       style={{
@@ -147,8 +139,8 @@ export function FaceMark({
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: `${radius}px`,
-        background: showLogo ? "#faf9f7" : isMonogram ? "rgba(255,255,255,0.06)" : accent.bg,
-        border: showLogo ? "1px solid rgba(0,0,0,0.10)" : isMonogram ? "1px solid rgba(255,255,255,0.10)" : `1px solid ${accent.ring}33`,
+        background: "#faf9f7",
+        border: "1px solid rgba(0,0,0,0.10)",
         boxShadow: INNER_HIGHLIGHT,
         display: "flex",
         alignItems: "center",
@@ -156,23 +148,15 @@ export function FaceMark({
         overflow: "hidden",
       }}
     >
-      {showLogo ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl!}
-          alt=""
-          loading="lazy"
-          draggable={false}
-          onError={() => setFailed(true)}
-          style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
-        />
-      ) : monogram ? (
-        <span style={{ fontFamily: SG, fontSize: `${Math.round(size * 0.42)}px`, fontWeight: 700, lineHeight: 1, color: TEXT.body }}>
-          {monogram}
-        </span>
-      ) : (
-        <Icon size={Math.round(size * 0.47)} color={accent.fg} strokeWidth={1.8} />
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={logoUrl!}
+        alt=""
+        loading="lazy"
+        draggable={false}
+        onError={() => setFailed(true)}
+        style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
+      />
     </span>
   );
 }

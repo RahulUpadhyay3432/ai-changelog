@@ -156,11 +156,11 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
         <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>The latest launches we&apos;re tracking</p>
       </div>
 
-      {/* Source row: MCP market first (gold wayfinding → its own view), then the
+      {/* Source row: MCP and skills first (gold wayfinding → its own view), then the
           in-place filters — All · GitHub · Product Hunt. */}
       <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 10px", overflowX: "auto" }}>
         <Link href="/radar/mcp" onClick={() => posthog.capture("radar_mcp_pill_tapped")} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "6px 13px", whiteSpace: "nowrap", textDecoration: "none" }}>
-          <Plug size={13} strokeWidth={2.2} /> MCP market
+          <Plug size={13} strokeWidth={2.2} /> MCP and skills
         </Link>
         <Pill active={source === "all"} onClick={() => setSrc("all")}>All</Pill>
         <Pill active={source === "github"} onClick={() => setSrc("github")}>

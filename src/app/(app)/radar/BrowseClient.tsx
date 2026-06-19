@@ -146,8 +146,8 @@ export function BrowseClient(data: BrowseData) {
             <Plug size={18} color={GOLD} strokeWidth={2} />
           </span>
           <span style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: TEXT.primary }}>MCP market</span>
-            <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, marginTop: "1px" }}>Top MCP servers, by category</span>
+            <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: TEXT.primary }}>MCP and skills</span>
+            <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, marginTop: "1px" }}>Top MCP servers and AI skills</span>
           </span>
           <ArrowUpRight size={17} color={TEXT.muted} strokeWidth={2} />
         </Link>

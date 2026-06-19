@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, MapPin, Users, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Trophy, MapPin, Users, ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { Hackathon } from "@/lib/hackathons";
-import { CoverImage, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
+import { CoverImage, usePressTap, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
+import { HackathonDetailSheet } from "./HackathonDetailSheet";
 
 type LocFilter = "all" | "online" | "inperson";
 type StateFilter = "all" | "open" | "upcoming";
@@ -19,17 +20,17 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
-function HackathonCard({ h }: { h: Hackathon }) {
+// Tapping a card opens the in-app brief (HackathonDetailSheet); only its
+// "Register" button leaves the app. Tap-guarded so a vertical scroll never opens.
+function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => void }) {
   const open = h.openState.toLowerCase() === "open";
+  const tap = usePressTap(() => onOpen(h));
   return (
-    <motion.a
-      href={h.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={() => posthog.capture("radar_hackathon_opened", { source: h.source, online: h.isOnline })}
+    <motion.button
+      {...tap}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 440, damping: 28 }}
-      style={{ display: "block", textDecoration: "none", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT }}
+      style={{ display: "block", width: "100%", textAlign: "left", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT, cursor: "pointer", padding: 0 }}
     >
       <div style={{ position: "relative" }}>
         <CoverImage src={h.imageUrl} category="startups" height={116} radius={0} />
@@ -55,17 +56,23 @@ function HackathonCard({ h }: { h: Hackathon }) {
             </span>
           )}
         </div>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginTop: "12px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: "#0a0a0a", background: GOLD, borderRadius: "10px", padding: "8px 14px" }}>
-          Register <ArrowUpRight size={14} strokeWidth={2.4} />
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginTop: "12px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: GOLD }}>
+          View details <ArrowRight size={14} strokeWidth={2.4} />
         </span>
       </div>
-    </motion.a>
+    </motion.button>
   );
 }
 
 export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
   const [loc, setLoc] = useState<LocFilter>("all");
   const [state, setState] = useState<StateFilter>("all");
+  const [detail, setDetail] = useState<Hackathon | null>(null);
+
+  const open = (h: Hackathon) => {
+    setDetail(h);
+    posthog.capture("radar_hackathon_brief_opened", { source: h.source, scope: "list" });
+  };
 
   const visible = useMemo(
     () =>
@@ -115,9 +122,11 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 20px" }}>
-          {visible.map((h, i) => <HackathonCard key={`${h.source}-${i}`} h={h} />)}
+          {visible.map((h, i) => <HackathonCard key={`${h.source}-${i}`} h={h} onOpen={open} />)}
         </div>
       )}
+
+      <HackathonDetailSheet hackathon={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }

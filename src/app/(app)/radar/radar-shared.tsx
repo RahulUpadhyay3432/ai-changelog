@@ -1,9 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, type LucideIcon } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import type { CategorySlug } from "@/lib/types";
+
+// ─── Tap-vs-scroll guard ─────────────────────────────────────────────────────
+// Cards inside a scroll container must open ONLY on a deliberate tap — not when
+// a finger brushes them mid-scroll. Records the pointer-down position; fires the
+// handler on pointer-up only if the finger barely moved (< ~10px). A scroll
+// gesture moves further (or fires pointercancel), so it never triggers. Spread
+// the returned props on the element instead of using a bare onClick.
+export function usePressTap(handler: () => void) {
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const moved = useRef(false);
+  return {
+    onPointerDown: (e: React.PointerEvent) => {
+      start.current = { x: e.clientX, y: e.clientY };
+      moved.current = false;
+    },
+    onPointerMove: (e: React.PointerEvent) => {
+      const s = start.current;
+      if (s && Math.hypot(e.clientX - s.x, e.clientY - s.y) > 10) moved.current = true;
+    },
+    onPointerUp: (e: React.PointerEvent) => {
+      const s = start.current;
+      start.current = null;
+      if (!s) return;
+      if (!moved.current && Math.hypot(e.clientX - s.x, e.clientY - s.y) < 10) handler();
+    },
+    onPointerCancel: () => { start.current = null; },
+  };
+}
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
 export const GOLD = "#E8B25C"; // brand / wayfinding ONLY — never a data or content signal

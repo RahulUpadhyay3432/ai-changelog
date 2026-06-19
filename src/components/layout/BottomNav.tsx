@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid } from "lucide-react";
@@ -46,32 +47,41 @@ export function BottomNav() {
         const active = pathname === href;
         // Radar is the hero feature — its tab reads larger than the rest.
         const isRadar = label === "Radar" || label === "Today";
+        // In Radar, "Home" is the way *out* — set it apart with a divider and a
+        // brighter-than-inactive tint so "how do I get back" is always answerable.
+        const isExit = inRadar && href === "/";
+        const color = isExit ? (active ? "#e8e8e8" : "#7d7d7d") : active ? "#e8e8e8" : isRadar ? "#8a8a8a" : "#404040";
         return (
-          <Link
-            key={href}
-            href={href}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "2px",
-              padding: "4px 14px",
-              color: active ? "#e8e8e8" : isRadar ? "#8a8a8a" : "#404040",
-              textDecoration: "none",
-              transition: "color 120ms ease, opacity 120ms ease",
-            }}
-          >
-            <Icon size={isRadar ? 25 : 19} strokeWidth={active ? 2.3 : isRadar ? 2 : 1.7} />
-            <span
+          <Fragment key={href}>
+            {isExit && (
+              <span aria-hidden style={{ alignSelf: "center", width: "1px", height: "22px", background: "rgba(255,255,255,0.10)" }} />
+            )}
+            <Link
+              href={href}
+              aria-label={isExit ? "Leave Radar — back to Home" : label}
               style={{
-                fontSize: isRadar ? "9.5px" : "9px",
-                fontWeight: active ? 600 : isRadar ? 600 : 400,
-                letterSpacing: "0.02em",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2px",
+                padding: "4px 14px",
+                color,
+                textDecoration: "none",
+                transition: "color 120ms ease, opacity 120ms ease",
               }}
             >
-              {label}
-            </span>
-          </Link>
+              <Icon size={isRadar ? 25 : 19} strokeWidth={active ? 2.3 : isRadar ? 2 : 1.7} />
+              <span
+                style={{
+                  fontSize: isRadar ? "9.5px" : "9px",
+                  fontWeight: active ? 600 : isRadar ? 600 : 400,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {label}
+              </span>
+            </Link>
+          </Fragment>
         );
       })}
     </nav>

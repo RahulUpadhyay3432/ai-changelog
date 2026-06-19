@@ -1,7 +1,7 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-06-17 — *4/5 builder validations now in (all → B, on actionability); radar vision expanded to a 7-trigger first-principles frame (Discover/Protect/Decide), brief rewritten; radar gate run (conditional pass); breakdown cost fixed; builder UI feedback shipped.*
+> **Last updated:** 2026-06-19 — *Radar redesign **shipped to production** (PR #10 merged → main, merge commit `7105ceb`, Vercel prod green): bento browse, spotlight trending, colour foundation, real logos, MCP-and-skills catalog with a Skills tab, logo-less marks dropped. The entity-radar probe has graduated into the live radar surface.*
 >
 > **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` + `docs/market-research.md` before any product/UI work.
 
@@ -43,13 +43,15 @@
 | `fix/remove-feed-cards` | [#7](https://github.com/RahulUpadhyay3432/ai-changelog/pull/7) | Removed notification + Elon/insight cards from feed | ✅ Merged |
 | `fix/feedback-quickwins` | [#8](https://github.com/RahulUpadhyay3432/ai-changelog/pull/8) | Tap-summary→source + model attribution | ✅ Merged |
 | `feat/desktop-layout` | [#6](https://github.com/RahulUpadhyay3432/ai-changelog/pull/6) | Desktop 3-col `/learn` + `/explore` + AppCta + **editorial-serif redesign** | ⚠️ **OPEN, NOT merged — design rejected by founder, needs reference-driven redo (see Design status)** |
-| `feat/entity-radar` | — (no PR yet) | **"On the radar"** entity-discovery surface — new Radar tab listing models/tools/companies by traction (`getRadarEntities()` mirrors `getLearnEntities()`) | 🟡 **Pushed (`ca12719`), on Vercel preview — awaiting data-quality go/no-go.** The current direction's lead build. |
+| `feat/radar-screen` | [#10](https://github.com/RahulUpadhyay3432/ai-changelog/pull/10) | **Radar redesign** — bento browse, spotlight trending, colour foundation, real logos, **MCP-and-skills catalog** (curated MCP servers + AI skills, segmented view), logo-less marks dropped | ✅ **Merged to main 2026-06-19** (merge commit `7105ceb`, Vercel prod green). The radar surface is now live. |
+| `feat/entity-radar` | — (no PR) | **"On the radar"** entity-discovery surface — original Radar tab listing models/tools/companies by traction (`getRadarEntities()` mirrors `getLearnEntities()`) | ⤴️ **Superseded** — graduated into `feat/radar-screen` (the shipped redesign). Branch can be retired. |
 | `feat/your-ai-read-history` | — (no PR yet) | localStorage read-history logging (`recordRead` on swipe) + "Your AI" Profile block (top areas, count, quietest-area nudge) | 🟠 **Pushed (`0dfb0c2`), no PR.** Logging is a fine cheap foundation; the *displayed reflection block* was reconsidered (founder: low value) — **superseded by the radar's "follow" as the retention mechanic.** Keep logging, reconsider the UI. |
 | `feat/india-sources` | [#9](https://github.com/RahulUpadhyay3432/ai-changelog/pull/9) | Added Indian AI sources to ingestion: **India AI** (Google News AI+India query — the "miss nothing" net, catches AIM/NDTV/Forbes India), **ET CIO** (AI-scoped enterprise), **Inc42** (startups/funding, capped 8) | ✅ **Merged to main 2026-06-16.** Root cause of "no Indian AI news": feed had 20+ sources, zero Indian. Takes effect after production deploy + ingestion run. |
 
 ---
 
 ## ✅ Shipped & live (production = www.kapyn.app)
+- **Radar redesign** (PR #10, merged 2026-06-19): the radar is now a full discovery surface — **bento browse** grid, **spotlight trending**, a calm colour/gold foundation, **real brand logos** (via same-origin `/api/favicon` proxy), per-category accents, and the **"MCP and skills"** catalog at `/radar/mcp` (curated MCP servers enriched with live GitHub stars + a curated AI-skills catalog grouped by use-case, behind a `[MCP servers] [Skills]` segmented toggle). Logo-less marks render nothing (no first-letter boxes). Static curated `.ts` catalogs — no new DB/ingestion.
 - **Knowledge base M1**: `/learn/[slug]` + `/explore`, 5 durable Supabase tables, auto-generation cron with self-critique gating, sitemap + JSON-LD. All 15 seed concepts published. Migration run.
 - **SEO/LLM discovery**: `/llms.txt` + `/feed.xml` live; sitemap confirmed in Google Search Console (Success, 208 pages).
 - **API hardening**: Upstash rate limiting + input cap on `/api/breakdown` + `/api/news/trigger` (`src/lib/ratelimit.ts`).

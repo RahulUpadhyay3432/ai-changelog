@@ -152,8 +152,8 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
   return (
     <section style={{ marginBottom: "30px" }}>
       <div style={{ padding: "0 24px", marginBottom: "12px" }}>
-        <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.02em" }}>What&apos;s new</h2>
-        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>Fresh from GitHub, the MCP market &amp; Product Hunt</p>
+        <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.02em" }}>New on the radar</h2>
+        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>The latest launches we&apos;re tracking</p>
       </div>
 
       {/* Source row: MCP market first (gold wayfinding → its own view), then the
@@ -241,7 +241,8 @@ function HackathonsRail({ items, onOpen }: { items: Hackathon[]; onOpen: (h: Hac
 const SECTION_ACCENT: Record<string, string> = {
   // builder lens
   coding: "#3b82f6", ui: "#a855f7", agents: "#6366f1", models: "#06b6d4",
-  data: "#f59e0b", safe: "#f43f5e", media: "#fb923c", moving: "#22c55e", oss: "#94a3b8",
+  data: "#f59e0b", safe: "#f43f5e", media: "#fb923c", moving: "#22c55e",
+  ghtrending: "#7c8aa0", oss: "#94a3b8",
   // curious lens
   start: "#06b6d4", big: "#f59e0b", toolkit: "#3b82f6", notable: "#a855f7",
   // creator lens
@@ -372,6 +373,7 @@ function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
       { key: "safe", emoji: "🔒", eyebrow: "Ship it safely", sub: "Security, evals & observability", variant: "rail", things: [...byCat("Security"), ...byCat("Eval & observability")].map(essThing) },
       { key: "media", emoji: "🎬", eyebrow: "Generate media", sub: "Voice, image, and video models", variant: "rail", things: [...byCat("Video"), ...byCat("Voice & audio"), ...byCat("Image")].map(essThing) },
       { key: "moving", emoji: "📈", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
+      { key: "ghtrending", emoji: "🐙", eyebrow: "Trending on GitHub", sub: "Repos gaining stars fast right now", variant: "rail", things: data.tools.filter((t) => t.source === "github").sort((a, b) => b.score - a.score).map(toolThing) },
       { key: "oss", emoji: "📦", eyebrow: "Popular open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
   } else if (lens === "creator") {
@@ -408,7 +410,7 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
         {HEADLINE.map(({ id, label, tagline, Icon }) => {
           const active = sel === id;
           return (
-            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(232,178,92,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
+            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(217,178,124,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
               <span style={{ flexShrink: 0, width: "42px", height: "42px", borderRadius: "11px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={20} color={GOLD} strokeWidth={1.8} />
               </span>

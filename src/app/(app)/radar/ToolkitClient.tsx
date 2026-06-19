@@ -82,7 +82,7 @@ export function ToolkitClient() {
       {/* Header */}
       <div style={{ padding: "24px 24px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Toolkit</h1>
+          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Loadout</h1>
           {!empty && (
             <button onClick={shareAll} aria-label="Share toolkit" style={{ flexShrink: 0, width: "40px", height: "40px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
               <Share2 size={18} color="#a3a3a3" strokeWidth={1.8} />

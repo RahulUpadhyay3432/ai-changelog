@@ -34,9 +34,9 @@ export function usePressTap(handler: () => void) {
 }
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
-export const GOLD = "#E8B25C"; // brand / wayfinding ONLY — never a data or content signal
-export const GOLD_SOFT = "rgba(232,178,92,0.12)";
-export const GOLD_BORDER = "rgba(232,178,92,0.28)";
+export const GOLD = "#D9B27C"; // brand / wayfinding ONLY — never a data or content signal (muted sand-gold)
+export const GOLD_SOFT = "rgba(217,178,124,0.12)";
+export const GOLD_BORDER = "rgba(217,178,124,0.28)";
 export const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
 
 // Warm surface ramp — lifted off pure-black so the eye has somewhere to rest
@@ -111,8 +111,9 @@ export function accentForFace(face: Face): Accent {
   return accentFor(FACE_CATEGORY[face]);
 }
 
-// The mark: real brand logo if we have one, else a category-TINTED monogram.
-// Never a flat grey box (the single highest-leverage recolor in the redesign).
+// The mark: real brand logo if we have one, else a neutral first-letter monogram,
+// else a category-tinted face icon. (Monograms are kept grey so they don't fight
+// the colourful real logos sitting next to them.)
 export function FaceMark({
   face,
   category,
@@ -134,8 +135,11 @@ export function FaceMark({
   const monogram = label?.trim()?.[0]?.toUpperCase() ?? "";
   const [failed, setFailed] = useState(false);
   // Show a real logo on a light chip (so dark/mono brand marks stay visible),
-  // and fall back to the category-tinted monogram if it fails to load.
+  // and fall back to a monogram if it fails to load.
   const showLogo = !!logoUrl && !failed;
+  // Letter monograms stay NEUTRAL grey (the colourful real logos carry the hue);
+  // only the icon-fallback keeps the category tint.
+  const isMonogram = !showLogo && !!monogram;
   return (
     <span
       style={{
@@ -143,8 +147,8 @@ export function FaceMark({
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: `${radius}px`,
-        background: showLogo ? "#faf9f7" : accent.bg,
-        border: showLogo ? "1px solid rgba(0,0,0,0.10)" : `1px solid ${accent.ring}33`,
+        background: showLogo ? "#faf9f7" : isMonogram ? "rgba(255,255,255,0.06)" : accent.bg,
+        border: showLogo ? "1px solid rgba(0,0,0,0.10)" : isMonogram ? "1px solid rgba(255,255,255,0.10)" : `1px solid ${accent.ring}33`,
         boxShadow: INNER_HIGHLIGHT,
         display: "flex",
         alignItems: "center",
@@ -163,7 +167,7 @@ export function FaceMark({
           style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
         />
       ) : monogram ? (
-        <span style={{ fontFamily: SG, fontSize: `${Math.round(size * 0.42)}px`, fontWeight: 700, lineHeight: 1, color: accent.fg }}>
+        <span style={{ fontFamily: SG, fontSize: `${Math.round(size * 0.42)}px`, fontWeight: 700, lineHeight: 1, color: TEXT.body }}>
           {monogram}
         </span>
       ) : (
@@ -232,9 +236,9 @@ export function CoverImage({
   );
 }
 
-// Metric chip. Defaults to gold for back-compat; pass a category fg to make the
-// metric carry taxonomy signal (the redesign default for data chips).
-export function MetricChip({ children, color = GOLD }: { children: React.ReactNode; color?: string }) {
+// Metric chip. Defaults to a calm grey so star/upvote counts don't compete with
+// the colourful real logos on each card; pass a colour to override per-call.
+export function MetricChip({ children, color = TEXT.body }: { children: React.ReactNode; color?: string }) {
   return (
     <span
       style={{

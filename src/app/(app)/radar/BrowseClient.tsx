@@ -134,9 +134,9 @@ export function BrowseClient(data: BrowseData) {
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Header */}
         <div style={{ padding: "26px 24px 14px" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Browse</h1>
+          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Explore the radar</h1>
           <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>
-            Every tool, model and company on the radar.
+            Every tool, model and company in one place.
           </p>
         </div>
 

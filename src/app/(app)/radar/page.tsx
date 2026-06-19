@@ -8,7 +8,7 @@ export const revalidate = 1800;
 
 export default async function RadarPage() {
   const [tools, entities, essentials, hackathons] = await Promise.all([
-    getRadarTools(12),
+    getRadarTools(30),
     getRadarCards(21, 2, 16),
     getRadarEssentials(40),
     getHackathons(8),

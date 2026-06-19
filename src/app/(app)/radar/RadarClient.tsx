@@ -1,18 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Cpu, Compass, Bell, Check, ArrowRight, ArrowUpRight, Plug, Trophy, type LucideIcon } from "lucide-react";
+import { Cpu, Compass, Clapperboard, MessageSquare, Check, ArrowRight, ArrowUpRight, Plug, Trophy, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { Hackathon } from "@/lib/hackathons";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
 import { FaceMark, MetricChip, CoverImage, usePressTap, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
-import { toolThing, essThing, canonThing, entThing, categorizeTool, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
+import { toolThing, essThing, canonThing, entThing, categorizeTool, logoFor, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
+import { SectionAllSheet } from "./SectionAllSheet";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
+import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -24,13 +26,15 @@ interface RadarData {
   hackathons: Hackathon[];
 }
 
-// ─── Lenses (Builder + Exploring) ─────────────────────────────────────────────
+// ─── Lenses (Builder + Exploring + Creator) ──────────────────────────────────
 const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", tagline: "I build with AI — code, agents, UI, infra", Icon: Cpu },
+  { id: "creator", label: "Creator", tagline: "I create with AI — video, voice, image, content", Icon: Clapperboard },
   { id: "curious", label: "Just exploring", tagline: "Keep me current across AI, broadly", Icon: Compass },
 ];
 const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "builder", label: "Builder", Icon: Cpu },
+  { id: "creator", label: "Creator", Icon: Clapperboard },
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
@@ -64,7 +68,7 @@ let introPlayed = false;
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 // SectionKicker: muted — for section headers above rows/rails.
 function SectionKicker({ children }: { children: React.ReactNode }) {
-  return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, lineHeight: 1, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{children}</span>;
+  return <span style={{ fontFamily: SG, fontSize: "14px", fontWeight: 700, lineHeight: 1.1, letterSpacing: "0.04em", textTransform: "uppercase", color: TEXT.body }}>{children}</span>;
 }
 
 // ─── What's new (filter pills over one ranked feed) ──────────────────────────
@@ -110,7 +114,7 @@ function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarT
   return (
     <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-        <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} size={34} />
+        <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={34} />
         <SourceMark face={thing.face} size={14} />
       </div>
       <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
@@ -197,7 +201,7 @@ function HackathonRailCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon)
       style={{ flexShrink: 0, scrollSnapAlign: "start", width: "228px", textAlign: "left", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT, cursor: "pointer", padding: 0 }}
     >
       <div style={{ position: "relative" }}>
-        <CoverImage src={h.imageUrl} category="startups" height={98} radius={0} />
+        <CoverImage src={h.imageUrl ?? logoFor(h.url)} category="startups" fallbackIcon={Trophy} height={98} radius={0} />
         <span style={{ position: "absolute", top: "8px", left: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 8px" }}>{open ? "Open" : "Upcoming"}</span>
       </div>
       <div style={{ padding: "10px 12px 12px" }}>
@@ -240,6 +244,9 @@ const SECTION_ACCENT: Record<string, string> = {
   data: "#f59e0b", safe: "#f43f5e", media: "#fb923c", moving: "#22c55e", oss: "#94a3b8",
   // curious lens
   start: "#06b6d4", big: "#f59e0b", toolkit: "#3b82f6", notable: "#a855f7",
+  // creator lens
+  video: "#fb923c", voice: "#a855f7", image: "#06b6d4", marketing: "#22c55e",
+  cbig: "#f59e0b", cnotable: "#ec4899",
 };
 const sectionAccent = (key: string) => SECTION_ACCENT[key] ?? GOLD;
 
@@ -285,7 +292,7 @@ function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => 
   const tap = usePressTap(() => onOpen(thing));
   return (
     <motion.button {...tap} whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: `1px solid ${HAIRLINE}`, cursor: "pointer", color: "inherit" }}>
-      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} />
+      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em" }}>{thing.name}</span>
         <p style={{ fontSize: "14px", fontWeight: 450, color: TEXT.body, lineHeight: 1.4, margin: "2px 0 0" }}>{thing.valueLine}</p>
@@ -299,7 +306,7 @@ function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; o
   const tap = usePressTap(() => onOpen(thing));
   return (
     <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: wide ? "262px" : "210px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
-      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} />
+      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} />
       <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
       <p style={{ fontSize: "13px", color: TEXT.body, lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
       {thing.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{thing.metric}</MetricChip></span>}
@@ -309,16 +316,26 @@ function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; o
 
 interface SectionData { key: string; emoji?: string; eyebrow: string; sub: string; variant: "list" | "rail"; things: RadarThing[] }
 
-function Section({ emoji, eyebrow, sub, variant, things, onOpen }: SectionData & { onOpen: (t: RadarThing) => void }) {
+function Section({ emoji, eyebrow, sub, variant, things, onOpen, onSeeAll }: SectionData & { onOpen: (t: RadarThing) => void; onSeeAll?: () => void }) {
   if (things.length === 0) return null;
+  // Rails hide most cards off the right edge — offer a focused full view. List
+  // sections already show everything inline, so no "See all" there.
+  const showSeeAll = variant === "rail" && things.length > 3 && !!onSeeAll;
   return (
     <section style={{ marginBottom: "30px" }}>
-      <div style={{ padding: "0 24px", marginBottom: "12px" }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
-          {emoji && <span style={{ fontSize: "14px" }}>{emoji}</span>}
-          <SectionKicker>{eyebrow}</SectionKicker>
-        </span>
-        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>{sub}</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "0 24px", marginBottom: "12px" }}>
+        <div style={{ minWidth: 0 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
+            {emoji && <span style={{ fontSize: "16px" }}>{emoji}</span>}
+            <SectionKicker>{eyebrow}</SectionKicker>
+          </span>
+          <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "3px 0 0" }}>{sub}</p>
+        </div>
+        {showSeeAll && (
+          <button onClick={onSeeAll} style={{ flexShrink: 0, fontFamily: SG, fontSize: "12.5px", fontWeight: 600, color: GOLD, background: "transparent", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", padding: 0 }}>
+            See all <ArrowUpRight size={13} strokeWidth={2.3} />
+          </button>
+        )}
       </div>
       {variant === "rail" ? (
         <div className="scrollbar-none radar-rail" style={{ display: "flex", gap: "12px", padding: "0 24px", overflowX: "auto", scrollSnapType: "x proximity" }}>
@@ -353,9 +370,20 @@ function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
       { key: "models", emoji: "🧠", eyebrow: "Models & inference", sub: "Where to run the models you build on", variant: "rail", things: [...byCat("Models & chat"), ...byCat("Inference")].map(essThing) },
       { key: "data", emoji: "🗄️", eyebrow: "Data & RAG", sub: "Give your app memory and retrieval", variant: "rail", things: byCat("Data & RAG").map(essThing) },
       { key: "safe", emoji: "🔒", eyebrow: "Ship it safely", sub: "Security, evals & observability", variant: "rail", things: [...byCat("Security"), ...byCat("Eval & observability")].map(essThing) },
-      { key: "media", emoji: "🎬", eyebrow: "Generate media", sub: "Voice, image, and video models", variant: "rail", things: byCat("Media").map(essThing) },
+      { key: "media", emoji: "🎬", eyebrow: "Generate media", sub: "Voice, image, and video models", variant: "rail", things: [...byCat("Video"), ...byCat("Voice & audio"), ...byCat("Image")].map(essThing) },
       { key: "moving", emoji: "📈", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
       { key: "oss", emoji: "📦", eyebrow: "Popular open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
+    ];
+  } else if (lens === "creator") {
+    // For makers & marketers: generate, then distribute. Video → voice → image
+    // → marketing content, plus what's big and what's newly launched.
+    raw = [
+      { key: "video", emoji: "🎥", eyebrow: "Generate video", sub: "Text-to-video & motion models", variant: "rail", things: byCat("Video").map(essThing) },
+      { key: "voice", emoji: "🎙️", eyebrow: "Voice & audio", sub: "Speech, music & sound generation", variant: "rail", things: byCat("Voice & audio").map(essThing) },
+      { key: "image", emoji: "🖼️", eyebrow: "Generate images", sub: "Image & design generation", variant: "rail", things: byCat("Image").map(essThing) },
+      { key: "marketing", emoji: "📣", eyebrow: "Marketing & content", sub: "Avatars, clips & decks that sell", variant: "rail", things: byCat("Marketing & content").map(essThing) },
+      { key: "cbig", emoji: "🔥", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
+      { key: "cnotable", emoji: "✨", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
     ];
   } else {
     raw = [
@@ -368,43 +396,7 @@ function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
   return raw;
 }
 
-// ─── Category quick-nav — the "where are the categories" answer ──────────────
-// One swipeable row of bigger chips + a scroll-progress bar so it reads as
-// scrollable and doesn't eat vertical space.
-function CategoryNav({ sections }: { sections: SectionData[] }) {
-  const items = sections.filter((s) => s.things.length > 0);
-  const ref = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
-  const onScroll = () => {
-    const el = ref.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setProgress(max > 0 ? el.scrollLeft / max : 0);
-  };
-  if (items.length === 0) return null;
-  const jump = (key: string) => {
-    document.getElementById(`sec-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    posthog.capture("radar_category_jump", { key });
-  };
-  return (
-    <div style={{ padding: "0 0 22px" }}>
-      <span style={{ display: "block", padding: "0 24px", fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>Browse by</span>
-      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "grid", gridAutoFlow: "column", gridTemplateRows: "auto auto", gridAutoColumns: "max-content", gap: "9px", marginTop: "11px", padding: "0 24px", overflowX: "auto" }}>
-        {items.map((s) => (
-          <button key={s.key} onClick={() => jump(s.key)} style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 500, color: TEXT.body, background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "9px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
-            {s.emoji && <span style={{ fontSize: "14px" }}>{s.emoji}</span>}{s.eyebrow}
-          </button>
-        ))}
-      </div>
-      {/* Scroll-progress bar — signals "swipe me" */}
-      <div style={{ margin: "12px 24px 0", height: "3px", borderRadius: "3px", background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-        <div style={{ width: "34%", height: "100%", borderRadius: "3px", background: "rgba(255,255,255,0.28)", transform: `translateX(${progress * 196}%)`, transition: "transform 0.05s linear" }} />
-      </div>
-    </div>
-  );
-}
-
-// ─── Lens chooser (2 headline + "Just exploring") ────────────────────────────
+// ─── Lens chooser (Builder · Creator · Just exploring) ───────────────────────
 function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
   const [sel, setSel] = useState<RadarLens | null>(null);
   return (
@@ -444,6 +436,8 @@ export function RadarClient(data: RadarData) {
   const [ready, setReady] = useState(false);
   const [detail, setDetail] = useState<RadarThing | null>(null);
   const [hackDetail, setHackDetail] = useState<Hackathon | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [allSection, setAllSection] = useState<SectionData | null>(null);
   // Default to the first phrase so SSR + first client render match; a fresh
   // delightful one is picked on mount (each visit).
   const [headline, setHeadline] = useState(HEADER_PHRASES[0]);
@@ -456,9 +450,9 @@ export function RadarClient(data: RadarData) {
 
   useEffect(() => {
     const override = new URLSearchParams(window.location.search).get("lens");
-    if (override === "builder" || override === "curious" || override === "vibe" || override === "founder") {
+    if (override === "builder" || override === "creator" || override === "curious" || override === "vibe" || override === "founder") {
       // Retired lenses (vibe/founder) collapse into builder.
-      const mapped: RadarLens = override === "curious" ? "curious" : "builder";
+      const mapped: RadarLens = override === "curious" ? "curious" : override === "creator" ? "creator" : "builder";
       setRadarLens(mapped);
       setLens(mapped);
     } else {
@@ -501,9 +495,13 @@ export function RadarClient(data: RadarData) {
             <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{headline}</h1>
             <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>What&apos;s new and worth knowing in AI, tuned to you.</p>
           </div>
-          <Link href="/profile" aria-label="Settings & notifications" style={{ flexShrink: 0, marginTop: "2px", width: "38px", height: "38px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Bell size={17} color="#a3a3a3" strokeWidth={1.8} />
-          </Link>
+          <button
+            onClick={() => { setShowFeedback(true); posthog.capture("radar_feedback_opened", { from: "today_header" }); }}
+            aria-label="Send feedback"
+            style={{ flexShrink: 0, marginTop: "2px", display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "100px", background: SURFACE, border: `1px solid ${HAIRLINE}`, padding: "8px 14px", cursor: "pointer", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, boxShadow: INNER_HIGHLIGHT }}
+          >
+            <MessageSquare size={15} strokeWidth={2} /> Feedback
+          </button>
         </div>
 
         {/* Lens switcher + Hackathons entry. The two toggles tune the content
@@ -530,23 +528,36 @@ export function RadarClient(data: RadarData) {
           <motion.div key={lens} variants={V.block} initial={skipIntro ? false : "hidden"} animate="show" exit="exit">
             <motion.div variants={V.hero}><CategoryTiles sections={sections} /></motion.div>
             {lens === "builder" && (
-              <>
-                <motion.div variants={V.item}><CategoryNav sections={sections} /></motion.div>
-                <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
-              </>
+              <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
             )}
             {data.hackathons.length > 0 && (
               <motion.div variants={V.item}><HackathonsRail items={data.hackathons} onOpen={onOpenHackathon} /></motion.div>
             )}
             {sections.map((s) => (
-              <motion.div key={s.key} id={`sec-${s.key}`} variants={V.item}><Section {...s} onOpen={onOpen} /></motion.div>
+              <motion.div key={s.key} id={`sec-${s.key}`} variants={V.item}>
+                <Section
+                  {...s}
+                  onOpen={onOpen}
+                  onSeeAll={() => { setAllSection(s); posthog.capture("radar_section_see_all", { key: s.key, count: s.things.length }); }}
+                />
+              </motion.div>
             ))}
           </motion.div>
         </AnimatePresence>
       </div>
 
       <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />
+      <SectionAllSheet
+        open={!!allSection}
+        emoji={allSection?.emoji}
+        title={allSection?.eyebrow ?? ""}
+        sub={allSection?.sub ?? ""}
+        things={allSection?.things ?? []}
+        onClose={() => setAllSection(null)}
+        onOpenThing={(t) => { setAllSection(null); onOpen(t); }}
+      />
       <HackathonDetailSheet hackathon={hackDetail} onClose={() => setHackDetail(null)} />
+      <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
     </div>
   );
 }

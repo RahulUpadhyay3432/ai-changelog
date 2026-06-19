@@ -13,6 +13,9 @@ export interface EssentialTool {
   valueLine: string;
   url: string;
   category: string;
+  // Optional fuller body for the detail sheet's "About" block — for curated tools
+  // that aren't in the hand-authored getToolDepth map (e.g. the Creator catalog).
+  description?: string;
 }
 
 export const CURATED_ESSENTIALS: EssentialTool[] = [
@@ -119,13 +122,51 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Arize Phoenix", valueLine: "Open-source tracing and evaluation for LLM apps.", url: "https://phoenix.arize.com", category: "Eval & observability" },
   { name: "Weights & Biases", valueLine: "Track experiments, models, and LLM apps in one place.", url: "https://wandb.ai", category: "Eval & observability" },
 
-  // ── Media (builder-relevant) ──
-  { name: "ElevenLabs", valueLine: "Generate realistic AI voices and speech via API.", url: "https://elevenlabs.io", category: "Media" },
-  { name: "Midjourney", valueLine: "Generate striking images from text prompts.", url: "https://midjourney.com", category: "Media" },
-  { name: "Runway", valueLine: "Generate and edit video with AI.", url: "https://runwayml.com", category: "Media" },
-  { name: "Suno", valueLine: "Create full songs, with vocals, from a prompt.", url: "https://suno.com", category: "Media" },
-  { name: "Luma", valueLine: "Generate cinematic video and 3D from text or images.", url: "https://lumalabs.ai", category: "Media" },
-  { name: "HeyGen", valueLine: "Generate AI avatar and spokesperson videos.", url: "https://heygen.com", category: "Media" },
-  { name: "Sora", valueLine: "OpenAI's text-to-video model for generating clips.", url: "https://sora.com", category: "Media" },
-  { name: "Kling", valueLine: "Generate cinematic video from text and images.", url: "https://klingai.com", category: "Media" },
+  // ── Video (generate & edit motion) ──
+  { name: "Sora", valueLine: "OpenAI's text-to-video model for generating clips.", url: "https://sora.com", category: "Video",
+    description: "OpenAI's video model turns a text prompt into short, coherent clips, with control over style, motion, and camera. Available through the Sora app and API." },
+  { name: "Runway", valueLine: "Generate and edit video with AI.", url: "https://runwayml.com", category: "Video",
+    description: "A creative suite for generating and editing video — text-to-video, video-to-video, and a deep set of motion and editing tools used in real production work." },
+  { name: "Kling", valueLine: "Generate cinematic video from text and images.", url: "https://klingai.com", category: "Video",
+    description: "Kuaishou's video model turns text and reference images into cinematic, high-motion clips, popular for stylized and narrative shots." },
+  { name: "Luma", valueLine: "Generate cinematic video and 3D from text or images.", url: "https://lumalabs.ai", category: "Video",
+    description: "Luma's Dream Machine generates cinematic video and 3D scenes from text or images, with fast iteration and natural camera movement." },
+  { name: "Veo", valueLine: "Google's flagship text-to-video model.", url: "https://deepmind.google/models/veo/", category: "Video",
+    description: "Google DeepMind's video model generates high-resolution clips with strong prompt adherence and realistic motion, available through Flow and the Gemini app." },
+  { name: "Pika", valueLine: "Generate and restyle short video from a prompt.", url: "https://pika.art", category: "Video",
+    description: "Pika turns text and images into short, shareable videos, with playful effects for restyling and animating clips you already have." },
+
+  // ── Voice & audio (speech, music, sound) ──
+  { name: "ElevenLabs", valueLine: "Generate realistic AI voices and speech via API.", url: "https://elevenlabs.io", category: "Voice & audio",
+    description: "ElevenLabs produces natural text-to-speech, voice cloning, dubbing, and sound effects through a simple API, widely used for narration and product voiceovers." },
+  { name: "Suno", valueLine: "Create full songs, with vocals, from a prompt.", url: "https://suno.com", category: "Voice & audio",
+    description: "Suno generates complete songs — melody, instrumentation, and vocals — from a short text prompt, with control over genre and lyrics." },
+  { name: "Udio", valueLine: "Generate music and vocals from a prompt.", url: "https://udio.com", category: "Voice & audio",
+    description: "Udio creates high-fidelity music with vocals from a text description, with fine control over style, structure, and lyrics." },
+  { name: "Descript", valueLine: "Edit audio and video by editing the transcript.", url: "https://descript.com", category: "Voice & audio",
+    description: "Descript transcribes your recording and lets you edit the media by editing the text, with AI tools for removing filler words, cloning voices, and cleaning up audio." },
+
+  // ── Image (generate & design visuals) ──
+  { name: "Midjourney", valueLine: "Generate striking images from text prompts.", url: "https://midjourney.com", category: "Image",
+    description: "Midjourney is known for its distinctive, high-aesthetic image generation, with deep control over style, composition, and consistency across a series." },
+  { name: "Ideogram", valueLine: "Generate images with reliable, legible text.", url: "https://ideogram.ai", category: "Image",
+    description: "Ideogram generates images from prompts and is especially strong at rendering accurate, legible text — useful for posters, logos, and typographic art." },
+  { name: "Krea", valueLine: "Generate and enhance images in real time.", url: "https://krea.ai", category: "Image",
+    description: "Krea offers real-time image generation, upscaling, and restyling on one canvas, with live previews as you adjust the prompt and reference images." },
+  { name: "Recraft", valueLine: "Design-grade image and vector generation.", url: "https://recraft.ai", category: "Image",
+    description: "Recraft generates images, icons, and editable vector art in brand-consistent styles, aimed at designers who need production-ready assets." },
+  { name: "Flux", valueLine: "Open, high-quality image generation models.", url: "https://blackforestlabs.ai", category: "Image",
+    description: "Black Forest Labs builds the FLUX family of image models, offering open weights and a hosted API known for sharp detail and strong prompt following." },
+
+  // ── Marketing & content (avatars, clips, decks) ──
+  { name: "HeyGen", valueLine: "Generate AI avatar and spokesperson videos.", url: "https://heygen.com", category: "Marketing & content",
+    description: "HeyGen creates studio-quality avatar videos from a script, with realistic talking-head presenters and translation into dozens of languages — used for marketing and training." },
+  { name: "Synthesia", valueLine: "Create AI avatar videos from a script.", url: "https://synthesia.io", category: "Marketing & content",
+    description: "Synthesia turns plain text into professional videos fronted by AI avatars in 140+ languages, widely used for training, onboarding, and sales content." },
+  { name: "Captions", valueLine: "Edit and caption talking videos with AI.", url: "https://captions.ai", category: "Marketing & content",
+    description: "Captions is an AI video studio for creators — auto-captions, eye-contact correction, dubbing, and an AI presenter for short-form social video." },
+  { name: "OpusClip", valueLine: "Turn long videos into short, captioned clips.", url: "https://opus.pro", category: "Marketing & content",
+    description: "OpusClip finds the most engaging moments in a long video and reframes them into captioned short clips ready for TikTok, Reels, and Shorts." },
+  { name: "Gamma", valueLine: "Generate decks, docs, and sites from a prompt.", url: "https://gamma.app", category: "Marketing & content",
+    description: "Gamma generates polished presentations, documents, and web pages from a prompt, with on-brand styling and one-click publishing." },
 ];

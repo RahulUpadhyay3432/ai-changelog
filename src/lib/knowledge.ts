@@ -451,7 +451,7 @@ const STATIC_ESSENTIALS: RadarTool[] = CURATED_ESSENTIALS.map((t) => ({
   score: 0,
   topics: [],
   lastSeenAt: "",
-  description: null,
+  description: t.description ?? null,
   imageUrl: null,
 }));
 

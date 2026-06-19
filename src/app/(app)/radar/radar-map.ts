@@ -47,7 +47,9 @@ const TOPIC_CATEGORY: [RegExp, string][] = [
   [/rag\b|vector|embedding|database|postgres|semantic-search|retrieval|knowledge-base/i, "Data & RAG"],
   [/inference|serving|gpu|deploy|hosting|fine-?tun/i, "Inference"],
   [/eval|observability|monitoring|tracing|analytics|logging/i, "Eval & observability"],
-  [/voice|speech|image|video|audio|music|avatar|generative-art|text-to-/i, "Media"],
+  [/video|avatar|text-to-video|motion-graphics|filmmaking/i, "Video"],
+  [/voice|speech|audio|music|podcast|dubbing|text-to-speech|sound/i, "Voice & audio"],
+  [/image|photo|generative-art|text-to-image|diffusion|illustration|logo-maker/i, "Image"],
   [/dev-?tool|developer-tools|sdk|cli\b|api\b|framework|library|productivity/i, "Dev tools"],
   [/llm|language-model|gpt|chatbot|machine-learning|\bml\b|\bai\b|artificial-intelligence/i, "AI / Models"],
 ];
@@ -65,8 +67,9 @@ export function categorizeTool(topics: string[], source: RadarTool["source"]): s
 // relevant first). Categories not listed fall to the end, alphabetically.
 export const WHATS_NEW_CATEGORY_ORDER = [
   "Agents & automation", "Security", "UI & design", "AI / Models",
-  "Data & RAG", "Inference", "Dev tools", "Media", "Eval & observability",
-  "New on GitHub", "New on Product Hunt",
+  "Data & RAG", "Inference", "Dev tools",
+  "Video", "Voice & audio", "Image", "Marketing & content",
+  "Eval & observability", "New on GitHub", "New on Product Hunt",
 ];
 
 // A small emoji per category — UI wayfinding only (never in summary content).
@@ -84,6 +87,10 @@ const CATEGORY_EMOJI: Record<string, string> = {
   "Security": "🔒",
   "Eval & observability": "📊",
   "Media": "🎬",
+  "Video": "🎥",
+  "Voice & audio": "🎙️",
+  "Image": "🖼️",
+  "Marketing & content": "📣",
   "Open source": "📦",
   "MCP": "🔌",
   "New on GitHub": "🐙",

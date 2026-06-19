@@ -117,16 +117,21 @@ export function FaceMark({
   face,
   category,
   logoUrl,
+  label,
   size = 40,
 }: {
   face: Face;
   category?: CategorySlug | null;
   logoUrl?: string | null;
+  // When set and no logo resolves, render a first-letter monogram instead of the
+  // generic face icon — so a logo-less card reads as branded, not a stock rocket.
+  label?: string | null;
   size?: number;
 }) {
   const accent = category ? accentFor(category) : accentForFace(face);
   const Icon = FACE_ICON[face] ?? Sparkles;
   const radius = Math.round(size * 0.28);
+  const monogram = label?.trim()?.[0]?.toUpperCase() ?? "";
   const [failed, setFailed] = useState(false);
   // Show a real logo on a light chip (so dark/mono brand marks stay visible),
   // and fall back to the category-tinted monogram if it fails to load.
@@ -157,6 +162,10 @@ export function FaceMark({
           onError={() => setFailed(true)}
           style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
         />
+      ) : monogram ? (
+        <span style={{ fontFamily: SG, fontSize: `${Math.round(size * 0.42)}px`, fontWeight: 700, lineHeight: 1, color: accent.fg }}>
+          {monogram}
+        </span>
       ) : (
         <Icon size={Math.round(size * 0.47)} color={accent.fg} strokeWidth={1.8} />
       )}
@@ -170,6 +179,7 @@ export function CoverImage({
   src,
   category,
   face,
+  fallbackIcon,
   height = 180,
   radius = 18,
   style,
@@ -177,12 +187,15 @@ export function CoverImage({
   src?: string | null;
   category?: CategorySlug | null;
   face?: Face;
+  // Branded placeholder icon for the null-src state (e.g. Trophy for hackathons)
+  // so an image-less cover looks intentional, not broken.
+  fallbackIcon?: LucideIcon;
   height?: number;
   radius?: number;
   style?: React.CSSProperties;
 }) {
   const accent = category ? accentFor(category) : face ? accentForFace(face) : NEUTRAL;
-  const Icon = face ? FACE_ICON[face] ?? Sparkles : Sparkles;
+  const Icon = fallbackIcon ?? (face ? FACE_ICON[face] ?? Sparkles : Sparkles);
   return (
     <div
       style={{

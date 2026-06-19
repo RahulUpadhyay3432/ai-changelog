@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Bookmark, Copy, ArrowUpRight, Check } from "lucide-react";
 import posthog from "posthog-js";
 import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
+import { categoryEmoji } from "./radar-map";
 import { toggleRadarTool, isRadarToolSaved } from "@/lib/storage";
 import { getToolDepth } from "@/lib/radar-tool-depth";
 
@@ -24,6 +25,19 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
   const [saved, setSaved] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const depth = getToolDepth(thing.url);
+
+  // Promote a real description (≠ the value line) to an "About" block.
+  const about = thing.description?.trim();
+  const hasAbout = !!about && about !== thing.valueLine.trim();
+
+  // Always-on context facts, built from metadata the thing already carries — so
+  // even a depth-less GitHub/PH card reads as substantial, not a single line.
+  const metricLabel = thing.face === "github" ? "Stars" : thing.face === "producthunt" ? "Upvotes" : "Traction";
+  const contextRows: { label: string; value: string }[] = [];
+  if (thing.typeLabel) contextRows.push({ label: "Source", value: thing.typeLabel });
+  if (thing.metric) contextRows.push({ label: metricLabel, value: thing.metric });
+  if (thing.recency) contextRows.push({ label: "Updated", value: thing.recency });
+  if (thing.category) contextRows.push({ label: "Category", value: `${categoryEmoji(thing.category)} ${thing.category}` });
 
   useEffect(() => {
     setSaved(isRadarToolSaved(thing.id));
@@ -99,17 +113,28 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
         {/* Content */}
         <div style={{ padding: "18px 20px 0", overflowY: "auto", flex: 1 }}>
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#cfcbc4", margin: 0 }}>{thing.valueLine}</p>
-          {depth ? (
+
+          {/* Context facts — always present so the card never reads as one line. */}
+          {contextRows.length > 0 && (
+            <div style={{ marginTop: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", overflow: "hidden" }}>
+              {contextRows.map((r, i) => (
+                <div key={r.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "10px 14px", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
+                  <span style={{ fontSize: "12.5px", color: "#8a8a8a", fontWeight: 500 }}>{r.label}</span>
+                  <span style={{ fontSize: "13.5px", color: TEXT.body, fontWeight: 500, textAlign: "right" }}>{r.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {hasAbout && <Field label="About" body={about!} />}
+
+          {depth && (
             <>
               <Field label="What it is" body={depth.whatItIs} />
               <Field label="How it works" body={depth.howItWorks} />
               <Field label="Who it's for" body={depth.whoItsFor} />
               <Field label="Where it's used" body={depth.whereUsed} />
             </>
-          ) : (
-            thing.description && thing.description.trim() && thing.description.trim() !== thing.valueLine.trim() && (
-              <p style={{ fontSize: "14px", lineHeight: 1.6, color: "#a7a39d", margin: "12px 0 0" }}>{thing.description.trim()}</p>
-            )
           )}
           {thing.topics && thing.topics.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "16px" }}>

@@ -7,10 +7,32 @@ import { ArrowLeft, Trophy, MapPin, Users, ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { Hackathon } from "@/lib/hackathons";
 import { CoverImage, usePressTap, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
+import { logoFor } from "./radar-map";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
 
 type LocFilter = "all" | "online" | "inperson";
 type StateFilter = "all" | "open" | "upcoming";
+
+// Keyword-derived topics over a hackathon's themes/title/org. Only chips that
+// match at least one event are shown (no empty chips). First-match-agnostic — an
+// event can carry several topics. Canonical order drives the chip row.
+const TOPIC_ORDER = ["Agents", "GenAI / LLMs", "Vision", "Voice & audio", "Data / ML", "Web3", "Beginner"] as const;
+const TOPIC_RULES: [string, RegExp][] = [
+  ["Agents", /\bagent|autonomous|multi-?agent|agentic|automation|workflow/i],
+  ["GenAI / LLMs", /\bllm\b|gen-?ai|generative|language model|\bgpt\b|gemini|claude|chatbot|\bprompt/i],
+  ["Vision", /vision|image|video|computer-?vision|multimodal|\bar\b|\bvr\b|\bxr\b|3d\b/i],
+  ["Voice & audio", /voice|speech|audio|music|\bsound\b|podcast/i],
+  ["Data / ML", /\bml\b|machine learning|deep learning|\bdata\b|analytics|dataset|\bmlops\b/i],
+  ["Web3", /web3|blockchain|crypto|solana|ethereum|\bdefi\b|\bnft\b|on-?chain/i],
+  ["Beginner", /beginner|student|first hack|intro|newcomer|getting started|college|university/i],
+];
+
+function topicsFor(h: Hackathon): Set<string> {
+  const hay = `${h.themes.join(" ")} ${h.title} ${h.organization ?? ""}`;
+  const out = new Set<string>();
+  for (const [label, re] of TOPIC_RULES) if (re.test(hay)) out.add(label);
+  return out;
+}
 
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -33,7 +55,7 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
       style={{ display: "block", width: "100%", textAlign: "left", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT, cursor: "pointer", padding: 0 }}
     >
       <div style={{ position: "relative" }}>
-        <CoverImage src={h.imageUrl} category="startups" height={116} radius={0} />
+        <CoverImage src={h.imageUrl ?? logoFor(h.url)} category="startups" fallbackIcon={Trophy} height={116} radius={0} />
         <span style={{ position: "absolute", top: "10px", left: "10px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 9px" }}>
           {open ? "Open now" : "Upcoming"}
         </span>
@@ -67,6 +89,7 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
 export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
   const [loc, setLoc] = useState<LocFilter>("all");
   const [state, setState] = useState<StateFilter>("all");
+  const [topic, setTopic] = useState<string>("all");
   const [detail, setDetail] = useState<Hackathon | null>(null);
 
   const open = (h: Hackathon) => {
@@ -74,12 +97,25 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
     posthog.capture("radar_hackathon_brief_opened", { source: h.source, scope: "list" });
   };
 
+  const pickTopic = (t: string) => {
+    setTopic(t);
+    posthog.capture("radar_hackathon_topic_filter", { topic: t });
+  };
+
+  // Only surface topic chips that match ≥1 loaded hackathon — no empty chips.
+  const availableTopics = useMemo(() => {
+    const present = new Set<string>();
+    for (const h of hackathons) for (const t of topicsFor(h)) present.add(t);
+    return TOPIC_ORDER.filter((t) => present.has(t));
+  }, [hackathons]);
+
   const visible = useMemo(
     () =>
       hackathons
         .filter((h) => loc === "all" || (loc === "online" ? h.isOnline : !h.isOnline))
-        .filter((h) => state === "all" || h.openState.toLowerCase() === state),
-    [hackathons, loc, state],
+        .filter((h) => state === "all" || h.openState.toLowerCase() === state)
+        .filter((h) => topic === "all" || topicsFor(h).has(topic)),
+    [hackathons, loc, state, topic],
   );
 
   return (
@@ -106,11 +142,26 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
         <Pill active={loc === "online"} onClick={() => setLoc("online")}>Online</Pill>
         <Pill active={loc === "inperson"} onClick={() => setLoc("inperson")}>In-person</Pill>
       </div>
-      <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 16px", overflowX: "auto" }}>
+      <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: topic === "all" && availableTopics.length === 0 ? "0 24px 16px" : "0 24px 10px", overflowX: "auto" }}>
         <Pill active={state === "all"} onClick={() => setState("all")}>Any status</Pill>
         <Pill active={state === "open"} onClick={() => setState("open")}>Open now</Pill>
         <Pill active={state === "upcoming"} onClick={() => setState("upcoming")}>Upcoming</Pill>
       </div>
+      {availableTopics.length > 0 && (
+        <div className="scrollbar-none" style={{ display: "flex", gap: "8px", padding: "0 24px 14px", overflowX: "auto" }}>
+          <Pill active={topic === "all"} onClick={() => pickTopic("all")}>All topics</Pill>
+          {availableTopics.map((t) => (
+            <Pill key={t} active={topic === t} onClick={() => pickTopic(t)}>{t}</Pill>
+          ))}
+        </div>
+      )}
+
+      {/* Result count */}
+      {visible.length > 0 && (
+        <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "0 0 10px", padding: "0 24px" }}>
+          {visible.length} hackathon{visible.length === 1 ? "" : "s"}
+        </p>
+      )}
 
       {/* List */}
       {visible.length === 0 ? (

@@ -12,12 +12,13 @@ const KEYS = {
 };
 
 // ==========================================
-// Radar lens (Builder / Exploring) — persona self-segmentation
+// Radar lens (Builder / Exploring / Creator) — persona self-segmentation
 // A "vibe coder" is a builder; a "founder" building with AI wants the same
-// moves — so both legacy ids collapse into "builder".
+// moves — so both legacy ids collapse into "builder". "Creator" is for people
+// who make with AI — video, voice, image, marketing content.
 // ==========================================
-export type RadarLens = "builder" | "curious";
-const RADAR_LENSES: RadarLens[] = ["builder", "curious"];
+export type RadarLens = "builder" | "curious" | "creator";
+const RADAR_LENSES: RadarLens[] = ["builder", "curious", "creator"];
 
 export function getRadarLens(): RadarLens | null {
   if (!isBrowser) return null;

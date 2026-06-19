@@ -19,6 +19,11 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  /* Standalone PWA + viewport-fit:cover + black-translucent status bar means the
+     web view runs UNDER the iOS status bar, so the radar headers would tuck
+     beneath the clock. Reserve the top safe-area inset (0 in a normal browser,
+     ~47-59px on a notched home-screen app) — same fix the (app) shell uses. */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .mobileNav {

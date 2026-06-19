@@ -114,17 +114,10 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
           {thing.topics && thing.topics.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "16px" }}>
               {thing.topics.slice(0, 6).map((topic) => (
-                <span key={topic} style={{ fontSize: "12px", fontWeight: 500, color: "#b8b4ac", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "100px", padding: "4px 11px", textTransform: "capitalize" }}>
+                <span key={topic} style={{ fontSize: "12px", fontWeight: 500, color: TEXT.body, background: "rgba(255,255,255,0.06)", border: `1px solid rgba(255,255,255,0.09)`, borderRadius: "100px", padding: "4px 11px", textTransform: "capitalize" }}>
                   {topic.replace(/-/g, " ")}
                 </span>
               ))}
-            </div>
-          )}
-          {thing.storyTitle && (
-            <div style={{ marginTop: "18px", padding: "14px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px" }}>
-              <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", color: GOLD, textTransform: "uppercase" }}>Latest</span>
-              <p style={{ fontSize: "14px", color: "#c9c5bf", lineHeight: 1.45, margin: "6px 0 0" }}>{thing.storyTitle}</p>
-              {thing.storySource && <span style={{ display: "block", fontSize: "12px", color: "#6a6a6a", marginTop: "6px" }}>{thing.storySource}</span>}
             </div>
           )}
         </div>

@@ -3,16 +3,16 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Search, Compass } from "lucide-react";
+import { Search, Compass, Plug, ArrowUpRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
 import {
   CoverImage, MetricChip,
-  GOLD, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
+  GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
   type RadarThing,
 } from "./radar-shared";
-import { toolThing, essThing, canonThing, entThing } from "./radar-map";
+import { toolThing, essThing, canonThing, entThing, categoryEmoji } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 const GRAIN =
@@ -124,17 +124,29 @@ export function BrowseClient(data: BrowseData) {
   };
 
   return (
-    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "28px" }}>
+    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: CANVAS, paddingBottom: "28px" }}>
       <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
 
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Header */}
         <div style={{ padding: "26px 24px 14px" }}>
-          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: "#f5f3ef", margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Browse</h1>
+          <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Browse</h1>
           <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>
             Every tool, model and company on the radar.
           </p>
         </div>
+
+        {/* MCP market entry */}
+        <Link href="/radar/mcp" onClick={() => posthog.capture("radar_browse_mcp_tapped")} style={{ display: "flex", alignItems: "center", gap: "12px", margin: "0 24px 14px", padding: "13px 14px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", textDecoration: "none", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+          <span style={{ flexShrink: 0, width: "38px", height: "38px", borderRadius: "10px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Plug size={18} color={GOLD} strokeWidth={2} />
+          </span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: TEXT.primary }}>MCP market</span>
+            <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, marginTop: "1px" }}>Top MCP servers, by category</span>
+          </span>
+          <ArrowUpRight size={17} color={TEXT.muted} strokeWidth={2} />
+        </Link>
 
         {/* Search — secondary ghost pill */}
         <div style={{ padding: "0 24px 14px" }}>
@@ -152,10 +164,11 @@ export function BrowseClient(data: BrowseData) {
         {/* Sticky category chips — the persistent nav */}
         <div
           className="scrollbar-none"
-          style={{ position: "sticky", top: 0, zIndex: 4, display: "flex", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: "linear-gradient(to bottom, #0a0a0a 75%, transparent)" }}
+          style={{ position: "sticky", top: 0, zIndex: 4, display: "flex", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: `linear-gradient(to bottom, ${CANVAS} 75%, transparent)` }}
         >
           {chips.map((c) => {
             const active = c.key === activeCat && !query;
+            const emoji = c.key === ALL ? "🧭" : categoryEmoji(c.key);
             return (
               <button
                 key={c.key}
@@ -163,12 +176,13 @@ export function BrowseClient(data: BrowseData) {
                 style={{
                   flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
                   fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
-                  color: active ? "#0a0a0a" : "#a3a3a3",
-                  background: active ? GOLD : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
+                  color: active ? "#0a0a0a" : TEXT.body,
+                  background: active ? GOLD : "rgba(255,255,255,0.05)",
+                  border: `1px solid ${active ? GOLD : HAIRLINE}`,
                   borderRadius: "100px", padding: "7px 14px", cursor: "pointer", whiteSpace: "nowrap",
                 }}
               >
+                <span style={{ fontSize: "13px" }}>{emoji}</span>
                 {c.key}
                 <span style={{ fontSize: "11px", opacity: 0.65, fontVariantNumeric: "tabular-nums" }}>{c.count}</span>
               </button>

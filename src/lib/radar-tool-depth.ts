@@ -261,6 +261,242 @@ const RAW: Record<string, ToolDepth> = {
     whoItsFor: "Builders adding voice to products, plus creators making audio content.",
     whereUsed: "Voice agents, narration, dubbing, and accessibility features.",
   },
+
+  // ── Models & chat (added) ──
+  "https://grok.com": {
+    whatItIs: "xAI's assistant, with access to real-time posts on X.",
+    howItWorks: "It answers like other chat models but can pull in current conversation from X for fresher, more opinionated responses.",
+    whoItsFor: "People who want an assistant tuned to live discussion and current events.",
+    whereUsed: "Real-time questions, social context, and general reasoning.",
+  },
+  "https://mistral.ai": {
+    whatItIs: "A European AI lab offering frontier and open-weight models.",
+    howItWorks: "You use its models through the Le Chat assistant or an API, including open weights you can self-host.",
+    whoItsFor: "Builders who want capable models with an open option and EU data residency.",
+    whereUsed: "Chat, coding, and apps that need open or region-specific models.",
+  },
+  "https://deepseek.com": {
+    whatItIs: "A lab known for strong, low-cost open reasoning models.",
+    howItWorks: "Its models are available via chat and a cheap API, with open weights you can run yourself.",
+    whoItsFor: "Builders who want strong reasoning without frontier-model pricing.",
+    whereUsed: "Coding, math, and reasoning tasks where cost matters.",
+  },
+
+  // ── AI coding (added) ──
+  "https://replit.com": {
+    whatItIs: "A browser IDE that builds, runs, and deploys apps with an AI agent.",
+    howItWorks: "You describe an app and its Agent writes, runs, and hosts it in a full cloud environment — no local setup.",
+    whoItsFor: "Beginners and builders who want to go from idea to deployed app in one place.",
+    whereUsed: "Prototypes, learning to code, and small apps shipped from the browser.",
+  },
+  "https://aider.chat": {
+    whatItIs: "An open-source AI pair-programmer for your terminal.",
+    howItWorks: "It edits files in your local git repo from your instructions and commits each change, so history stays clean.",
+    whoItsFor: "Developers who live in the terminal and want AI edits tracked in git.",
+    whereUsed: "Feature work and refactors on local repositories.",
+  },
+  "https://cline.bot": {
+    whatItIs: "An autonomous coding agent that runs inside VS Code.",
+    howItWorks: "It plans a task, edits files, and runs terminal commands, asking permission at each step you choose to gate.",
+    whoItsFor: "VS Code users who want an open, transparent coding agent.",
+    whereUsed: "Multi-step changes and debugging without leaving the editor.",
+  },
+  "https://zed.dev": {
+    whatItIs: "A fast, collaborative code editor with AI built in.",
+    howItWorks: "Built in Rust for speed, it adds AI assistance and real-time collaboration alongside a lightweight editing core.",
+    whoItsFor: "Developers who want performance and native AI without a heavy IDE.",
+    whereUsed: "Everyday editing, pair programming, and AI-assisted changes.",
+  },
+  "https://devin.ai": {
+    whatItIs: "An autonomous AI software engineer from Cognition.",
+    howItWorks: "You assign a task and Devin plans, codes, tests, and opens a pull request, working in its own environment.",
+    whoItsFor: "Teams who want to offload well-scoped engineering tasks to an agent.",
+    whereUsed: "Bug fixes, small features, and migrations handled end to end.",
+  },
+
+  // ── UI & design (added) ──
+  "https://magicpatterns.com": {
+    whatItIs: "A tool for generating and iterating on UI designs from prompts.",
+    howItWorks: "You describe an interface and it produces editable designs and React code you can refine and export.",
+    whoItsFor: "Product teams who want to explore UI directions quickly.",
+    whereUsed: "Prototyping screens and components before building for real.",
+  },
+  "https://builder.io": {
+    whatItIs: "A visual development platform that turns designs into code.",
+    howItWorks: "It imports Figma designs, lets you edit visually, and outputs code for your framework, with an AI assist.",
+    whoItsFor: "Teams who want designers and marketers to ship without blocking developers.",
+    whereUsed: "Landing pages, marketing sites, and design-to-code workflows.",
+  },
+  "https://webflow.com": {
+    whatItIs: "A visual platform to design, build, and host production websites.",
+    howItWorks: "You design on a canvas that maps to real HTML and CSS, then publish to managed hosting.",
+    whoItsFor: "Designers and teams who want pixel control without writing front-end code.",
+    whereUsed: "Marketing sites, portfolios, and content-driven sites.",
+  },
+  "https://tailwindcss.com": {
+    whatItIs: "A utility-first CSS framework for styling in your markup.",
+    howItWorks: "You compose small utility classes directly in HTML or JSX; a build step strips everything you don't use.",
+    whoItsFor: "Developers who want consistent, fast styling without writing custom CSS.",
+    whereUsed: "Almost any modern web UI — it's the default for many AI-generated front ends.",
+  },
+
+  // ── Inference (added) ──
+  "https://fireworks.ai": {
+    whatItIs: "A fast inference platform for open models.",
+    howItWorks: "It serves popular open models through an API tuned for low latency and high throughput, with fine-tuning support.",
+    whoItsFor: "Teams running open models in production who care about speed and cost.",
+    whereUsed: "Production inference and serving custom fine-tunes.",
+  },
+  "https://fal.ai": {
+    whatItIs: "An inference platform specialized in media models.",
+    howItWorks: "It runs image, video, and audio models behind a fast API, optimized for real-time generation.",
+    whoItsFor: "Builders adding generative media to apps without managing GPUs.",
+    whereUsed: "Image and video generation features in production apps.",
+  },
+  "https://modal.com": {
+    whatItIs: "A serverless platform for running Python and GPU workloads.",
+    howItWorks: "You write Python functions and Modal runs them in the cloud on demand, handling scaling and GPUs.",
+    whoItsFor: "Engineers who want to run models or batch jobs without managing infrastructure.",
+    whereUsed: "Model serving, fine-tuning, and data and AI pipelines.",
+  },
+  "https://cerebras.ai": {
+    whatItIs: "An AI compute company offering record-fast model inference.",
+    howItWorks: "Its wafer-scale chips serve open models at very high token speeds through an API.",
+    whoItsFor: "Builders who need the fastest possible responses from large open models.",
+    whereUsed: "Latency-critical apps and high-volume inference.",
+  },
+
+  // ── Data & RAG (added) ──
+  "https://weaviate.io": {
+    whatItIs: "An open-source vector database with hybrid search.",
+    howItWorks: "It stores embeddings alongside keyword indexes so you can combine semantic and keyword search in one query.",
+    whoItsFor: "Builders who want open-source retrieval with both search styles.",
+    whereUsed: "RAG and search where keyword precision and semantics both matter.",
+  },
+  "https://qdrant.tech": {
+    whatItIs: "A high-performance open-source vector search engine.",
+    howItWorks: "Written in Rust, it indexes vectors with rich filtering and serves fast nearest-neighbour queries at scale.",
+    whoItsFor: "Teams who want fast, self-hostable vector search.",
+    whereUsed: "RAG, recommendations, and large-scale semantic search.",
+  },
+  "https://trychroma.com": {
+    whatItIs: "An open-source embedding database for AI applications.",
+    howItWorks: "It gives you a simple API to store and query embeddings, easy to run locally and scale up later.",
+    whoItsFor: "Builders who want the quickest path to retrieval in a prototype.",
+    whereUsed: "Local RAG experiments and small-to-mid production apps.",
+  },
+  "https://llamaindex.ai": {
+    whatItIs: "A framework for connecting your data to LLMs.",
+    howItWorks: "It handles loading, chunking, indexing, and querying your documents so models can answer over them.",
+    whoItsFor: "Developers building RAG and document-aware apps.",
+    whereUsed: "Chat-over-your-docs, knowledge assistants, and data agents.",
+  },
+  "https://neon.tech": {
+    whatItIs: "Serverless Postgres with database branching and pgvector.",
+    howItWorks: "It separates storage from compute so databases scale to zero and branch like code, with vector search built in.",
+    whoItsFor: "Builders who want a modern Postgres that doubles as their vector store.",
+    whereUsed: "App backends and RAG where embeddings live beside relational data.",
+  },
+
+  // ── Agents & automation (added) ──
+  "https://crewai.com": {
+    whatItIs: "A framework for teams of role-playing AI agents.",
+    howItWorks: "You define agents with roles and tools and a process for how they collaborate on a task.",
+    whoItsFor: "Developers building multi-agent systems where roles divide the work.",
+    whereUsed: "Research, content, and automation tasks split across agents.",
+  },
+  "https://dify.ai": {
+    whatItIs: "An open-source platform for building and running LLM apps and agents.",
+    howItWorks: "It gives you a visual builder for prompts, workflows, and RAG, with APIs to ship the result.",
+    whoItsFor: "Teams who want to build AI apps without wiring every piece from scratch.",
+    whereUsed: "Internal assistants, chatbots, and agent workflows.",
+  },
+  "https://lindy.ai": {
+    whatItIs: "A platform for building AI assistants that automate busywork.",
+    howItWorks: "You describe a task and Lindy builds an assistant that connects to your apps and acts on triggers.",
+    whoItsFor: "Operators who want AI to handle email, scheduling, and routine work.",
+    whereUsed: "Sales, support, and operations automation.",
+  },
+
+  // ── Orchestration (added) ──
+  "https://mastra.ai": {
+    whatItIs: "A TypeScript framework for agents, workflows, and RAG.",
+    howItWorks: "It gives you typed building blocks — agents, tools, workflows, memory — to assemble AI features in one codebase.",
+    whoItsFor: "TypeScript developers who want structure for production AI apps.",
+    whereUsed: "Agents, RAG, and multi-step AI workflows in JavaScript stacks.",
+  },
+
+  // ── Security (added) ──
+  "https://gitguardian.com": {
+    whatItIs: "A platform that detects leaked secrets across your code and CI.",
+    howItWorks: "It scans repositories and pipelines for exposed credentials and alerts you to rotate them fast.",
+    whoItsFor: "Teams who want to catch committed secrets before they're exploited.",
+    whereUsed: "Securing repos, CI pipelines, and developer workflows.",
+  },
+  "https://infisical.com": {
+    whatItIs: "An open-source platform for managing secrets.",
+    howItWorks: "It stores secrets centrally and syncs them to apps, environments, and CI, with access controls.",
+    whoItsFor: "Teams who want self-hostable secrets management.",
+    whereUsed: "Managing API keys and config across services and environments.",
+  },
+  "https://lakera.ai": {
+    whatItIs: "A security layer that guards LLM apps against misuse.",
+    howItWorks: "It screens prompts and outputs for prompt injection, data leaks, and unsafe content before they reach the model or user.",
+    whoItsFor: "Teams putting LLM features in front of real users.",
+    whereUsed: "Protecting chatbots and agents from prompt-injection attacks.",
+  },
+
+  // ── Eval & observability (added) ──
+  "https://braintrust.dev": {
+    whatItIs: "A platform for evaluating and improving AI products.",
+    howItWorks: "You build datasets and scorers, run evals on prompt or model changes, and compare results before shipping.",
+    whoItsFor: "Teams who want to measure whether an AI change actually helped.",
+    whereUsed: "Regression testing prompts, models, and agents.",
+  },
+  "https://phoenix.arize.com": {
+    whatItIs: "Open-source tracing and evaluation for LLM apps.",
+    howItWorks: "It captures traces of model and agent runs and provides evals and visualizations to debug them.",
+    whoItsFor: "Engineers who want open observability for their AI stack.",
+    whereUsed: "Debugging RAG and agents, and evaluating quality.",
+  },
+  "https://wandb.ai": {
+    whatItIs: "A platform to track experiments, models, and LLM apps.",
+    howItWorks: "You log runs, metrics, and traces; it organizes them into dashboards for comparison and collaboration.",
+    whoItsFor: "ML and AI teams who need a record of what they trained and shipped.",
+    whereUsed: "Training experiments, model versioning, and LLM tracing.",
+  },
+
+  // ── Media (added) ──
+  "https://midjourney.com": {
+    whatItIs: "A generative model known for striking, stylized images.",
+    howItWorks: "You prompt it and it returns image options to upscale or vary, refining toward what you want.",
+    whoItsFor: "Designers, marketers, and anyone needing original imagery.",
+    whereUsed: "Concept art, marketing visuals, and moodboards.",
+  },
+  "https://runwayml.com": {
+    whatItIs: "A suite for generating and editing video with AI.",
+    howItWorks: "You generate clips from text or images and edit them with AI tools for motion, style, and effects.",
+    whoItsFor: "Creators and teams producing video without a full production setup.",
+    whereUsed: "Short-form video, ads, and visual effects.",
+  },
+  "https://suno.com": {
+    whatItIs: "A model that generates full songs, including vocals, from a prompt.",
+    howItWorks: "You describe a style and lyrics, or let it write them, and it produces a complete track.",
+    whoItsFor: "Creators who want original music without producing it themselves.",
+    whereUsed: "Soundtracks, jingles, and creative music projects.",
+  },
+  "https://lumalabs.ai": {
+    whatItIs: "A lab making models for cinematic video and 3D.",
+    howItWorks: "Its Dream Machine generates video from text or images; other tools capture and create 3D scenes.",
+    whoItsFor: "Creators and builders adding generated video or 3D to their work.",
+    whereUsed: "Video generation, visual effects, and 3D capture.",
+  },
+  "https://heygen.com": {
+    whatItIs: "A platform for generating AI avatar and spokesperson videos.",
+    howItWorks: "You pick or clone an avatar, type a script, and it produces a talking-head video in many languages.",
+    whoItsFor: "Teams making training, marketing, or localized video at scale.",
+    whereUsed: "Explainer videos, localization, and personalized outreach.",
+  },
 };
 
 // Build a normalized lookup once at module load.

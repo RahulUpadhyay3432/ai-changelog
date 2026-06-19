@@ -10,16 +10,21 @@ export const GOLD_SOFT = "rgba(232,178,92,0.12)";
 export const GOLD_BORDER = "rgba(232,178,92,0.28)";
 export const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
 
-// Warm surface ramp (replaces cold #111 / pure-black flatness).
-export const SURFACE = "#131210"; // raised card surface (warm)
-export const HAIRLINE = "rgba(255,255,255,0.07)"; // white-alpha only, never colored
-export const INNER_HIGHLIGHT = "inset 0 1px 0 rgba(255,255,255,0.07)";
+// Warm surface ramp — lifted off pure-black so the eye has somewhere to rest
+// (the "it's too dark / reading is effort" fix). Cards now sit clearly above
+// the canvas; raised rows sit above the cards.
+export const CANVAS = "#0c0b0a"; // app canvas (warm near-black, not pure #0a0a0a)
+export const SURFACE = "#1b1a17"; // card surface — visibly above canvas
+export const SURFACE_RAISED = "#24221d"; // elevated rows / hovered cards
+export const HAIRLINE = "rgba(255,255,255,0.09)"; // white-alpha only, never colored
+export const INNER_HIGHLIGHT = "inset 0 1px 0 rgba(255,255,255,0.08)";
 
-// Warm text ramp — the only greys used on dark.
+// Warm text ramp — the only greys used on dark. Brighter than before so the
+// value-line (the thing people actually read) never costs effort.
 export const TEXT = {
-  primary: "#f5f3ef",
-  body: "#c2beb6",
-  muted: "#8f8b83",
+  primary: "#f6f4f0",
+  body: "#cbc7bf", // brighter than the old #c2beb6
+  muted: "#a29d94", // brighter than the old #8f8b83 — still clearly secondary
 } as const;
 
 // Mobile type scale. One big jump (20px title vs 15px body) IS the hierarchy.

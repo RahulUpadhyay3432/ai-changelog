@@ -49,6 +49,38 @@ export const WHATS_NEW_CATEGORY_ORDER = [
   "New on GitHub", "New on Product Hunt",
 ];
 
+// A small emoji per category — UI wayfinding only (never in summary content).
+// Makes categories scannable at a glance and adds warmth without loud color.
+const CATEGORY_EMOJI: Record<string, string> = {
+  "AI coding": "⌨️",
+  "Dev tools": "🛠️",
+  "UI & design": "🎨",
+  "Agents & automation": "🤖",
+  "Orchestration": "🔀",
+  "Models & chat": "🧠",
+  "AI / Models": "🧠",
+  "Inference": "⚡",
+  "Data & RAG": "🗄️",
+  "Security": "🔒",
+  "Eval & observability": "📊",
+  "Media": "🎬",
+  "Open source": "📦",
+  "MCP": "🔌",
+  "New on GitHub": "🐙",
+  "New on Product Hunt": "🚀",
+  // Browse-catalog buckets (entities + trending)
+  "Models": "🧠",
+  "Tools": "🛠️",
+  "Companies": "🏢",
+  "Concepts": "💡",
+  "New & trending": "📡",
+};
+
+export function categoryEmoji(category: string | null | undefined): string {
+  if (!category) return "✨";
+  return CATEGORY_EMOJI[category] ?? "✨";
+}
+
 // Trending GitHub / Product Hunt launch.
 export function toolThing(t: RadarTool): RadarThing {
   return {

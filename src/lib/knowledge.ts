@@ -5,6 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { isGenericEntityName, type EntityType } from "./entities";
+import { CURATED_ESSENTIALS } from "./radar-essentials";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -404,6 +405,11 @@ export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
 
 // "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),
 // accessible-first (sort_rank), then by traction.
+//
+// The curated half is static editorial (CURATED_ESSENTIALS) that only reaches
+// the DB after the tools cron runs. So we ALWAYS merge the static list in: the
+// Builder category sections + Browse render richly regardless of DB state, and
+// the DB still layers canon OSS (and any DB copy of the curated rows) on top.
 export async function getRadarEssentials(limit = 40): Promise<RadarTool[]> {
   const run = (cols: string) =>
     supabase
@@ -415,8 +421,35 @@ export async function getRadarEssentials(limit = 40): Promise<RadarTool[]> {
       .limit(limit);
   const first = await run(RADAR_TOOL_COLS_DESC);
   const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
-  return (data ?? []).map(toRadarTool);
+  const fromDb = (data ?? []).map(toRadarTool);
+
+  // De-dupe by url: static curated wins for its own rows; DB supplies the rest
+  // (canon OSS, plus curated rows if the cron has run). Static comes first so
+  // the accessible-first editorial ordering is preserved.
+  const seen = new Set<string>();
+  const merged: RadarTool[] = [];
+  for (const t of [...STATIC_ESSENTIALS, ...fromDb]) {
+    const key = t.url.replace(/\/+$/, "").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(t);
+  }
+  return merged;
 }
+
+// The curated essentials as RadarTool rows, sourced from the static editorial
+// list (no DB round-trip). meta = category bucket, mirroring the cron's mapping.
+const STATIC_ESSENTIALS: RadarTool[] = CURATED_ESSENTIALS.map((t) => ({
+  source: "curated",
+  name: t.name,
+  valueLine: t.valueLine,
+  url: t.url,
+  meta: t.category,
+  score: 0,
+  topics: [],
+  lastSeenAt: "",
+  description: null,
+}));
 
 // Whole-word, case-insensitive check that a story headline names an entity —
 // boundaries so "Meta" doesn't match "metadata" and "AI" doesn't match "train".

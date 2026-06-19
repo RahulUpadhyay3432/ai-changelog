@@ -59,9 +59,6 @@ function sessionHeadline(): string {
 // returning to Today from another tab doesn't replay it (the "reload" feel).
 let introPlayed = false;
 
-// Curated cross-cut: the tools that take you from idea to a working demo fast.
-// Names match CURATED_ESSENTIALS exactly.
-const HACKATHON_TOOLS = ["Lovable", "Bolt.new", "v0", "Replit", "Cursor", "Windsurf", "Supabase"];
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
 // Eyebrow: gold — for hero overlay context (image backdrop).
@@ -424,19 +421,15 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
   const curated = data.essentials.filter((e) => e.source === "curated");
   const canon = data.essentials.filter((e) => e.source === "github");
   const byCat = (cat: string) => curated.filter((e) => e.meta === cat);
-  // Pick specific curated tools by name, preserving the given order.
-  const byNames = (names: string[]) =>
-    names.map((n) => curated.find((e) => e.name === n)).filter((e): e is RadarTool => !!e);
   const byTraction = [...data.entities].sort((a, b) => b.entity.mentionCount - a.entity.mentionCount);
   const modelsTools = byTraction.filter((e) => e.entity.entityType === "model" || e.entity.entityType === "tool");
 
   let raw: SectionData[];
   if (lens === "builder") {
     // Everything a builder reaches for, in the order they reach for it:
-    // hackathon-fast → write code → ship the UI → wire agents → pick models →
-    // store data → ship it safely → see what's new / moving / canonical.
+    // write code → ship the UI → wire agents → pick models → store data →
+    // ship it safely → see what's new / moving / canonical.
     raw = [
-      { key: "hackathon", emoji: "🏁", eyebrow: "Hackathon mode", sub: "Idea to demo in a weekend", variant: "rail", things: byNames(HACKATHON_TOOLS).map(essThing) },
       { key: "coding", emoji: "⌨️", eyebrow: "Build with AI", sub: "AI coding tools & agentic editors", variant: "rail", things: byCat("AI coding").map(essThing) },
       { key: "ui", emoji: "🎨", eyebrow: "Ship the interface", sub: "UI, design & front-end generation", variant: "rail", things: byCat("UI & design").map(essThing) },
       { key: "agents", emoji: "🤖", eyebrow: "Agents & orchestration", sub: "Wire AI into workflows that run themselves", variant: "rail", things: [...byCat("Agents & automation"), ...byCat("Orchestration")].map(essThing) },

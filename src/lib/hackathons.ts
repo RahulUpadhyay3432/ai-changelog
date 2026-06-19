@@ -160,14 +160,26 @@ function toHackathon(r: HackathonRow): Hackathon {
   };
 }
 
-// Reads the stored hackathons, most-subscribed first. Degrades to [] if the
-// table doesn't exist yet (pre-migration), so the app never breaks.
+// Reads the stored hackathons, most-subscribed first. The table (migration 0008 +
+// the cron) is the primary, durable path. If it isn't there yet — or is still empty
+// — we fall back to a live Devpost fetch so the feature shows immediately with zero
+// Supabase setup. Both paths degrade to [] on failure, so the app never breaks.
 export async function getHackathons(limit = 40): Promise<Hackathon[]> {
   const { data, error } = await supabase
     .from("radar_hackathons")
     .select(HACKATHON_COLS)
     .order("participants", { ascending: false, nullsFirst: false })
     .limit(limit);
-  if (error) return [];
-  return (data ?? []).map((r) => toHackathon(r as HackathonRow));
+  if (!error && data && data.length > 0) {
+    return data.map((r) => toHackathon(r as HackathonRow));
+  }
+  // Table missing or empty → live fallback (HackathonInput extends Hackathon).
+  try {
+    const live = await fetchDevpostHackathons();
+    return live
+      .sort((a, b) => (b.participants ?? 0) - (a.participants ?? 0))
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
 }

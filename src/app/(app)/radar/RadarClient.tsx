@@ -61,10 +61,6 @@ let introPlayed = false;
 
 
 // ─── Shared bits ─────────────────────────────────────────────────────────────
-// Eyebrow: gold — for hero overlay context (image backdrop).
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", color: GOLD }}>{children}</span>;
-}
 // SectionKicker: muted — for section headers above rows/rails.
 function SectionKicker({ children }: { children: React.ReactNode }) {
   return <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, lineHeight: 1, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{children}</span>;
@@ -227,99 +223,52 @@ function HackathonsRail({ items }: { items: Hackathon[] }) {
   );
 }
 
-// ─── Hero deck (swipeable; ends on "Caught up") ──────────────────────────────
-type HeroCard =
-  | { kind: "thing"; eyebrow: string; thing: RadarThing; imageUrl: string | null }
-  | { kind: "closer"; count: number };
+// ─── High-level category tiles — the builder's branching, top of Today ───────
+// Replaces the old swipeable hero deck: instead of 3 passive cards, the same
+// vertical space becomes navigable entry points into the radar's categories.
+// One tile per non-empty section; tap → smooth-scroll to that section below.
+// A faint per-category tint adds life while honoring radar-shared's monochrome
+// discipline (GOLD stays wayfinding-only; the tints are corner glows, not fills).
+const SECTION_ACCENT: Record<string, string> = {
+  // builder lens
+  coding: "#3b82f6", ui: "#a855f7", agents: "#6366f1", models: "#06b6d4",
+  data: "#f59e0b", safe: "#f43f5e", media: "#fb923c", moving: "#22c55e", oss: "#94a3b8",
+  // curious lens
+  start: "#06b6d4", big: "#f59e0b", toolkit: "#3b82f6", notable: "#a855f7",
+};
+const sectionAccent = (key: string) => SECTION_ACCENT[key] ?? GOLD;
 
-const CARD_W = "84%";
-
-function HeroCardThing({ card, onOpen }: { card: Extract<HeroCard, { kind: "thing" }>; onOpen: (t: RadarThing) => void }) {
-  const t = card.thing;
-  // When an entity has a real news story, lead with the story (the move), not the entity name.
-  const isStoryLed = t.kind === "entity" && !!t.storyTitle;
-  const headline = isStoryLed ? t.storyTitle! : t.name;
-
-  return (
-    <button onClick={() => onOpen(t)} className="radar-hero" style={{ flex: `0 0 ${CARD_W}`, scrollSnapAlign: "start", display: "block", textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
-      <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ position: "relative", height: "196px", borderRadius: "22px", overflow: "hidden", background: "#101010", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.12)" }}>
-          {card.imageUrl ? (
-            <img src={card.imageUrl} alt="" draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.85)" }} />
-          ) : (
-            <>
-              <div style={{ position: "absolute", inset: 0, background: `radial-gradient(125% 95% at 72% -10%, ${GOLD}30 0%, #0a0a0a 58%)` }} />
-              <span style={{ position: "absolute", top: "16px", left: "18px" }}><FaceMark face={t.face} size={40} /></span>
-            </>
-          )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.96) 18%, rgba(8,8,8,0.35) 55%, rgba(8,8,8,0.1) 100%)" }} />
-          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 18px" }}>
-            <Eyebrow>{card.eyebrow}</Eyebrow>
-            {isStoryLed && (
-              <span style={{ display: "inline-block", marginTop: "5px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>{t.name}</span>
-            )}
-            <h2 style={{ fontFamily: SG, fontSize: "21px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#f5f3ef", margin: isStoryLed ? "3px 0 4px" : "5px 0 4px", textWrap: "balance" }}>{headline}</h2>
-            <p style={{ fontSize: "13.5px", color: "#c9c5bf", lineHeight: 1.4, margin: 0, maxWidth: "94%", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.valueLine}</p>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "11px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                {t.metric && <MetricChip>{t.metric}</MetricChip>}
-                {t.recency && <span style={{ fontSize: "12px", color: "#a7a39d" }}>{t.recency}</span>}
-              </div>
-              <span style={{ width: "32px", height: "32px", borderRadius: "100px", background: "rgba(255,255,255,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <ArrowUpRight size={16} color="#f5f3ef" strokeWidth={2} />
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function HeroCardCloser() {
-  return (
-    <div style={{ flex: `0 0 ${CARD_W}`, scrollSnapAlign: "start" }}>
-      <div style={{ padding: "6px", borderRadius: "28px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ position: "relative", height: "196px", borderRadius: "22px", overflow: "hidden", background: `radial-gradient(120% 100% at 50% 0%, ${GOLD}1f 0%, #0d0d0d 60%)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 26px", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.10)" }}>
-          <span style={{ width: "44px", height: "44px", borderRadius: "100px", background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}>
-            <Check size={22} color={GOLD} strokeWidth={2.4} />
-          </span>
-          <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 600, color: "#f5f3ef", margin: 0, letterSpacing: "-0.02em" }}>You&apos;re caught up</h2>
-          <p style={{ fontSize: "13.5px", color: "#a7a39d", lineHeight: 1.45, margin: "7px 0 14px", maxWidth: "260px" }}>That&apos;s what moved in your world today. Nothing else worth your time.</p>
-          <Link href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: "#0a0a0a", background: GOLD, borderRadius: "100px", padding: "9px 16px", textDecoration: "none" }}>
-            Open your Toolkit <ArrowUpRight size={15} strokeWidth={2.3} />
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Dots({ count, active }: { count: number; active: number }) {
-  return (
-    <div style={{ display: "flex", gap: "6px", justifyContent: "center", marginTop: "14px" }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <span key={i} style={{ width: i === active ? "18px" : "6px", height: "6px", borderRadius: "100px", background: i === active ? GOLD : "rgba(255,255,255,0.16)", transition: "width 0.25s ease, background 0.25s ease" }} />
-      ))}
-    </div>
-  );
-}
-
-function HeroDeck({ cards, onOpen }: { cards: HeroCard[]; onOpen: (t: RadarThing) => void }) {
-  const [active, setActive] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const onScroll = () => {
-    const el = ref.current;
-    if (!el || !el.firstElementChild) return;
-    const step = (el.firstElementChild as HTMLElement).offsetWidth + 12;
-    setActive(Math.round(el.scrollLeft / step));
+function CategoryTiles({ sections }: { sections: SectionData[] }) {
+  const items = sections.filter((s) => s.things.length > 0);
+  if (items.length === 0) return null;
+  const jump = (key: string) => {
+    document.getElementById(`sec-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    posthog.capture("radar_category_tile", { key });
   };
   return (
-    <div style={{ margin: "0 0 26px" }}>
-      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "flex", gap: "12px", overflowX: "auto", scrollSnapType: "x mandatory", padding: "0 20px", scrollPaddingLeft: "20px" }}>
-        {cards.map((c, i) => (c.kind === "thing" ? <HeroCardThing key={i} card={c} onOpen={onOpen} /> : <HeroCardCloser key={i} />))}
-      </div>
-      {cards.length > 1 && <Dots count={cards.length} active={Math.min(active, cards.length - 1)} />}
+    <div
+      className="scrollbar-none"
+      style={{ display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
+    >
+      {items.map((s) => {
+        const accent = sectionAccent(s.key);
+        return (
+          <motion.button
+            key={s.key}
+            onClick={() => jump(s.key)}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 440, damping: 28 }}
+            style={{ scrollSnapAlign: "start", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 58%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "12px 13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "9px" }}>
+              <span style={{ flexShrink: 0, width: "30px", height: "30px", borderRadius: "9px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{s.emoji ?? "✨"}</span>
+              <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
+            </div>
+            <span style={{ display: "block", width: "100%", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
+            <span style={{ display: "block", width: "100%", fontSize: "11.5px", color: TEXT.muted, lineHeight: 1.3, marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
+          </motion.button>
+        );
+      })}
     </div>
   );
 }
@@ -375,49 +324,8 @@ function Section({ emoji, eyebrow, sub, variant, things, onOpen }: SectionData &
   );
 }
 
-// ─── Hero cards + section arrangement per lens ───────────────────────────────
-function buildHeroCards(lens: RadarLens, data: RadarData): HeroCard[] {
-  const cards: HeroCard[] = [];
-  const used = new Set<string>();
-  const byTraction = [...data.entities].sort((a, b) => b.entity.mentionCount - a.entity.mentionCount);
-  const modelsTools = byTraction.filter((e) => e.entity.entityType === "model" || e.entity.entityType === "tool");
-
-  // 1. The big move — top-traction (prefer one with an image)
-  const bigPool = lens === "builder" ? [...modelsTools, ...byTraction] : byTraction;
-  const big = bigPool.find((e) => e.latestStory?.imageUrl) ?? bigPool[0];
-  if (big) {
-    const t = entThing(big);
-    used.add(t.id);
-    cards.push({ kind: "thing", eyebrow: lens === "curious" ? "What's moving" : "The big move", thing: t, imageUrl: big.latestStory?.imageUrl ?? null });
-  }
-
-  // 2. New & worth a look — freshest launch
-  const newTool = data.tools[0];
-  if (newTool) {
-    const t = toolThing(newTool);
-    if (!used.has(t.id)) { used.add(t.id); cards.push({ kind: "thing", eyebrow: "New & worth a look", thing: t, imageUrl: null }); }
-  }
-
-  // 3. For you — a lens-relevant pick
-  let pick: { thing: RadarThing; img: string | null; eyebrow: string } | null = null;
-  if (lens === "builder") {
-    const cur = data.essentials.find((e) => e.source === "curated" && (e.meta === "AI coding" || e.meta === "Agents & automation"));
-    if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "For your stack" };
-  } else {
-    const cur = data.essentials.find((e) => e.source === "curated" && e.meta === "Models & chat");
-    if (cur) pick = { thing: essThing(cur), img: null, eyebrow: "Start here" };
-  }
-  if (pick && !used.has(pick.thing.id)) {
-    used.add(pick.thing.id);
-    cards.push({ kind: "thing", eyebrow: pick.eyebrow, thing: pick.thing, imageUrl: pick.img });
-  }
-
-  // 4. Caught up — the closer (always last)
-  cards.push({ kind: "closer", count: cards.length });
-  return cards;
-}
-
-function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): SectionData[] {
+// ─── Section arrangement per lens ────────────────────────────────────────────
+function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
   const curated = data.essentials.filter((e) => e.source === "curated");
   const canon = data.essentials.filter((e) => e.source === "github");
   const byCat = (cat: string) => curated.filter((e) => e.meta === cat);
@@ -448,8 +356,7 @@ function buildSections(lens: RadarLens, data: RadarData, heroIds: Set<string>): 
       { key: "notable", emoji: "✨", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
     ];
   }
-  // De-dup: nothing in the hero deck repeats in the lists below.
-  return raw.map((s) => ({ ...s, things: s.things.filter((t) => !heroIds.has(t.id)) }));
+  return raw;
 }
 
 // ─── Category quick-nav — the "where are the categories" answer ──────────────
@@ -473,9 +380,9 @@ function CategoryNav({ sections }: { sections: SectionData[] }) {
   return (
     <div style={{ padding: "0 0 22px" }}>
       <span style={{ display: "block", padding: "0 24px", fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>Browse by</span>
-      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "flex", gap: "9px", marginTop: "11px", padding: "0 24px", overflowX: "auto" }}>
+      <div ref={ref} onScroll={onScroll} className="scrollbar-none" style={{ display: "grid", gridAutoFlow: "column", gridTemplateRows: "auto auto", gridAutoColumns: "max-content", gap: "9px", marginTop: "11px", padding: "0 24px", overflowX: "auto" }}>
         {items.map((s) => (
-          <button key={s.key} onClick={() => jump(s.key)} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 500, color: TEXT.body, background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "9px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
+          <button key={s.key} onClick={() => jump(s.key)} style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 500, color: TEXT.body, background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "9px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
             {s.emoji && <span style={{ fontSize: "14px" }}>{s.emoji}</span>}{s.eyebrow}
           </button>
         ))}
@@ -566,9 +473,7 @@ export function RadarClient(data: RadarData) {
   if (!ready) return <div style={{ height: "100%", background: CANVAS }} />;
   if (!lens) return <LensChooser onChoose={choose} />;
 
-  const heroCards = buildHeroCards(lens, data);
-  const heroIds = new Set(heroCards.flatMap((c) => (c.kind === "thing" ? [c.thing.id] : [])));
-  const sections = buildSections(lens, data, heroIds);
+  const sections = buildSections(lens, data);
 
   return (
     <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS, paddingBottom: "28px" }}>
@@ -602,7 +507,7 @@ export function RadarClient(data: RadarData) {
         {/* Lens content */}
         <AnimatePresence mode="wait">
           <motion.div key={lens} variants={V.block} initial={skipIntro ? false : "hidden"} animate="show" exit="exit">
-            <motion.div variants={V.hero}><HeroDeck cards={heroCards} onOpen={onOpen} /></motion.div>
+            <motion.div variants={V.hero}><CategoryTiles sections={sections} /></motion.div>
             {lens === "builder" && (
               <>
                 <motion.div variants={V.item}><CategoryNav sections={sections} /></motion.div>

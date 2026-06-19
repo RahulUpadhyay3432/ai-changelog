@@ -165,7 +165,7 @@ export function BrowseClient(data: BrowseData) {
         {/* Sticky category chips — the persistent nav */}
         <div
           className="scrollbar-none"
-          style={{ position: "sticky", top: 0, zIndex: 4, display: "flex", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: `linear-gradient(to bottom, ${CANVAS} 75%, transparent)` }}
+          style={{ position: "sticky", top: 0, zIndex: 4, display: "grid", gridAutoFlow: "column", gridTemplateRows: "auto auto", gridAutoColumns: "max-content", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: `linear-gradient(to bottom, ${CANVAS} 75%, transparent)` }}
         >
           {chips.map((c) => {
             const active = c.key === activeCat && !query;
@@ -175,7 +175,7 @@ export function BrowseClient(data: BrowseData) {
                 key={c.key}
                 onClick={() => { setActiveCat(c.key); setQuery(""); posthog.capture("radar_browse_category_tapped", { category: c.key, count: c.count }); }}
                 style={{
-                  flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
+                  display: "inline-flex", alignItems: "center", gap: "6px",
                   fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
                   color: active ? "#0a0a0a" : TEXT.body,
                   background: active ? GOLD : "rgba(255,255,255,0.05)",

@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2 } from "lucide-react";
+import { Search, Copy, ChevronDown, Bookmark, ArrowRight, Share2, Plus, Trash2 } from "lucide-react";
 import posthog from "posthog-js";
-import { getSavedRadarTools, getRadarNotes, setRadarNotes, type SavedRadarTool } from "@/lib/storage";
-import { FaceMark, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
+import {
+  getSavedRadarTools, getRadarNotes, setRadarNotes,
+  getLoadouts, createLoadout, deleteLoadout,
+  type SavedRadarTool, type Loadout,
+} from "@/lib/storage";
+import { FaceMark, GOLD, GOLD_SOFT, GOLD_BORDER, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
 import { logoFor } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
@@ -24,24 +28,60 @@ function copyLine(s: SavedRadarTool): string {
   return `${s.name} — ${s.valueLine}${s.url ? ` ${s.url}` : ""}`;
 }
 
+function LoadoutChip({ active, label, count, onClick }: { active: boolean; label: string; count: number; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
+        fontFamily: SG, fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap",
+        color: active ? "#0a0a0a" : TEXT.body,
+        background: active ? GOLD : "rgba(255,255,255,0.05)",
+        border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
+        borderRadius: "100px", padding: "8px 14px", cursor: "pointer",
+      }}
+    >
+      {label}
+      <span style={{ fontSize: "11.5px", fontVariantNumeric: "tabular-nums", opacity: active ? 0.7 : 0.55 }}>{count}</span>
+    </button>
+  );
+}
+
 export function ToolkitClient() {
   const [saved, setSaved] = useState<SavedRadarTool[]>([]);
+  const [loadouts, setLoadouts] = useState<Loadout[]>([]);
+  const [activeLoadout, setActiveLoadout] = useState<string | null>(null); // null = All
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
   const [query, setQuery] = useState("");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [detail, setDetail] = useState<RadarThing | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
 
-  const refresh = useCallback(() => setSaved(getSavedRadarTools()), []);
+  const refresh = useCallback(() => {
+    setSaved(getSavedRadarTools());
+    setLoadouts(getLoadouts());
+  }, []);
   useEffect(() => { refresh(); setNotes(getRadarNotes()); }, [refresh]);
 
   const flash = (m: string) => { setToast(m); window.setTimeout(() => setToast(null), 1600); };
 
+  // Counts per loadout (from all saves, independent of search) for the chips.
+  const loadoutCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const s of saved) if (s.loadoutId) m.set(s.loadoutId, (m.get(s.loadoutId) ?? 0) + 1);
+    return m;
+  }, [saved]);
+
+  // Search first, then scope to the active loadout (null = show everything).
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return saved;
-    return saved.filter((s) => s.name.toLowerCase().includes(q) || s.valueLine.toLowerCase().includes(q));
-  }, [saved, query]);
+    const base = q
+      ? saved.filter((s) => s.name.toLowerCase().includes(q) || s.valueLine.toLowerCase().includes(q))
+      : saved;
+    return activeLoadout ? base.filter((s) => s.loadoutId === activeLoadout) : base;
+  }, [saved, query, activeLoadout]);
 
   const groups = useMemo(() => {
     const m = new Map<string, SavedRadarTool[]>();
@@ -52,6 +92,24 @@ export function ToolkitClient() {
     }
     return [...m.entries()];
   }, [filtered]);
+
+  const onCreateLoadout = () => {
+    const lo = createLoadout(newName);
+    setNewName("");
+    setCreating(false);
+    if (!lo) return;
+    refresh();
+    setActiveLoadout(lo.id);
+    posthog.capture("radar_loadout_created", { from: "toolkit" });
+  };
+
+  const onDeleteLoadout = (id: string) => {
+    deleteLoadout(id);
+    setActiveLoadout(null);
+    refresh();
+    flash("Loadout removed");
+    posthog.capture("radar_loadout_deleted");
+  };
 
   const shareAll = async () => {
     const lines = saved.map(copyLine).join("\n");
@@ -131,6 +189,31 @@ export function ToolkitClient() {
         </div>
       ) : (
         <>
+          {/* Loadout switcher — All · each loadout · ＋ New. Loadouts are the
+              user's own named kits; "All" is every save, filed by category. */}
+          <div className="scrollbar-none radar-rail" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 24px 14px", overflowX: "auto" }}>
+            <LoadoutChip active={activeLoadout === null} label="All" count={saved.length} onClick={() => setActiveLoadout(null)} />
+            {loadouts.map((l) => (
+              <LoadoutChip key={l.id} active={activeLoadout === l.id} label={l.name} count={loadoutCounts.get(l.id) ?? 0} onClick={() => setActiveLoadout(l.id)} />
+            ))}
+            {creating ? (
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") onCreateLoadout(); if (e.key === "Escape") { setCreating(false); setNewName(""); } }}
+                onBlur={() => { if (!newName.trim()) setCreating(false); }}
+                placeholder="Name…"
+                maxLength={40}
+                autoFocus
+                style={{ flexShrink: 0, width: "130px", background: "#111111", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "8px 14px", color: "#ededed", fontSize: "13px", outline: "none" }}
+              />
+            ) : (
+              <button onClick={() => setCreating(true)} aria-label="New loadout" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "8px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                <Plus size={14} strokeWidth={2.4} /> New
+              </button>
+            )}
+          </div>
+
           {/* Search */}
           <div style={{ padding: "0 24px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", padding: "10px 13px" }}>
@@ -139,8 +222,23 @@ export function ToolkitClient() {
             </div>
           </div>
 
+          {/* Active-loadout meta: delete control (its tools stay saved, unfiled) */}
+          {activeLoadout && (
+            <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px 12px" }}>
+              <button onClick={() => onDeleteLoadout(activeLoadout)} style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: "none", border: "none", cursor: "pointer", color: TEXT.muted, fontSize: "12px", fontWeight: 500, padding: "2px 4px" }}>
+                <Trash2 size={13} strokeWidth={2} /> Delete loadout
+              </button>
+            </div>
+          )}
+
           {groups.length === 0 && (
-            <p style={{ padding: "0 24px", color: "#5c5c5c", fontSize: "14px" }}>No matches for &ldquo;{query}&rdquo;.</p>
+            <p style={{ padding: "0 24px", color: "#5c5c5c", fontSize: "14px" }}>
+              {query
+                ? <>No matches for &ldquo;{query}&rdquo;.</>
+                : activeLoadout
+                  ? "No tools in this loadout yet. Open any tool and tap “Add to loadout.”"
+                  : "Nothing saved yet."}
+            </p>
           )}
 
           {groups.map(([cat, items]) => {

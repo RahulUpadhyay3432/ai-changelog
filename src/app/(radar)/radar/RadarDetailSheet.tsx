@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Bookmark, Copy, ArrowUpRight, Check } from "lucide-react";
+import { X, Bookmark, Copy, ArrowUpRight, Check, Layers, Plus, ChevronDown } from "lucide-react";
 import posthog from "posthog-js";
 import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
 import { categoryEmoji } from "./radar-map";
-import { toggleRadarTool, isRadarToolSaved } from "@/lib/storage";
+import {
+  toggleRadarTool, isRadarToolSaved, getLoadouts, createLoadout,
+  assignToolToLoadout, getToolLoadoutId, type Loadout, type SavedRadarTool,
+} from "@/lib/storage";
 import { getToolDepth } from "@/lib/radar-tool-depth";
 
 function useIsDesktop() {
@@ -30,6 +33,129 @@ function Field({ label, body }: { label: string; body: string }) {
       <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>{label}</span>
       <p style={{ fontSize: "14.5px", lineHeight: 1.6, color: TEXT.body, margin: "7px 0 0" }}>{body}</p>
     </section>
+  );
+}
+
+// Optional "file this into a named collection" control. Saving stays one-tap →
+// Toolkit; this is the secondary path for people who want a "Hackathon" kit etc.
+// Filing also saves the tool if it wasn't already saved.
+function LoadoutControl({ thing, saved, flash, onSavedChange }: {
+  thing: RadarThing;
+  saved: boolean;
+  flash: (m: string) => void;
+  onSavedChange: (saved: boolean) => void;
+}) {
+  const [loadouts, setLoadouts] = useState<Loadout[]>([]);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  useEffect(() => { setLoadouts(getLoadouts()); }, [thing.id]);
+  // Re-read filing from storage whenever saved-state flips — so unsaving via the
+  // main Save button clears the "In {loadout}" label (the record is gone), and
+  // re-saving reads back as unfiled. Always reads truth → no stale state.
+  useEffect(() => { setCurrentId(getToolLoadoutId(thing.id)); }, [thing.id, saved]);
+
+  const asSaved = (): SavedRadarTool => ({
+    id: thing.id, name: thing.name, valueLine: thing.valueLine,
+    category: thing.category, face: thing.face, url: thing.url,
+    savedAt: new Date().toISOString(),
+  });
+
+  const fileInto = (loadout: Loadout) => {
+    assignToolToLoadout(asSaved(), loadout.id);
+    setCurrentId(loadout.id);
+    onSavedChange(true);
+    setOpen(false);
+    flash(`Saved to ${loadout.name}`);
+    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
+    posthog.capture("radar_loadout_filed", { id: thing.id });
+  };
+
+  const create = () => {
+    const lo = createLoadout(newName);
+    if (!lo) return;
+    setLoadouts(getLoadouts());
+    setNewName("");
+    setCreating(false);
+    fileInto(lo);
+    posthog.capture("radar_loadout_created");
+  };
+
+  const removeFromLoadout = () => {
+    assignToolToLoadout(asSaved(), null); // stays saved, just unfiled
+    setCurrentId(null);
+    onSavedChange(true);
+    setOpen(false);
+    flash("Moved to Toolkit");
+    posthog.capture("radar_loadout_unfiled", { id: thing.id });
+  };
+
+  const current = loadouts.find((l) => l.id === currentId) ?? null;
+  const chipBase: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG,
+    fontSize: "13px", fontWeight: 600, borderRadius: "100px", padding: "8px 13px",
+    cursor: "pointer", whiteSpace: "nowrap", border: "1px solid rgba(255,255,255,0.08)",
+  };
+
+  return (
+    <div style={{ padding: "10px 20px 0", flexShrink: 0 }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG,
+          fontSize: "13.5px", fontWeight: 600, color: current ? GOLD : TEXT.body,
+          background: current ? GOLD_SOFT : "rgba(255,255,255,0.05)",
+          border: `1px solid ${current ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`,
+          borderRadius: "100px", padding: "9px 15px", cursor: "pointer",
+        }}
+      >
+        <Layers size={15} strokeWidth={2.1} />
+        {current ? `In ${current.name}` : "Add to loadout"}
+        <ChevronDown size={14} strokeWidth={2.3} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s ease", opacity: 0.7 }} />
+      </button>
+
+      {open && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "12px", maxHeight: "168px", overflowY: "auto" }}>
+          {loadouts.map((l) => {
+            const active = l.id === currentId;
+            return (
+              <button key={l.id} onClick={() => fileInto(l)} style={{ ...chipBase, color: active ? GOLD : TEXT.body, background: active ? GOLD_SOFT : "rgba(255,255,255,0.05)", borderColor: active ? GOLD_BORDER : "rgba(255,255,255,0.08)" }}>
+                {active && <Check size={13} strokeWidth={2.6} />}{l.name}
+              </button>
+            );
+          })}
+
+          {creating ? (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "7px", width: "100%" }}>
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") create(); if (e.key === "Escape") setCreating(false); }}
+                placeholder="Loadout name (e.g. Hackathon)"
+                maxLength={40}
+                autoFocus
+                style={{ flex: 1, minWidth: 0, background: "#111111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "100px", padding: "9px 14px", color: "#ededed", fontSize: "13.5px", outline: "none" }}
+              />
+              <button onClick={create} disabled={!newName.trim()} style={{ ...chipBase, color: newName.trim() ? "#0a0a0a" : "#666", background: newName.trim() ? GOLD : "rgba(255,255,255,0.05)", border: "none", cursor: newName.trim() ? "pointer" : "default" }}>
+                Create
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setCreating(true)} style={{ ...chipBase, color: TEXT.body, background: "rgba(255,255,255,0.05)" }}>
+              <Plus size={14} strokeWidth={2.4} /> New loadout
+            </button>
+          )}
+
+          {current && !creating && (
+            <button onClick={removeFromLoadout} style={{ ...chipBase, color: TEXT.muted, background: "transparent", border: "1px solid transparent" }}>
+              Remove
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -179,6 +305,8 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
             </a>
           )}
         </div>
+
+        <LoadoutControl thing={thing} saved={saved} flash={flash} onSavedChange={setSaved} />
 
         <AnimatePresence>
           {toast && (

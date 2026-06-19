@@ -7,8 +7,9 @@ import { Cpu, Compass, Bell, Check, ArrowRight, ArrowUpRight, Plug, type LucideI
 import posthog from "posthog-js";
 import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
+import type { Hackathon } from "@/lib/hackathons";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, CoverImage, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
@@ -19,6 +20,7 @@ interface RadarData {
   tools: RadarTool[];
   entities: RadarItem[];
   essentials: RadarTool[];
+  hackathons: Hackathon[];
 }
 
 // ─── Lenses (Builder + Exploring) ─────────────────────────────────────────────
@@ -31,11 +33,31 @@ const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
   { id: "curious", label: "Exploring", Icon: Compass },
 ];
 
-// The top headline shuffles on each visit — a small delight.
+// The top headline shuffles on each visit — a small delight. Held stable for
+// the session (sessionStorage) so hopping between radar tabs doesn't reshuffle
+// it; a fresh load/visit picks a new one.
 const HEADER_PHRASES = [
   "Let's build", "Let's explore", "What's new today",
   "Let's learn something", "Find your next tool", "What moved today",
 ];
+const HEADLINE_KEY = "kapyn_radar_headline";
+
+function sessionHeadline(): string {
+  if (typeof window === "undefined") return HEADER_PHRASES[0];
+  try {
+    const saved = window.sessionStorage.getItem(HEADLINE_KEY);
+    if (saved) return saved;
+    const pick = HEADER_PHRASES[Math.floor(Math.random() * HEADER_PHRASES.length)];
+    window.sessionStorage.setItem(HEADLINE_KEY, pick);
+    return pick;
+  } catch {
+    return HEADER_PHRASES[0];
+  }
+}
+
+// Play the entrance animation only on the first radar mount of a session — so
+// returning to Today from another tab doesn't replay it (the "reload" feel).
+let introPlayed = false;
 
 // Curated cross-cut: the tools that take you from idea to a working demo fast.
 // Names match CURATED_ESSENTIALS exactly.
@@ -162,6 +184,48 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
           {visible.slice(0, 20).map((tool) => <WhatsNewCard key={tool.url} thing={toolThing(tool)} onOpen={onOpen} />)}
         </div>
       )}
+    </section>
+  );
+}
+
+// ─── Hackathons rail (Pulse: opportunities to go build) ──────────────────────
+function HackathonRailCard({ h }: { h: Hackathon }) {
+  const open = h.openState.toLowerCase() === "open";
+  return (
+    <motion.a
+      href={h.url} target="_blank" rel="noopener noreferrer"
+      onClick={() => posthog.capture("radar_hackathon_opened", { source: h.source, scope: "today" })}
+      whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }}
+      style={{ flexShrink: 0, scrollSnapAlign: "start", width: "228px", textDecoration: "none", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT }}
+    >
+      <div style={{ position: "relative" }}>
+        <CoverImage src={h.imageUrl} category="startups" height={98} radius={0} />
+        <span style={{ position: "absolute", top: "8px", left: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 8px" }}>{open ? "Open" : "Upcoming"}</span>
+      </div>
+      <div style={{ padding: "10px 12px 12px" }}>
+        <span style={{ display: "-webkit-box", fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, lineHeight: 1.25, letterSpacing: "-0.01em", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "34px" }}>{h.title}</span>
+        <span style={{ display: "block", fontSize: "12px", color: TEXT.muted, marginTop: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.isOnline ? "Online" : h.location || "In-person"}{h.prize ? ` · ${h.prize}` : ""}</span>
+      </div>
+    </motion.a>
+  );
+}
+
+function HackathonsRail({ items }: { items: Hackathon[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section style={{ marginBottom: "30px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", marginBottom: "12px" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
+          <span style={{ fontSize: "14px" }}>🏆</span>
+          <SectionKicker>Hackathons happening now</SectionKicker>
+        </span>
+        <Link href="/radar/hackathons" style={{ fontFamily: SG, fontSize: "12.5px", fontWeight: 600, color: GOLD, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+          See all <ArrowUpRight size={13} strokeWidth={2.3} />
+        </Link>
+      </div>
+      <div className="scrollbar-none radar-rail" style={{ display: "flex", gap: "12px", padding: "0 24px", overflowX: "auto", scrollSnapType: "x proximity" }}>
+        {items.map((h, i) => <HackathonRailCard key={`${h.source}-${i}`} h={h} />)}
+      </div>
     </section>
   );
 }
@@ -473,6 +537,10 @@ export function RadarClient(data: RadarData) {
   // Default to the first phrase so SSR + first client render match; a fresh
   // delightful one is picked on mount (each visit).
   const [headline, setHeadline] = useState(HEADER_PHRASES[0]);
+  // Skip the entrance animation when returning to Today from another radar tab
+  // (introPlayed is true after the first mount of the session). Lazy state, not
+  // a ref, so it's safe to read during render.
+  const [skipIntro] = useState(() => introPlayed);
   const reduced = !!useReducedMotion();
   const V = radarVariants(reduced);
 
@@ -486,7 +554,8 @@ export function RadarClient(data: RadarData) {
     } else {
       setLens(getRadarLens());
     }
-    setHeadline(HEADER_PHRASES[Math.floor(Math.random() * HEADER_PHRASES.length)]);
+    setHeadline(sessionHeadline());
+    introPlayed = true;
     setReady(true);
   }, []);
 
@@ -539,13 +608,16 @@ export function RadarClient(data: RadarData) {
 
         {/* Lens content */}
         <AnimatePresence mode="wait">
-          <motion.div key={lens} variants={V.block} initial="hidden" animate="show" exit="exit">
+          <motion.div key={lens} variants={V.block} initial={skipIntro ? false : "hidden"} animate="show" exit="exit">
             <motion.div variants={V.hero}><HeroDeck cards={heroCards} onOpen={onOpen} /></motion.div>
             {lens === "builder" && (
               <>
                 <motion.div variants={V.item}><CategoryNav sections={sections} /></motion.div>
                 <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
               </>
+            )}
+            {data.hackathons.length > 0 && (
+              <motion.div variants={V.item}><HackathonsRail items={data.hackathons} /></motion.div>
             )}
             {sections.map((s) => (
               <motion.div key={s.key} id={`sec-${s.key}`} variants={V.item}><Section {...s} onOpen={onOpen} /></motion.div>

@@ -74,6 +74,33 @@ function getHeaders(): HeadersInit {
   return h;
 }
 
+export interface RepoMeta {
+  stars: number;
+  createdAt: string;
+  pushedAt: string;
+}
+
+// Stars + dates for specific repos by "owner/name". Best-effort per repo (a
+// renamed/missing repo just drops out). Used to rank curated lists like the MCP
+// market by popularity/recency. Each fetch is cached a day at the fetch layer.
+export async function fetchReposMeta(fullNames: string[]): Promise<Record<string, RepoMeta>> {
+  const unique = [...new Set(fullNames)];
+  const settled = await Promise.allSettled(
+    unique.map(async (fullName) => {
+      const res = await fetch(`https://api.github.com/repos/${fullName}`, {
+        headers: getHeaders(),
+        next: { revalidate: 86400 },
+      });
+      if (!res.ok) throw new Error(`GitHub repo ${fullName}: ${res.status}`);
+      const r = (await res.json()) as { stargazers_count: number; created_at: string; pushed_at: string };
+      return [fullName, { stars: r.stargazers_count ?? 0, createdAt: r.created_at, pushedAt: r.pushed_at }] as const;
+    })
+  );
+  const out: Record<string, RepoMeta> = {};
+  for (const e of settled) if (e.status === "fulfilled") out[e.value[0]] = e.value[1];
+  return out;
+}
+
 async function searchRepos(
   topicQ: string,
   minStars: number,

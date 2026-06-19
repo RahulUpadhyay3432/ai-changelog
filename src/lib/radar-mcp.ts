@@ -44,6 +44,18 @@ export const MCP_CATEGORY_EMOJI: Record<McpCategory, string> = {
   "Payments": "💳",
 };
 
+// Extract "owner/repo" from a github.com URL (for stars/date enrichment).
+export function githubFullName(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== "github.com") return null;
+    const parts = u.pathname.split("/").filter(Boolean);
+    return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : null;
+  } catch {
+    return null;
+  }
+}
+
 // Category → accent slug, for the mark/cover tint (reuses the category palette).
 export const MCP_CATEGORY_SLUG: Record<McpCategory, CategorySlug> = {
   "Dev tools": "dev-tools",
@@ -215,5 +227,115 @@ export const MCP_SERVERS: McpServer[] = [
     tagline: "Work with payments and billing in Stripe.",
     description: "Stripe's MCP server lets an assistant create customers, payments, and invoices, and query billing data, so commerce tasks can run from the chat.",
     url: "https://github.com/stripe/agent-toolkit",
+  },
+  {
+    name: "PayPal", by: "official", category: "Payments",
+    tagline: "Create invoices and manage payments via PayPal.",
+    description: "PayPal's agent toolkit exposes payments, invoicing, and order management to an assistant, so commerce flows can run from natural language.",
+    url: "https://github.com/paypal/agent-toolkit",
+  },
+
+  // ── More: Dev tools ──
+  {
+    name: "Context7", by: "community", category: "Dev tools",
+    tagline: "Pull up-to-date library docs into the model.",
+    description: "Context7 fetches current, version-specific documentation and code examples for libraries and feeds them to the assistant, cutting down on outdated or hallucinated APIs.",
+    url: "https://github.com/upstash/context7",
+  },
+  {
+    name: "Figma", by: "community", category: "Dev tools",
+    tagline: "Give the assistant your Figma design context.",
+    description: "The Framelink Figma MCP server lets an AI coding tool read your Figma layouts and styles, so it can generate UI that matches the design.",
+    url: "https://github.com/GLips/Figma-Context-MCP",
+  },
+  {
+    name: "Desktop Commander", by: "community", category: "Dev tools",
+    tagline: "Run terminal commands and edit files locally.",
+    description: "Gives an assistant control of your terminal and filesystem to run commands, manage processes, and edit code across a project.",
+    url: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+  },
+
+  // ── More: Databases ──
+  {
+    name: "MongoDB", by: "official", category: "Databases",
+    tagline: "Query and manage MongoDB from the assistant.",
+    description: "MongoDB's official MCP server lets an assistant explore collections, run queries, and manage data and indexes against your clusters.",
+    url: "https://github.com/mongodb-js/mongodb-mcp-server",
+  },
+  {
+    name: "Neon", by: "official", category: "Databases",
+    tagline: "Manage serverless Postgres with natural language.",
+    description: "Neon's MCP server lets an assistant create databases and branches and run SQL against serverless Postgres, turning requests into database operations.",
+    url: "https://github.com/neondatabase/mcp-server-neon",
+  },
+  {
+    name: "ClickHouse", by: "official", category: "Databases",
+    tagline: "Run analytics queries on ClickHouse.",
+    description: "ClickHouse's MCP server lets an assistant run read queries against your analytics database, so it can answer questions over large datasets.",
+    url: "https://github.com/ClickHouse/mcp-clickhouse",
+  },
+
+  // ── More: Search & web ──
+  {
+    name: "Firecrawl", by: "community", category: "Search & web",
+    tagline: "Scrape and crawl websites into clean data.",
+    description: "Firecrawl's MCP server lets an assistant scrape pages and crawl sites, returning clean markdown or structured data for research and extraction.",
+    url: "https://github.com/mendableai/firecrawl-mcp-server",
+  },
+  {
+    name: "Perplexity", by: "official", category: "Search & web",
+    tagline: "Add Perplexity's Sonar web search.",
+    description: "Perplexity's MCP server gives an assistant live, cited web answers through the Sonar API, grounding responses in current sources.",
+    url: "https://github.com/ppl-ai/modelcontextprotocol",
+  },
+
+  // ── More: Browser & automation ──
+  {
+    name: "Apify", by: "official", category: "Browser & automation",
+    tagline: "Run web scrapers and automation actors.",
+    description: "Apify's MCP server lets an assistant run thousands of pre-built scrapers and automation 'actors' to extract data from across the web.",
+    url: "https://github.com/apify/actors-mcp-server",
+  },
+
+  // ── More: Productivity ──
+  {
+    name: "Atlassian", by: "community", category: "Productivity",
+    tagline: "Work with Jira and Confluence.",
+    description: "The Atlassian MCP server lets an assistant search and update Jira issues and Confluence pages, so planning and docs can happen from the chat.",
+    url: "https://github.com/sooperset/mcp-atlassian",
+  },
+  {
+    name: "Obsidian", by: "community", category: "Productivity",
+    tagline: "Read and search your Obsidian vault.",
+    description: "Connects an assistant to your Obsidian notes so it can search, read, and reference your knowledge base while it works.",
+    url: "https://github.com/MarkusPfundstein/mcp-obsidian",
+  },
+
+  // ── More: Cloud & infra ──
+  {
+    name: "Kubernetes", by: "community", category: "Cloud & infra",
+    tagline: "Inspect and manage Kubernetes clusters.",
+    description: "Lets an assistant list, inspect, and manage Kubernetes resources, useful for ops and debugging from natural language.",
+    url: "https://github.com/Flux159/mcp-server-kubernetes",
+  },
+  {
+    name: "Grafana", by: "official", category: "Cloud & infra",
+    tagline: "Query dashboards, metrics, and incidents.",
+    description: "Grafana's MCP server lets an assistant search dashboards, query datasources, and read incidents, so observability data is available in the chat.",
+    url: "https://github.com/grafana/mcp-grafana",
+  },
+  {
+    name: "Terraform", by: "official", category: "Cloud & infra",
+    tagline: "Work with Terraform providers and modules.",
+    description: "HashiCorp's Terraform MCP server lets an assistant look up providers, modules, and registry data to help author and reason about infrastructure as code.",
+    url: "https://github.com/hashicorp/terraform-mcp-server",
+  },
+
+  // ── More: Memory & reasoning ──
+  {
+    name: "Time", by: "official", category: "Memory & reasoning",
+    tagline: "Give the model timezone-aware time tools.",
+    description: "A reference server providing current time and timezone conversion, so an assistant can reason about schedules and deadlines correctly.",
+    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
   },
 ];

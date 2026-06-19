@@ -110,12 +110,12 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
 
 function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
   return (
-    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+    <motion.button onClick={() => onOpen(thing)} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} size={34} />
         <SourceMark face={thing.face} size={14} />
       </div>
-      <span style={{ fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+      <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
       <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{thing.valueLine}</span>
       {thing.metric && <span style={{ marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
     </motion.button>
@@ -177,7 +177,7 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
       {visible.length === 0 ? (
         <p style={{ padding: "8px 24px", color: TEXT.muted, fontSize: "13.5px" }}>Nothing new in this filter yet.</p>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
           {visible.slice(0, 20).map((tool) => <WhatsNewCard key={tool.url} thing={toolThing(tool)} onOpen={onOpen} />)}
         </div>
       )}

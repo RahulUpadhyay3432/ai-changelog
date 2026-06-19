@@ -160,7 +160,7 @@ export function ToolkitClient() {
                 {!isCollapsed && (
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "0 24px" }}>
                     {items.map((s) => (
-                      <button key={s.id} onClick={() => setDetail(toThing(s))} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "12px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+                      <button key={s.id} onClick={() => setDetail(toThing(s))} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "12px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, width: "100%", overflow: "hidden" }}>
                         <FaceMark face={(s.face as Face) ?? "essential"} logoUrl={toThing(s).logoUrl} size={32} />
                         <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", marginTop: "9px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
                         <span style={{ display: "-webkit-box", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{s.valueLine}</span>

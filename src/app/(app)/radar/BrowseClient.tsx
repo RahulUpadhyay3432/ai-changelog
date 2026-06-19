@@ -64,6 +64,7 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
         display: "flex", flexDirection: "column", textAlign: "left",
         background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px",
         overflow: "hidden", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
+        minWidth: 0, width: "100%",
       }}
     >
       <CoverImage src={thing.imageUrl} category={thing.categorySlug ?? catSlug} face={thing.face} height={94} radius={0} />
@@ -204,7 +205,7 @@ export function BrowseClient(data: BrowseData) {
             )}
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 0" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
             {visible.map((t) => (
               <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} />
             ))}

@@ -8,6 +8,18 @@ import posthog from "posthog-js";
 import type { Hackathon } from "@/lib/hackathons";
 import { CoverImage, GOLD, SG, TEXT } from "./radar-shared";
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
 // One labelled meta line — muted icon + warm value. Mirrors the radar card meta.
 function MetaRow({ Icon, label, value }: { Icon: LucideIcon; label: string; value: string }) {
   return (
@@ -20,6 +32,7 @@ function MetaRow({ Icon, label, value }: { Icon: LucideIcon; label: string; valu
 }
 
 function Sheet({ hackathon: h, onClose }: { hackathon: Hackathon; onClose: () => void }) {
+  const isDesktop = useIsDesktop();
   const open = h.openState.toLowerCase() === "open";
   const brief = h.description?.trim();
   return (
@@ -34,7 +47,12 @@ function Sheet({ hackathon: h, onClose }: { hackathon: Hackathon; onClose: () =>
         transition={{ type: "spring", stiffness: 380, damping: 34 }}
         drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => { if (info.offset.y > 80) onClose(); }}
-        style={{ position: "relative", background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "58dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}
+        style={{
+          position: "relative",
+          width: isDesktop ? "min(600px, 100%)" : undefined,
+          alignSelf: isDesktop ? "center" : undefined,
+          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "58dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column", overflow: "hidden"
+        }}
       >
         {/* Drag handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 0", flexShrink: 0, position: "absolute", top: 0, left: 0, right: 0, zIndex: 2 }}>

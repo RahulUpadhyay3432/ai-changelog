@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Cpu, Compass, Clapperboard, MessageSquare, Check, ArrowRight, ArrowUpRight, Plug, Trophy, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
@@ -15,6 +15,20 @@ import { RadarDetailSheet } from "./RadarDetailSheet";
 import { SectionAllSheet } from "./SectionAllSheet";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
+const DesktopCtx = createContext(false);
 
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -125,6 +139,7 @@ function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarT
 }
 
 function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThing) => void }) {
+  const isDesktop = useContext(DesktopCtx);
   const [source, setSource] = useState<"all" | "github" | "producthunt">("all");
   const [cat, setCat] = useState<string>("All");
 
@@ -180,7 +195,7 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
       {visible.length === 0 ? (
         <p style={{ padding: "8px 24px", color: TEXT.muted, fontSize: "13.5px" }}>Nothing new in this filter yet.</p>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "1fr 1fr 1fr" : "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
           {visible.slice(0, 20).map((tool) => <WhatsNewCard key={tool.url} thing={toolThing(tool)} onOpen={onOpen} />)}
         </div>
       )}
@@ -272,6 +287,7 @@ function CategoryTile({ s, onJump }: { s: SectionData; onJump: (key: string) => 
 }
 
 function CategoryTiles({ sections }: { sections: SectionData[] }) {
+  const isDesktop = useContext(DesktopCtx);
   const items = sections.filter((s) => s.things.length > 0);
   if (items.length === 0) return null;
   const jump = (key: string) => {
@@ -281,7 +297,9 @@ function CategoryTiles({ sections }: { sections: SectionData[] }) {
   return (
     <div
       className="scrollbar-none"
-      style={{ display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
+      style={isDesktop
+        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px", padding: "0 24px", margin: "0 0 24px" }
+        : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
     >
       {items.map((s) => <CategoryTile key={s.key} s={s} onJump={jump} />)}
     </div>
@@ -318,10 +336,11 @@ function RailCard({ thing, wide, onOpen }: { thing: RadarThing; wide: boolean; o
 interface SectionData { key: string; emoji?: string; eyebrow: string; sub: string; variant: "list" | "rail"; things: RadarThing[] }
 
 function Section({ emoji, eyebrow, sub, variant, things, onOpen, onSeeAll }: SectionData & { onOpen: (t: RadarThing) => void; onSeeAll?: () => void }) {
+  const isDesktop = useContext(DesktopCtx);
   if (things.length === 0) return null;
   // Rails hide most cards off the right edge — offer a focused full view. List
   // sections already show everything inline, so no "See all" there.
-  const showSeeAll = variant === "rail" && things.length > 3 && !!onSeeAll;
+  const showSeeAll = !isDesktop && variant === "rail" && things.length > 3 && !!onSeeAll;
   return (
     <section style={{ marginBottom: "30px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "0 24px", marginBottom: "12px" }}>
@@ -339,9 +358,15 @@ function Section({ emoji, eyebrow, sub, variant, things, onOpen, onSeeAll }: Sec
         )}
       </div>
       {variant === "rail" ? (
-        <div className="scrollbar-none radar-rail" style={{ display: "flex", gap: "12px", padding: "0 24px", overflowX: "auto", scrollSnapType: "x proximity" }}>
-          {things.map((t, i) => <RailCard key={t.id} thing={t} wide={i === 0} onOpen={onOpen} />)}
-        </div>
+        isDesktop ? (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "0 24px" }}>
+            {things.map((t) => <RailCard key={t.id} thing={t} wide={false} onOpen={onOpen} />)}
+          </div>
+        ) : (
+          <div className="scrollbar-none radar-rail" style={{ display: "flex", gap: "12px", padding: "0 24px", overflowX: "auto", scrollSnapType: "x proximity" }}>
+            {things.map((t, i) => <RailCard key={t.id} thing={t} wide={i === 0} onOpen={onOpen} />)}
+          </div>
+        )
       ) : (
         <div style={{ borderTop: `1px solid ${HAIRLINE}` }}>
           {things.map((t) => <Row key={t.id} thing={t} onOpen={onOpen} />)}
@@ -509,6 +534,7 @@ export function RadarClient(data: RadarData) {
   // a ref, so it's safe to read during render.
   const [skipIntro] = useState(() => introPlayed);
   const reduced = !!useReducedMotion();
+  const isDesktop = useIsDesktop();
   const V = radarVariants(reduced);
 
   useEffect(() => {
@@ -548,65 +574,67 @@ export function RadarClient(data: RadarData) {
   const sections = buildSections(lens, data);
 
   return (
-    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS, paddingBottom: "28px" }}>
-      <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
+    <DesktopCtx.Provider value={isDesktop}>
+      <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS, paddingBottom: "28px" }}>
+        <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
 
-      <div style={{ position: "relative", zIndex: 2 }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "26px 24px 16px" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{headline}</h1>
-            <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>What&apos;s new and worth knowing in AI, tuned to you.</p>
+        <div style={{ position: "relative", zIndex: 2 }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "26px 24px 16px" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{headline}</h1>
+              <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>What&apos;s new and worth knowing in AI, tuned to you.</p>
+            </div>
+            <button
+              onClick={() => { setShowFeedback(true); posthog.capture("radar_feedback_opened", { from: "today_header" }); }}
+              aria-label="Send feedback"
+              style={{ flexShrink: 0, marginTop: "2px", display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "100px", background: SURFACE, border: `1px solid ${HAIRLINE}`, padding: "8px 14px", cursor: "pointer", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, boxShadow: INNER_HIGHLIGHT }}
+            >
+              <MessageSquare size={15} strokeWidth={2} /> Feedback
+            </button>
           </div>
-          <button
-            onClick={() => { setShowFeedback(true); posthog.capture("radar_feedback_opened", { from: "today_header" }); }}
-            aria-label="Send feedback"
-            style={{ flexShrink: 0, marginTop: "2px", display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "100px", background: SURFACE, border: `1px solid ${HAIRLINE}`, padding: "8px 14px", cursor: "pointer", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, boxShadow: INNER_HIGHLIGHT }}
-          >
-            <MessageSquare size={15} strokeWidth={2} /> Feedback
-          </button>
+
+          {/* Lens switcher + Hackathons entry. The two toggles tune the content
+              lens; the gold Hackathons pill (right of a divider) is wayfinding to
+              a separate events view — a different kind of thing, kept distinct. */}
+          <LensRail lens={lens} choose={choose} />
+
+          {/* Lens content */}
+          <AnimatePresence mode="wait">
+            <motion.div key={lens} variants={V.block} initial={skipIntro ? false : "hidden"} animate="show" exit="exit">
+              <motion.div variants={V.hero}><CategoryTiles sections={sections} /></motion.div>
+              {lens === "builder" && (
+                <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
+              )}
+              {data.hackathons.length > 0 && (
+                <motion.div variants={V.item}><HackathonsRail items={data.hackathons} onOpen={onOpenHackathon} /></motion.div>
+              )}
+              {sections.map((s) => (
+                <motion.div key={s.key} id={`sec-${s.key}`} variants={V.item}>
+                  <Section
+                    {...s}
+                    onOpen={onOpen}
+                    onSeeAll={() => { setAllSection(s); posthog.capture("radar_section_see_all", { key: s.key, count: s.things.length }); }}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Lens switcher + Hackathons entry. The two toggles tune the content
-            lens; the gold Hackathons pill (right of a divider) is wayfinding to
-            a separate events view — a different kind of thing, kept distinct. */}
-        <LensRail lens={lens} choose={choose} />
-
-        {/* Lens content */}
-        <AnimatePresence mode="wait">
-          <motion.div key={lens} variants={V.block} initial={skipIntro ? false : "hidden"} animate="show" exit="exit">
-            <motion.div variants={V.hero}><CategoryTiles sections={sections} /></motion.div>
-            {lens === "builder" && (
-              <motion.div variants={V.item}><WhatsNew tools={data.tools} onOpen={onOpen} /></motion.div>
-            )}
-            {data.hackathons.length > 0 && (
-              <motion.div variants={V.item}><HackathonsRail items={data.hackathons} onOpen={onOpenHackathon} /></motion.div>
-            )}
-            {sections.map((s) => (
-              <motion.div key={s.key} id={`sec-${s.key}`} variants={V.item}>
-                <Section
-                  {...s}
-                  onOpen={onOpen}
-                  onSeeAll={() => { setAllSection(s); posthog.capture("radar_section_see_all", { key: s.key, count: s.things.length }); }}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
+        <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />
+        <SectionAllSheet
+          open={!!allSection}
+          emoji={allSection?.emoji}
+          title={allSection?.eyebrow ?? ""}
+          sub={allSection?.sub ?? ""}
+          things={allSection?.things ?? []}
+          onClose={() => setAllSection(null)}
+          onOpenThing={(t) => { setAllSection(null); onOpen(t); }}
+        />
+        <HackathonDetailSheet hackathon={hackDetail} onClose={() => setHackDetail(null)} />
+        <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
       </div>
-
-      <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />
-      <SectionAllSheet
-        open={!!allSection}
-        emoji={allSection?.emoji}
-        title={allSection?.eyebrow ?? ""}
-        sub={allSection?.sub ?? ""}
-        things={allSection?.things ?? []}
-        onClose={() => setAllSection(null)}
-        onOpenThing={(t) => { setAllSection(null); onOpen(t); }}
-      />
-      <HackathonDetailSheet hackathon={hackDetail} onClose={() => setHackDetail(null)} />
-      <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
-    </div>
+    </DesktopCtx.Provider>
   );
 }

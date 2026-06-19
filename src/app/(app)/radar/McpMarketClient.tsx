@@ -74,7 +74,7 @@ export function McpMarketClient() {
   };
 
   return (
-    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: CANVAS, paddingBottom: "28px" }}>
+    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS, paddingBottom: "28px" }}>
       {/* Header */}
       <div style={{ padding: "22px 24px 12px" }}>
         <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "13px", color: TEXT.muted, textDecoration: "none", marginBottom: "14px" }}>

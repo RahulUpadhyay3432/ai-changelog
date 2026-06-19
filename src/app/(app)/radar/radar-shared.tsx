@@ -125,6 +125,7 @@ export function FaceMark({
           src={logoUrl!}
           alt=""
           loading="lazy"
+          draggable={false}
           onError={() => setFailed(true)}
           style={{ width: "100%", height: "100%", objectFit: "contain", padding: `${Math.round(size * 0.16)}px`, boxSizing: "border-box" }}
         />
@@ -173,6 +174,7 @@ export function CoverImage({
             src={src}
             alt=""
             loading="lazy"
+            draggable={false}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.9)" }}
           />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.94) 22%, rgba(8,8,8,0.1) 60%, transparent 100%)" }} />

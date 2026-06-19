@@ -78,7 +78,7 @@ export function ToolkitClient() {
   const empty = saved.length === 0;
 
   return (
-    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", background: CANVAS, paddingBottom: "28px" }}>
+    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS, paddingBottom: "28px" }}>
       {/* Header */}
       <div style={{ padding: "24px 24px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

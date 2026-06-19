@@ -1,0 +1,64 @@
+/* ── Mobile base ───────────────────────────────────────────── */
+.outer {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sideNav {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.mobileNav {
+  flex-shrink: 0;
+}
+
+.overlayRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Desktop ─────────────────────────────────────────────────── */
+@media (min-width: 900px) {
+  .outer {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .sideNav {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    flex-shrink: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 28px 0 24px;
+    gap: 4px;
+    overflow-y: auto;
+  }
+
+  .mobileNav {
+    display: none;
+  }
+
+  .overlayRoot {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    overflow: visible;
+  }
+}

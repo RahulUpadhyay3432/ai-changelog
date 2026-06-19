@@ -10,6 +10,18 @@ import { categoryEmoji } from "./radar-map";
 import { toggleRadarTool, isRadarToolSaved } from "@/lib/storage";
 import { getToolDepth } from "@/lib/radar-tool-depth";
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
 // One labelled depth block — gold kicker + warm body. Mirrors the /learn
 // section pattern (heading + paragraph) inside the dark sheet.
 function Field({ label, body }: { label: string; body: string }) {
@@ -22,6 +34,7 @@ function Field({ label, body }: { label: string; body: string }) {
 }
 
 function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
+  const isDesktop = useIsDesktop();
   const [saved, setSaved] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const depth = getToolDepth(thing.url);
@@ -55,7 +68,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
       savedAt: new Date().toISOString(),
     });
     setSaved(nowSaved);
-    flash(nowSaved ? (thing.category ? `Saved to ${thing.category}` : "Saved to Toolkit") : "Removed");
+    flash(nowSaved ? "Saved to Toolkit" : "Removed");
     if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
     posthog.capture(nowSaved ? "radar_tool_saved" : "radar_tool_unsaved", { id: thing.id, category: thing.category });
   };
@@ -83,7 +96,12 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
         transition={{ type: "spring", stiffness: 380, damping: 34 }}
         drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => { if (info.offset.y > 80) onClose(); }}
-        style={{ position: "relative", background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column" }}
+        style={{
+          position: "relative",
+          width: isDesktop ? "min(600px, 100%)" : undefined,
+          alignSelf: isDesktop ? "center" : undefined,
+          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
+        }}
       >
         {/* Drag handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 6px", flexShrink: 0 }}>

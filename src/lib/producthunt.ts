@@ -28,6 +28,7 @@ interface PHPost {
   thumbnail: { url: string } | null;
   votesCount: number;
   url: string;
+  website: string | null;
   createdAt: string;
   topics: {
     edges: Array<{ node: PHTopicNode }>;
@@ -56,6 +57,8 @@ export interface PHFeedItem {
   votesCount: number;
   /** Canonical PH launch URL */
   sourceUrl: string;
+  /** The maker's own product website (for meta enrichment) — may be null */
+  website: string | null;
   /** ISO 8601 launch date */
   publishedAt: string;
   /** Topic slugs for secondary classification */
@@ -78,6 +81,7 @@ const POSTS_QUERY = /* GraphQL */ `
           }
           votesCount
           url
+          website
           createdAt
           topics {
             edges {
@@ -218,6 +222,7 @@ export async function fetchProductHuntPosts(hoursBack = 48): Promise<PHFeedItem[
       imageUrl: p.thumbnail?.url ?? null,
       votesCount: p.votesCount,
       sourceUrl: p.url,
+      website: p.website ?? null,
       publishedAt: p.createdAt,
       topics: p.topics.edges.map((e) => e.node.slug),
     }));

@@ -6,6 +6,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { FaceMark, MetricChip, usePressTap, SG, TEXT, HAIRLINE, type RadarThing } from "./radar-shared";
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
 // One full-height row — same content shape as the inline Row, but the value line
 // is never clamped, so every tool in the section reads in full.
 function DetailRow({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
@@ -42,6 +54,7 @@ function Sheet({
   onClose: () => void;
   onOpenThing: (t: RadarThing) => void;
 }) {
+  const isDesktop = useIsDesktop();
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 9999, display: "flex", flexDirection: "column", justifyContent: "flex-end", pointerEvents: "none" }}>
       <motion.div
@@ -54,7 +67,12 @@ function Sheet({
         transition={{ type: "spring", stiffness: 380, damping: 34 }}
         drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.4 }}
         onDragEnd={(_, info) => { if (info.offset.y > 80) onClose(); }}
-        style={{ position: "relative", background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 8px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column" }}
+        style={{
+          position: "relative",
+          width: isDesktop ? "min(600px, 100%)" : undefined,
+          alignSelf: isDesktop ? "center" : undefined,
+          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 8px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
+        }}
       >
         {/* Drag handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 6px", flexShrink: 0 }}>

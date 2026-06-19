@@ -5,7 +5,7 @@ import { TrendingUp, Sparkles, Flame } from "lucide-react";
 import posthog from "posthog-js";
 import type { TrendingStory } from "@/lib/trending";
 import { getCategoryBySlug } from "@/lib/categories";
-import { CoverImage } from "../radar/radar-shared";
+import { CoverImage } from "../../(radar)/radar/radar-shared";
 import { formatTimeAgo } from "@/lib/mock-data";
 import { BreakdownSheet } from "@/components/feed/BreakdownSheet";
 import type { CategorySlug } from "@/lib/types";

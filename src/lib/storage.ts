@@ -73,6 +73,9 @@ export interface SavedRadarTool {
   face: string;
   url: string | null;
   savedAt: string;
+  // Optional named-collection membership. null/undefined = unfiled (general
+  // Toolkit). Existing saves predate this field and read as unfiled.
+  loadoutId?: string | null;
 }
 
 export function getSavedRadarTools(): SavedRadarTool[] {
@@ -102,6 +105,89 @@ export function toggleRadarTool(tool: SavedRadarTool): boolean {
   } catch {
     return false;
   }
+}
+
+// ==========================================
+// Radar loadouts — user-created named collections (e.g. a "Hackathon" kit)
+// A saved tool carries an optional loadoutId; null/undefined = unfiled Toolkit.
+// On-device only (no auth/sync) — same as the rest of the Toolkit state.
+// ==========================================
+const RADAR_LOADOUTS_KEY = "kapyn_radar_loadouts";
+
+export interface Loadout {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export function getLoadouts(): Loadout[] {
+  if (!isBrowser) return [];
+  try {
+    const raw = localStorage.getItem(RADAR_LOADOUTS_KEY);
+    return raw ? (JSON.parse(raw) as Loadout[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLoadouts(list: Loadout[]): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(RADAR_LOADOUTS_KEY, JSON.stringify(list)); } catch {}
+}
+
+// Create a loadout, or return the existing one with the same name
+// (case-insensitive) so "New loadout" never silently duplicates.
+export function createLoadout(name: string): Loadout | null {
+  if (!isBrowser) return null;
+  const clean = name.trim().slice(0, 40);
+  if (!clean) return null;
+  const list = getLoadouts();
+  const existing = list.find((l) => l.name.toLowerCase() === clean.toLowerCase());
+  if (existing) return existing;
+  const loadout: Loadout = {
+    id: `lo_${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`,
+    name: clean,
+    createdAt: new Date().toISOString(),
+  };
+  writeLoadouts([loadout, ...list]);
+  return loadout;
+}
+
+export function renameLoadout(id: string, name: string): void {
+  if (!isBrowser) return;
+  const clean = name.trim().slice(0, 40);
+  if (!clean) return;
+  writeLoadouts(getLoadouts().map((l) => (l.id === id ? { ...l, name: clean } : l)));
+}
+
+// Remove a loadout; its tools stay saved but become unfiled (loadoutId → null).
+export function deleteLoadout(id: string): void {
+  if (!isBrowser) return;
+  writeLoadouts(getLoadouts().filter((l) => l.id !== id));
+  try {
+    const saved = getSavedRadarTools().map((t) => (t.loadoutId === id ? { ...t, loadoutId: null } : t));
+    localStorage.setItem(RADAR_SAVED_KEY, JSON.stringify(saved));
+  } catch {}
+}
+
+// File a tool into a loadout (saving it first if it isn't already saved).
+// Pass null to keep it saved but unfiled. Idempotent on the tool id.
+export function assignToolToLoadout(tool: SavedRadarTool, loadoutId: string | null): void {
+  if (!isBrowser) return;
+  try {
+    const saved = getSavedRadarTools();
+    const exists = saved.some((t) => t.id === tool.id);
+    const next = exists
+      ? saved.map((t) => (t.id === tool.id ? { ...t, loadoutId } : t))
+      : [{ ...tool, loadoutId }, ...saved];
+    localStorage.setItem(RADAR_SAVED_KEY, JSON.stringify(next));
+  } catch {}
+}
+
+// The loadout a given tool is filed under (null = unfiled / not saved).
+export function getToolLoadoutId(toolId: string): string | null {
+  if (!isBrowser) return null;
+  return getSavedRadarTools().find((t) => t.id === toolId)?.loadoutId ?? null;
 }
 
 // ==========================================

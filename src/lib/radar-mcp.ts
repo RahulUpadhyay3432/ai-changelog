@@ -254,6 +254,18 @@ export const MCP_SERVERS: McpServer[] = [
     description: "Gives an assistant control of your terminal and filesystem to run commands, manage processes, and edit code across a project.",
     url: "https://github.com/wonderwhy-er/DesktopCommanderMCP",
   },
+  {
+    name: "Figma Dev Mode", by: "official", category: "Dev tools",
+    tagline: "Pull Figma's official design context into your IDE.",
+    description: "Figma's official Dev Mode MCP server gives an AI coding tool structured access to your selected frames — layout, variables, and components — so generated code matches the design.",
+    url: "https://developers.figma.com/docs/figma-mcp-server",
+  },
+  {
+    name: "Hugging Face", by: "official", category: "Dev tools",
+    tagline: "Search models, datasets, and Spaces from the assistant.",
+    description: "Hugging Face's official MCP server lets an assistant search the Hub for models, datasets, and papers, and call Spaces as tools, grounding work in the open-source ecosystem.",
+    url: "https://huggingface.co/mcp",
+  },
 
   // ── More: Databases ──
   {
@@ -295,6 +307,12 @@ export const MCP_SERVERS: McpServer[] = [
     tagline: "Run web scrapers and automation actors.",
     description: "Apify's MCP server lets an assistant run thousands of pre-built scrapers and automation 'actors' to extract data from across the web.",
     url: "https://github.com/apify/actors-mcp-server",
+  },
+  {
+    name: "Chrome DevTools", by: "official", category: "Browser & automation",
+    tagline: "Let the assistant debug a live Chrome page.",
+    description: "Chrome's official DevTools MCP server lets an assistant inspect the DOM, read console and network activity, and run performance traces against a real browser, so it can debug and verify web pages.",
+    url: "https://github.com/ChromeDevTools/chrome-devtools-mcp",
   },
 
   // ── More: Productivity ──

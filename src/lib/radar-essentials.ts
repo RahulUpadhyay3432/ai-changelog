@@ -24,6 +24,9 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Grok", valueLine: "xAI's assistant, wired into real-time posts on X.", url: "https://grok.com", category: "Models & chat" },
   { name: "Mistral", valueLine: "European frontier and open-weight models, via chat or API.", url: "https://mistral.ai", category: "Models & chat" },
   { name: "DeepSeek", valueLine: "Strong open reasoning models at low cost.", url: "https://deepseek.com", category: "Models & chat" },
+  { name: "Qwen", valueLine: "Alibaba's open-weight model family, strong at code and multilingual work.", url: "https://chat.qwen.ai", category: "Models & chat" },
+  { name: "Kimi", valueLine: "Moonshot AI's assistant, built for very long context.", url: "https://www.kimi.com", category: "Models & chat" },
+  { name: "Llama", valueLine: "Meta's open-weight models you can run and fine-tune yourself.", url: "https://llama.com", category: "Models & chat" },
 
   // ── AI coding ──
   { name: "Cursor", valueLine: "AI-native editor that edits across your whole repo.", url: "https://cursor.com", category: "AI coding" },
@@ -37,6 +40,12 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Cline", valueLine: "An autonomous coding agent inside VS Code.", url: "https://cline.bot", category: "AI coding" },
   { name: "Zed", valueLine: "A fast, collaborative editor with AI built in.", url: "https://zed.dev", category: "AI coding" },
   { name: "Devin", valueLine: "An autonomous software engineer that takes whole tasks.", url: "https://devin.ai", category: "AI coding" },
+  { name: "Codex", valueLine: "OpenAI's coding agent for the terminal and your IDE.", url: "https://openai.com/codex", category: "AI coding" },
+  { name: "Antigravity", valueLine: "Google's agent-first IDE built around Gemini.", url: "https://antigravity.google", category: "AI coding" },
+  { name: "Amp", valueLine: "Sourcegraph's agentic coding tool for large codebases.", url: "https://ampcode.com", category: "AI coding" },
+  { name: "OpenCode", valueLine: "An open-source coding agent that runs in your terminal.", url: "https://opencode.ai", category: "AI coding" },
+  { name: "Continue", valueLine: "Open-source IDE autopilot you point at your own models.", url: "https://continue.dev", category: "AI coding" },
+  { name: "Roo Code", valueLine: "An open-source autonomous coding agent inside VS Code.", url: "https://roocode.com", category: "AI coding" },
 
   // ── UI & design ──
   { name: "v0", valueLine: "Generate production React UIs from a prompt.", url: "https://v0.dev", category: "UI & design" },
@@ -59,6 +68,8 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Fal", valueLine: "Fast inference for image, video, and audio models.", url: "https://fal.ai", category: "Inference" },
   { name: "Modal", valueLine: "Run Python and GPU workloads in the cloud, serverless.", url: "https://modal.com", category: "Inference" },
   { name: "Cerebras", valueLine: "Run open models at record speed on wafer-scale chips.", url: "https://cerebras.ai", category: "Inference" },
+  { name: "Baseten", valueLine: "Deploy and serve open models in production.", url: "https://baseten.co", category: "Inference" },
+  { name: "DeepInfra", valueLine: "Run open models through a low-cost inference API.", url: "https://deepinfra.com", category: "Inference" },
 
   // ── Data & RAG infra ──
   { name: "Pinecone", valueLine: "Managed vector database for fast semantic search.", url: "https://pinecone.io", category: "Data & RAG" },
@@ -68,6 +79,8 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Chroma", valueLine: "An open-source embedding database for AI apps.", url: "https://trychroma.com", category: "Data & RAG" },
   { name: "LlamaIndex", valueLine: "A framework for connecting your data to LLMs.", url: "https://llamaindex.ai", category: "Data & RAG" },
   { name: "Neon", valueLine: "Serverless Postgres with branching and pgvector.", url: "https://neon.tech", category: "Data & RAG" },
+  { name: "Turbopuffer", valueLine: "Serverless vector search built on object storage.", url: "https://turbopuffer.com", category: "Data & RAG" },
+  { name: "LanceDB", valueLine: "An open-source vector database that runs on your own storage.", url: "https://lancedb.com", category: "Data & RAG" },
 
   // ── Agents & automation ──
   { name: "n8n", valueLine: "Wire AI into automated workflows, self-hostable.", url: "https://n8n.io", category: "Agents & automation" },
@@ -76,6 +89,11 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "CrewAI", valueLine: "Build teams of role-playing agents that work together.", url: "https://crewai.com", category: "Agents & automation" },
   { name: "Dify", valueLine: "Open-source platform to build and run LLM apps and agents.", url: "https://dify.ai", category: "Agents & automation" },
   { name: "Lindy", valueLine: "Build AI assistants that automate your busywork.", url: "https://lindy.ai", category: "Agents & automation" },
+  { name: "OpenAI Agents SDK", valueLine: "Build multi-agent systems with OpenAI's lightweight SDK.", url: "https://openai.github.io/openai-agents-python", category: "Agents & automation" },
+  { name: "Agent Development Kit", valueLine: "Google's open framework for building and shipping agents.", url: "https://google.github.io/adk-docs", category: "Agents & automation" },
+  { name: "Pydantic AI", valueLine: "A type-safe Python framework for building agents.", url: "https://ai.pydantic.dev", category: "Agents & automation" },
+  { name: "smolagents", valueLine: "Hugging Face's minimal library for code-writing agents.", url: "https://huggingface.co/docs/smolagents", category: "Agents & automation" },
+  { name: "AutoGen", valueLine: "Microsoft's framework for multi-agent conversations.", url: "https://microsoft.github.io/autogen", category: "Agents & automation" },
 
   // ── Orchestration (long-running & agent workflows) ──
   { name: "LangGraph", valueLine: "Build stateful, multi-step agent workflows.", url: "https://langchain.com/langgraph", category: "Orchestration" },
@@ -108,4 +126,6 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Suno", valueLine: "Create full songs, with vocals, from a prompt.", url: "https://suno.com", category: "Media" },
   { name: "Luma", valueLine: "Generate cinematic video and 3D from text or images.", url: "https://lumalabs.ai", category: "Media" },
   { name: "HeyGen", valueLine: "Generate AI avatar and spokesperson videos.", url: "https://heygen.com", category: "Media" },
+  { name: "Sora", valueLine: "OpenAI's text-to-video model for generating clips.", url: "https://sora.com", category: "Media" },
+  { name: "Kling", valueLine: "Generate cinematic video from text and images.", url: "https://klingai.com", category: "Media" },
 ];

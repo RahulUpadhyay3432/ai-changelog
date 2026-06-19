@@ -18,14 +18,24 @@ const GH_API = "https://api.github.com/search/repositories";
 // Topic clusters — tightly scoped to AI/ML engineering topics.
 // Intentionally excludes broad consumer topics (generative-ai, text-to-image,
 // diffusion-models) which attract piracy/spam repos and off-topic content.
+// Still excludes the spam-prone consumer topics (text-to-image, diffusion-models);
+// star-velocity trending now flows in via OSSInsight (fetchOssInsightTrending), so
+// we don't need those noisy topic queries to catch hot repos. The additions below
+// are high-signal 2026 agent/automation topics.
 const TOPIC_QUERIES = [
   { q: "topic:llm",                  minStars: 10 },
   { q: "topic:large-language-model", minStars: 10 },
   { q: "topic:ai-agent",             minStars: 10 },
+  { q: "topic:ai-agents",            minStars: 10 },
+  { q: "topic:agentic-ai",           minStars: 10 },
   { q: "topic:rag",                  minStars: 10 },
   { q: "topic:ollama",               minStars: 10 },
   { q: "topic:langchain",            minStars: 10 },
   { q: "topic:llm-inference",        minStars: 10 },
+  { q: "topic:llmops",               minStars: 10 },
+  { q: "topic:computer-use",         minStars: 10 },
+  { q: "topic:voice-agent",          minStars: 10 },
+  { q: "topic:deep-research",        minStars: 10 },
   { q: "topic:mcp",                  minStars: 10 }, // Model Context Protocol
   { q: "topic:openai-api",           minStars: 15 },
   { q: "topic:huggingface",          minStars: 15 },
@@ -221,6 +231,92 @@ export async function fetchTopAIRepos(): Promise<GitHubRepo[]> {
       createdAt: r.created_at,
       owner: r.owner.login,
     }));
+}
+
+// ── OSSInsight star-velocity trending ────────────────────────────────────────
+// GitHub's own "Trending" (and the Search API's created:>… filter) only sees
+// brand-new repos. An established repo gaining stars *today* (Langflow, Dify,
+// Ollama, OpenClaw…) is structurally invisible to those. OSSInsight ranks repos
+// by recent star velocity — free, no key. We pull the 24h + 7d windows so the
+// feed gets both the freshest spikes and the recognizable week-trenders, then
+// AI-filter (most trending repos are not AI) and map to the GitHubRepo shape.
+// Docs: https://ossinsight.io/docs/api (trends/repos)
+
+const OSS_API = "https://api.ossinsight.io/v1/trends/repos/";
+
+interface OssRow {
+  repo_name: string; // "owner/name"
+  description: string | null;
+  stars: string; // count as string
+  forks: string;
+  primary_language: string | null;
+  collection_names: string | null; // comma-separated OSSInsight collections
+  total_score: string;
+}
+
+// AI relevance for a trending repo: in an AI/LLM OSSInsight collection, or the
+// name/description clearly reads AI. Word-boundary on the short tokens so "ai"
+// doesn't fire on "domain" / "available".
+const OSS_AI_COLLECTION = /\b(ai|aigc|llm|gpt|machine learning|artificial intelligence|agent|rag|deep learning|generative|stable diffusion|chatbot|nlp)\b/i;
+const OSS_AI_WORD = /\b(ai|ml|llm|llms|gpt|nlp|rag|agent|agentic|aigc)\b/i;
+const OSS_AI_PHRASE = [
+  "artificial intelligence", "machine learning", "deep learning", "generative",
+  "neural", "transformer", "embedding", "vector", "inference", "fine-tun",
+  "multimodal", "diffusion", "langchain", "chatbot", "prompt", "openai",
+  "anthropic", "claude", "gemini", "llama", "model context protocol",
+];
+
+function ossIsAi(r: OssRow): boolean {
+  const coll = r.collection_names ?? "";
+  if (coll && OSS_AI_COLLECTION.test(coll)) return true;
+  const hay = `${r.repo_name} ${r.description ?? ""}`.toLowerCase();
+  return OSS_AI_WORD.test(hay) || OSS_AI_PHRASE.some((p) => hay.includes(p));
+}
+
+async function fetchOssPeriod(period: string): Promise<OssRow[]> {
+  const res = await fetch(`${OSS_API}?period=${period}`, {
+    headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0" },
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`OSSInsight ${res.status} (${period})`);
+  const json = (await res.json()) as { data?: { rows?: OssRow[] } };
+  return json.data?.rows ?? [];
+}
+
+/**
+ * Repos trending by recent star velocity (not just newly-created), AI-filtered.
+ * Pulls the 24h and 7d windows, dedupes, requires a description + a small star
+ * floor, and returns the GitHubRepo shape so it merges with the Search results.
+ */
+export async function fetchOssInsightTrending(minStars = 25): Promise<GitHubRepo[]> {
+  const settled = await Promise.allSettled([fetchOssPeriod("past_24_hours"), fetchOssPeriod("past_week")]);
+  const seen = new Set<string>();
+  const out: GitHubRepo[] = [];
+  for (const r of settled) {
+    if (r.status !== "fulfilled") continue;
+    for (const row of r.value) {
+      if (!row.repo_name || seen.has(row.repo_name)) continue;
+      const desc = (row.description ?? "").trim();
+      if (!desc) continue; // no self-description → no trustworthy value-line
+      const stars = parseInt(row.stars, 10) || 0;
+      if (stars < minStars) continue;
+      if (!ossIsAi(row)) continue;
+      seen.add(row.repo_name);
+      const [owner, ...rest] = row.repo_name.split("/");
+      out.push({
+        name: rest.join("/") || row.repo_name,
+        fullName: row.repo_name,
+        description: desc,
+        htmlUrl: `https://github.com/${row.repo_name}`,
+        stars,
+        language: row.primary_language ?? null,
+        topics: (row.collection_names ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 8),
+        createdAt: "", // OSSInsight doesn't return creation date for trending rows
+        owner: owner ?? row.repo_name,
+      });
+    }
+  }
+  return out.sort((a, b) => b.stars - a.stars);
 }
 
 /**

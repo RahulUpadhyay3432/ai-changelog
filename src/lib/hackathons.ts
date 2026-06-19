@@ -28,6 +28,7 @@ export interface Hackathon {
   participants: number | null;
   openState: string; // "open" | "upcoming" | "ended"
   organization: string | null;
+  description?: string | null; // longer brief for the in-app detail sheet (where a source provides one)
 }
 
 // What the ingestion upserts (adds the dedup key).
@@ -82,19 +83,37 @@ function normalizeDevpost(h: DevpostHackathon): HackathonInput | null {
     participants: h.registrations_count ?? null,
     openState: h.open_state ?? "",
     organization: h.organization_name ?? null,
+    description: null, // Devpost's listing JSON carries no blurb
   };
 }
 
-// Fetch open + upcoming AI/ML hackathons (online + in-person) from Devpost.
-export async function fetchDevpostHackathons(): Promise<HackathonInput[]> {
-  const params = new URLSearchParams();
-  params.append("challenge_type[]", "online");
-  params.append("challenge_type[]", "in-person");
-  params.append("themes[]", "Machine Learning/AI");
-  params.append("status[]", "open");
-  params.append("status[]", "upcoming");
-  params.set("order_by", "deadline");
+// ─── AI / tech relevance ─────────────────────────────────────────────────────
+// Sources that aren't pre-themed (Devpost's broad pass, Unstop, MLH) span every
+// domain. We keep only the AI/tech-relevant ones so a finance or biology
+// hackathon doesn't dilute the radar. Word-boundary match on the short acronyms
+// (so "ai" doesn't fire on "captain"), substring on the multi-word phrases.
+const AI_WORD = /\b(ai|a\.i\.|ml|ai\/ml|ml\/ai|llm|llms|gpt|nlp|rag|genai)\b/i;
+const AI_PHRASE = [
+  "artificial intelligence", "machine learning", "deep learning", "generative",
+  "agent", "agentic", "neural", "computer vision", "data science", "chatbot",
+  "large language", "multimodal", "diffusion", "voice ai", "automation", "robotics",
+];
 
+function isAiRelevant(h: HackathonInput): boolean {
+  const hay = `${h.title} ${h.themes.join(" ")} ${h.organization ?? ""}`.toLowerCase();
+  return AI_WORD.test(hay) || AI_PHRASE.some((p) => hay.includes(p));
+}
+
+// Format an ISO timestamp → "Jul 05, 2026" (used by sources that give a raw date).
+function fmtDate(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+}
+
+// One Devpost listing page → normalized items.
+async function fetchDevpostPage(params: URLSearchParams): Promise<HackathonInput[]> {
   const res = await fetch(`${DEVPOST_API}?${params.toString()}`, {
     headers: { Accept: "application/json" },
     next: { revalidate: 3600 },
@@ -106,21 +125,260 @@ export async function fetchDevpostHackathons(): Promise<HackathonInput[]> {
     .filter((h): h is HackathonInput => !!h);
 }
 
-// All sources, deduped by source+externalId. Add Luma/MLH/etc. here later.
-export async function fetchAllHackathons(): Promise<HackathonInput[]> {
-  const settled = await Promise.allSettled([fetchDevpostHackathons()]);
+// Devpost, two passes: (1) the themed Machine-Learning/AI listing — every item is
+// already on-topic — and (2) a broad, prize-ranked listing AI-filtered down, which
+// catches AI hackathons that simply weren't tagged ML/AI. Merged + deduped here.
+export async function fetchDevpostHackathons(): Promise<HackathonInput[]> {
+  const base = () => {
+    const p = new URLSearchParams();
+    p.append("challenge_type[]", "online");
+    p.append("challenge_type[]", "in-person");
+    p.append("status[]", "open");
+    p.append("status[]", "upcoming");
+    return p;
+  };
+
+  const themed = base();
+  themed.append("themes[]", "Machine Learning/AI");
+  themed.set("order_by", "deadline");
+
+  const broad = base();
+  broad.set("order_by", "prize-amount");
+
+  const [a, b] = await Promise.allSettled([fetchDevpostPage(themed), fetchDevpostPage(broad)]);
+  const themedItems = a.status === "fulfilled" ? a.value : [];
+  const broadItems = (b.status === "fulfilled" ? b.value : []).filter(isAiRelevant);
+
   const seen = new Set<string>();
   const out: HackathonInput[] = [];
-  for (const r of settled) {
-    if (r.status !== "fulfilled") continue;
-    for (const h of r.value) {
-      const key = `${h.source}:${h.externalId}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(h);
-    }
+  for (const h of [...themedItems, ...broadItems]) {
+    if (seen.has(h.externalId)) continue;
+    seen.add(h.externalId);
+    out.push(h);
   }
   return out;
+}
+
+// ─── Unstop source (India's largest hackathon aggregator) ────────────────────
+// Public search JSON, no auth. Spans every domain, so we AI-filter it.
+
+interface UnstopOpportunity {
+  id: number;
+  title: string;
+  seo_url: string | null;
+  logoUrl2: string | null;
+  region: string | null;
+  registerCount: number | null;
+  regn_open: number | null;
+  end_date: string | null;
+  organisation: { name?: string } | null;
+  prizes: Array<{ cash?: number; currency?: string }> | null;
+  required_skills: Array<{ skill?: string; skill_name?: string }> | null;
+  details: string | null;
+}
+
+function unstopPrize(prizes: UnstopOpportunity["prizes"]): string | null {
+  if (!prizes?.length) return null;
+  const total = prizes.reduce((sum, p) => sum + (Number(p.cash) || 0), 0);
+  if (total <= 0) return null;
+  const cur = prizes[0].currency ?? "";
+  const sym = /rupee/i.test(cur) ? "₹" : /dollar/i.test(cur) ? "$" : "";
+  return `${sym}${total.toLocaleString(sym === "₹" ? "en-IN" : "en-US")}`;
+}
+
+export async function fetchUnstopHackathons(): Promise<HackathonInput[]> {
+  const url =
+    "https://unstop.com/api/public/opportunity/search-result?opportunity=hackathons&oppstatus=open&per_page=30";
+  const res = await fetch(url, {
+    headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0" },
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`Unstop API ${res.status}`);
+  const json = (await res.json()) as { data?: { data?: UnstopOpportunity[] } };
+  const rows = json.data?.data ?? [];
+  return rows
+    .map((o): HackathonInput | null => {
+      if (!o.title || !o.seo_url) return null;
+      const isOnline = /online/i.test(o.region ?? "");
+      const brief = stripHtml(o.details);
+      return {
+        source: "unstop",
+        externalId: String(o.id),
+        title: o.title.trim(),
+        url: o.seo_url,
+        imageUrl: o.logoUrl2 ?? null,
+        dates: o.end_date ? `Ends ${fmtDate(o.end_date)}` : "",
+        prize: unstopPrize(o.prizes),
+        location: isOnline ? "Online" : "In-person",
+        isOnline,
+        themes: (o.required_skills ?? [])
+          .map((s) => s.skill ?? s.skill_name ?? "")
+          .filter(Boolean)
+          .slice(0, 6),
+        participants: o.registerCount ?? null,
+        openState: o.regn_open ? "open" : "upcoming",
+        organization: o.organisation?.name ?? null,
+        description: brief ? brief.slice(0, 360) : null,
+      };
+    })
+    .filter((h): h is HackathonInput => !!h)
+    .filter(isAiRelevant);
+}
+
+// ─── MLH source (Major League Hacking, 2026 season) ──────────────────────────
+// MLH is a static HTML page; each event is an <a> wrapping image, title, and two
+// info rows (date, location). Best-effort + AI-filtered — mostly student events,
+// so only the AI-themed ones (e.g. "Global Hack Week: Agents") survive the filter.
+
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&nbsp;/g, " ");
+}
+
+export async function fetchMlhEvents(): Promise<HackathonInput[]> {
+  const res = await fetch("https://mlh.com/seasons/2026/events", {
+    headers: { Accept: "text/html", "User-Agent": "Mozilla/5.0" },
+    redirect: "follow",
+    next: { revalidate: 21600 },
+  });
+  if (!res.ok) throw new Error(`MLH ${res.status}`);
+  const html = await res.text();
+  const cards = [...html.matchAll(/<a\b[^>]*href="(https?:\/\/[^"]*utm_source=mlh[^"]*)"[^>]*>([\s\S]*?)<\/a>/g)];
+  const out: HackathonInput[] = [];
+  const seen = new Set<string>();
+  for (const [, rawHref, inner] of cards) {
+    const titleM = inner.match(/line-clamp-2[^>]*>([\s\S]*?)<\//);
+    const imgM = inner.match(/src="(https?:\/\/[^"]+)"/);
+    const infos = [...inner.matchAll(/text-sm truncate[^>]*>([\s\S]*?)<\//g)].map((m) =>
+      decodeEntities(m[1].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()),
+    );
+    const title = titleM ? decodeEntities(titleM[1].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()) : "";
+    if (!title) continue;
+    const url = decodeEntities(rawHref).split("?")[0];
+    const id = url.replace(/^https?:\/\//, "").replace(/[^a-z0-9]/gi, "-").slice(0, 80);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const location = infos[1] ?? "";
+    out.push({
+      source: "mlh",
+      externalId: id,
+      title,
+      url,
+      imageUrl: imgM ? imgM[1] : null,
+      dates: infos[0] ?? "",
+      prize: null,
+      location: /everywhere|worldwide|online|virtual/i.test(location) ? "Online" : location || "In-person",
+      isOnline: /everywhere|worldwide|online|virtual/i.test(location),
+      themes: [],
+      participants: null,
+      openState: "upcoming",
+      organization: "Major League Hacking",
+      description: null,
+    });
+  }
+  return out.filter(isAiRelevant);
+}
+
+// ─── Curated marquee backbone ────────────────────────────────────────────────
+// A small, hand-verified set of flagship events that the generic scrapers
+// structurally miss — e.g. Devpost subdomain microsites the themed listing can't
+// see, and national programmes off Devpost entirely. Mirrors CURATED_ESSENTIALS.
+// These are guaranteed present and ranked first. Keep tight + currently-live.
+const CURATED_HACKATHONS: HackathonInput[] = [
+  {
+    source: "curated",
+    externalId: "google-cloud-rapid-agent-2026",
+    title: "Google Cloud Rapid Agent Hackathon",
+    url: "https://rapid-agent.devpost.com",
+    imageUrl: null,
+    dates: "Starts Jul 13, 2026",
+    prize: null,
+    location: "Online",
+    isOnline: true,
+    themes: ["AI agents", "Google Cloud", "Gemini"],
+    participants: null,
+    openState: "upcoming",
+    organization: "Google Cloud",
+    description:
+      "Google Cloud's sprint to build AI agents for real-world challenges, using Gemini and the Agent Development Kit. Open to builders worldwide.",
+  },
+  {
+    source: "curated",
+    externalId: "build-with-gemini-xprize-2026",
+    title: "Build with Gemini XPRIZE",
+    url: "https://xprize.devpost.com",
+    imageUrl: null,
+    dates: "May 19 - Aug 17, 2026",
+    prize: "$2,000,000",
+    location: "Online",
+    isOnline: true,
+    themes: ["Gemini", "AI", "Multimodal"],
+    participants: null,
+    openState: "open",
+    organization: "XPRIZE × Google",
+    description:
+      "A global competition to build breakthrough applications on Gemini, with a $2M prize pool across multiple tracks.",
+  },
+  {
+    source: "curated",
+    externalId: "smart-india-hackathon-2026",
+    title: "Smart India Hackathon 2026",
+    url: "https://www.sih.gov.in",
+    imageUrl: null,
+    dates: "2026",
+    prize: null,
+    location: "India",
+    isOnline: false,
+    themes: ["AI", "Innovation", "Government"],
+    participants: null,
+    openState: "upcoming",
+    organization: "Government of India",
+    description:
+      "India's flagship nationwide hackathon, where student teams build solutions — many AI-driven — for problem statements posed by ministries and industry.",
+  },
+];
+
+// Rank: curated marquee first, then open before upcoming, then by registrations.
+function rankHackathons(items: HackathonInput[]): HackathonInput[] {
+  const stateRank = (s: string) => (s.toLowerCase() === "open" ? 0 : s.toLowerCase() === "upcoming" ? 1 : 2);
+  return [...items].sort((a, b) => {
+    if ((a.source === "curated") !== (b.source === "curated")) return a.source === "curated" ? -1 : 1;
+    const sr = stateRank(a.openState) - stateRank(b.openState);
+    if (sr !== 0) return sr;
+    return (b.participants ?? 0) - (a.participants ?? 0);
+  });
+}
+
+// All sources, curated first, deduped by source+externalId AND normalized title
+// (the same event can surface on Devpost + Unstop). Any failing source drops out.
+export async function fetchAllHackathons(): Promise<HackathonInput[]> {
+  const settled = await Promise.allSettled([
+    fetchDevpostHackathons(),
+    fetchUnstopHackathons(),
+    fetchMlhEvents(),
+  ]);
+  const idSeen = new Set<string>();
+  const titleSeen = new Set<string>();
+  const out: HackathonInput[] = [];
+  const norm = (t: string) => t.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  const consider = (h: HackathonInput) => {
+    const idKey = `${h.source}:${h.externalId}`;
+    const titleKey = norm(h.title);
+    if (idSeen.has(idKey) || titleSeen.has(titleKey)) return;
+    idSeen.add(idKey);
+    titleSeen.add(titleKey);
+    out.push(h);
+  };
+
+  // Curated first so it wins title-dedup over a live duplicate.
+  CURATED_HACKATHONS.forEach(consider);
+  for (const r of settled) {
+    if (r.status !== "fulfilled") continue;
+    r.value.forEach(consider);
+  }
+  return rankHackathons(out);
 }
 
 // ─── Reader (radar_hackathons table) ─────────────────────────────────────────
@@ -157,6 +415,7 @@ function toHackathon(r: HackathonRow): Hackathon {
     participants: r.participants,
     openState: r.open_state ?? "",
     organization: r.organization,
+    description: null, // table has no blurb column yet (migration 0008)
   };
 }
 
@@ -173,12 +432,11 @@ export async function getHackathons(limit = 40): Promise<Hackathon[]> {
   if (!error && data && data.length > 0) {
     return data.map((r) => toHackathon(r as HackathonRow));
   }
-  // Table missing or empty → live fallback (HackathonInput extends Hackathon).
+  // Table missing or empty → live multi-source fallback (Devpost + Unstop + MLH +
+  // curated marquee). Already ranked; just cap. HackathonInput extends Hackathon.
   try {
-    const live = await fetchDevpostHackathons();
-    return live
-      .sort((a, b) => (b.participants ?? 0) - (a.participants ?? 0))
-      .slice(0, limit);
+    const live = await fetchAllHackathons();
+    return live.slice(0, limit);
   } catch {
     return [];
   }

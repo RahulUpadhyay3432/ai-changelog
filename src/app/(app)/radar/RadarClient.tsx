@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Cpu, Compass, Clapperboard, MessageSquare, Check, ArrowRight, ArrowUpRight, Plug, Trophy, type LucideIcon } from "lucide-react";
 import posthog from "posthog-js";
@@ -432,6 +432,67 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
   );
 }
 
+// Lens switcher + Hackathons entry. The row scrolls horizontally; on phones the
+// gold Hackathons CTA can sit off the right edge, so we add (a) a right-edge
+// fade so it dissolves instead of hard-clipping, and (b) a slim gold
+// scroll-progress bar — shown only when the row overflows — so it reads as
+// "there's more to the right." A progress bar (not dots) is honest for a
+// free-scrolling row: dots would imply discrete pages.
+function LensRail({ lens, choose }: { lens: RadarLens; choose: (l: RadarLens) => void }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState(false);
+  const [progress, setProgress] = useState(0); // 0..1 along the scrollable range
+
+  const measure = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setOverflow(max > 2);
+    setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
+  }, []);
+
+  useEffect(() => {
+    measure();
+    const el = scrollerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure]);
+
+  const TRACK = 44; // px — track width; thumb is a third of it
+  const thumb = TRACK / 3;
+  return (
+    <div style={{ padding: "0 24px 14px" }}>
+      <div
+        ref={scrollerRef}
+        onScroll={measure}
+        className={overflow ? "scrollbar-none radar-rail" : "scrollbar-none"}
+        style={{ display: "flex", alignItems: "center", gap: "8px", overflowX: "auto" }}
+      >
+        {PILLS.map(({ id, label, Icon }) => {
+          const active = id === lens;
+          return (
+            <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              {active && <motion.span layoutId="lensPill" transition={lensIndicatorSpring} style={{ position: "absolute", inset: 0, background: GOLD, borderRadius: "100px", zIndex: 0 }} />}
+              <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon size={15} strokeWidth={2.2} />{label}</span>
+            </button>
+          );
+        })}
+        <span aria-hidden style={{ flexShrink: 0, width: "1px", height: "22px", background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
+        <Link href="/radar/hackathons" onClick={() => posthog.capture("radar_hackathon_pill_tapped")} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "9px 18px", whiteSpace: "nowrap", textDecoration: "none" }}>
+          <Trophy size={15} strokeWidth={2.2} /> Hackathons
+        </Link>
+      </div>
+      {overflow && (
+        <div aria-hidden style={{ width: `${TRACK}px`, height: "3px", margin: "10px 0 0", borderRadius: "2px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+          <div style={{ width: `${thumb}px`, height: "100%", borderRadius: "2px", background: GOLD, opacity: 0.7, transform: `translateX(${progress * (TRACK - thumb)}px)`, transition: "transform 0.08s linear" }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 export function RadarClient(data: RadarData) {
   const [lens, setLens] = useState<RadarLens | null>(null);
@@ -509,21 +570,7 @@ export function RadarClient(data: RadarData) {
         {/* Lens switcher + Hackathons entry. The two toggles tune the content
             lens; the gold Hackathons pill (right of a divider) is wayfinding to
             a separate events view — a different kind of thing, kept distinct. */}
-        <div className="scrollbar-none" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 24px 18px", overflowX: "auto" }}>
-          {PILLS.map(({ id, label, Icon }) => {
-            const active = id === lens;
-            return (
-              <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
-                {active && <motion.span layoutId="lensPill" transition={lensIndicatorSpring} style={{ position: "absolute", inset: 0, background: GOLD, borderRadius: "100px", zIndex: 0 }} />}
-                <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon size={15} strokeWidth={2.2} />{label}</span>
-              </button>
-            );
-          })}
-          <span aria-hidden style={{ flexShrink: 0, width: "1px", height: "22px", background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
-          <Link href="/radar/hackathons" onClick={() => posthog.capture("radar_hackathon_pill_tapped")} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "9px 18px", whiteSpace: "nowrap", textDecoration: "none" }}>
-            <Trophy size={15} strokeWidth={2.2} /> Hackathons
-          </Link>
-        </div>
+        <LensRail lens={lens} choose={choose} />
 
         {/* Lens content */}
         <AnimatePresence mode="wait">

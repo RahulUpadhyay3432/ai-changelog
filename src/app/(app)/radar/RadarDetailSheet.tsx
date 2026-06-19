@@ -55,7 +55,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
       savedAt: new Date().toISOString(),
     });
     setSaved(nowSaved);
-    flash(nowSaved ? (thing.category ? `Saved to ${thing.category}` : "Saved to Toolkit") : "Removed");
+    flash(nowSaved ? "Saved to Toolkit" : "Removed");
     if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
     posthog.capture(nowSaved ? "radar_tool_saved" : "radar_tool_unsaved", { id: thing.id, category: thing.category });
   };

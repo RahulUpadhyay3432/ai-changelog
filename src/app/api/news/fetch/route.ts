@@ -15,7 +15,7 @@ import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
 import { isAuthorizedCron } from "@/lib/cron-auth";
-import { isSafePublicUrl } from "@/lib/url-guard";
+import { fetchPageMeta } from "@/lib/page-meta";
 import {
   canonicalize,
   parseExtractedEntities,
@@ -142,78 +142,6 @@ function extractImageUrl(item: ParserItem): string | null {
   const m = html.match(/<img[^>]+src=["']([^"'>]+)["']/i);
   if (m) return m[1];
   return null;
-}
-
-type PageMeta = { imageUrl: string | null; description: string | null; title: string | null };
-
-function decodeHTMLEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&#39;|&apos;|&#x27;/g, "'")
-    .replace(/&nbsp;/g, " ").trim();
-}
-
-function extractMeta(html: string, property: string, nameAttr = "property"): string | null {
-  return (
-    html.match(new RegExp(`<meta[^>]+${nameAttr}=["']${property}["'][^>]+content=["']([^"']+)["']`, "i"))?.[1] ??
-    html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+${nameAttr}=["']${property}["']`, "i"))?.[1] ??
-    null
-  );
-}
-
-async function fetchPageMeta(url: string): Promise<PageMeta> {
-  // SSRF guard: only fetch public http(s) URLs from third-party feed content —
-  // never internal/private/loopback/link-local addresses.
-  if (!url || !isSafePublicUrl(url)) return { imageUrl: null, description: null, title: null };
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
-    });
-    clearTimeout(timer);
-    if (!res.ok) return { imageUrl: null, description: null, title: null };
-    const reader = res.body?.getReader();
-    if (!reader) return { imageUrl: null, description: null, title: null };
-    const decoder = new TextDecoder();
-    let html = "";
-    try {
-      while (html.length < 51200) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        html += decoder.decode(value, { stream: true });
-      }
-    } finally {
-      reader.cancel();
-    }
-    const rawImageUrl =
-      extractMeta(html, "og:image") ??
-      extractMeta(html, "og:image:secure_url") ??
-      extractMeta(html, "twitter:image", "name") ??
-      extractMeta(html, "twitter:image:src", "name") ??
-      null;
-    // Resolve relative URLs to absolute
-    let imageUrl: string | null = null;
-    if (rawImageUrl) {
-      try {
-        imageUrl = new URL(rawImageUrl, url).href;
-      } catch {
-        imageUrl = rawImageUrl.startsWith("http") ? rawImageUrl : null;
-      }
-    }
-    const description =
-      extractMeta(html, "og:description") ?? extractMeta(html, "twitter:description", "name") ?? null;
-    const titleRaw =
-      extractMeta(html, "og:title") ?? extractMeta(html, "twitter:title", "name") ?? null;
-    return {
-      imageUrl,
-      description: description ? decodeHTMLEntities(description) : null,
-      title: titleRaw ? decodeHTMLEntities(titleRaw) : null,
-    };
-  } catch {
-    return { imageUrl: null, description: null, title: null };
-  }
 }
 
 // ─── Classification + Summarization ──────────────────────────────────────────

@@ -5,6 +5,7 @@ import { fetchProductHuntPosts } from "@/lib/producthunt";
 import { slugify } from "@/lib/entities";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { isAuthorizedCron } from "@/lib/cron-auth";
+import { fetchPageMeta } from "@/lib/page-meta";
 
 // Pulls the radar tool sources into radar_tools. Each value-line is the maker's
 // OWN description/tagline (or our curated copy) — no LLM, no drift. Two layers:
@@ -110,17 +111,37 @@ export async function GET(request: NextRequest) {
 
   // ── Trending: Product Hunt ──
   if (ph.status === "fulfilled") {
-    for (const p of ph.value) {
+    // Enrich the detail-sheet description. PH's own `description` is null/thin for
+    // most 48h-new launches, so when it's missing we pull an og:description from
+    // the maker's own site (falling back to the launch page). ≤15 items, parallel,
+    // best-effort — any failure degrades to the tagline alone. (User ask: PH items
+    // should show real product detail, not just the title.)
+    const MIN_DESC = 80; // shorter than this → try to fetch something richer
+    const phPosts = ph.value;
+    const enriched = await Promise.allSettled(
+      phPosts.map(async (p): Promise<string> => {
+        const own = p.description ? cleanText(p.description).slice(0, 600) : "";
+        if (own.length >= MIN_DESC) return own;
+        const meta = await fetchPageMeta(p.website ?? p.sourceUrl);
+        const fetched = meta.description ? cleanText(meta.description).slice(0, 600) : "";
+        return fetched.length > own.length ? fetched : own;
+      })
+    );
+
+    for (let i = 0; i < phPosts.length; i++) {
+      const p = phPosts[i];
       const line = (p.tagline?.trim() || p.description?.trim()) ?? "";
       if (!line) continue;
+      const valueLine = cleanLine(line);
       // Keep the punchy tagline as the value-line; carry the fuller description
-      // for the detail sheet (the user asked for it). Drop if it just repeats.
-      const desc = p.description ? cleanText(p.description).slice(0, 600) : "";
+      // for the detail sheet. Drop only if it exactly repeats the value-line.
+      const result = enriched[i];
+      const desc = result.status === "fulfilled" ? result.value : "";
       rows.push({
         source: "producthunt",
         external_id: p.sourceUrl, // PHFeedItem drops the id; the launch url is unique
         name: p.title,
-        value_line: cleanLine(line),
+        value_line: valueLine,
         url: p.sourceUrl,
         meta: `${compact(p.votesCount)} upvotes`,
         score: p.votesCount,
@@ -128,7 +149,7 @@ export async function GET(request: NextRequest) {
         kind: "trending",
         sort_rank: 0,
         last_seen_at: now,
-        description: desc && desc !== cleanLine(line) ? desc : null,
+        description: desc && desc !== valueLine ? desc : null,
         image_url: p.imageUrl ?? null,
       });
     }

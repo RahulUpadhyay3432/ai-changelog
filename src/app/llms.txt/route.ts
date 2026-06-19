@@ -29,8 +29,17 @@ export async function GET() {
 
   lines.push(
     "",
+    "## Knowledge catalog (Open Knowledge Format)",
+    "",
+    "Structured, agent-readable bundles in text/markdown with YAML frontmatter (OKF v0.1). Updated hourly.",
+    "",
+    `- [Catalog index](${APP_URL}/okf): bundle index — story counts, tool inventory, category breakdown`,
+    `- [Today's stories](${APP_URL}/okf/stories): full 48h news digest grouped by category`,
+    `- [AI tools radar](${APP_URL}/okf/tools): active AI tools, models, and entities tracked by Kapyn`,
+    "",
     "## Key pages",
     `- [Explore — the AI glossary](${APP_URL}/explore): index of every concept explainer`,
+    `- [Radar](${APP_URL}/radar): AI tool & entity discovery`,
     `- [Kapyn](${APP_URL}): the swipeable AI/tech news feed`,
     ""
   );

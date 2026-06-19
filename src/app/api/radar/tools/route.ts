@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { fetchGitHubTrendingRepos, fetchTopAIRepos } from "@/lib/github";
+import { fetchGitHubTrendingRepos, fetchOssInsightTrending, fetchTopAIRepos } from "@/lib/github";
 import { fetchProductHuntPosts } from "@/lib/producthunt";
 import { slugify } from "@/lib/entities";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
@@ -26,11 +26,15 @@ function getAdmin(): SupabaseClient {
 
 function cleanLine(s: string): string {
   // Strip emoji/pictographs (calm brand: no emoji in content), then tidy.
+  return cleanText(s).slice(0, 160);
+}
+
+// Same scrub as cleanLine, but for the longer detail-sheet body (no 160 cap).
+function cleanText(s: string): string {
   return s
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 160);
+    .trim();
 }
 
 function compact(n: number): string {
@@ -49,6 +53,8 @@ interface ToolRow {
   kind: "trending" | "essential";
   sort_rank: number;
   last_seen_at: string;
+  description: string | null; // longer body for the detail sheet (PH only today)
+  image_url: string | null; // product thumbnail (PH) — used as the logo
 }
 
 export async function GET(request: NextRequest) {
@@ -63,40 +69,53 @@ export async function GET(request: NextRequest) {
   const rows: ToolRow[] = [];
   const errors: string[] = [];
 
-  const [gh, ph, canon] = await Promise.allSettled([
+  const [gh, oss, ph, canon] = await Promise.allSettled([
     fetchGitHubTrendingRepos(48),
+    fetchOssInsightTrending(),
     fetchProductHuntPosts(48),
     fetchTopAIRepos(),
   ]);
 
-  // ── Trending: GitHub created-last-48h ──
-  if (gh.status === "fulfilled") {
-    for (const r of gh.value) {
-      // No self-description → can't ship a trustworthy value-line, skip it.
-      if (!r.description || !r.description.trim()) continue;
-      rows.push({
-        source: "github",
-        external_id: r.fullName,
-        name: r.name,
-        value_line: cleanLine(r.description),
-        url: r.htmlUrl,
-        meta: [`${compact(r.stars)} stars`, r.language].filter(Boolean).join(" · "),
-        score: r.stars,
-        topics: r.topics ?? [],
-        kind: "trending",
-        sort_rank: 0,
-        last_seen_at: now,
-      });
-    }
-  } else {
-    errors.push(`github: ${String(gh.reason).slice(0, 120)}`);
-  }
+  // ── Trending: GitHub. Two complementary sources, deduped by full_name —
+  //    Search (repos created in the last 48h) + OSSInsight (established repos
+  //    spiking by star-velocity today). Same row shape; the created-48h set wins
+  //    on conflict (it has real createdAt + curated topics).
+  const ghSeen = new Set<string>();
+  const pushGitHubTrending = (r: { fullName: string; name: string; description: string | null; htmlUrl: string; stars: number; language: string | null; topics: string[] }) => {
+    if (!r.description || !r.description.trim()) return; // no value-line → skip
+    if (ghSeen.has(r.fullName)) return;
+    ghSeen.add(r.fullName);
+    rows.push({
+      source: "github",
+      external_id: r.fullName,
+      name: r.name,
+      value_line: cleanLine(r.description),
+      url: r.htmlUrl,
+      meta: [`${compact(r.stars)} stars`, r.language].filter(Boolean).join(" · "),
+      score: r.stars,
+      topics: r.topics ?? [],
+      kind: "trending",
+      sort_rank: 0,
+      last_seen_at: now,
+      description: null,
+      image_url: null,
+    });
+  };
+
+  if (gh.status === "fulfilled") gh.value.forEach(pushGitHubTrending);
+  else errors.push(`github: ${String(gh.reason).slice(0, 120)}`);
+
+  if (oss.status === "fulfilled") oss.value.forEach(pushGitHubTrending);
+  else errors.push(`ossinsight: ${String(oss.reason).slice(0, 120)}`);
 
   // ── Trending: Product Hunt ──
   if (ph.status === "fulfilled") {
     for (const p of ph.value) {
       const line = (p.tagline?.trim() || p.description?.trim()) ?? "";
       if (!line) continue;
+      // Keep the punchy tagline as the value-line; carry the fuller description
+      // for the detail sheet (the user asked for it). Drop if it just repeats.
+      const desc = p.description ? cleanText(p.description).slice(0, 600) : "";
       rows.push({
         source: "producthunt",
         external_id: p.sourceUrl, // PHFeedItem drops the id; the launch url is unique
@@ -109,6 +128,8 @@ export async function GET(request: NextRequest) {
         kind: "trending",
         sort_rank: 0,
         last_seen_at: now,
+        description: desc && desc !== cleanLine(line) ? desc : null,
+        image_url: p.imageUrl ?? null,
       });
     }
   } else {
@@ -131,6 +152,8 @@ export async function GET(request: NextRequest) {
         kind: "essential",
         sort_rank: CANON_SORT_RANK,
         last_seen_at: now,
+        description: null,
+        image_url: null,
       });
     }
   } else {
@@ -151,6 +174,8 @@ export async function GET(request: NextRequest) {
       kind: "essential",
       sort_rank: i, // 0..N — keeps the accessible-first ordering
       last_seen_at: now,
+      description: null,
+      image_url: null,
     });
   });
 
@@ -167,6 +192,7 @@ export async function GET(request: NextRequest) {
   return Response.json({
     trending: {
       github: gh.status === "fulfilled" ? gh.value.length : 0,
+      ossinsight: oss.status === "fulfilled" ? oss.value.length : 0,
       producthunt: ph.status === "fulfilled" ? ph.value.length : 0,
     },
     essential: {

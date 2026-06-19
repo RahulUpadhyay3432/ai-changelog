@@ -8,7 +8,101 @@ const KEYS = {
   PINNED_CATEGORIES: "ai_changelog_pinned_categories",
   STREAK_DATES: "ai_changelog_streak_dates",
   LAST_VISIT: "kapyn_last_visit",
+  RADAR_LENS: "kapyn_radar_lens",
 };
+
+// ==========================================
+// Radar lens (Builder / Exploring / Creator) — persona self-segmentation
+// A "vibe coder" is a builder; a "founder" building with AI wants the same
+// moves — so both legacy ids collapse into "builder". "Creator" is for people
+// who make with AI — video, voice, image, marketing content.
+// ==========================================
+export type RadarLens = "builder" | "curious" | "creator";
+const RADAR_LENSES: RadarLens[] = ["builder", "curious", "creator"];
+
+export function getRadarLens(): RadarLens | null {
+  if (!isBrowser) return null;
+  try {
+    const v = localStorage.getItem(KEYS.RADAR_LENS);
+    if (!v) return null;
+    // Migrate retired lenses ("founder", "vibe") → "builder" silently.
+    if (v === "founder" || v === "vibe") {
+      localStorage.setItem(KEYS.RADAR_LENS, "builder");
+      return "builder";
+    }
+    return (RADAR_LENSES as string[]).includes(v) ? (v as RadarLens) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setRadarLens(lens: RadarLens): void {
+  if (!isBrowser) return;
+  try {
+    localStorage.setItem(KEYS.RADAR_LENS, lens);
+  } catch {
+    /* ignore */
+  }
+}
+
+// ==========================================
+// Radar notes — freeform workspace scratch pad
+// ==========================================
+const RADAR_NOTES_KEY = "kapyn_radar_notes";
+
+export function getRadarNotes(): string {
+  if (!isBrowser) return "";
+  return localStorage.getItem(RADAR_NOTES_KEY) ?? "";
+}
+
+export function setRadarNotes(text: string): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(RADAR_NOTES_KEY, text); } catch {}
+}
+
+// ==========================================
+// Radar saved tools — the "Toolkit" knowledge base (auto-filed by category)
+// ==========================================
+const RADAR_SAVED_KEY = "kapyn_radar_saved_tools";
+
+export interface SavedRadarTool {
+  id: string;
+  name: string;
+  valueLine: string;
+  category: string | null;
+  face: string;
+  url: string | null;
+  savedAt: string;
+}
+
+export function getSavedRadarTools(): SavedRadarTool[] {
+  if (!isBrowser) return [];
+  try {
+    const raw = localStorage.getItem(RADAR_SAVED_KEY);
+    return raw ? (JSON.parse(raw) as SavedRadarTool[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function isRadarToolSaved(id: string): boolean {
+  if (!isBrowser) return false;
+  return getSavedRadarTools().some((t) => t.id === id);
+}
+
+// Toggle save; returns the new saved state (true = now saved).
+export function toggleRadarTool(tool: SavedRadarTool): boolean {
+  if (!isBrowser) return false;
+  try {
+    const saved = getSavedRadarTools();
+    const exists = saved.some((t) => t.id === tool.id);
+    const next = exists ? saved.filter((t) => t.id !== tool.id) : [tool, ...saved];
+    localStorage.setItem(RADAR_SAVED_KEY, JSON.stringify(next));
+    return !exists;
+  } catch {
+    return false;
+  }
+}
 
 // ==========================================
 // Last Visit Timestamp

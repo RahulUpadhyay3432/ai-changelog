@@ -149,6 +149,44 @@
   opacity: 0.65;
 }
 
+/* Radar rows — subtle press feedback */
+.radar-row {
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+.radar-row:active {
+  background: rgba(255, 255, 255, 0.03);
+  transform: scale(0.99);
+}
+
+/* Radar hero + rail cards — calm press feedback */
+.radar-hero,
+.radar-railcard {
+  transition: transform 0.12s ease, filter 0.15s ease;
+}
+.radar-hero:active {
+  transform: scale(0.99);
+}
+.radar-railcard:active {
+  transform: scale(0.97);
+}
+
+/* Radar rails — fade the right edge so off-screen cards dissolve, not clip */
+.radar-rail {
+  -webkit-mask-image: linear-gradient(to right, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 92%, transparent 100%);
+}
+
+/* Radar lens chooser options */
+.lens-option {
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+.lens-option:hover {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+.lens-option:active {
+  transform: scale(0.99);
+}
+
 /* "Why it matters" — make the affordance unmistakable on tap/hover */
 .why-matters-btn {
   transition: transform 0.12s ease, filter 0.15s ease;

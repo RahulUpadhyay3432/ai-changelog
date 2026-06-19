@@ -5,6 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { isGenericEntityName, type EntityType } from "./entities";
+import { CURATED_ESSENTIALS } from "./radar-essentials";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -317,12 +318,22 @@ export async function getRadarFeed(
   }));
 }
 
+// Entities that are extracted but aren't really AI/tech subjects — they get a
+// generated value-line but read as off-topic on the radar. Dropped at read time.
+const RADAR_ENTITY_DENYLIST = new Set<string>([
+  "spacex", "tesla", "amazon", "facebook", "whatsapp", "instagram", "walmart",
+  "netflix", "disney", "uber", "starlink",
+]);
+
 // Radar cards for the UI: only entities with a generated, grounded value line
-// (held-back / ungenerated entities don't ship a card). Over-fetches then
-// filters, so the caller still gets up to `limit` grounded cards.
+// (held-back / ungenerated entities don't ship a card), minus off-topic names.
+// Over-fetches then filters, so the caller still gets up to `limit` grounded cards.
 export async function getRadarCards(recencyDays = 21, minMentions = 2, limit = 40): Promise<RadarItem[]> {
   const all = await getRadarFeed(recencyDays, minMentions, Math.max(limit * 2, 60));
-  return all.filter((it) => !!it.valueLine && it.valueLine.trim().length > 0).slice(0, limit);
+  return all
+    .filter((it) => !!it.valueLine && it.valueLine.trim().length > 0)
+    .filter((it) => !RADAR_ENTITY_DENYLIST.has(it.entity.canonicalName.trim().toLowerCase()))
+    .slice(0, limit);
 }
 
 // ─── Radar tools (GitHub trending + Product Hunt) ────────────────────────────
@@ -338,6 +349,8 @@ export interface RadarTool {
   score: number;
   topics: string[];
   lastSeenAt: string;
+  description: string | null; // longer body (e.g. the full Product Hunt description)
+  imageUrl: string | null; // product thumbnail (Product Hunt) — used as the logo
 }
 
 interface RadarToolRow {
@@ -349,6 +362,8 @@ interface RadarToolRow {
   score: number;
   topics: string[] | null;
   last_seen_at: string;
+  description?: string | null;
+  image_url?: string | null;
 }
 
 function toRadarTool(r: unknown): RadarTool {
@@ -362,35 +377,83 @@ function toRadarTool(r: unknown): RadarTool {
     score: row.score,
     topics: row.topics ?? [],
     lastSeenAt: row.last_seen_at,
+    description: row.description ?? null,
+    imageUrl: row.image_url ?? null,
   };
 }
 
 const RADAR_TOOL_COLS = "source, name, value_line, url, meta, score, topics, last_seen_at";
+// `description` (0006) + `image_url` (0007) — request them, but degrade
+// gracefully so a deploy that lands before a migration still returns tools.
+const RADAR_TOOL_COLS_DESC = "source, name, value_line, url, meta, score, topics, last_seen_at, description, image_url";
+
+function columnMissing(message: string | undefined): boolean {
+  return !!message && /(description|image_url)/i.test(message);
+}
 
 // "What's new" — GitHub created-last-48h + Product Hunt, freshest/most-traction first.
 export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
-  const { data } = await supabase
-    .from("radar_tools")
-    .select(RADAR_TOOL_COLS)
-    .eq("kind", "trending")
-    .order("last_seen_at", { ascending: false })
-    .order("score", { ascending: false })
-    .limit(limit);
+  const run = (cols: string) =>
+    supabase
+      .from("radar_tools")
+      .select(cols)
+      .eq("kind", "trending")
+      .order("last_seen_at", { ascending: false })
+      .order("score", { ascending: false })
+      .limit(limit);
+  const first = await run(RADAR_TOOL_COLS_DESC);
+  const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
   return (data ?? []).map(toRadarTool);
 }
 
 // "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),
 // accessible-first (sort_rank), then by traction.
+//
+// The curated half is static editorial (CURATED_ESSENTIALS) that only reaches
+// the DB after the tools cron runs. So we ALWAYS merge the static list in: the
+// Builder category sections + Browse render richly regardless of DB state, and
+// the DB still layers canon OSS (and any DB copy of the curated rows) on top.
 export async function getRadarEssentials(limit = 40): Promise<RadarTool[]> {
-  const { data } = await supabase
-    .from("radar_tools")
-    .select(RADAR_TOOL_COLS)
-    .eq("kind", "essential")
-    .order("sort_rank", { ascending: true })
-    .order("score", { ascending: false })
-    .limit(limit);
-  return (data ?? []).map(toRadarTool);
+  const run = (cols: string) =>
+    supabase
+      .from("radar_tools")
+      .select(cols)
+      .eq("kind", "essential")
+      .order("sort_rank", { ascending: true })
+      .order("score", { ascending: false })
+      .limit(limit);
+  const first = await run(RADAR_TOOL_COLS_DESC);
+  const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
+  const fromDb = (data ?? []).map(toRadarTool);
+
+  // De-dupe by url: static curated wins for its own rows; DB supplies the rest
+  // (canon OSS, plus curated rows if the cron has run). Static comes first so
+  // the accessible-first editorial ordering is preserved.
+  const seen = new Set<string>();
+  const merged: RadarTool[] = [];
+  for (const t of [...STATIC_ESSENTIALS, ...fromDb]) {
+    const key = t.url.replace(/\/+$/, "").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(t);
+  }
+  return merged;
 }
+
+// The curated essentials as RadarTool rows, sourced from the static editorial
+// list (no DB round-trip). meta = category bucket, mirroring the cron's mapping.
+const STATIC_ESSENTIALS: RadarTool[] = CURATED_ESSENTIALS.map((t) => ({
+  source: "curated",
+  name: t.name,
+  valueLine: t.valueLine,
+  url: t.url,
+  meta: t.category,
+  score: 0,
+  topics: [],
+  lastSeenAt: "",
+  description: t.description ?? null,
+  imageUrl: null,
+}));
 
 // Whole-word, case-insensitive check that a story headline names an entity —
 // boundaries so "Meta" doesn't match "metadata" and "AI" doesn't match "train".

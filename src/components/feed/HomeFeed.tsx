@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "lucide-react";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
 import { SwipeHint } from "./SwipeHint";
@@ -19,6 +19,11 @@ import posthog from "posthog-js";
 // Minimum drag distance (px) or velocity (px/s) to commit a swipe
 const SWIPE_DISTANCE = 72;
 const SWIPE_VELOCITY = 400;
+
+// Mock stories are a LOCAL dev convenience (work without a populated DB). Never
+// in production: a failed/empty fetch there must show a real error/empty state,
+// not silently swap in fake placeholder cards.
+const USE_MOCK_FALLBACK = process.env.NODE_ENV === "development";
 
 // Warm the browser cache for a feed's first few hero images so they're already
 // downloaded before the user swipes into that category. Module-level dedupe set
@@ -44,6 +49,8 @@ export function HomeFeed() {
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadNonce, setReloadNonce] = useState(0); // bump to force a re-fetch (retry)
   const [showFeedHint, setShowFeedHint] = useState(false);
   const router = useRouter();
   const hasLoadedOnce = useRef(false);
@@ -74,17 +81,23 @@ export function HomeFeed() {
   const dragVelocity = useVelocity(dragX);
   const isAnimating = useRef(false);
 
-  // Resolve a category's feed: cache → Supabase → mock fallback. Caches result.
+  // Resolve a category's feed: cache → Supabase. Lets fetch errors propagate so
+  // the caller can show a real error state — we never silently swap in mock data
+  // in production. Only successful, non-empty results are cached (so a failed or
+  // empty category re-fetches on retry / next visit).
   const resolveFeed = useCallback(async (slug: CategorySlug): Promise<NewsItem[]> => {
     const cached = feedCache.current.get(slug);
     if (cached) return cached;
-    const items = await fetchNewsItems(slug).catch(() => [] as NewsItem[]);
-    const base =
-      items.length > 0
-        ? items
-        : MOCK_STORIES.filter((s) => slug === "all" || s.categorySlug === slug);
-    feedCache.current.set(slug, base);
-    return base;
+    const items = await fetchNewsItems(slug); // may throw → handled by the caller
+    if (items.length > 0) {
+      feedCache.current.set(slug, items);
+      return items;
+    }
+    // Successful fetch, genuinely empty. Locally fall back to mock so dev isn't
+    // blocked by an empty DB; in production return empty → real empty state.
+    return USE_MOCK_FALLBACK
+      ? MOCK_STORIES.filter((s) => slug === "all" || s.categorySlug === slug)
+      : items;
   }, []);
 
   // Background-prefetch the categories on either side of the active tab and warm
@@ -109,6 +122,7 @@ export function HomeFeed() {
       ]);
       if (cancelled) return;
 
+      setLoadError(false);
       if (pinnedStory) {
         const deduped = base.filter((s) => s.id !== pinnedStory.id);
         setStories([pinnedStory, ...deduped]);
@@ -126,11 +140,20 @@ export function HomeFeed() {
     loadFeed()
       .catch(() => {
         if (cancelled) return;
-        setStories(
-          MOCK_STORIES.filter(
-            (s) => activeCategory === "all" || s.categorySlug === activeCategory
-          )
-        );
+        // A real failure (network / Supabase). In dev, fall back to mock so local
+        // work isn't blocked; in production, surface a retryable error instead of
+        // faking it with placeholder content.
+        if (USE_MOCK_FALLBACK) {
+          setStories(
+            MOCK_STORIES.filter(
+              (s) => activeCategory === "all" || s.categorySlug === activeCategory
+            )
+          );
+          setLoadError(false);
+        } else {
+          setStories([]);
+          setLoadError(true);
+        }
       })
       .finally(() => {
         if (cancelled) return;
@@ -139,11 +162,19 @@ export function HomeFeed() {
       });
 
     return () => { cancelled = true; };
-  }, [activeCategory, storyId, resolveFeed, prefetchAdjacent]);
+  }, [activeCategory, storyId, resolveFeed, prefetchAdjacent, reloadNonce]);
 
   const handleCategoryChange = useCallback((slug: CategorySlug) => {
     posthog.capture("category_changed", { category: slug, previous_category: activeCategory });
     setActiveCategory(slug);
+  }, [activeCategory]);
+
+  const handleRetry = useCallback(() => {
+    feedCache.current.delete(activeCategory); // drop the empty/failed result so it re-fetches
+    setInitialLoading(true);
+    setLoadError(false);
+    setReloadNonce((n) => n + 1);
+    posthog.capture("feed_retry", { category: activeCategory });
   }, [activeCategory]);
 
   const handleRefresh = useCallback(async (): Promise<number> => {
@@ -241,6 +272,28 @@ export function HomeFeed() {
             color: "#525252", fontSize: "14px",
           }}>
             Loading stories…
+          </div>
+        ) : loadError ? (
+          <div style={{
+            position: "absolute", inset: 0,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: "12px", padding: "0 32px", textAlign: "center",
+          }}>
+            <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 500 }}>Couldn&apos;t load stories</p>
+            <p style={{ fontSize: "13.5px", color: "#737373", margin: 0, lineHeight: 1.5, maxWidth: "260px" }}>
+              Something went wrong reaching the feed. Check your connection and try again.
+            </p>
+            <button
+              onClick={handleRetry}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "7px", marginTop: "4px",
+                fontSize: "14px", fontWeight: 600, color: "#0a0a0a", background: "#E8E4DE",
+                border: "none", borderRadius: "100px", padding: "10px 20px", cursor: "pointer",
+                fontFamily: "var(--font-space-grotesk), sans-serif",
+              }}
+            >
+              <RefreshCw size={15} strokeWidth={2.3} /> Try again
+            </button>
           </div>
         ) : (
           <>

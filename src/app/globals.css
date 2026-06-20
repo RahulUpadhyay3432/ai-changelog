@@ -97,6 +97,20 @@
   display: none;
 }
 
+/* Skeleton loading blocks — calm opacity pulse (perceived-perf on cold fetch) */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+.skeleton-block {
+  background: rgba(255, 255, 255, 0.055);
+  border-radius: 8px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block { animation: none; }
+}
+
 /* Pull-to-refresh spinner */
 @keyframes spin {
   to { transform: rotate(360deg); }

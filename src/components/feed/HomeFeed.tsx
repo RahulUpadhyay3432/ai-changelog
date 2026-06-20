@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "f
 import { ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "lucide-react";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
+import { FeedSkeleton } from "./FeedSkeleton";
 import { SwipeHint } from "./SwipeHint";
 import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
@@ -48,12 +49,14 @@ export function HomeFeed() {
 
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
-  const [initialLoading, setInitialLoading] = useState(true);
+  // Loading is true whenever the active category's feed isn't ready yet — cold
+  // start AND switches to a not-yet-prefetched tab (so the latter shows a
+  // skeleton instead of frozen stale content). Cached/prefetched tabs stay instant.
+  const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [reloadNonce, setReloadNonce] = useState(0); // bump to force a re-fetch (retry)
   const [showFeedHint, setShowFeedHint] = useState(false);
   const router = useRouter();
-  const hasLoadedOnce = useRef(false);
   const storiesLenRef = useRef(0); // stable ref so handleRefresh doesn't capture stale stories
   useEffect(() => { storiesLenRef.current = stories.length; }, [stories.length]);
 
@@ -112,7 +115,9 @@ export function HomeFeed() {
   }, [resolveFeed]);
 
   useEffect(() => {
-    if (!hasLoadedOnce.current) setInitialLoading(true);
+    // Show the skeleton only when this category isn't already resolved — a
+    // prefetched/cached tab swaps in instantly with no flash.
+    if (!feedCache.current.has(activeCategory)) setLoading(true);
     let cancelled = false;
 
     const loadFeed = async () => {
@@ -157,8 +162,7 @@ export function HomeFeed() {
       })
       .finally(() => {
         if (cancelled) return;
-        setInitialLoading(false);
-        hasLoadedOnce.current = true;
+        setLoading(false);
       });
 
     return () => { cancelled = true; };
@@ -171,7 +175,7 @@ export function HomeFeed() {
 
   const handleRetry = useCallback(() => {
     feedCache.current.delete(activeCategory); // drop the empty/failed result so it re-fetches
-    setInitialLoading(true);
+    setLoading(true);
     setLoadError(false);
     setReloadNonce((n) => n + 1);
     posthog.capture("feed_retry", { category: activeCategory });
@@ -265,14 +269,8 @@ export function HomeFeed() {
 
       {/* Feed — clip overflow so sliding card stays within phone frame */}
       <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
-        {initialLoading ? (
-          <div style={{
-            position: "absolute", inset: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#525252", fontSize: "14px",
-          }}>
-            Loading stories…
-          </div>
+        {loading ? (
+          <FeedSkeleton />
         ) : loadError ? (
           <div style={{
             position: "absolute", inset: 0,

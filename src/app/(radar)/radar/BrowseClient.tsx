@@ -185,7 +185,7 @@ export function BrowseClient(data: BrowseData) {
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
-                  color: active ? "#0a0a0a" : TEXT.body,
+                  color: active ? "#ffffff" : TEXT.body,
                   background: active ? GOLD : "rgba(255,255,255,0.05)",
                   border: `1px solid ${active ? GOLD : HAIRLINE}`,
                   borderRadius: "100px", padding: "7px 14px", cursor: "pointer", whiteSpace: "nowrap",
@@ -207,7 +207,7 @@ export function BrowseClient(data: BrowseData) {
               {query ? <>No matches for &ldquo;{query}&rdquo;.</> : <>Nothing on the radar yet. Check back after the next refresh.</>}
             </p>
             {!query && (
-              <Link href="/radar" style={{ marginTop: "16px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#0a0a0a", background: GOLD, borderRadius: "12px", padding: "10px 16px", textDecoration: "none" }}>
+              <Link href="/radar" style={{ marginTop: "16px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "10px 16px", textDecoration: "none" }}>
                 Back to Today
               </Link>
             )}

@@ -35,7 +35,7 @@ function LoadoutChip({ active, label, count, onClick }: { active: boolean; label
       style={{
         flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
         fontFamily: SG, fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap",
-        color: active ? "#0a0a0a" : TEXT.body,
+        color: active ? "#ffffff" : TEXT.body,
         background: active ? GOLD : "rgba(255,255,255,0.05)",
         border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
         borderRadius: "100px", padding: "8px 14px", cursor: "pointer",
@@ -183,7 +183,7 @@ export function ToolkitClient() {
           </span>
           <p style={{ fontSize: "15px", color: "#c9c5bf", lineHeight: 1.5, margin: "0 0 6px", maxWidth: "260px" }}>Build your toolkit</p>
           <p style={{ fontSize: "13.5px", color: "#737373", lineHeight: 1.5, margin: "0 0 20px", maxWidth: "280px" }}>Tap any tool on Today and hit Save. It files itself by category — so you never lose the one that mattered.</p>
-          <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#0a0a0a", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
+          <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
             Browse Today <ArrowRight size={16} strokeWidth={2.3} />
           </Link>
         </div>

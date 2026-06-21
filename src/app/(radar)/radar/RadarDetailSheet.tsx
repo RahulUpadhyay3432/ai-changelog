@@ -138,7 +138,7 @@ function LoadoutControl({ thing, saved, flash, onSavedChange }: {
                 autoFocus
                 style={{ flex: 1, minWidth: 0, background: "#111111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "100px", padding: "9px 14px", color: "#ededed", fontSize: "13.5px", outline: "none" }}
               />
-              <button onClick={create} disabled={!newName.trim()} style={{ ...chipBase, color: newName.trim() ? "#0a0a0a" : "#666", background: newName.trim() ? GOLD : "rgba(255,255,255,0.05)", border: "none", cursor: newName.trim() ? "pointer" : "default" }}>
+              <button onClick={create} disabled={!newName.trim()} style={{ ...chipBase, color: newName.trim() ? "#ffffff" : "#666", background: newName.trim() ? GOLD : "rgba(255,255,255,0.05)", border: "none", cursor: newName.trim() ? "pointer" : "default" }}>
                 Create
               </button>
             </div>
@@ -293,7 +293,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
 
         {/* Actions — Save primary, Copy, then Open site (last) */}
         <div style={{ display: "flex", gap: "10px", padding: "16px 20px 0", flexShrink: 0 }}>
-          <button onClick={onSave} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: saved ? GOLD : "#0a0a0a", background: saved ? GOLD_SOFT : GOLD, border: saved ? `1px solid ${GOLD_BORDER}` : "none", borderRadius: "13px", padding: "13px", cursor: "pointer" }}>
+          <button onClick={onSave} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: saved ? GOLD : "#ffffff", background: saved ? GOLD_SOFT : GOLD, border: saved ? `1px solid ${GOLD_BORDER}` : "none", borderRadius: "13px", padding: "13px", cursor: "pointer" }}>
             {saved ? <><Check size={17} strokeWidth={2.5} /> Saved</> : <><Bookmark size={17} strokeWidth={2} /> Save</>}
           </button>
           <button onClick={onCopy} aria-label="Copy" style={{ width: "50px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "13px", cursor: "pointer" }}>

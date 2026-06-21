@@ -5,9 +5,9 @@
    (CSS can't import TS) — canonical source is @/lib/design-tokens. */
 
 .root {
-  --gold: #d9b27c;
-  --gold-soft: rgba(217, 178, 124, 0.12);
-  --gold-border: rgba(217, 178, 124, 0.28);
+  --gold: #3b82f6;
+  --gold-soft: rgba(59, 130, 246, 0.12);
+  --gold-border: rgba(59, 130, 246, 0.28);
   --canvas: #0c0b0a;
   --surface: #1b1a17;
   --surface-raised: #24221d;

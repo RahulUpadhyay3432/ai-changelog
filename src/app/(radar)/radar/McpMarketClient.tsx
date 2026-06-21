@@ -132,7 +132,7 @@ function Chips({ items, active, onPick }: { items: { key: string; emoji: string 
             style={{
               flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
               fontFamily: SG, fontSize: "13px", fontWeight: on ? 700 : 500,
-              color: on ? "#0a0a0a" : TEXT.body,
+              color: on ? "#ffffff" : TEXT.body,
               background: on ? GOLD : "rgba(255,255,255,0.05)",
               border: `1px solid ${on ? GOLD : HAIRLINE}`,
               borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
@@ -236,7 +236,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
           {([["mcp", "MCP servers"], ["skills", "Skills"]] as const).map(([v, label]) => {
             const on = view === v;
             return (
-              <button key={v} onClick={() => switchView(v)} style={{ fontFamily: SG, fontSize: "13px", fontWeight: on ? 700 : 600, color: on ? "#0a0a0a" : TEXT.body, background: on ? GOLD : "transparent", border: "none", borderRadius: "100px", padding: "7px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              <button key={v} onClick={() => switchView(v)} style={{ fontFamily: SG, fontSize: "13px", fontWeight: on ? 700 : 600, color: on ? "#ffffff" : TEXT.body, background: on ? GOLD : "transparent", border: "none", borderRadius: "100px", padding: "7px 16px", cursor: "pointer", whiteSpace: "nowrap" }}>
                 {label}
               </button>
             );

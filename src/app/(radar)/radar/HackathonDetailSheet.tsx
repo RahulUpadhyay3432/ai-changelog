@@ -62,7 +62,7 @@ function Sheet({ hackathon: h, onClose }: { hackathon: Hackathon; onClose: () =>
         {/* Cover image with open/upcoming badge + close */}
         <div style={{ position: "relative", flexShrink: 0 }}>
           <CoverImage src={h.imageUrl} category="startups" height={150} radius={0} />
-          <span style={{ position: "absolute", top: "14px", left: "16px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "4px 10px" }}>
+          <span style={{ position: "absolute", top: "14px", left: "16px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#ffffff" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "4px 10px" }}>
             {open ? "Open now" : "Upcoming"}
           </span>
           <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: "12px", right: "12px", width: "32px", height: "32px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -100,7 +100,7 @@ function Sheet({ hackathon: h, onClose }: { hackathon: Hackathon; onClose: () =>
           <a
             href={h.url} target="_blank" rel="noopener noreferrer"
             onClick={() => posthog.capture("radar_hackathon_opened", { source: h.source, online: h.isOnline })}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#0a0a0a", background: GOLD, border: "none", borderRadius: "13px", padding: "14px", textDecoration: "none" }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: GOLD, border: "none", borderRadius: "13px", padding: "14px", textDecoration: "none" }}
           >
             Register <ArrowUpRight size={17} strokeWidth={2.4} />
           </a>

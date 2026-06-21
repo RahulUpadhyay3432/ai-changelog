@@ -4,9 +4,13 @@
 // re-exports these so every existing radar import keeps working unchanged.
 // One palette, one place → the landing and Radar can never drift apart.
 
-export const GOLD = "#D9B27C"; // brand / wayfinding ONLY — never a data or content signal (muted sand-gold)
-export const GOLD_SOFT = "rgba(217,178,124,0.12)";
-export const GOLD_BORDER = "rgba(217,178,124,0.28)";
+// Brand accent — currently BLUE (#3b82f6). The export is still named GOLD to
+// avoid a repo-wide rename across ~110 call sites; it's simply "the brand accent"
+// token. To change the brand colour, edit these three lines (+ the mirrored CSS
+// vars in home/landing.module.css) — everything propagates from here.
+export const GOLD = "#3b82f6"; // brand accent / wayfinding ONLY — never a data or content signal
+export const GOLD_SOFT = "rgba(59,130,246,0.12)";
+export const GOLD_BORDER = "rgba(59,130,246,0.28)";
 export const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
 
 // Warm surface ramp — lifted off pure-black so the eye has somewhere to rest.

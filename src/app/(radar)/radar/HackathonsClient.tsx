@@ -36,7 +36,7 @@ function topicsFor(h: Hackathon): Set<string> {
 
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} style={{ flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500, color: active ? "#0a0a0a" : TEXT.body, background: active ? GOLD : "rgba(255,255,255,0.05)", border: `1px solid ${active ? GOLD : HAIRLINE}`, borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
+    <button onClick={onClick} style={{ flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500, color: active ? "#ffffff" : TEXT.body, background: active ? GOLD : "rgba(255,255,255,0.05)", border: `1px solid ${active ? GOLD : HAIRLINE}`, borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
       {children}
     </button>
   );
@@ -56,7 +56,7 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
     >
       <div style={{ position: "relative" }}>
         <CoverImage src={h.imageUrl ?? logoFor(h.url)} category="startups" fallbackIcon={Trophy} height={116} radius={0} />
-        <span style={{ position: "absolute", top: "10px", left: "10px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 9px" }}>
+        <span style={{ position: "absolute", top: "10px", left: "10px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#ffffff" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 9px" }}>
           {open ? "Open now" : "Upcoming"}
         </span>
       </div>

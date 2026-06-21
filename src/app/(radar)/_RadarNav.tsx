@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { href: "/radar/hackathons", label: "Hackathons", Icon: Trophy, exact: true },
 ] as const;
 
-const GOLD = "#D9B27C";
+const GOLD = "#3b82f6";
 const SG = "Space Grotesk, sans-serif";
 
 export function RadarSideNav() {
@@ -43,7 +43,7 @@ export function RadarSideNav() {
               fontSize: "14px",
               fontWeight: active ? 600 : 450,
               color: active ? GOLD : "#a29d94",
-              background: active ? "rgba(217,178,124,0.08)" : "transparent",
+              background: active ? "rgba(59,130,246,0.08)" : "transparent",
               borderLeft: active ? `2px solid ${GOLD}` : "2px solid transparent",
               transition: "color 0.15s ease, background 0.15s ease",
             }}

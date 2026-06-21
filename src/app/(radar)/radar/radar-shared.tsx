@@ -4,6 +4,10 @@ import { useRef, useState } from "react";
 import { Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, type LucideIcon } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import type { CategorySlug } from "@/lib/types";
+import {
+  GOLD, GOLD_SOFT, GOLD_BORDER, SG,
+  CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, INNER_HIGHLIGHT, TEXT,
+} from "@/lib/design-tokens";
 
 // ─── Tap-vs-scroll guard ─────────────────────────────────────────────────────
 // Cards inside a scroll container must open ONLY on a deliberate tap — not when
@@ -34,27 +38,12 @@ export function usePressTap(handler: () => void) {
 }
 
 // ─── Tokens ──────────────────────────────────────────────────────────────────
-export const GOLD = "#D9B27C"; // brand / wayfinding ONLY — never a data or content signal (muted sand-gold)
-export const GOLD_SOFT = "rgba(217,178,124,0.12)";
-export const GOLD_BORDER = "rgba(217,178,124,0.28)";
-export const SG = "var(--font-space-grotesk), -apple-system, sans-serif";
-
-// Warm surface ramp — lifted off pure-black so the eye has somewhere to rest
-// (the "it's too dark / reading is effort" fix). Cards now sit clearly above
-// the canvas; raised rows sit above the cards.
-export const CANVAS = "#0c0b0a"; // app canvas (warm near-black, not pure #0a0a0a)
-export const SURFACE = "#1b1a17"; // card surface — visibly above canvas
-export const SURFACE_RAISED = "#24221d"; // elevated rows / hovered cards
-export const HAIRLINE = "rgba(255,255,255,0.09)"; // white-alpha only, never colored
-export const INNER_HIGHLIGHT = "inset 0 1px 0 rgba(255,255,255,0.08)";
-
-// Warm text ramp — the only greys used on dark. Brighter than before so the
-// value-line (the thing people actually read) never costs effort.
-export const TEXT = {
-  primary: "#f6f4f0",
-  body: "#cbc7bf", // brighter than the old #c2beb6
-  muted: "#a29d94", // brighter than the old #8f8b83 — still clearly secondary
-} as const;
+// Canonical values live in @/lib/design-tokens (non-client, server-importable).
+// Re-exported here so every existing radar import site keeps working unchanged.
+export {
+  GOLD, GOLD_SOFT, GOLD_BORDER, SG,
+  CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, INNER_HIGHLIGHT, TEXT,
+};
 
 // Mobile type scale. One big jump (20px title vs 15px body) IS the hierarchy.
 export const TYPE = {

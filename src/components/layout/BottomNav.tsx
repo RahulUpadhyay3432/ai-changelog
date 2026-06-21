@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid } from "lucide-react";
+import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid, Plug } from "lucide-react";
 
 const GLOBAL_NAV = [
   { href: "/", label: "Home", Icon: Home },
@@ -18,6 +18,7 @@ const GLOBAL_NAV = [
 const RADAR_NAV = [
   { href: "/radar", label: "Today", Icon: Radar },
   { href: "/radar/browse", label: "Browse", Icon: LayoutGrid },
+  { href: "/radar/mcp", label: "MCP", Icon: Plug },
   { href: "/radar/toolkit", label: "Toolkit", Icon: Bookmark },
   { href: "/", label: "Home", Icon: Home },
 ] as const;

@@ -112,7 +112,7 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       style={{
         flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
-        color: active ? "#0a0a0a" : "#a3a3a3",
+        color: active ? "#ffffff" : "#a3a3a3",
         background: active ? GOLD : "rgba(255,255,255,0.04)",
         border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
         borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
@@ -179,7 +179,7 @@ function WhatsNew({ tools, onOpen }: { tools: RadarTool[]; onOpen: (t: RadarThin
         </Link>
         <Pill active={source === "all"} onClick={() => setSrc("all")}>All</Pill>
         <Pill active={source === "github"} onClick={() => setSrc("github")}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><SourceMark face="github" size={13} color={source === "github" ? "#0a0a0a" : TEXT.body} />GitHub</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><SourceMark face="github" size={13} color={source === "github" ? "#ffffff" : TEXT.body} />GitHub</span>
         </Pill>
         <Pill active={source === "producthunt"} onClick={() => setSrc("producthunt")}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><SourceMark face="producthunt" size={13} />Product Hunt</span>
@@ -217,7 +217,7 @@ function HackathonRailCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon)
     >
       <div style={{ position: "relative" }}>
         <CoverImage src={h.imageUrl ?? logoFor(h.url)} category="startups" fallbackIcon={Trophy} height={98} radius={0} />
-        <span style={{ position: "absolute", top: "8px", left: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#0a0a0a" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 8px" }}>{open ? "Open" : "Upcoming"}</span>
+        <span style={{ position: "absolute", top: "8px", left: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#ffffff" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 8px" }}>{open ? "Open" : "Upcoming"}</span>
       </div>
       <div style={{ padding: "10px 12px 12px" }}>
         <span style={{ display: "-webkit-box", fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, lineHeight: 1.25, letterSpacing: "-0.01em", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "34px" }}>{h.title}</span>
@@ -435,7 +435,7 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
         {HEADLINE.map(({ id, label, tagline, Icon }) => {
           const active = sel === id;
           return (
-            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(217,178,124,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
+            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(59,130,246,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
               <span style={{ flexShrink: 0, width: "42px", height: "42px", borderRadius: "11px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={20} color={GOLD} strokeWidth={1.8} />
               </span>
@@ -444,13 +444,13 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
                 <span style={{ display: "block", fontSize: "13px", color: "#8a8a8a", marginTop: "2px", lineHeight: 1.4 }}>{tagline}</span>
               </span>
               <span style={{ flexShrink: 0, width: "20px", height: "20px", borderRadius: "100px", border: `1.5px solid ${active ? GOLD : "rgba(255,255,255,0.18)"}`, background: active ? GOLD : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {active && <Check size={12} color="#0a0a0a" strokeWidth={3} />}
+                {active && <Check size={12} color="#ffffff" strokeWidth={3} />}
               </span>
             </button>
           );
         })}
       </div>
-      <button onClick={() => sel && onChoose(sel)} disabled={!sel} style={{ marginTop: "20px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#0a0a0a", background: sel ? GOLD : "rgba(255,255,255,0.10)", border: "none", borderRadius: "14px", padding: "15px", cursor: sel ? "pointer" : "default", opacity: sel ? 1 : 0.55, transition: "background 0.2s ease, opacity 0.2s ease" }}>
+      <button onClick={() => sel && onChoose(sel)} disabled={!sel} style={{ marginTop: "20px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: sel ? GOLD : "rgba(255,255,255,0.10)", border: "none", borderRadius: "14px", padding: "15px", cursor: sel ? "pointer" : "default", opacity: sel ? 1 : 0.55, transition: "background 0.2s ease, opacity 0.2s ease" }}>
         Enter your Radar <ArrowRight size={17} strokeWidth={2.3} />
       </button>
     </div>
@@ -498,7 +498,7 @@ function LensRail({ lens, choose }: { lens: RadarLens; choose: (l: RadarLens) =>
         {PILLS.map(({ id, label, Icon }) => {
           const active = id === lens;
           return (
-            <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
+            <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#ffffff" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
               {active && <motion.span layoutId="lensPill" transition={lensIndicatorSpring} style={{ position: "absolute", inset: 0, background: GOLD, borderRadius: "100px", zIndex: 0 }} />}
               <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon size={15} strokeWidth={2.2} />{label}</span>
             </button>

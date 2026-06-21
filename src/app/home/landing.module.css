@@ -118,6 +118,37 @@
   }
 }
 
+/* ─── Hero aurora — a calm, slow-drifting blue glow behind the headline.
+   Pure CSS (no WebGL dep), low-opacity so it stays premium, not loud. ─────── */
+.heroWrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+.heroGlow {
+  position: absolute;
+  inset: -25% -10% auto -10%;
+  height: 760px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 48% at 22% 18%, rgba(59, 130, 246, 0.22), transparent 70%),
+    radial-gradient(34% 44% at 78% 8%, rgba(99, 102, 241, 0.16), transparent 70%),
+    radial-gradient(30% 40% at 58% 42%, rgba(56, 189, 248, 0.12), transparent 72%);
+  filter: blur(32px);
+  will-change: transform, opacity;
+  animation: heroDrift 24s ease-in-out infinite alternate;
+}
+@keyframes heroDrift {
+  0%   { transform: translate3d(-3%, -2%, 0) scale(1.05); opacity: 0.85; }
+  50%  { transform: translate3d(2%, 1.5%, 0) scale(1.13); opacity: 1; }
+  100% { transform: translate3d(4%, -1%, 0) scale(1.07); opacity: 0.8; }
+}
+
 /* ─── Marquee (hero catalog wall) ──────────────────────────────────────────── */
 .marqueeViewport {
   overflow: hidden;
@@ -222,7 +253,8 @@
 @media (prefers-reduced-motion: reduce) {
   .marqueeRow,
   .fadeUp,
-  .livePulse {
+  .livePulse,
+  .heroGlow {
     animation: none !important;
   }
   .marqueeRow {

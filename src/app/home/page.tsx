@@ -10,6 +10,7 @@ import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
 import { CATEGORIES } from "@/lib/categories";
+import { getPost, postTools } from "@/lib/blog-content";
 import {
   GOLD, GOLD_SOFT, GOLD_BORDER, CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, TEXT, SG,
 } from "@/lib/design-tokens";
@@ -170,13 +171,17 @@ export default async function LandingPage() {
     mainEntity: learn.map((l) => ({ "@type": "Question", name: l.q, acceptedAnswer: { "@type": "Answer", text: l.a } })),
   };
 
+  const guide = getPost("tools-every-vibe-coder-should-know");
+  const guideTools = guide ? postTools(guide) : [];
+
   return (
     <div className={styles.root}>
       <TopNav />
 
       {/* 1 · Hero ──────────────────────────────────────────────────────────── */}
-      <header className={styles.section}>
-        <div className={styles.inner}>
+      <header className={styles.heroWrap}>
+        <div className={styles.heroGlow} aria-hidden />
+        <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: SG, fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: TEXT.muted }}>
@@ -371,6 +376,25 @@ export default async function LandingPage() {
           <div style={{ marginTop: "18px" }}><SeeAll href="/explore">Explore every concept</SeeAll></div>
         </div>
       </section>
+
+      {/* 7.5 · From the blog ───────────────────────────────────────────────── */}
+      {guide && (
+        <section className={styles.section} style={{ padding: "0 24px 48px" }}>
+          <div className={styles.inner}>
+            <SectionHead kicker="From the blog" title="Tools every builder should know" sub="A working set of free front-end tools — the well-known and the deliberately niche — each one on the Radar." />
+            <Link href={`/blog/${guide.slug}`} style={{ display: "block", textDecoration: "none", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 24px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {guideTools.map((t) => (
+                  <span key={t.name} style={{ fontFamily: SG, fontSize: "13px", fontWeight: 500, color: TEXT.body, background: CANVAS, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "6px 13px", whiteSpace: "nowrap" }}>{t.name}</span>
+                ))}
+              </div>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "18px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: GOLD }}>
+                Read the guide <ArrowRight size={15} strokeWidth={2.4} />
+              </span>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* 8 · Categories ────────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>

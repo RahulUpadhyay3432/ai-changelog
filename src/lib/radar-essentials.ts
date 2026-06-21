@@ -60,6 +60,21 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Builder.io", valueLine: "Turn designs into code and edit it visually.", url: "https://builder.io", category: "UI & design" },
   { name: "Webflow", valueLine: "Design, build, and host production sites without code.", url: "https://webflow.com", category: "UI & design" },
   { name: "Tailwind CSS", valueLine: "Utility-first CSS for building UI fast in your markup.", url: "https://tailwindcss.com", category: "UI & design" },
+  // Copy-paste component libraries, assets & generators — free builder favorites
+  { name: "Magic UI", valueLine: "Animated React and Tailwind components for landing pages.", url: "https://magicui.design", category: "UI & design" },
+  { name: "Cult UI", valueLine: "Copy-paste animated React and shadcn components and blocks.", url: "https://cult-ui.com", category: "UI & design" },
+  { name: "Motion Primitives", valueLine: "Animation-first React components built on Framer Motion.", url: "https://motion-primitives.com", category: "UI & design" },
+  { name: "Watermelon UI", valueLine: "React components built on Tailwind, Radix, and Framer Motion.", url: "https://ui.watermelon.sh", category: "UI & design" },
+  { name: "Componentry", valueLine: "Animated React components built with Tailwind and Framer Motion.", url: "https://componentry.fun", category: "UI & design" },
+  { name: "Uiverse", valueLine: "Thousands of free CSS and Tailwind UI elements to copy.", url: "https://uiverse.io", category: "UI & design" },
+  { name: "Phosphor Icons", valueLine: "Open-source icon family in six weights, including duotone.", url: "https://phosphoricons.com", category: "UI & design" },
+  { name: "Fontshare", valueLine: "Free professional-grade fonts from the Indian Type Foundry.", url: "https://fontshare.com", category: "UI & design" },
+  { name: "Animista", valueLine: "Preview, tune, and copy ready-made CSS keyframe animations.", url: "https://animista.net", category: "UI & design" },
+  { name: "AutoAnimate", valueLine: "Add smooth enter, leave, and move transitions in one line.", url: "https://auto-animate.formkit.com", category: "UI & design" },
+  { name: "Shader Gradient", valueLine: "Configure animated WebGL gradient backgrounds and export them.", url: "https://shadergradient.co", category: "UI & design" },
+  { name: "Mesh Gradient", valueLine: "Create warped shader mesh gradients to export as backgrounds.", url: "https://meshgradient.com", category: "UI & design" },
+  { name: "Haikei", valueLine: "Generate SVG wave, blob, and gradient backgrounds to export.", url: "https://haikei.app", category: "UI & design" },
+  { name: "Pattern Monster", valueLine: "Customize repeatable SVG patterns, then copy the CSS or SVG.", url: "https://pattern.monster", category: "UI & design" },
 
   // ── Model access & inference ──
   { name: "OpenRouter", valueLine: "One API for hundreds of models, with fallback routing.", url: "https://openrouter.ai", category: "Inference" },

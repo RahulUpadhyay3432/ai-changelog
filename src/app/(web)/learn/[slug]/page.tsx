@@ -51,7 +51,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     entity.shortDesc ??
     `${entity.canonicalName}, explained — plus the latest news.`
   ).slice(0, 155);
-  const title = `${entity.canonicalName}: what it is and why it matters — Kapyn`;
+  // Page <title> is templated to "… | Kapyn" by the root layout; OG/Twitter
+  // aren't templated, so they carry the branded suffix explicitly.
+  const title = `${entity.canonicalName}: what it is and why it matters`;
+  const socialTitle = `${title} — Kapyn`;
   const url = `${APP_URL}/learn/${entity.slug}`;
 
   return {
@@ -60,8 +63,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: url },
     // Keep thin (pre-explainer) pages out of the index until they're filled in.
     robots: explainer ? undefined : { index: false, follow: true },
-    openGraph: { title, description, url, siteName: "Kapyn", type: "article" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title: socialTitle, description, url, siteName: "Kapyn", type: "article" },
+    twitter: { card: "summary_large_image", title: socialTitle, description },
   };
 }
 

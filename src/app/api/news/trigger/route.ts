@@ -22,7 +22,7 @@ export async function POST() {
   }
 
   // Fire-and-forget — don't await so the response returns immediately
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://kapyn.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://kapyn.app";
   fetch(`${baseUrl}/api/news/fetch`, {
     headers: process.env.CRON_SECRET
       ? { "x-cron-secret": process.env.CRON_SECRET }

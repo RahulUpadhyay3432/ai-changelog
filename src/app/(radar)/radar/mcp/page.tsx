@@ -9,11 +9,18 @@ import { McpMarketClient, type McpMeta } from "../McpMarketClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "MCP and skills — Kapyn Radar",
+  title: "MCP servers & AI skills",
   description: "The most useful MCP servers and AI skills, by category.",
 };
 
-export default async function McpMarketPage() {
+export default async function McpMarketPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const { tab } = await searchParams;
+  const initialView = tab === "skills" ? "skills" : "mcp";
+
   // Map each server's URL → its "owner/repo" (when it's a GitHub repo), fetch
   // stars + created dates, then key the result back by URL for the client.
   const fullByUrl = new Map<string, string>();
@@ -35,5 +42,5 @@ export default async function McpMarketPage() {
     if (m) meta[url] = { stars: m.stars, createdAt: m.createdAt };
   }
 
-  return <McpMarketClient meta={meta} />;
+  return <McpMarketClient meta={meta} initialView={initialView} />;
 }

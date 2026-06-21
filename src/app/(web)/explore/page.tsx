@@ -9,7 +9,7 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Explore AI concepts — Kapyn",
+  title: "Explore AI concepts",
   description:
     "The Kapyn AI glossary — plain-English explainers for the models, tools, and techniques shaping AI, each tied to the latest news.",
   alternates: { canonical: `${APP_URL}/explore` },

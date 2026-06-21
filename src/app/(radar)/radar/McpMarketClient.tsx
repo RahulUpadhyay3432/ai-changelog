@@ -175,8 +175,8 @@ function SectionHead({ emoji, title, count }: { emoji: string; title: string; co
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
-export function McpMarketClient({ meta = {} }: { meta?: Record<string, McpMeta> }) {
-  const [view, setView] = useState<View>("mcp");
+export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Record<string, McpMeta>; initialView?: View }) {
+  const [view, setView] = useState<View>(initialView);
   const [activeCat, setActiveCat] = useState<string>(ALL);
   const [mcpSort, setMcpSort] = useState<McpSort>("popular");
   const [skillSort, setSkillSort] = useState<SkillSort>("featured");

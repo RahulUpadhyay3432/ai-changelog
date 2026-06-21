@@ -13,12 +13,49 @@ const spaceGrotesk = Space_Grotesk({
 
 const APP_URL = "https://kapyn.app";
 
+// Sitewide entity graph — establishes Kapyn as a known Organization + WebSite
+// with a sitelinks search box. Lives only here (pages must not re-declare these
+// nodes). Mirrors the JSON-LD injection pattern used on story/learn pages.
+const SITE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${APP_URL}/#organization`,
+      name: "Kapyn",
+      url: APP_URL,
+      logo: `${APP_URL}/api/icon/512`,
+      description:
+        "The calm map of the AI worth using — agents, models, tools, MCP servers and skills.",
+      sameAs: [] as string[],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#website`,
+      name: "Kapyn",
+      url: APP_URL,
+      publisher: { "@id": `${APP_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${APP_URL}/explore?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   verification: {
     google: "vwiJeZYbR-J6Se91wicz3KZlpXtY8_YlWTxuZ7gRfjc",
   },
-  title: "Kapyn — What happened in AI today",
+  title: {
+    default: "Kapyn — What happened in AI today",
+    template: "%s | Kapyn",
+  },
   description:
     "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
   manifest: "/manifest.json",
@@ -76,6 +113,10 @@ export default function RootLayout({
           }}
         >
           <ServiceWorkerRegistrar />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }}
+          />
           {children}
         </body>
       </PostHogProvider>

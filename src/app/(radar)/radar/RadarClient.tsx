@@ -545,7 +545,9 @@ export function RadarClient(data: RadarData) {
       setRadarLens(mapped);
       setLens(mapped);
     } else {
-      setLens(getRadarLens());
+      // Default straight into the radar on the Builder lens — no onboarding
+      // chooser. People switch via the Builder/Creator/Exploring pills up top.
+      setLens(getRadarLens() ?? "builder");
     }
     setHeadline(sessionHeadline());
     introPlayed = true;
@@ -569,6 +571,8 @@ export function RadarClient(data: RadarData) {
   };
 
   if (!ready) return <div style={{ height: "100%", background: CANVAS }} />;
+  // Defensive fallback only — `lens` always defaults to "builder" above, so the
+  // chooser no longer renders on a normal visit to /radar.
   if (!lens) return <LensChooser onChoose={choose} />;
 
   const sections = buildSections(lens, data);

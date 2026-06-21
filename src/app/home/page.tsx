@@ -175,8 +175,9 @@ export default async function LandingPage() {
       <TopNav />
 
       {/* 1 · Hero ──────────────────────────────────────────────────────────── */}
-      <header className={styles.section}>
-        <div className={styles.inner}>
+      <header className={styles.heroWrap}>
+        <div className={styles.heroGlow} aria-hidden />
+        <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: SG, fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: TEXT.muted }}>

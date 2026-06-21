@@ -17,6 +17,7 @@ const TABS: { label: string; href: string }[] = [
   { label: "Skills", href: "/radar/mcp?tab=skills" },
   { label: "MCP", href: "/radar/mcp" },
   { label: "Hackathons", href: "/radar/hackathons" },
+  { label: "Blog", href: "/blog" },
   { label: "Learn", href: "/explore" },
 ];
 

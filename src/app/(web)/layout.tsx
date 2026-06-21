@@ -12,6 +12,9 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
           kapyn
         </Link>
         <nav className={styles.nav}>
+          <Link href="/blog" className={styles.navLink}>
+            Blog
+          </Link>
           <Link href="/explore" className={styles.navLink}>
             Explore
           </Link>

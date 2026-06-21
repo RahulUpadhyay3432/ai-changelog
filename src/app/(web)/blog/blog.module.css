@@ -1,0 +1,60 @@
+/* Blog — index + post. Layout, the gradient banner, and responsive only;
+   element colours come from @/lib/design-tokens inline in the page. */
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Post banner — a calm blue aurora, pure CSS (no asset, no WebGL). */
+.banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #111114;
+  padding: 32px 28px;
+  margin: 4px 0 30px;
+}
+.bannerGlow {
+  position: absolute;
+  inset: -45% -12% auto -12%;
+  height: 340px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 60% at 25% 30%, rgba(59, 130, 246, 0.36), transparent 70%),
+    radial-gradient(36% 52% at 78% 8%, rgba(99, 102, 241, 0.26), transparent 72%),
+    radial-gradient(30% 44% at 60% 62%, rgba(56, 189, 248, 0.18), transparent 72%);
+  filter: blur(30px);
+  will-change: transform;
+  animation: bannerDrift 22s ease-in-out infinite alternate;
+}
+.bannerInner {
+  position: relative;
+  z-index: 1;
+}
+@keyframes bannerDrift {
+  0% { transform: translate3d(-3%, -2%, 0) scale(1.04); }
+  100% { transform: translate3d(4%, 1.5%, 0) scale(1.12); }
+}
+
+/* Tool cards within a section */
+.toolGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0 0;
+}
+@media (max-width: 600px) {
+  .toolGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bannerGlow {
+    animation: none;
+  }
+}

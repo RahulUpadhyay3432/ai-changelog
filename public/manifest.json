@@ -2,7 +2,7 @@
   "name": "Kapyn",
   "short_name": "Kapyn",
   "description": "The calm intelligence layer for AI",
-  "start_url": "/",
+  "start_url": "/?app=1",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0E0D0C",

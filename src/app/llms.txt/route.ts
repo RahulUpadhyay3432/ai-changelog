@@ -39,7 +39,9 @@ export async function GET() {
     "",
     "## Key pages",
     `- [Explore — the AI glossary](${APP_URL}/explore): index of every concept explainer`,
-    `- [Radar](${APP_URL}/radar): AI tool & entity discovery`,
+    `- [Radar](${APP_URL}/radar): curated AI agents, models, tools, MCP servers & skills`,
+    `- [MCP servers](${APP_URL}/mcp): directory of Model Context Protocol servers, by category`,
+    `- [Blog](${APP_URL}/blog): guides on the AI and tools worth using`,
     `- [Kapyn](${APP_URL}): the swipeable AI/tech news feed`,
     ""
   );

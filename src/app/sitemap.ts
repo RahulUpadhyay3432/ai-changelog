@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { CATEGORIES } from "@/lib/categories";
 import { BLOG_POSTS } from "@/lib/blog-content";
+import { MCP_SERVERS } from "@/lib/radar-mcp";
+import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +80,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/home`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${APP_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     ...blogUrls,
+    { url: `${APP_URL}/radar`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${APP_URL}/mcp`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    ...MCP_SERVERS.map((s) => ({
+      url: `${APP_URL}/mcp/${slugify(s.name)}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     { url: `${APP_URL}/explore`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/trending`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
     { url: `${APP_URL}/categories`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.4 },

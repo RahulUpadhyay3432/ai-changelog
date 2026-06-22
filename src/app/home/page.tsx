@@ -17,7 +17,7 @@ import {
 import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
 import { TopNav } from "./TopNav";
 import { type MarqueeItem } from "./HeroMarquee";
-import { HeroRadarPanel, type RadarRow } from "./HeroRadarPanel";
+import { HeroRadarPanel } from "./HeroRadarPanel";
 import styles from "./landing.module.css";
 
 export const revalidate = 1800;
@@ -122,24 +122,6 @@ export default async function LandingPage() {
     AI_SKILLS.slice(0, 5).map((s) => ({ name: s.name, typeLabel: "skill", faviconHref: faviconFor(s.url), href: "/radar/mcp?tab=skills" })),
   );
 
-  // Hero "Radar" panel — the REAL curated catalog (a representative few across
-  // models / tools / design / MCP / skills), shown as the product itself.
-  const firstSentence = (s: string) => { const i = s.indexOf(". "); return i > 0 ? s.slice(0, i + 1) : s; };
-  const essByName = (name: string) => CURATED_ESSENTIALS.find((e) => e.name === name);
-  const essByCat = (cat: string) => CURATED_ESSENTIALS.find((e) => e.category === cat);
-  const model = essByName("Claude") ?? CURATED_ESSENTIALS[0];
-  const coder = essByCat("AI coding") ?? CURATED_ESSENTIALS[1] ?? CURATED_ESSENTIALS[0];
-  const design = essByName("Magic UI") ?? essByCat("UI & design") ?? CURATED_ESSENTIALS[0];
-  const mcp = MCP_SERVERS[0];
-  const skill = AI_SKILLS.find((s) => s.name === "Deep Research") ?? AI_SKILLS[0];
-  const heroRows: RadarRow[] = [
-    { name: model.name, value: model.valueLine, type: "MODEL", logoHref: faviconFor(model.url) },
-    { name: coder.name, value: coder.valueLine, type: "TOOL", logoHref: faviconFor(coder.url) },
-    { name: design.name, value: design.valueLine, type: "DESIGN", logoHref: faviconFor(design.url) },
-    { name: mcp.name, value: firstSentence(mcp.description), type: "MCP", logoHref: faviconFor(mcp.url) },
-    { name: skill.name, value: firstSentence(skill.description), type: "SKILL", logoHref: faviconFor(skill.url) },
-  ];
-
   const modelsCount = CURATED_ESSENTIALS.filter((e) => e.category === "Foundation models & chat").length;
 
   const mapCards = [
@@ -234,7 +216,7 @@ export default async function LandingPage() {
                 </div>
               </div>
             </div>
-            <HeroRadarPanel rows={heroRows} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} updated={timeAgo(news[0]?.publishedAt)} />
+            <HeroRadarPanel toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
           </div>
 
           {/* 2 · Stat strip */}

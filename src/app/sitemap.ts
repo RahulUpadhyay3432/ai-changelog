@@ -89,6 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),
+    { url: `${APP_URL}/tools`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${APP_URL}/skills`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     ...[...new Set(AI_SKILLS.map((s) => slugify(s.name)))].map((slug) => ({
       url: `${APP_URL}/skills/${slug}`,

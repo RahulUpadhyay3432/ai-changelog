@@ -59,7 +59,7 @@ export function HeroRadarPanel({
           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 4px rgba(59,130,246,0.18)" }} />
           On the Radar
         </span>
-        <span style={{ fontSize: "11px", color: TEXT.muted }}>updated {updated}</span>
+        <span style={{ fontSize: "11px", color: TEXT.muted }}>{updated}</span>
       </div>
       <div style={{ height: "1px", background: HAIRLINE }} />
 

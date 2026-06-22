@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { CATEGORIES } from "@/lib/categories";
 import { BLOG_POSTS } from "@/lib/blog-content";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
+import { AI_SKILLS } from "@/lib/radar-skills";
 import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/mcp`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     ...MCP_SERVERS.map((s) => ({
       url: `${APP_URL}/mcp/${slugify(s.name)}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+    { url: `${APP_URL}/skills`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    ...[...new Set(AI_SKILLS.map((s) => slugify(s.name)))].map((slug) => ({
+      url: `${APP_URL}/skills/${slug}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.6,

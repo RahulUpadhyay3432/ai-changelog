@@ -519,6 +519,65 @@ function LensRail({ lens, choose }: { lens: RadarLens; choose: (l: RadarLens) =>
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
+// Server-rendered, crawlable index of the radar's content. Rendered during SSR
+// and before the client mounts (the `!ready` state), so crawlers and AI fetchers
+// — most of which don't run JS — receive real names, descriptions and links
+// instead of an empty div. The interactive RadarClient takes over after hydration
+// (both server and first client render are `!ready`, so there's no mismatch).
+function RadarStaticIndex({ data }: { data: RadarData }) {
+  const groups: { title: string; items: RadarThing[] }[] = [
+    { title: "New on the radar", items: data.tools.map(toolThing) },
+    { title: "Essential AI tools", items: data.essentials.map(essThing) },
+    { title: "Models, companies & tools we track", items: data.entities.map(entThing) },
+  ];
+  const kicker = { fontFamily: SG, fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: GOLD, margin: "0 0 12px" };
+  const ul = { listStyle: "none" as const, margin: 0, padding: 0, display: "flex", flexDirection: "column" as const, gap: "11px" };
+  return (
+    <div className="scrollbar-none" style={{ height: "100%", overflowY: "auto", background: CANVAS, padding: "24px 24px 64px" }}>
+      <h1 style={{ fontFamily: SG, fontSize: "28px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.03em", margin: "0 0 8px", lineHeight: 1.1 }}>
+        The AI worth using
+      </h1>
+      <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.5, margin: "0 0 26px", maxWidth: "560px" }}>
+        A curated radar of AI agents, models, tools, MCP servers and skills — kept current by a daily signal. No paywall, ever.
+      </p>
+      {groups.map((g) =>
+        g.items.length === 0 ? null : (
+          <section key={g.title} style={{ marginBottom: "28px" }}>
+            <h2 style={kicker}>{g.title}</h2>
+            <ul style={ul}>
+              {g.items.map((t) => {
+                const inner = (
+                  <>
+                    <span style={{ fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.primary }}>{t.name}</span>
+                    {t.valueLine && <span style={{ display: "block", fontSize: "13.5px", color: TEXT.muted, lineHeight: 1.45, marginTop: "2px" }}>{t.valueLine}</span>}
+                  </>
+                );
+                return (
+                  <li key={t.id}>
+                    {t.url ? <a href={t.url} style={{ textDecoration: "none", display: "block" }}>{inner}</a> : <div>{inner}</div>}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )
+      )}
+      {data.hackathons.length > 0 && (
+        <section style={{ marginBottom: "28px" }}>
+          <h2 style={kicker}>Hackathons</h2>
+          <ul style={ul}>
+            {data.hackathons.map((h) => (
+              <li key={h.url}>
+                <a href={h.url} style={{ fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.primary, textDecoration: "none" }}>{h.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
 export function RadarClient(data: RadarData) {
   const [lens, setLens] = useState<RadarLens | null>(null);
   const [ready, setReady] = useState(false);
@@ -570,7 +629,7 @@ export function RadarClient(data: RadarData) {
     posthog.capture("radar_hackathon_brief_opened", { source: h.source, scope: "today" });
   };
 
-  if (!ready) return <div style={{ height: "100%", background: CANVAS }} />;
+  if (!ready) return <RadarStaticIndex data={data} />;
   // Defensive fallback only — `lens` always defaults to "builder" above, so the
   // chooser no longer renders on a normal visit to /radar.
   if (!lens) return <LensChooser onChoose={choose} />;

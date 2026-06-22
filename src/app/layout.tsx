@@ -53,11 +53,11 @@ export const metadata: Metadata = {
     google: "vwiJeZYbR-J6Se91wicz3KZlpXtY8_YlWTxuZ7gRfjc",
   },
   title: {
-    default: "Kapyn — What happened in AI today",
+    default: "Kapyn — The calm signal layer for AI",
     template: "%s | Kapyn",
   },
   description:
-    "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
+    "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -72,18 +72,18 @@ export const metadata: Metadata = {
     apple: [{ url: "/api/icon/180", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Kapyn — What happened in AI today",
+    title: "Kapyn — The calm signal layer for AI",
     description:
-      "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
+      "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
     url: APP_URL,
     siteName: "Kapyn",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kapyn — What happened in AI today",
+    title: "Kapyn — The calm signal layer for AI",
     description:
-      "AI and tech news distilled into 30-second reads. Every story that matters, no noise.",
+      "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
   },
 };
 

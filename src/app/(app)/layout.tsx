@@ -1,5 +1,6 @@
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AppSideNav } from "./AppSideNav";
+import { AppPositioningPanel } from "./AppPositioningPanel";
 import { RadarRailPanel } from "./RadarRailPanel";
 import styles from "./layout.module.css";
 
@@ -11,9 +12,12 @@ export default function AppLayout({
   return (
     <div className={styles.outer}>
 
-      {/* Left rail — desktop nav (≥1080px) */}
+      {/* Left rail — positioning pitch (≥700px) + nav (≥1080px) */}
       <aside className={styles.sideLeft}>
-        <AppSideNav />
+        <AppPositioningPanel />
+        <div className={styles.navOnly}>
+          <AppSideNav />
+        </div>
       </aside>
 
       {/* Phone frame — the feed stays mobile-shaped */}

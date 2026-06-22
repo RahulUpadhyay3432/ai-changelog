@@ -16,7 +16,8 @@ import {
 } from "@/lib/design-tokens";
 import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
 import { TopNav } from "./TopNav";
-import { HeroMarquee, type MarqueeItem } from "./HeroMarquee";
+import { type MarqueeItem } from "./HeroMarquee";
+import { HeroRadarPanel } from "./HeroRadarPanel";
 import styles from "./landing.module.css";
 
 export const revalidate = 1800;
@@ -215,7 +216,7 @@ export default async function LandingPage() {
                 </div>
               </div>
             </div>
-            <HeroMarquee items={marquee} />
+            <HeroRadarPanel toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
           </div>
 
           {/* 2 · Stat strip */}

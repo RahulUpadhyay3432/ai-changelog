@@ -11,7 +11,7 @@ import styles from "./landing.module.css";
 // SEO internal-linking). "Skills" opens the Skills view of the MCP market;
 // "Learn" points at /explore until the blog ships in Phase 2 (then → /blog).
 const TABS: { label: string; href: string }[] = [
-  { label: "Feed", href: "/" },
+  { label: "Feed", href: "/?app=1" },
   { label: "Radar", href: "/radar" },
   { label: "Tools & Agents", href: "/radar/browse" },
   { label: "Skills", href: "/radar/mcp?tab=skills" },
@@ -81,7 +81,7 @@ export function TopNav() {
 
         {/* Desktop "Open" pill */}
         <Link
-          href="/"
+          href="/?app=1"
           style={{
             marginLeft: "auto",
             display: "inline-flex",
@@ -133,7 +133,7 @@ export function TopNav() {
             </Link>
           ))}
           <Link
-            href="/"
+            href="/?app=1"
             onClick={() => setOpen(false)}
             style={{
               display: "inline-flex",

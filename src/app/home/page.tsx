@@ -198,16 +198,21 @@ export default async function LandingPage() {
                 <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
                   Open the Radar <ArrowRight size={17} strokeWidth={2.4} />
                 </Link>
-                <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.body, background: "transparent", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
+                <Link href="/?app=1" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.body, background: "transparent", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
                   Today&apos;s feed
                 </Link>
               </div>
-              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "9px", margin: "18px 0 0", fontFamily: SG, fontSize: "13.5px", color: TEXT.muted }}>
-                <span className={styles.livePulse} style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, display: "inline-block" }} />
-                Built for your phone — a 30-second daily dispatch.
-                <Link href="#get-app" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: TEXT.body, fontWeight: 600, textDecoration: "none" }}>
-                  Get the app <ArrowRight size={14} strokeWidth={2.4} />
-                </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", margin: "26px 0 0" }}>
+                <div style={{ background: "#fff", borderRadius: "10px", padding: "8px", display: "inline-flex", flexShrink: 0 }}>
+                  <QRCodeBlock size={76} />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                  <span style={{ fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary }}>Built for your phone</span>
+                  <span style={{ fontSize: "13px", color: TEXT.muted, lineHeight: 1.45, maxWidth: "240px" }}>
+                    Scan for the 30-second daily brief — or{" "}
+                    <Link href="/?app=1" style={{ color: TEXT.body, fontWeight: 600, textDecoration: "none" }}>open it here →</Link>
+                  </span>
+                </div>
               </div>
             </div>
             <HeroMarquee items={marquee} />
@@ -308,7 +313,7 @@ export default async function LandingPage() {
                   <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, marginTop: "3px" }}>{s.sourceName}</span>
                 </Link>
               ))}
-              <div style={{ marginTop: "10px" }}><SeeAll href="/">See the feed</SeeAll></div>
+              <div style={{ marginTop: "10px" }}><SeeAll href="/?app=1">See the feed</SeeAll></div>
             </div>
           </div>
         </div>
@@ -347,7 +352,7 @@ export default async function LandingPage() {
               <h3 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Keep it in your pocket</h3>
               <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen — your 30-second daily brief and breaking alerts, one tap away.</p>
             </div>
-            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
+            <Link href="/?app=1" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
               Open the app <ArrowUpRight size={15} strokeWidth={2.3} />
             </Link>
           </div>
@@ -458,7 +463,7 @@ export default async function LandingPage() {
             </div>
             {[
               { h: "Discover", links: [["Radar", "/radar"], ["Tools & Agents", "/radar/browse"], ["MCP servers", "/radar/mcp"], ["Hackathons", "/radar/hackathons"]] },
-              { h: "Stay current", links: [["Today's feed", "/"], ["Trending", "/trending"], ["Categories", "/categories"], ["RSS", "/feed.xml"]] },
+              { h: "Stay current", links: [["Today's feed", "/?app=1"], ["Trending", "/trending"], ["Categories", "/categories"], ["RSS", "/feed.xml"]] },
               { h: "Learn", links: [["Explore concepts", "/explore"], ["For LLMs", "/llms.txt"], ["Open data", "/okf"]] },
             ].map((col) => (
               <div key={col.h}>

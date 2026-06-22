@@ -202,6 +202,13 @@ export default async function LandingPage() {
                   Today&apos;s feed
                 </Link>
               </div>
+              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "9px", margin: "18px 0 0", fontFamily: SG, fontSize: "13.5px", color: TEXT.muted }}>
+                <span className={styles.livePulse} style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, display: "inline-block" }} />
+                Built for your phone — a 30-second daily dispatch.
+                <Link href="#get-app" style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: TEXT.body, fontWeight: 600, textDecoration: "none" }}>
+                  Get the app <ArrowRight size={14} strokeWidth={2.4} />
+                </Link>
+              </div>
             </div>
             <HeroMarquee items={marquee} />
           </div>
@@ -329,7 +336,25 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* 6 · Loadout showcase ──────────────────────────────────────────────── */}
+      {/* 6 · Get the app — pitched after the value props, where intent exists */}
+      <section id="get-app" className={styles.section} style={{ padding: "0 24px 48px", scrollMarginTop: "84px" }}>
+        <div className={styles.inner}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 24px" }}>
+            <div style={{ background: "#fff", borderRadius: "12px", padding: "10px", display: "inline-flex", flexShrink: 0 }}>
+              <QRCodeBlock />
+            </div>
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <h3 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Keep it in your pocket</h3>
+              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen — your 30-second daily brief and breaking alerts, one tap away.</p>
+            </div>
+            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
+              Open the app <ArrowUpRight size={15} strokeWidth={2.3} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 7 · Loadout showcase ──────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>
         <div className={styles.inner}>
           <div className={styles.loadoutGrid} style={{ background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "20px", padding: "32px" }}>
@@ -361,7 +386,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* 7 · Learn / AEO ───────────────────────────────────────────────────── */}
+      {/* 8 · Learn / AEO ───────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>
         <div className={styles.inner}>
           <SectionHead kicker="Learn" title="Straight answers, grounded in the source" sub="The terms everyone uses and few explain — calm, current, and linked to who's actually shipping them." />
@@ -396,7 +421,7 @@ export default async function LandingPage() {
         </section>
       )}
 
-      {/* 8 · Categories ────────────────────────────────────────────────────── */}
+      {/* 9 · Categories ────────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>
         <div className={styles.inner}>
           <SectionHead kicker="By topic" title="Or follow what you care about" />
@@ -411,7 +436,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* 9 · Trust band ────────────────────────────────────────────────────── */}
+      {/* 10 · Trust band ───────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "24px 24px 48px" }}>
         <div className={styles.inner}>
           <div style={{ textAlign: "center", borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "40px 24px" }}>
@@ -419,24 +444,6 @@ export default async function LandingPage() {
             <p style={{ fontSize: "15px", color: TEXT.muted, margin: "10px auto 0", maxWidth: "480px", lineHeight: 1.5 }}>
               No hype. No paywall. No signup wall. Every claim links to its source — so you can trust the map and move on with your day.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 10 · Get the app ──────────────────────────────────────────────────── */}
-      <section className={styles.section} style={{ padding: "0 24px 56px" }}>
-        <div className={styles.inner}>
-          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 24px" }}>
-            <div style={{ background: "#fff", borderRadius: "12px", padding: "10px", display: "inline-flex", flexShrink: 0 }}>
-              <QRCodeBlock />
-            </div>
-            <div style={{ flex: 1, minWidth: "200px" }}>
-              <h3 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Take it with you</h3>
-              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen for a 30-second daily dispatch. Scan, or open it right here.</p>
-            </div>
-            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
-              Open the app <ArrowUpRight size={15} strokeWidth={2.3} />
-            </Link>
           </div>
         </div>
       </section>

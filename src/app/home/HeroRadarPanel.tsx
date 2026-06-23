@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowRight, Compass, Sparkles, Layers, Bookmark, type LucideIcon } from "lucide-react";
 import { GOLD, HAIRLINE, TEXT, SG } from "@/lib/design-tokens";
 
@@ -16,19 +16,20 @@ const CAPABILITIES: { Icon: LucideIcon; title: string; line: string }[] = [
 const N = CAPABILITIES.length;
 const INTERVAL_MS = 3200;
 
-// Shared card chrome — used by the full front card and the static peeks behind it.
-const CARD_STYLE = {
-  background: "linear-gradient(180deg, rgba(27,26,23,0.92), rgba(18,17,15,0.92))",
+const CARD_STYLE: React.CSSProperties = {
+  background: "linear-gradient(180deg, rgba(27,26,23,0.95), rgba(18,17,15,0.95))",
   border: `1px solid ${HAIRLINE}`,
   borderRadius: "18px",
   boxShadow: "0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.4)",
+  padding: "18px 18px 14px",
 };
 
-function SingleCapabilityCard({
+// One feature, rendered as a full self-contained card (header + capability + footer).
+function CapabilityCard({
   Icon, title, line, toolCount, mcpCount, skillCount,
 }: { Icon: LucideIcon; title: string; line: string; toolCount: number; mcpCount: number; skillCount: number }) {
   return (
-    <div style={{ ...CARD_STYLE, padding: "18px 18px 14px" }}>
+    <div style={CARD_STYLE}>
       {/* header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: TEXT.muted }}>
@@ -41,8 +42,8 @@ function SingleCapabilityCard({
       </p>
       <div style={{ height: "1px", background: HAIRLINE }} />
 
-      {/* single capability row */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "14px 0 12px", borderBottom: `1px solid ${HAIRLINE}` }}>
+      {/* single capability row — minHeight keeps every card the same size */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "14px 0 12px", borderBottom: `1px solid ${HAIRLINE}`, minHeight: "78px" }}>
         <span style={{ width: "34px", height: "34px", borderRadius: "9px", background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.22)", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
           <Icon size={17} strokeWidth={2} color={GOLD} />
         </span>
@@ -61,6 +62,16 @@ function SingleCapabilityCard({
       </div>
     </div>
   );
+}
+
+// Depth → visual slot in the deck. depth 0 = front, 1/2 = peeks behind, ≥3 hidden.
+function slotFor(depth: number) {
+  return {
+    y: -depth * 11,
+    scale: 1 - depth * 0.05,
+    opacity: depth === 0 ? 1 : depth === 1 ? 0.7 : depth === 2 ? 0.4 : 0,
+    zIndex: N - depth,
+  };
 }
 
 export function HeroRadarPanel({
@@ -85,14 +96,19 @@ export function HeroRadarPanel({
     if (reduce) return;
     startTimer();
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [reduce]); // startTimer only uses refs — no stale closure
+  }, [reduce]); // startTimer only touches refs — no stale closure
 
-  // ─── Reduced motion: static 4-row list ────────────────────────────────────
+  const jumpTo = (i: number) => {
+    setActiveIndex(i);
+    startTimer();
+  };
+
+  // ─── Reduced motion: original static 4-row list ───────────────────────────
   if (reduce) {
     const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.08 } } };
     const row: Variants = { hidden: { opacity: 0 }, show: { opacity: 1 } };
     return (
-      <motion.div initial="hidden" animate="show" variants={container} style={{ ...CARD_STYLE, width: "100%", maxWidth: "440px", marginLeft: "auto", padding: "18px 18px 14px" }}>
+      <motion.div initial="hidden" animate="show" variants={container} style={{ ...CARD_STYLE, width: "100%", maxWidth: "440px", marginLeft: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: TEXT.muted }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD }} />
@@ -122,54 +138,52 @@ export function HeroRadarPanel({
     );
   }
 
-  // ─── Animated card deck ────────────────────────────────────────────────────
-  const { Icon, title, line } = CAPABILITIES[activeIndex];
-
+  // ─── Animated deck — each feature is its own card, cycling forward ────────
   return (
-    // paddingBottom creates visible space for the 2 peeking cards behind the front.
-    <div style={{ position: "relative", width: "100%", maxWidth: "440px", marginLeft: "auto", paddingBottom: "16px" }}>
+    <div style={{ width: "100%", maxWidth: "440px", marginLeft: "auto" }}>
+      {/* paddingTop reserves the room the peeking cards rise into */}
+      <div style={{ position: "relative", paddingTop: "26px" }}>
+        {/* invisible spacer — gives the absolutely-positioned deck its height */}
+        <div style={{ visibility: "hidden" }} aria-hidden>
+          <CapabilityCard {...CAPABILITIES[0]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
+        </div>
 
-      {/* Peeking card — furthest back (most inset, most shifted down) */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute", inset: 0, zIndex: 1,
-          ...CARD_STYLE,
-          transform: "translateY(14px) scaleX(0.91)",
-          transformOrigin: "top center",
-          opacity: 0.7,
-        }}
-      />
+        {CAPABILITIES.map((cap, i) => {
+          const depth = (i - activeIndex + N) % N;
+          const slot = slotFor(depth);
+          return (
+            <motion.div
+              key={i}
+              style={{ position: "absolute", top: "26px", left: 0, right: 0, transformOrigin: "top center", zIndex: slot.zIndex, pointerEvents: depth === 0 ? "auto" : "none" }}
+              animate={{ y: slot.y, scale: slot.scale, opacity: slot.opacity }}
+              transition={{ type: "spring", stiffness: 280, damping: 30 }}
+            >
+              <CapabilityCard {...cap} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
+            </motion.div>
+          );
+        })}
+      </div>
 
-      {/* Peeking card — middle */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute", inset: 0, zIndex: 2,
-          ...CARD_STYLE,
-          transform: "translateY(7px) scaleX(0.96)",
-          transformOrigin: "top center",
-          opacity: 0.85,
-        }}
-      />
-
-      {/* Front card — rotates through capabilities */}
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={activeIndex}
-          style={{ position: "relative", zIndex: 3 }}
-          // Enter: rises from the mid-card position (feels like it came from the stack)
-          initial={{ y: 8, scaleX: 0.96, opacity: 0 }}
-          animate={{ y: 0, scaleX: 1, opacity: 1, transition: { type: "spring", stiffness: 320, damping: 30 } }}
-          // Exit: slides up and off the deck
-          exit={{ y: -55, opacity: 0, transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } }}
-        >
-          <SingleCapabilityCard
-            Icon={Icon} title={title} line={line}
-            toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount}
+      {/* progress dots */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "16px" }}>
+        {CAPABILITIES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => jumpTo(i)}
+            aria-label={`Show capability ${i + 1}`}
+            style={{
+              width: i === activeIndex ? "22px" : "6px",
+              height: "6px",
+              borderRadius: "100px",
+              background: i === activeIndex ? GOLD : "rgba(255,255,255,0.2)",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              transition: "width 0.3s ease, background 0.3s ease",
+            }}
           />
-        </motion.div>
-      </AnimatePresence>
+        ))}
+      </div>
     </div>
   );
 }

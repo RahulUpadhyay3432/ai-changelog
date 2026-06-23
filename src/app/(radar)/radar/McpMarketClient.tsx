@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plug } from "lucide-react";
@@ -21,6 +21,19 @@ export interface McpMeta { stars: number; createdAt: string }
 
 type View = "mcp" | "skills";
 const ALL = "All";
+
+// Desktop ≥900px → 3-col card grids; mobile stays 2-col (mirrors RadarClient).
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
 const PRESS = { type: "spring" as const, stiffness: 440, damping: 28 };
 
 // ─── MCP ─────────────────────────────────────────────────────────────────────
@@ -176,6 +189,7 @@ function SectionHead({ emoji, title, count }: { emoji: string; title: string; co
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Record<string, McpMeta>; initialView?: View }) {
+  const isDesktop = useIsDesktop();
   const [view, setView] = useState<View>(initialView);
   const [activeCat, setActiveCat] = useState<string>(ALL);
   const [mcpSort, setMcpSort] = useState<McpSort>("popular");
@@ -262,7 +276,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
             return (
               <section key={cat} style={{ marginBottom: "26px" }}>
                 <SectionHead emoji={MCP_CATEGORY_EMOJI[cat]} title={cat} count={servers.length} />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "0 20px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
                   {servers.map((s) => <ServerCard key={s.url} server={s} stars={meta[s.url]?.stars} onOpen={(t) => onOpen(t, "mcp")} />)}
                 </div>
               </section>
@@ -274,7 +288,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
             return (
               <section key={cat} style={{ marginBottom: "26px" }}>
                 <SectionHead emoji={SKILL_CATEGORY_EMOJI[cat]} title={cat} count={skills.length} />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "0 20px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
                   {skills.map((s) => <SkillCard key={s.url} skill={s} onOpen={(t) => onOpen(t, "skills")} />)}
                 </div>
               </section>

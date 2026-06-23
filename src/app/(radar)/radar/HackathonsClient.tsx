@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, MapPin, Users, ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { Hackathon } from "@/lib/hackathons";
-import { CoverImage, usePressTap, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
+import { usePressTap, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
 
 type LocFilter = "all" | "online" | "inperson";
@@ -79,11 +79,13 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
     >
       <div style={{ position: "relative" }}>
         {h.imageUrl ? (
-          <CoverImage src={h.imageUrl} category="startups" fallbackIcon={Trophy} height={116} radius={0} />
+          // Clean 16:9 cover (Eventbrite-style) — no dark overlay.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={h.imageUrl} alt="" loading="lazy" draggable={false} style={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover", background: "#0c0c0c" }} />
         ) : (
           // Branded fallback — a designed cover, never an empty grey box
           // (refs: Devpost name-on-color, MLH initials-on-color, Devfolio).
-          <div style={{ position: "relative", height: "116px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", overflow: "hidden", background: "linear-gradient(135deg, #21478f 0%, #182a52 48%, #0e1326 100%)" }}>
+          <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", overflow: "hidden", background: "linear-gradient(135deg, #21478f 0%, #182a52 48%, #0e1326 100%)" }}>
             <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(75% 110% at 100% 0%, rgba(59,130,246,0.42), transparent 62%)" }} />
             <span style={{ position: "relative", fontFamily: SG, fontSize: "40px", fontWeight: 700, letterSpacing: "-0.02em", color: "#f4f6fb", lineHeight: 1 }}>{initialsOf(h.title)}</span>
             <span style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.62)" }}>
@@ -209,7 +211,7 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
         </div>
       ) : (
         <div style={isDesktop
-          ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "0 20px", alignItems: "start" }
+          ? { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", padding: "0 20px", alignItems: "start" }
           : { display: "flex", flexDirection: "column", gap: "12px", padding: "0 20px" }}>
           {visible.map((h, i) => <HackathonCard key={`${h.source}-${i}`} h={h} onOpen={open} />)}
         </div>

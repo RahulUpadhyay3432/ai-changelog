@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Search, Compass, Plug, ArrowUpRight } from "lucide-react";
@@ -8,7 +8,7 @@ import posthog from "posthog-js";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
 import {
-  FaceMark, MetricChip,
+  FaceMark, MetricChip, accentFor,
   GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
   type RadarThing,
 } from "./radar-shared";
@@ -73,18 +73,44 @@ const PRESS = { type: "spring" as const, stiffness: 440, damping: 28 };
 //     covers). FaceMark renders the brand logo on a light chip, or nothing when
 //     none resolves; the type tag stays right-aligned either way. ────────────────
 function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: CategorySlug | null; onOpen: (t: RadarThing) => void }) {
+  const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
+  const cardRef = useRef<HTMLButtonElement>(null);
+  const accent = accentFor(thing.categorySlug ?? catSlug);
+
   return (
     <motion.button
+      ref={cardRef}
       whileTap={{ scale: 0.97 }}
       transition={PRESS}
       onClick={() => onOpen(thing)}
+      onMouseMove={(e) => {
+        const rect = cardRef.current?.getBoundingClientRect();
+        if (rect) setMouse({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+      }}
+      onMouseLeave={() => setMouse(null)}
       style={{
         display: "flex", flexDirection: "column", textAlign: "left",
         background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px",
         padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
-        minWidth: 0, width: "100%",
+        minWidth: 0, width: "100%", position: "relative", overflow: "hidden",
       }}
     >
+      {/* Per-category spotlight on hover */}
+      {mouse && (
+        <div aria-hidden style={{
+          position: "absolute", inset: 0, borderRadius: "16px", pointerEvents: "none",
+          background: `radial-gradient(160px circle at ${mouse.x}px ${mouse.y}px, ${accent.ring}2a, transparent 65%)`,
+        }} />
+      )}
+      {/* Subtle category-accent bottom glow — blooms on hover */}
+      <div aria-hidden style={{
+        position: "absolute", bottom: 0, left: "8%", right: "8%", height: "1px",
+        background: `linear-gradient(90deg, transparent, ${accent.ring}60, transparent)`,
+        boxShadow: mouse ? `0 0 14px 2px ${accent.ring}44` : "none",
+        transition: "box-shadow 0.2s ease",
+        pointerEvents: "none",
+      }} />
+
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px", minHeight: "20px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={36} />
         {thing.typeLabel && (

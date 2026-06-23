@@ -19,6 +19,7 @@ import { TopNav } from "./TopNav";
 import { type MarqueeItem } from "./HeroMarquee";
 import { HeroRadarPanel } from "./HeroRadarPanel";
 import { HeroHeadline } from "./HeroHeadline";
+import { HeroPill } from "./HeroPill";
 import styles from "./landing.module.css";
 
 export const revalidate = 1800;
@@ -185,10 +186,7 @@ export default async function LandingPage() {
         <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: SG, fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: TEXT.muted }}>
-                <span className={styles.livePulse} style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, display: "inline-block" }} />
-                The calm map of AI · {timeAgo(news[0]?.publishedAt)}
-              </span>
+              <HeroPill storyCount={storyCount} />
               <HeroHeadline />
               <p style={{ fontSize: "18px", color: TEXT.body, lineHeight: 1.55, margin: "20px 0 0", maxWidth: "480px" }}>
                 Agents, models, tools, MCP servers and skills — curated, kept current by a calm daily signal. No noise, no paywall, ever.

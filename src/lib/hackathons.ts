@@ -350,6 +350,64 @@ function rankHackathons(items: HackathonInput[]): HackathonInput[] {
   });
 }
 
+// ─── Kaggle source (official public API, free auth) ──────────────────────────
+// Requires KAGGLE_USERNAME + KAGGLE_KEY env vars (from kaggle.com → Settings →
+// API → Create New Token). Falls back gracefully to [] if missing.
+
+interface KaggleCompetition {
+  ref: string;        // slug, e.g. "titanic"
+  title: string;
+  deadline: string;   // ISO 8601
+  reward: string;     // e.g. "$50,000" or "Swag" or ""
+  teamCount: number;
+  category: string;   // "featured" | "research" | "community" | "playground" | ...
+}
+
+export async function fetchKaggleCompetitions(): Promise<HackathonInput[]> {
+  const user = process.env.KAGGLE_USERNAME;
+  const key = process.env.KAGGLE_KEY;
+  if (!user || !key) return [];
+
+  const auth = Buffer.from(`${user}:${key}`).toString("base64");
+  const params = new URLSearchParams({ sortBy: "latestDeadline", pageSize: "30", group: "general" });
+  const res = await fetch(`https://www.kaggle.com/api/v1/competitions/list?${params}`, {
+    headers: { Authorization: `Basic ${auth}`, Accept: "application/json" },
+    next: { revalidate: 21600 },
+  });
+  if (!res.ok) return [];
+
+  const comps = (await res.json()) as KaggleCompetition[];
+  const now = Date.now();
+  return comps
+    .filter((c) => {
+      if (!c.ref || !c.title) return false;
+      if (c.category === "playground") return false; // skip getting-started toy comps
+      const dl = new Date(c.deadline).getTime();
+      return dl > now; // only active
+    })
+    .map((c): HackathonInput => {
+      const deadline = fmtDate(c.deadline);
+      const prize = c.reward && !/^(knowledge|kudos|swag)$/i.test(c.reward.trim()) ? c.reward : null;
+      return {
+        source: "kaggle",
+        externalId: c.ref,
+        title: c.title,
+        url: `https://www.kaggle.com/c/${c.ref}`,
+        imageUrl: null,
+        dates: deadline ? `Deadline ${deadline}` : "",
+        prize,
+        location: "Online",
+        isOnline: true,
+        themes: ["Machine Learning", "Data Science"],
+        participants: c.teamCount || null,
+        openState: "open",
+        organization: "Kaggle",
+        description: null,
+      };
+    })
+    .filter(isAiRelevant);
+}
+
 // All sources, curated first, deduped by source+externalId AND normalized title
 // (the same event can surface on Devpost + Unstop). Any failing source drops out.
 export async function fetchAllHackathons(): Promise<HackathonInput[]> {
@@ -357,6 +415,7 @@ export async function fetchAllHackathons(): Promise<HackathonInput[]> {
     fetchDevpostHackathons(),
     fetchUnstopHackathons(),
     fetchMlhEvents(),
+    fetchKaggleCompetitions(),
   ]);
   const idSeen = new Set<string>();
   const titleSeen = new Set<string>();

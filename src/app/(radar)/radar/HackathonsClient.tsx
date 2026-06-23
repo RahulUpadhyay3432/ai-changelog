@@ -7,7 +7,6 @@ import { ArrowLeft, Trophy, MapPin, Users, ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { Hackathon } from "@/lib/hackathons";
 import { CoverImage, usePressTap, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT } from "./radar-shared";
-import { logoFor } from "./radar-map";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
 
 type LocFilter = "all" | "online" | "inperson";
@@ -56,6 +55,16 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
+// Initials for the no-image cover fallback (e.g. "Smart India Hackathon" → "SI").
+// Skips small stopwords so "Build with Gemini" → "BG", not "BW".
+const STOP = new Set(["with", "the", "of", "and", "a", "an", "for", "to", "in", "on", "by"]);
+function initialsOf(name: string): string {
+  const words = name.replace(/[^a-zA-Z0-9 ]/g, " ").trim().split(/\s+/).filter((w) => w && !STOP.has(w.toLowerCase()));
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 // Tapping a card opens the in-app brief (HackathonDetailSheet); only its
 // "Register" button leaves the app. Tap-guarded so a vertical scroll never opens.
 function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => void }) {
@@ -69,7 +78,15 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
       style={{ display: "block", width: "100%", textAlign: "left", color: "inherit", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", overflow: "hidden", boxShadow: INNER_HIGHLIGHT, cursor: "pointer", padding: 0 }}
     >
       <div style={{ position: "relative" }}>
-        <CoverImage src={h.imageUrl ?? logoFor(h.url)} category="startups" fallbackIcon={Trophy} height={116} radius={0} />
+        {h.imageUrl ? (
+          <CoverImage src={h.imageUrl} category="startups" fallbackIcon={Trophy} height={116} radius={0} />
+        ) : (
+          // Branded fallback — never an empty grey box (refs: Devpost/MLH/Devfolio).
+          <div style={{ height: "116px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px", background: "radial-gradient(120% 130% at 0% 0%, #1c2b54 0%, #0E0D0C 68%), linear-gradient(135deg, rgba(59,130,246,0.30), rgba(59,130,246,0) 55%)" }}>
+            <span style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, letterSpacing: "-0.02em", color: "rgba(232,228,222,0.92)" }}>{initialsOf(h.title)}</span>
+            <Trophy size={15} strokeWidth={2} color="rgba(59,130,246,0.9)" />
+          </div>
+        )}
         <span style={{ position: "absolute", top: "10px", left: "10px", fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.03em", textTransform: "uppercase", color: open ? "#ffffff" : TEXT.primary, background: open ? GOLD : "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "100px", padding: "3px 9px" }}>
           {open ? "Open now" : "Upcoming"}
         </span>

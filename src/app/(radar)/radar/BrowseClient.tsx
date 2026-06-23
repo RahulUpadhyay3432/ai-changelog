@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Search, Compass, Plug, ArrowUpRight } from "lucide-react";
@@ -20,6 +20,19 @@ const GRAIN =
 
 const ALL = "All";
 const TRENDING = "New & trending";
+
+// Desktop ≥900px → 3-col card grid; mobile stays 2-col (mirrors RadarClient/MCP).
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
 
 // Preferred chip / group order.
 const ORDER = [
@@ -87,6 +100,7 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 export function BrowseClient(data: BrowseData) {
+  const isDesktop = useIsDesktop();
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>(ALL);
   const [detail, setDetail] = useState<RadarThing | null>(null);
@@ -213,7 +227,7 @@ export function BrowseClient(data: BrowseData) {
             )}
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
             {visible.map((t) => (
               <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} />
             ))}

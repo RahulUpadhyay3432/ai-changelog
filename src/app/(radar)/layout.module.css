@@ -60,6 +60,14 @@
     display: none;
   }
 
+  /* Bound + centre the content on wide desktops — otherwise it stretches
+     edge-to-edge after the 220px sidebar (over-wide cards, huge banners). */
+  .main {
+    max-width: 1200px;
+    width: 100%;
+    margin-inline: auto;
+  }
+
   .overlayRoot {
     position: fixed;
     inset: 0;

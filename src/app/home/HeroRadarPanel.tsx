@@ -55,10 +55,12 @@ const N = CAPABILITIES.length;
 const INTERVAL_MS = 3200;
 
 const CARD_STYLE: React.CSSProperties = {
-  background: "linear-gradient(180deg, rgba(27,26,23,0.95), rgba(18,17,15,0.95))",
+  // Fully opaque — the deck stacks, so the front card must completely hide
+  // whatever sits behind it (no translucency, no bleed-through).
+  background: "linear-gradient(180deg, #201e1a, #161411)",
   border: `1px solid ${HAIRLINE}`,
   borderRadius: "18px",
-  boxShadow: "0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.4)",
+  boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.45)",
   padding: "18px 18px 14px",
 };
 
@@ -87,15 +89,15 @@ function CapabilityCard({
           <Icon size={21} strokeWidth={2} color={GOLD} />
         </span>
         <span style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ display: "block", fontFamily: SG, fontSize: "17px", fontWeight: 700, color: TEXT.primary, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{title}</span>
-          <span style={{ display: "block", fontSize: "13px", color: TEXT.muted, lineHeight: 1.45, marginTop: "4px" }}>{line}</span>
+          <span style={{ display: "block", fontFamily: SG, fontSize: "19px", fontWeight: 700, color: "#ffffff", lineHeight: 1.18, letterSpacing: "-0.015em" }}>{title}</span>
+          <span style={{ display: "block", fontSize: "13px", color: TEXT.body, lineHeight: 1.45, marginTop: "5px" }}>{line}</span>
         </span>
       </div>
 
       {/* supporting detail points */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "4px 0 16px", borderBottom: `1px solid ${HAIRLINE}` }}>
         {points.map((p) => (
-          <span key={p} style={{ display: "flex", alignItems: "flex-start", gap: "9px", fontSize: "13px", color: TEXT.body, lineHeight: 1.4 }}>
+          <span key={p} style={{ display: "flex", alignItems: "flex-start", gap: "9px", fontSize: "13px", color: TEXT.primary, lineHeight: 1.4 }}>
             <span style={{ width: "18px", height: "18px", borderRadius: "6px", background: "rgba(59,130,246,0.12)", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: "1px" }}>
               <Check size={12} strokeWidth={2.6} color={GOLD} />
             </span>

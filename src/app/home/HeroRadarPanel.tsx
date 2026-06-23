@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowRight, Check, Compass, Sparkles, Layers, Bookmark, type LucideIcon } from "lucide-react";
 import { GOLD, HAIRLINE, TEXT, SG } from "@/lib/design-tokens";
 
@@ -115,15 +115,7 @@ function CapabilityCard({
   );
 }
 
-// Depth → visual slot in the deck. depth 0 = front, 1/2 = peeks behind, ≥3 hidden.
-function slotFor(depth: number) {
-  return {
-    y: -depth * 11,
-    scale: 1 - depth * 0.05,
-    opacity: depth === 0 ? 1 : depth === 1 ? 0.7 : depth === 2 ? 0.4 : 0,
-    zIndex: N - depth,
-  };
-}
+const PEEK_TOP = "26px"; // matches container paddingTop — the room peeks rise into
 
 export function HeroRadarPanel({
   toolCount,
@@ -159,7 +151,7 @@ export function HeroRadarPanel({
     const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.08 } } };
     const row: Variants = { hidden: { opacity: 0 }, show: { opacity: 1 } };
     return (
-      <motion.div initial="hidden" animate="show" variants={container} style={{ ...CARD_STYLE, width: "100%", maxWidth: "460px", marginLeft: "auto" }}>
+      <motion.div initial="hidden" animate="show" variants={container} style={{ ...CARD_STYLE, width: "100%", maxWidth: "460px", marginInline: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: "4px" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: TEXT.muted }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD }} />
@@ -189,30 +181,47 @@ export function HeroRadarPanel({
     );
   }
 
-  // ─── Animated deck — each feature is its own card, cycling forward ────────
+  // ─── Animated deck — a front card cycles over two static peek shells ──────
+  // The two peeks behind give the deck depth (they only show a top sliver, so
+  // their content never matters). Only the front card animates — it rises in
+  // from the deck and slides up & out — which keeps the motion smooth with no
+  // zIndex flicker.
+  const peeks = [
+    { y: -22, scale: 0.90, opacity: 0.4, z: 1 },
+    { y: -11, scale: 0.95, opacity: 0.7, z: 2 },
+  ];
   return (
-    <div style={{ width: "100%", maxWidth: "460px", marginLeft: "auto" }}>
+    <div style={{ width: "100%", maxWidth: "460px", marginInline: "auto" }}>
       {/* paddingTop reserves the room the peeking cards rise into */}
-      <div style={{ position: "relative", paddingTop: "26px" }}>
+      <div style={{ position: "relative", paddingTop: PEEK_TOP }}>
         {/* invisible spacer — gives the absolutely-positioned deck its height */}
         <div style={{ visibility: "hidden" }} aria-hidden>
           <CapabilityCard cap={CAPABILITIES[0]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
         </div>
 
-        {CAPABILITIES.map((cap, i) => {
-          const depth = (i - activeIndex + N) % N;
-          const slot = slotFor(depth);
-          return (
-            <motion.div
-              key={i}
-              style={{ position: "absolute", top: "26px", left: 0, right: 0, transformOrigin: "top center", zIndex: slot.zIndex, pointerEvents: depth === 0 ? "auto" : "none" }}
-              animate={{ y: slot.y, scale: slot.scale, opacity: slot.opacity }}
-              transition={{ type: "spring", stiffness: 280, damping: 30 }}
-            >
-              <CapabilityCard cap={cap} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
-            </motion.div>
-          );
-        })}
+        {/* static peek shells behind the front card */}
+        {peeks.map((p) => (
+          <div
+            key={p.z}
+            aria-hidden
+            style={{ position: "absolute", top: PEEK_TOP, left: 0, right: 0, transformOrigin: "top center", transform: `translateY(${p.y}px) scale(${p.scale})`, opacity: p.opacity, zIndex: p.z, pointerEvents: "none" }}
+          >
+            <CapabilityCard cap={CAPABILITIES[0]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
+          </div>
+        ))}
+
+        {/* front card — cycles through the features */}
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.div
+            key={activeIndex}
+            style={{ position: "absolute", top: PEEK_TOP, left: 0, right: 0, transformOrigin: "top center", zIndex: 3, willChange: "transform, opacity" }}
+            initial={{ y: 14, scale: 0.96, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 32 } }}
+            exit={{ y: -46, scale: 1, opacity: 0, transition: { duration: 0.32, ease: [0.4, 0, 1, 1] } }}
+          >
+            <CapabilityCard cap={CAPABILITIES[activeIndex]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* progress dots */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, MapPin, Users, ArrowRight } from "lucide-react";
@@ -12,6 +12,20 @@ import { HackathonDetailSheet } from "./HackathonDetailSheet";
 
 type LocFilter = "all" | "online" | "inperson";
 type StateFilter = "all" | "open" | "upcoming";
+
+// Desktop ≥900px → 2-col card grid; mobile stays single-column (mirrors the
+// other radar pages). Full-width banner cards are too wide on desktop.
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 900px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
 
 // Keyword-derived topics over a hackathon's themes/title/org. Only chips that
 // match at least one event are shown (no empty chips). First-match-agnostic — an
@@ -87,6 +101,7 @@ function HackathonCard({ h, onOpen }: { h: Hackathon; onOpen: (h: Hackathon) => 
 }
 
 export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
+  const isDesktop = useIsDesktop();
   const [loc, setLoc] = useState<LocFilter>("all");
   const [state, setState] = useState<StateFilter>("all");
   const [topic, setTopic] = useState<string>("all");
@@ -172,7 +187,9 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
           </p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "0 20px" }}>
+        <div style={isDesktop
+          ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "0 20px", alignItems: "start" }
+          : { display: "flex", flexDirection: "column", gap: "12px", padding: "0 20px" }}>
           {visible.map((h, i) => <HackathonCard key={`${h.source}-${i}`} h={h} onOpen={open} />)}
         </div>
       )}

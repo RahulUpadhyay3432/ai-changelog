@@ -10,7 +10,7 @@ import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
 import { CATEGORIES } from "@/lib/categories";
-import { getPost, postTools } from "@/lib/blog-content";
+import { BLOG_POSTS } from "@/lib/blog-content";
 import {
   GOLD, GOLD_SOFT, GOLD_BORDER, CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, TEXT, SG,
 } from "@/lib/design-tokens";
@@ -18,6 +18,7 @@ import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
 import { TopNav } from "./TopNav";
 import { type MarqueeItem } from "./HeroMarquee";
 import { HeroRadarPanel } from "./HeroRadarPanel";
+import { HeroHeadline } from "./HeroHeadline";
 import styles from "./landing.module.css";
 
 export const revalidate = 1800;
@@ -172,8 +173,7 @@ export default async function LandingPage() {
     mainEntity: learn.map((l) => ({ "@type": "Question", name: l.q, acceptedAnswer: { "@type": "Answer", text: l.a } })),
   };
 
-  const guide = getPost("tools-every-vibe-coder-should-know");
-  const guideTools = guide ? postTools(guide) : [];
+  const blogPosts = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
   return (
     <div className={styles.root}>
@@ -189,9 +189,7 @@ export default async function LandingPage() {
                 <span className={styles.livePulse} style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, display: "inline-block" }} />
                 The calm map of AI · {timeAgo(news[0]?.publishedAt)}
               </span>
-              <h1 style={{ fontFamily: SG, fontSize: "clamp(40px, 6vw, 64px)", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.04em", lineHeight: 1.02, margin: "18px 0 0" }}>
-                Find the AI<br />worth <span style={{ color: GOLD }}>using.</span>
-              </h1>
+              <HeroHeadline />
               <p style={{ fontSize: "18px", color: TEXT.body, lineHeight: 1.55, margin: "20px 0 0", maxWidth: "480px" }}>
                 Agents, models, tools, MCP servers and skills — curated, kept current by a calm daily signal. No noise, no paywall, ever.
               </p>
@@ -409,20 +407,31 @@ export default async function LandingPage() {
       </section>
 
       {/* 7.5 · From the blog ───────────────────────────────────────────────── */}
-      {guide && (
+      {blogPosts.length > 0 && (
         <section className={styles.section} style={{ padding: "0 24px 48px" }}>
           <div className={styles.inner}>
-            <SectionHead kicker="From the blog" title="Tools every builder should know" sub="A working set of free front-end tools — the well-known and the deliberately niche — each one on the Radar." />
-            <Link href={`/blog/${guide.slug}`} style={{ display: "block", textDecoration: "none", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 24px" }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {guideTools.map((t) => (
-                  <span key={t.name} style={{ fontFamily: SG, fontSize: "13px", fontWeight: 500, color: TEXT.body, background: CANVAS, border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "6px 13px", whiteSpace: "nowrap" }}>{t.name}</span>
-                ))}
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "22px" }}>
+              <div>
+                <Kicker>From the blog</Kicker>
+                <h2 style={{ fontFamily: SG, fontSize: "28px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: "10px 0 0", lineHeight: 1.1 }}>Guides and opinions worth reading</h2>
               </div>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "18px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: GOLD }}>
-                Read the guide <ArrowRight size={15} strokeWidth={2.4} />
-              </span>
-            </Link>
+              <SeeAll href="/blog">All posts</SeeAll>
+            </div>
+            <div className={styles.blogGrid}>
+              {blogPosts.map((p) => (
+                <Link key={p.slug} href={`/blog/${p.slug}`} style={{ display: "block", textDecoration: "none", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "20px 22px" }}>
+                  <span style={{ display: "inline-block", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "3px 10px" }}>{p.tag}</span>
+                  <h3 style={{ fontFamily: SG, fontSize: "17px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "10px 0 0" }}>{p.title}</h3>
+                  <p style={{ fontSize: "13.5px", color: TEXT.muted, lineHeight: 1.5, margin: "7px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.deck}</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px" }}>
+                    <span style={{ fontSize: "12px", color: TEXT.muted }}>{p.readingMin} min read</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: GOLD }}>
+                      Read <ArrowRight size={13} strokeWidth={2.4} />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -465,7 +474,7 @@ export default async function LandingPage() {
             {[
               { h: "Discover", links: [["Radar", "/radar"], ["Tools & Agents", "/radar/browse"], ["MCP servers", "/radar/mcp"], ["Hackathons", "/radar/hackathons"]] },
               { h: "Stay current", links: [["Today's feed", "/?app=1"], ["Trending", "/trending"], ["Categories", "/categories"], ["RSS", "/feed.xml"]] },
-              { h: "Learn", links: [["Explore concepts", "/explore"], ["For LLMs", "/llms.txt"], ["Open data", "/okf"]] },
+              { h: "Learn", links: [["Blog", "/blog"], ["Explore concepts", "/explore"], ["For LLMs", "/llms.txt"], ["Open data", "/okf"]] },
             ].map((col) => (
               <div key={col.h}>
                 <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{col.h}</span>

@@ -60,7 +60,7 @@ const CARD_STYLE: React.CSSProperties = {
   background: "linear-gradient(180deg, #201e1a, #161411)",
   border: `1px solid ${HAIRLINE}`,
   borderRadius: "18px",
-  boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.45)",
+  boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)",
   padding: "18px 18px 14px",
 };
 
@@ -97,7 +97,7 @@ function CapabilityCard({
       {/* supporting detail points */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "4px 0 16px", borderBottom: `1px solid ${HAIRLINE}` }}>
         {points.map((p) => (
-          <span key={p} style={{ display: "flex", alignItems: "flex-start", gap: "9px", fontSize: "13px", color: TEXT.primary, lineHeight: 1.4 }}>
+          <span key={p} style={{ display: "flex", alignItems: "flex-start", gap: "9px", fontSize: "13px", color: TEXT.body, lineHeight: 1.4 }}>
             <span style={{ width: "18px", height: "18px", borderRadius: "6px", background: "rgba(59,130,246,0.12)", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: "1px" }}>
               <Check size={12} strokeWidth={2.6} color={GOLD} />
             </span>
@@ -189,8 +189,8 @@ export function HeroRadarPanel({
   // from the deck and slides up & out — which keeps the motion smooth with no
   // zIndex flicker.
   const peeks = [
-    { y: -22, scale: 0.90, opacity: 0.4, z: 1 },
-    { y: -11, scale: 0.95, opacity: 0.7, z: 2 },
+    { y: -26, scale: 0.90, opacity: 0.32, z: 1 },
+    { y: -13, scale: 0.95, opacity: 0.55, z: 2 },
   ];
   return (
     <div style={{ width: "100%", maxWidth: "460px", marginInline: "auto" }}>

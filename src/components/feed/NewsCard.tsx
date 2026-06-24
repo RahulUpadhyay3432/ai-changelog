@@ -192,6 +192,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
         background: "#0a0a0a",
         userSelect: "none",
         position: "relative",
+        borderLeft: `3px solid ${category?.colorAccent ?? "#333"}b0`,
       }}
     >
       {/* Hero — slightly taller for cinematic feel */}
@@ -306,6 +307,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           padding: "10px 20px 60px",
           overflow: "hidden",
           minHeight: 0,
+          background: `radial-gradient(ellipse at 50% -20%, ${category?.colorAccent ?? "transparent"}18, transparent 65%)`,
         }}
       >
         {/* Category + time */}

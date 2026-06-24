@@ -9,7 +9,7 @@ import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { Hackathon } from "@/lib/hackathons";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, CoverImage, usePressTap, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, CoverImage, usePressTap, accentFor, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, logoFor, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 import { SectionAllSheet } from "./SectionAllSheet";
@@ -125,6 +125,11 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
 
 function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
   const tap = usePressTap(() => onOpen(thing));
+  const accent = accentFor(thing.categorySlug);
+  const meta =
+    [thing.recency, thing.storySource].filter(Boolean).join(" · ") ||
+    thing.category ||
+    "";
   return (
     <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
@@ -132,8 +137,17 @@ function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarT
         <SourceMark face={thing.face} size={14} />
       </div>
       <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
-      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{thing.valueLine}</span>
-      {thing.metric && <span style={{ marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
+      {meta && (
+        <span style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "4px", fontSize: "11px", fontWeight: 500, color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span aria-hidden style={{ flexShrink: 0, width: "5px", height: "5px", borderRadius: "50%", background: accent.ring }} />
+          {meta}
+        </span>
+      )}
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
+        {thing.metric ? <MetricChip>{thing.metric}</MetricChip> : <span />}
+        <ArrowUpRight size={15} strokeWidth={2} color={TEXT.muted} style={{ flexShrink: 0 }} />
+      </div>
     </motion.button>
   );
 }

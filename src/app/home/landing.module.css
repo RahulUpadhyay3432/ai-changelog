@@ -200,6 +200,11 @@
   gap: 40px;
   align-items: center;
 }
+.toolGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
 .blogGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -215,6 +220,7 @@
   .movingGrid { grid-template-columns: 1fr; }
   .jobsGrid { grid-template-columns: 1fr; }
   .learnGrid { grid-template-columns: 1fr 1fr; }
+  .toolGrid { grid-template-columns: repeat(3, 1fr); }
   .blogGrid { grid-template-columns: 1fr 1fr; }
   .loadoutGrid { grid-template-columns: 1fr; gap: 24px; }
   .footerGrid { grid-template-columns: 1fr 1fr; }
@@ -222,6 +228,7 @@
 @media (max-width: 560px) {
   .mapGrid { grid-template-columns: 1fr; }
   .learnGrid { grid-template-columns: 1fr; }
+  .toolGrid { grid-template-columns: 1fr 1fr; }
   .blogGrid { grid-template-columns: 1fr; }
 }
 

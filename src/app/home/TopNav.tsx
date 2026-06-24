@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, Search } from "lucide-react";
 import { GOLD, HAIRLINE, TEXT, SG } from "@/lib/design-tokens";
 import styles from "./landing.module.css";
 
@@ -79,11 +79,31 @@ export function TopNav() {
           })}
         </div>
 
+        {/* Search icon */}
+        <Link
+          href="/search"
+          aria-label="Search"
+          style={{
+            marginLeft: "auto",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "36px",
+            height: "36px",
+            borderRadius: "10px",
+            border: `1px solid ${HAIRLINE}`,
+            color: TEXT.muted,
+            textDecoration: "none",
+            flexShrink: 0,
+          }}
+        >
+          <Search size={16} strokeWidth={2} />
+        </Link>
+
         {/* Desktop "Open" pill */}
         <Link
           href="/?app=1"
           style={{
-            marginLeft: "auto",
             display: "inline-flex",
             alignItems: "center",
             gap: "5px",
@@ -132,26 +152,46 @@ export function TopNav() {
               {t.label}
             </Link>
           ))}
-          <Link
-            href="/?app=1"
-            onClick={() => setOpen(false)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              marginTop: "14px",
-              fontFamily: SG,
-              fontSize: "15px",
-              fontWeight: 600,
-              color: "#ffffff",
-              background: GOLD,
-              borderRadius: "100px",
-              padding: "10px 18px",
-              textDecoration: "none",
-            }}
-          >
-            Open the app <ArrowUpRight size={16} strokeWidth={2.4} />
-          </Link>
+          <div style={{ display: "flex", gap: "10px", marginTop: "14px", flexWrap: "wrap" }}>
+            <Link
+              href="/search"
+              onClick={() => setOpen(false)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontFamily: SG,
+                fontSize: "15px",
+                fontWeight: 600,
+                color: TEXT.body,
+                border: `1px solid ${HAIRLINE}`,
+                borderRadius: "100px",
+                padding: "10px 18px",
+                textDecoration: "none",
+              }}
+            >
+              <Search size={15} strokeWidth={2} /> Search
+            </Link>
+            <Link
+              href="/?app=1"
+              onClick={() => setOpen(false)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontFamily: SG,
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "#ffffff",
+                background: GOLD,
+                borderRadius: "100px",
+                padding: "10px 18px",
+                textDecoration: "none",
+              }}
+            >
+              Open the app <ArrowUpRight size={16} strokeWidth={2.4} />
+            </Link>
+          </div>
         </div>
       )}
     </nav>

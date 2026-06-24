@@ -277,4 +277,47 @@ export const AI_SKILLS: AiSkill[] = [
     category: "Marketing & social", platform: "GPT",
     url: "https://chatgpt.com/g/g-Hkqnd7mFV-video-gpt-by-veed",
   },
+
+  // ── Additional: Research & analysis ───────────────────────────────────────
+  {
+    name: "NotebookLM",
+    tagline: "Ground a research session in your own documents.",
+    description: "Google's AI research tool indexes your uploaded sources — papers, notes, PDFs, transcripts — and answers questions, writes briefings, and generates audio summaries based solely on what you provide.",
+    category: "Research & analysis", platform: "Gemini",
+    url: "https://notebooklm.google.com",
+  },
+
+  // ── Additional: Design & images ────────────────────────────────────────────
+  {
+    name: "Whimsical Diagrams",
+    tagline: "Sketch flowcharts, mind maps and wireframes from text.",
+    description: "One of the most popular design GPTs — describe a system or idea and get an editable diagram rendered in Whimsical: flowcharts, mind maps, org charts and sequence diagrams.",
+    category: "Design & images", platform: "GPT",
+    url: "https://chatgpt.com/g/g-vI2kaiM9N-whimsical-diagrams",
+  },
+
+  // ── Additional: Productivity & docs ───────────────────────────────────────
+  {
+    name: "Zapier",
+    tagline: "Trigger 7,000+ app automations from the chat.",
+    description: "Zapier's official GPT lets you run and manage Zaps in natural language — connect your tools, automate repetitive work, and check automation status without leaving the conversation.",
+    category: "Productivity & docs", platform: "GPT",
+    url: "https://chatgpt.com/g/g-zdG3jFbLN-zapier",
+  },
+
+  // ── Additional: Learning ───────────────────────────────────────────────────
+  {
+    name: "Speak",
+    tagline: "Practice a foreign language with a real tutor dynamic.",
+    description: "A popular language-learning GPT that runs realistic conversation practice, corrects errors in context, and adapts the lesson to your level and target language.",
+    category: "Learning", platform: "GPT",
+    url: "https://chatgpt.com/g/g-pe1WRgEi8-speak",
+  },
+  {
+    name: "Mr. Ranedeer",
+    tagline: "Adaptive tutor — builds a curriculum to your level.",
+    description: "One of the most used learning GPTs: generates a structured lesson plan on any topic, explains concepts at the right depth, quizzes you, and adjusts as you improve.",
+    category: "Learning", platform: "GPT",
+    url: "https://chatgpt.com/g/g-pdWLoE6XT-mr-ranedeer",
+  },
 ];

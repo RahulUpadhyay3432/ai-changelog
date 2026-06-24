@@ -14,6 +14,7 @@ export interface BlogSection {
   heading: string;
   intro: string;
   tools: BlogTool[];
+  diagram?: string;
 }
 
 export interface BlogPost {
@@ -205,6 +206,142 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
     closing:
       "None of this is about adding more — it's about reaching for the right small tool at the right moment. Save the ones that fit into a Loadout on the Radar, and they'll be there the next time you're staring at a blank section.",
+  },
+  // ─── Guide: AI tech stack ─────────────────────────────────────────────────
+  {
+    slug: "best-ai-tech-stack-for-any-product-2026",
+    title: "The AI tech stack for any product in 2026",
+    deck: "A pragmatic blueprint — from frontend to LLM layer to observability — for building AI-powered products that ship, scale, and don't embarrass you.",
+    date: "2026-06-20",
+    readingMin: 8,
+    tag: "Architecture",
+    intro: [
+      "Every builder eventually asks the same question: what do I actually wire together? The answer in 2026 is simpler than it looks — the ecosystem has converged on a short list of composable primitives. Pick one from each layer and you're most of the way there.",
+      "This isn't a beginner tutorial. It's the list experienced builders actually use, with notes on where each choice gets you and where it costs you.",
+    ],
+    sections: [
+      {
+        heading: "Frontend",
+        intro:
+          "Next.js App Router is the de facto standard. Vercel deploys it in seconds, edge caching handles most traffic, and the AI SDK gives you streaming out of the box. For UI components, Radix primitives with a custom dark theme beats heavy component libraries — you own the look.",
+        diagram: `flowchart TD
+  U([User]) --> F["Next.js App Router\n(Vercel Edge)"]
+  F --> DB[("Supabase\nPostgres + pgvector")]
+  F --> LLM["LLM API\nAnthropic · OpenAI\nOpenRouter"]
+  LLM --> STR["Streaming response"]
+  STR --> F
+  DB --> VEC["Vector search\nRAG retrieval"]
+  VEC --> LLM
+  F --> MON["PostHog · Sentry\nObservability"]`,
+        tools: [
+          { name: "Next.js", valueLine: "App Router, RSC, and built-in API routes — the standard React framework for production apps.", url: "https://nextjs.org" },
+          { name: "Vercel", valueLine: "Deploy Next.js globally with zero config — built-in CDN, preview URLs, and cron support.", url: "https://vercel.com" },
+          { name: "Radix UI", valueLine: "Unstyled, accessible component primitives — own the look, inherit the behavior.", url: "https://radix-ui.com" },
+          { name: "Framer Motion", valueLine: "Production-grade animation for React — springs, gestures, and layout transitions.", url: "https://www.framer.com/motion/" },
+        ],
+      },
+      {
+        heading: "Backend & database",
+        intro:
+          "Supabase gives you Postgres, auth, storage, and pgvector in a single hosted product. pgvector is the key — it means your embeddings live next to your data, no separate vector DB to manage. For heavier ingestion workloads, add a background queue.",
+        tools: [
+          { name: "Supabase", valueLine: "Postgres + auth + storage + pgvector. The fastest path to a production-ready backend.", url: "https://supabase.com" },
+          { name: "Upstash", valueLine: "Serverless Redis and Kafka — rate limiting, queues, and pub/sub without managing infra.", url: "https://upstash.com" },
+          { name: "Neon", valueLine: "Serverless Postgres with branching — a database per PR branch, zero cold start.", url: "https://neon.tech" },
+        ],
+      },
+      {
+        heading: "AI & LLM layer",
+        intro:
+          "Route through OpenRouter unless you have a strong reason not to. It gives you fallback across providers, unified billing, and access to every frontier model. For structured outputs and tool use, Anthropic's Claude consistently produces the most reliable JSON. For embeddings, text-embedding-3-small is fast and cheap enough for most use cases.",
+        tools: [
+          { name: "OpenRouter", valueLine: "One API for 100+ LLMs — switch models without code changes, unified billing.", url: "https://openrouter.ai" },
+          { name: "Vercel AI SDK", valueLine: "Streaming AI responses with built-in support for tool use, RSC, and multiple providers.", url: "https://sdk.vercel.ai" },
+          { name: "LangChain", valueLine: "Composable chains and agents — useful when you need multi-step reasoning or RAG pipelines.", url: "https://www.langchain.com" },
+          { name: "Instructor", valueLine: "Guaranteed structured outputs from LLMs — Pydantic/Zod schemas with automatic retries.", url: "https://python.useinstructor.com" },
+        ],
+      },
+      {
+        heading: "Deployment & observability",
+        intro:
+          "Vercel handles deployment. PostHog handles user analytics and feature flags. Add Sentry for runtime errors. That covers the three questions you'll always ask: did it ship, are people using it, and what broke?",
+        tools: [
+          { name: "PostHog", valueLine: "Open-source product analytics — events, funnels, feature flags, and session replay.", url: "https://posthog.com" },
+          { name: "Sentry", valueLine: "Error tracking with full stack traces — catch what breaks before users report it.", url: "https://sentry.io" },
+          { name: "Axiom", valueLine: "Serverless log ingestion at any scale — structured queries, zero operational overhead.", url: "https://axiom.co" },
+        ],
+      },
+    ],
+    closing:
+      "This stack isn't magic — it's just the combination that eliminates the most decisions. You're not choosing between 30 databases; you're choosing between Supabase and Neon. Start with Supabase. The moment you outgrow it, you'll know exactly why and what to replace it with.",
+  },
+  // ─── Guide: Design checklist ──────────────────────────────────────────────
+  {
+    slug: "vibe-coding-design-checklist",
+    title: "How to make sure your vibe-coded project doesn't suck design-wise",
+    deck: "The 20 decisions that separate a project that looks shipped from one that looks like a demo. Practical, visual, and opinionated.",
+    date: "2026-06-22",
+    readingMin: 6,
+    tag: "Design",
+    intro: [
+      "AI coding tools are incredible at generating functional code. They're less good at generating considered design. The result: a sea of projects that work but look slightly off — too much contrast in the wrong places, font sizes that don't scale, paddings that feel arbitrary.",
+      "This checklist covers the decisions that matter most. It won't turn you into a designer, but it will stop the common mistakes that make otherwise solid projects look unpolished.",
+    ],
+    sections: [
+      {
+        heading: "Color and typography",
+        intro:
+          "Most design mistakes come from too many colors and too many font sizes. Pick one accent color, define three text shades, and enforce a type scale of four sizes. That's the whole system. The decision tree below shows the right order to make these calls.",
+        diagram: `flowchart LR
+  A["Start design"] --> B{"Using a\ndesign system?"}
+  B -- Yes --> C["shadcn/ui or\nRadix + Tailwind"]
+  B -- No --> D["Pick ONE\naccent color"]
+  C --> E["Dark or light\nbackground?"]
+  D --> E
+  E --> F["Set font scale:\nbody 15-16px\nheadings 24-32px"]
+  F --> G["Check mobile\n430px width"]
+  G --> H{"Looks good\non phone?"}
+  H -- No --> F
+  H -- Yes --> I["Ship it"]`,
+        tools: [
+          { name: "Realtime Colors", valueLine: "Visualize a full color palette live on a sample UI before committing to it.", url: "https://www.realtimecolors.com" },
+          { name: "Fontpair", valueLine: "Curated font pairings that actually work — see them together before picking.", url: "https://www.fontpair.co" },
+          { name: "Type Scale", valueLine: "Generate a modular type scale from a base size and ratio — copy the CSS vars.", url: "https://typescale.com" },
+          { name: "Radix Colors", valueLine: "12-step accessible color scales, dark mode included — drop into any design system.", url: "https://www.radix-ui.com/colors" },
+        ],
+      },
+      {
+        heading: "Layout and spacing",
+        intro:
+          "Inconsistent spacing is the most common tell that a project was vibe-coded. Use a 4px or 8px base unit for everything — padding, gap, margin. Never use arbitrary values like 13px or 17px. On mobile (430px), check that tap targets are at least 44px tall.",
+        tools: [
+          { name: "Tailwind CSS", valueLine: "Utility-first CSS with a built-in 4px spacing scale — makes consistent spacing automatic.", url: "https://tailwindcss.com" },
+          { name: "Every Layout", valueLine: "CSS layout primitives (Stack, Sidebar, Grid) that work at every viewport size.", url: "https://every-layout.dev" },
+        ],
+      },
+      {
+        heading: "Component quality",
+        intro:
+          "A few components define the entire feel of a product: the primary button, the input, and the card. Get these three right and the rest follows. For the button: 12-14px border-radius, 500-600 font-weight, enough horizontal padding (16px+). For cards: subtle border, no hard drop shadow.",
+        tools: [
+          { name: "shadcn/ui", valueLine: "Copy-paste components built on Radix — you own the code, you control the style.", url: "https://ui.shadcn.com" },
+          { name: "Radix UI", valueLine: "Unstyled accessible primitives — the behavior is correct, the look is yours to define.", url: "https://radix-ui.com" },
+          { name: "Lucide React", valueLine: "Clean, consistent icon set — 1000+ icons that all feel like they belong together.", url: "https://lucide.dev" },
+        ],
+      },
+      {
+        heading: "Mobile-first testing",
+        intro:
+          "Open DevTools, set the viewport to 430×932 (iPhone 15 Pro), and scroll every page top to bottom. Look for: text that's too small to read, tap targets that overlap, content that overflows the viewport, and navigation that breaks below 480px. Fix these before you ship.",
+        tools: [
+          { name: "Polypane", valueLine: "Browser for developers — test multiple viewports simultaneously, inspect spacing visually.", url: "https://polypane.app" },
+          { name: "BrowserStack", valueLine: "Real device testing across 3000+ device/browser combinations — catch what DevTools misses.", url: "https://www.browserstack.com" },
+          { name: "Storybook", valueLine: "Build and test UI components in isolation — see every state, every viewport, every theme.", url: "https://storybook.js.org" },
+        ],
+      },
+    ],
+    closing:
+      "Design polish isn't about talent — it's about decisions made consistently. Fix the spacing scale, lock down the color palette, and test at 430px. That's 80% of the gap between 'looks like a demo' and 'looks like a product'.",
   },
 ];
 

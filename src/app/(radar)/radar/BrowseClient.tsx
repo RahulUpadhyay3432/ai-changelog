@@ -77,6 +77,13 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
   const cardRef = useRef<HTMLButtonElement>(null);
   const accent = accentFor(thing.categorySlug ?? catSlug);
 
+  // Honest freshness signal from real fields — recency + publisher, else the
+  // category bucket. Never fabricates a brand name.
+  const meta =
+    [thing.recency, thing.storySource].filter(Boolean).join(" · ") ||
+    thing.category ||
+    "";
+
   return (
     <motion.button
       ref={cardRef}
@@ -118,8 +125,19 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
         )}
       </div>
       <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
-      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{thing.valueLine}</span>
-      {thing.metric && <span style={{ display: "block", marginTop: "9px" }}><MetricChip>{thing.metric}</MetricChip></span>}
+      {meta && (
+        <span style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "4px", fontSize: "11px", fontWeight: 500, color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span aria-hidden style={{ flexShrink: 0, width: "5px", height: "5px", borderRadius: "50%", background: accent.ring }} />
+          {meta}
+        </span>
+      )}
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
+
+      {/* Footer — anchored to the bottom so every card reads as header/body/footer */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
+        {thing.metric ? <MetricChip>{thing.metric}</MetricChip> : <span />}
+        <ArrowUpRight size={15} strokeWidth={2} color={mouse ? accent.fg : TEXT.muted} style={{ flexShrink: 0, transition: "color 0.2s ease" }} />
+      </div>
     </motion.button>
   );
 }

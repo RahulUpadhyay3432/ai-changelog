@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ArrowRight } from "lucide-react";
 import { BLOG_POSTS, getPost, postTools, type BlogTool } from "@/lib/blog-content";
+import { MermaidDiagram } from "@/components/blog/MermaidDiagram";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG } from "@/lib/design-tokens";
 import styles from "../blog.module.css";
 
@@ -147,6 +148,7 @@ export default async function BlogPostPage({ params }: Props) {
         <section key={sec.heading} style={{ margin: "34px 0 0" }}>
           <h2 style={{ fontFamily: SG, fontSize: "22px", fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em", margin: 0 }}>{sec.heading}</h2>
           <p style={{ fontSize: "15.5px", color: "#b3afa8", lineHeight: 1.65, margin: "10px 0 0" }}>{sec.intro}</p>
+          {sec.diagram && <MermaidDiagram chart={sec.diagram} />}
           <div className={styles.toolGrid}>
             {sec.tools.map((t) => <ToolCard key={t.name} tool={t} />)}
           </div>

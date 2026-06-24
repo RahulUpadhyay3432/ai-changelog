@@ -148,6 +148,22 @@ export default async function LandingPage() {
     display: "block", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "18px", textDecoration: "none", color: "inherit",
   };
 
+  // Hand-picked 12 — 3 from each key category. Order matters (most recognisable first).
+  const ESSENTIALS_SHOWCASE = [
+    { name: "ChatGPT",       valueLine: "Reason, write, and prototype with OpenAI's frontier models.",          url: "https://chatgpt.com" },
+    { name: "Claude",        valueLine: "Long-context reasoning and coding with Anthropic's models.",           url: "https://claude.ai" },
+    { name: "Gemini",        valueLine: "Multimodal reasoning across text, image, and video.",                  url: "https://gemini.google.com" },
+    { name: "Cursor",        valueLine: "AI-native editor that edits across your whole repo.",                  url: "https://cursor.com" },
+    { name: "Claude Code",   valueLine: "Agentic coding in your terminal — plans and edits across files.",      url: "https://claude.com/claude-code" },
+    { name: "Lovable",       valueLine: "Build and ship full web apps from a prompt.",                          url: "https://lovable.dev" },
+    { name: "v0",            valueLine: "Generate polished UI components from text or a screenshot.",           url: "https://v0.dev" },
+    { name: "Bolt",          valueLine: "Full-stack AI apps in your browser — no local setup needed.",          url: "https://bolt.new" },
+    { name: "Figma",         valueLine: "The collaborative design tool — now with AI-powered features.",        url: "https://figma.com" },
+    { name: "Supabase",      valueLine: "Postgres + auth + storage + pgvector, ready in minutes.",              url: "https://supabase.com" },
+    { name: "Vercel",        valueLine: "Deploy and scale Next.js apps globally with zero config.",             url: "https://vercel.com" },
+    { name: "OpenRouter",    valueLine: "One API for 100+ LLMs — switch models without code changes.",          url: "https://openrouter.ai" },
+  ];
+
   // ── JSON-LD ──
   const navJsonLd = {
     "@context": "https://schema.org",
@@ -259,7 +275,46 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* 4 · Moving Now ────────────────────────────────────────────────────── */}
+      {/* 4 · Essential Toolkit ─────────────────────────────────────────────── */}
+      <section className={styles.section} style={{ padding: "0 24px 48px" }}>
+        <div className={styles.inner}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "22px", gap: "12px", flexWrap: "wrap" }}>
+            <div>
+              <Kicker>Essential toolkit</Kicker>
+              <h2 style={{ fontFamily: SG, fontSize: "28px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: "10px 0 0", lineHeight: 1.1 }}>
+                The tools every AI builder uses
+              </h2>
+            </div>
+            <SeeAll href="/radar/browse">See full toolkit</SeeAll>
+          </div>
+          <div className={styles.toolGrid}>
+            {ESSENTIALS_SHOWCASE.map((tool) => {
+              const fav = faviconFor(tool.url);
+              return (
+                <a
+                  key={tool.name}
+                  href={tool.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "flex", flexDirection: "column", gap: "8px",
+                    background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px",
+                    padding: "12px 14px", textDecoration: "none",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    {fav && <img src={fav} alt="" width={20} height={20} style={{ borderRadius: "5px", flexShrink: 0 }} />}
+                    <span style={{ fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.name}</span>
+                  </div>
+                  <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{tool.valueLine}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 5 · Moving Now ────────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>
         <div className={styles.inner}>
           <SectionHead kicker="Moving now" title="What changed this week" />

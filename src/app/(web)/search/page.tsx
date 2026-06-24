@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Search, ArrowUpRight } from "lucide-react";
@@ -86,7 +86,7 @@ function match(r: SearchResult, q: string): boolean {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function SearchPage() {
+function SearchInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -225,5 +225,13 @@ export default function SearchPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchInner />
+    </Suspense>
   );
 }

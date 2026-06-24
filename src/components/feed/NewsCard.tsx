@@ -192,7 +192,6 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
         background: "#0a0a0a",
         userSelect: "none",
         position: "relative",
-        borderLeft: `3px solid ${category?.colorAccent ?? "#333"}b0`,
       }}
     >
       {/* Hero — slightly taller for cinematic feel */}

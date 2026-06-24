@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BLOG_POSTS, postTools } from "@/lib/blog-content";
-import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG } from "@/lib/design-tokens";
+import { GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT } from "@/lib/design-tokens";
 import styles from "./blog.module.css";
 
 const APP_URL = "https://kapyn.app";
@@ -32,6 +32,7 @@ function fmtDate(iso: string): string {
 
 export default function BlogIndex() {
   const posts = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
+  const [featured, ...rest] = posts;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -44,50 +45,76 @@ export default function BlogIndex() {
       headline: p.title,
       description: p.deck,
       datePublished: p.date,
+      image: p.hero?.src,
       url: `${APP_URL}/blog/${p.slug}`,
       author: { "@type": "Organization", name: "Kapyn" },
     })),
   };
 
+  const tagChip = (tag: string, small?: boolean) => (
+    <span style={{ display: "inline-block", fontFamily: SG, fontSize: small ? "10.5px" : "11.5px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: small ? "2px 9px" : "3px 10px" }}>
+      {tag}
+    </span>
+  );
+
+  const meta = (p: (typeof posts)[number]) => (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "12px 0 0", fontSize: "12.5px", color: TEXT.muted }}>
+      <span>{fmtDate(p.date)}</span>
+      <span aria-hidden>·</span>
+      <span>{p.readingMin} min read</span>
+      <span aria-hidden>·</span>
+      <span>{postTools(p).length} tools</span>
+    </div>
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <header style={{ margin: "4px 0 28px" }}>
+      <header style={{ margin: "4px 0 30px" }}>
         <span style={{ fontFamily: SG, fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>
           The Kapyn Blog
         </span>
-        <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 40px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.08, margin: "12px 0 0", color: "#f5f5f5" }}>
+        <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 42px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.06, margin: "12px 0 0", color: TEXT.primary }}>
           Guides on the AI and tools worth using
         </h1>
-        <p style={{ fontSize: "16px", color: "#a3a3a3", lineHeight: 1.55, margin: "14px 0 0", maxWidth: "560px" }}>
+        <p style={{ fontSize: "16px", color: TEXT.muted, lineHeight: 1.55, margin: "14px 0 0", maxWidth: "560px" }}>
           {DESC}
         </p>
       </header>
 
-      <div className={styles.posts}>
-        {posts.map((p) => (
-          <Link
-            key={p.slug}
-            href={`/blog/${p.slug}`}
-            style={{ display: "block", textDecoration: "none", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 22px" }}
-          >
-            <span style={{ display: "inline-block", fontFamily: SG, fontSize: "11.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "3px 10px" }}>
-              {p.tag}
-            </span>
-            <h2 style={{ fontFamily: SG, fontSize: "21px", fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em", lineHeight: 1.2, margin: "12px 0 0" }}>
-              {p.title}
+      {/* Featured (newest) */}
+      {featured && (
+        <Link href={`/blog/${featured.slug}`} className={styles.featuredCard}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={featured.hero.src} alt="" className={styles.featuredThumb} />
+          <div className={styles.featuredBody}>
+            {tagChip(featured.tag)}
+            <h2 style={{ fontFamily: SG, fontSize: "clamp(22px, 3vw, 28px)", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", lineHeight: 1.15, margin: "12px 0 0" }}>
+              {featured.title}
             </h2>
-            <p style={{ fontSize: "14.5px", color: "#a3a3a3", lineHeight: 1.55, margin: "8px 0 0" }}>{p.deck}</p>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "14px 0 0", fontSize: "13px", color: "#737373" }}>
-              <span>{fmtDate(p.date)}</span>
-              <span aria-hidden>·</span>
-              <span>{p.readingMin} min read</span>
-              <span aria-hidden>·</span>
-              <span>{postTools(p).length} tools</span>
-              <span style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: "4px", color: GOLD, fontWeight: 600, fontFamily: SG }}>
-                Read <ArrowRight size={14} strokeWidth={2.4} />
-              </span>
+            <p style={{ fontSize: "15px", color: TEXT.muted, lineHeight: 1.55, margin: "10px 0 0", maxWidth: "560px" }}>{featured.deck}</p>
+            {meta(featured)}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", margin: "16px 0 0", color: GOLD, fontWeight: 600, fontFamily: SG, fontSize: "14px" }}>
+              Read the article <ArrowRight size={15} strokeWidth={2.4} />
+            </span>
+          </div>
+        </Link>
+      )}
+
+      {/* Rest — grid with thumbnails */}
+      <div className={styles.postGrid}>
+        {rest.map((p) => (
+          <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.postCard}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.hero.src} alt="" className={styles.postThumb} loading="lazy" />
+            <div className={styles.postCardBody}>
+              {tagChip(p.tag, true)}
+              <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", lineHeight: 1.22, margin: "10px 0 0" }}>
+                {p.title}
+              </h2>
+              <p style={{ fontSize: "13.5px", color: TEXT.muted, lineHeight: 1.5, margin: "8px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.deck}</p>
+              {meta(p)}
             </div>
           </Link>
         ))}

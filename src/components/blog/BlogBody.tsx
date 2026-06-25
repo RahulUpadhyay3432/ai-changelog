@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, Info, Lightbulb, AlertTriangle } from "lucide-react";
 import { MermaidDiagram } from "@/components/blog/MermaidDiagram";
 import { slugify, type BlogBlock, type BlogTool } from "@/lib/blog-content";
-import { GOLD, HAIRLINE, SURFACE, SG } from "@/lib/design-tokens";
+import { HAIRLINE, SG } from "@/lib/design-tokens";
 import styles from "../../app/(web)/blog/blog.module.css";
 
 // ─── Inline formatter ────────────────────────────────────────────────────────
@@ -14,17 +14,17 @@ const INLINE_RE = /(\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g;
 const inlineCodeStyle: React.CSSProperties = {
   fontFamily: 'ui-monospace, "Geist Mono", "SF Mono", Menlo, monospace',
   fontSize: "0.875em",
-  background: "rgba(255,255,255,0.06)",
+  background: "rgba(255,255,255,0.07)",
   border: `1px solid ${HAIRLINE}`,
   borderRadius: "5px",
   padding: "1px 5px",
-  color: "#e8e4de",
+  color: "#efebe2",
 };
 const linkStyle: React.CSSProperties = {
-  color: GOLD,
+  color: "var(--accent, #5b9bff)",
   textDecoration: "underline",
   textUnderlineOffset: "2px",
-  textDecorationColor: "rgba(59,130,246,0.4)",
+  textDecorationColor: "rgba(91,155,255,0.45)",
 };
 
 export function renderInline(text: string): React.ReactNode[] {
@@ -37,7 +37,7 @@ export function renderInline(text: string): React.ReactNode[] {
     if (m.index > last) nodes.push(text.slice(last, m.index));
     if (m[2] !== undefined) {
       nodes.push(
-        <strong key={key++} style={{ color: "#f6f4f0", fontWeight: 600 }}>
+        <strong key={key++} style={{ color: "var(--heading, #fbfaf7)", fontWeight: 600 }}>
           {m[2]}
         </strong>
       );

@@ -4,8 +4,9 @@ import { useState } from "react";
 import { Link2, Check } from "lucide-react";
 import { HAIRLINE, SG, TEXT } from "@/lib/design-tokens";
 
-// Minimal share affordances under the byline: X, LinkedIn, copy-link.
-export function ShareRow({ url, title }: { url: string; title: string }) {
+// Minimal share affordances: X, LinkedIn, copy-link. `vertical` stacks them for
+// the sticky right rail; default is the inline row used under the byline.
+export function ShareRow({ url, title, vertical = false }: { url: string; title: string; vertical?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -36,11 +37,22 @@ export function ShareRow({ url, title }: { url: string; title: string }) {
     padding: "6px 12px",
     textDecoration: "none",
     cursor: "pointer",
+    ...(vertical ? { justifyContent: "flex-start", width: "100%" } : null),
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-      <span style={{ fontSize: "12px", color: TEXT.muted, fontFamily: SG, marginRight: "2px" }}>Share</span>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: vertical ? "column" : "row",
+        alignItems: vertical ? "stretch" : "center",
+        gap: "8px",
+        flexWrap: vertical ? "nowrap" : "wrap",
+      }}
+    >
+      <span style={{ fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted, fontFamily: SG, fontWeight: 700, marginRight: vertical ? 0 : "2px", marginBottom: vertical ? "2px" : 0 }}>
+        Share
+      </span>
       <a href={xUrl} target="_blank" rel="noopener noreferrer" style={btn} aria-label="Share on X">
         X
       </a>

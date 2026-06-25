@@ -6,7 +6,9 @@ import { BLOG_POSTS, getPost, postTools, tableOfContents } from "@/lib/blog-cont
 import { BlogBody } from "@/components/blog/BlogBody";
 import { ArticleToc } from "@/components/blog/ArticleToc";
 import { ShareRow } from "@/components/blog/ShareRow";
-import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG, TEXT } from "@/lib/design-tokens";
+import { BlogReader } from "@/components/blog/BlogReader";
+import { GOLD, GOLD_SOFT, GOLD_BORDER, SG } from "@/lib/design-tokens";
+import { READING } from "../theme";
 import styles from "../blog.module.css";
 
 const APP_URL = "https://kapyn.app";
@@ -92,76 +94,84 @@ export default async function BlogPostPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
 
-      <Link href="/blog" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.muted, textDecoration: "none", margin: "0 0 20px" }}>
-        <ArrowLeft size={14} strokeWidth={2.3} /> All posts
-      </Link>
-
-      {/* Hero — image with overlaid tag, title, deck */}
-      <header className={styles.hero}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.hero.src} alt={post.hero.alt} className={styles.heroImg} />
-        <div className={styles.heroOverlay} aria-hidden />
-        <div className={styles.heroInner}>
-          <span style={{ display: "inline-block", fontFamily: SG, fontSize: "11.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "#fff", background: "rgba(59,130,246,0.85)", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "3px 10px" }}>
-            {post.tag}
-          </span>
-          <h1 className={styles.heroTitle}>{post.title}</h1>
-          <p className={styles.heroDeck}>{post.deck}</p>
-        </div>
-      </header>
-
-      {/* Byline */}
-      <div className={styles.byline}>
-        <span className={styles.avatar} aria-hidden>K</span>
-        <div style={{ minWidth: 0 }}>
-          <span style={{ display: "block", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary }}>Kapyn</span>
-          <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted }}>
-            {fmtDate(post.date)} · {post.readingMin} min read
-          </span>
-        </div>
-        <div style={{ marginLeft: "auto" }}>
-          <ShareRow url={url} title={post.title} />
-        </div>
-      </div>
-
-      <ArticleToc items={toc} />
-
-      <BlogBody body={post.body} />
-
-      {/* CTA → Radar */}
-      <div style={{ margin: "44px 0 0", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px 24px" }}>
-        <div style={{ flex: 1, minWidth: "220px" }}>
-          <h3 style={{ fontFamily: SG, fontSize: "17px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Find these on the Radar</h3>
-          <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Every tool here lives on Kapyn Radar. Save the ones that fit into a Loadout and find them again.</p>
-        </div>
-        <Link href="/radar/browse" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "12px 20px", textDecoration: "none" }}>
-          Open the Radar <ArrowRight size={16} strokeWidth={2.4} />
-        </Link>
-      </div>
-
-      {/* Keep reading */}
-      {related.length > 0 && (
-        <section style={{ margin: "52px 0 0" }}>
-          <h2 style={{ fontFamily: SG, fontSize: "13px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: TEXT.muted, margin: "0 0 16px" }}>
-            Keep reading
-          </h2>
-          <div className={styles.relatedGrid}>
-            {related.map((p) => (
-              <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.relatedCard}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.hero.src} alt="" className={styles.relatedThumb} loading="lazy" />
-                <div style={{ padding: "14px 16px 16px" }}>
-                  <span style={{ display: "inline-block", fontFamily: SG, fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "2px 9px" }}>
-                    {p.tag}
-                  </span>
-                  <h3 style={{ fontFamily: SG, fontSize: "16px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", lineHeight: 1.25, margin: "10px 0 0" }}>{p.title}</h3>
-                  <p style={{ fontSize: "13px", color: TEXT.muted, lineHeight: 1.5, margin: "6px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.deck}</p>
-                </div>
-              </Link>
-            ))}
+      <BlogReader
+        toc={toc}
+        url={url}
+        title={post.title}
+        hero={
+          <header className={styles.hero}>
+            <Link href="/blog" className={styles.heroBack}>
+              <ArrowLeft size={14} strokeWidth={2.3} /> All posts
+            </Link>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={post.hero.src} alt={post.hero.alt} className={styles.heroImg} />
+            <div className={styles.heroOverlay} aria-hidden />
+            <div className={styles.heroInner}>
+              <span style={{ display: "inline-block", fontFamily: SG, fontSize: "11.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "#fff", background: "rgba(59,130,246,0.85)", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "3px 10px" }}>
+                {post.tag}
+              </span>
+              <h1 className={styles.heroTitle}>{post.title}</h1>
+              <p className={styles.heroDeck}>{post.deck}</p>
+            </div>
+          </header>
+        }
+      >
+        {/* Byline */}
+        <div className={styles.byline}>
+          <span className={styles.avatar} aria-hidden>K</span>
+          <div style={{ minWidth: 0 }}>
+            <span style={{ display: "block", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: READING.heading }}>Kapyn</span>
+            <span style={{ display: "block", fontSize: "12.5px", color: READING.muted }}>
+              {fmtDate(post.date)} · {post.readingMin} min read
+            </span>
           </div>
-        </section>
-      )}
+          <div className={styles.tabletShare}>
+            <ShareRow url={url} title={post.title} />
+          </div>
+        </div>
+
+        {/* Mobile / tablet inline TOC (the sticky rail covers desktop) */}
+        <div className={styles.tocMobileWrap}>
+          <ArticleToc items={toc} />
+        </div>
+
+        <BlogBody body={post.body} />
+
+        {/* CTA → Radar */}
+        <div style={{ margin: "44px 0 0", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", background: READING.surface, border: `1px solid ${READING.hairline}`, borderRadius: "16px", padding: "22px 24px" }}>
+          <div style={{ flex: 1, minWidth: "220px" }}>
+            <h3 style={{ fontFamily: SG, fontSize: "17px", fontWeight: 700, color: READING.heading, margin: 0 }}>Find these on the Radar</h3>
+            <p style={{ fontSize: "14px", color: READING.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Every tool here lives on Kapyn Radar. Save the ones that fit into a Loadout and find them again.</p>
+          </div>
+          <Link href="/radar/browse" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "12px 20px", textDecoration: "none" }}>
+            Open the Radar <ArrowRight size={16} strokeWidth={2.4} />
+          </Link>
+        </div>
+
+        {/* Keep reading */}
+        {related.length > 0 && (
+          <section style={{ margin: "52px 0 0" }}>
+            <h2 style={{ fontFamily: SG, fontSize: "13px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: READING.muted, margin: "0 0 16px" }}>
+              Keep reading
+            </h2>
+            <div className={styles.relatedGrid}>
+              {related.map((p) => (
+                <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.relatedCard}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.hero.src} alt="" className={styles.relatedThumb} loading="lazy" />
+                  <div style={{ padding: "14px 16px 16px" }}>
+                    <span style={{ display: "inline-block", fontFamily: SG, fontSize: "10.5px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "2px 9px" }}>
+                      {p.tag}
+                    </span>
+                    <h3 style={{ fontFamily: SG, fontSize: "16px", fontWeight: 700, color: READING.heading, letterSpacing: "-0.02em", lineHeight: 1.25, margin: "10px 0 0" }}>{p.title}</h3>
+                    <p style={{ fontSize: "13px", color: READING.muted, lineHeight: 1.5, margin: "6px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.deck}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </BlogReader>
     </article>
   );
 }

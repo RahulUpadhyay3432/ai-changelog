@@ -144,13 +144,14 @@ function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarT
   const nav = useThingNav();
   const tap = usePressTap(() => nav(thing, onOpen));
   const accent = accentFor(thing.categorySlug);
+  const directImage = thing.imageUrl?.startsWith("http") ? thing.imageUrl : null;
   const meta =
     [thing.recency, thing.storySource].filter(Boolean).join(" · ") ||
     thing.category ||
     "";
   return (
     <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
-      <CoverImage src={thing.imageUrl} category={thing.categorySlug} face={thing.face} height={128} radius={11} style={{ marginBottom: "10px" }} />
+      {directImage && <CoverImage src={directImage} category={thing.categorySlug} face={thing.face} height={128} radius={11} style={{ marginBottom: "10px" }} />}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
         <SourceMark face={thing.face} size={14} />
@@ -358,9 +359,10 @@ function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => 
 function RailCard({ thing, wide, fill, onOpen }: { thing: RadarThing; wide: boolean; fill?: boolean; onOpen: (t: RadarThing) => void }) {
   const nav = useThingNav();
   const tap = usePressTap(() => nav(thing, onOpen));
+  const directImage = thing.imageUrl?.startsWith("http") ? thing.imageUrl : null;
   return (
     <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: fill ? "100%" : wide ? "262px" : "210px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", textAlign: "left", cursor: "pointer", color: "inherit", overflow: "hidden" }}>
-      <CoverImage src={thing.imageUrl} category={thing.categorySlug} face={thing.face} height={120} radius={11} style={{ marginBottom: "10px" }} />
+      {directImage && <CoverImage src={directImage} category={thing.categorySlug} face={thing.face} height={120} radius={11} style={{ marginBottom: "10px" }} />}
       <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
       <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, margin: "8px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
       <p style={{ fontSize: "13px", color: TEXT.body, lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>

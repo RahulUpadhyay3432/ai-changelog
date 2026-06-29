@@ -1,4 +1,5 @@
 import { BottomNav } from "@/components/layout/BottomNav";
+import { CommandPalette } from "@/components/CommandPalette";
 import { RadarSideNav } from "./_RadarNav";
 import styles from "./layout.module.css";
 
@@ -13,6 +14,7 @@ export default function RadarLayout({ children }: { children: React.ReactNode })
         <BottomNav />
       </div>
       <div id="phone-overlay-root" className={styles.overlayRoot} />
+      <CommandPalette />
     </div>
   );
 }

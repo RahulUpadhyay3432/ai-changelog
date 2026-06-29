@@ -181,6 +181,12 @@ export function categoryEmoji(category: string | null | undefined): string {
   return CATEGORY_EMOJI[category] ?? "✨";
 }
 
+// Same-origin cover image for a tool's site (og:image → screenshot → gradient).
+// CoverImage falls back to the category gradient if this 204s / fails to load.
+function ogProxy(url: string | null | undefined): string | null {
+  return url ? `/api/og-image?url=${encodeURIComponent(url)}` : null;
+}
+
 // Trending GitHub / Product Hunt launch.
 export function toolThing(t: RadarTool): RadarThing {
   return {
@@ -190,6 +196,7 @@ export function toolThing(t: RadarTool): RadarThing {
     category: categorizeTool(t.topics, t.source), url: t.url, recency: null,
     storyTitle: null, storySource: null,
     description: t.description ?? null, topics: t.topics,
+    imageUrl: t.imageUrl ?? ogProxy(t.url),
     logoUrl: t.imageUrl ?? logoFor(t.url),
   };
 }
@@ -201,6 +208,7 @@ export function essThing(t: RadarTool): RadarThing {
     metric: null, typeLabel: null, category: t.meta ?? "Essentials",
     url: t.url, recency: null, storyTitle: null, storySource: null,
     description: t.description ?? null, topics: t.topics,
+    imageUrl: ogProxy(t.url),
     logoUrl: logoFor(t.url),
   };
 }
@@ -213,6 +221,7 @@ export function canonThing(t: RadarTool): RadarThing {
     url: t.url, recency: null, storyTitle: null, storySource: null,
     categorySlug: "open-source",
     description: t.description ?? null, topics: t.topics,
+    imageUrl: ogProxy(t.url),
     logoUrl: logoFor(t.url),
   };
 }

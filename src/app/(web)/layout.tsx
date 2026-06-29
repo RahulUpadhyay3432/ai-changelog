@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { CommandPalette } from "@/components/CommandPalette";
 import styles from "./layout.module.css";
 
 // Nested layout for the (web) route group — sits under the root layout (html/
@@ -37,6 +38,8 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
           Every story that matters, distilled to 30 seconds. No paywall, ever.
         </span>
       </footer>
+
+      <CommandPalette />
     </div>
   );
 }

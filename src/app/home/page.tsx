@@ -15,6 +15,7 @@ import {
   GOLD, GOLD_SOFT, GOLD_BORDER, CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, TEXT, SG,
 } from "@/lib/design-tokens";
 import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
+import { CommandPalette } from "@/components/CommandPalette";
 import { TopNav } from "./TopNav";
 import { type MarqueeItem } from "./HeroMarquee";
 import { HeroRadarPanel } from "./HeroRadarPanel";
@@ -195,6 +196,7 @@ export default async function LandingPage() {
   return (
     <div className={styles.root}>
       <TopNav />
+      <CommandPalette />
 
       {/* 1 · Hero ──────────────────────────────────────────────────────────── */}
       <header className={styles.heroWrap}>

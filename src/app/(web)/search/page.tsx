@@ -4,87 +4,9 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Search, ArrowUpRight } from "lucide-react";
-import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
-import { MCP_SERVERS } from "@/lib/radar-mcp";
-import { AI_SKILLS } from "@/lib/radar-skills";
-import { BLOG_POSTS } from "@/lib/blog-content";
+import { ALL_RESULTS, KIND_LABEL, KIND_ORDER, faviconFor, searchAll, totalResults } from "@/lib/search-index";
 import { GOLD, HAIRLINE, SURFACE, TEXT, SG } from "@/lib/design-tokens";
 import styles from "../layout.module.css";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-type ResultKind = "tool" | "mcp" | "skill" | "guide";
-
-interface SearchResult {
-  kind: ResultKind;
-  name: string;
-  tagline: string;
-  category: string;
-  url: string;
-  external: boolean;
-}
-
-// ─── Data indexing ───────────────────────────────────────────────────────────
-
-const ALL_RESULTS: SearchResult[] = [
-  ...CURATED_ESSENTIALS.map((e) => ({
-    kind: "tool" as const,
-    name: e.name,
-    tagline: e.valueLine,
-    category: e.category,
-    url: e.url,
-    external: true,
-  })),
-  ...MCP_SERVERS.map((m) => ({
-    kind: "mcp" as const,
-    name: m.name,
-    tagline: m.tagline,
-    category: m.category,
-    url: m.url,
-    external: true,
-  })),
-  ...AI_SKILLS.map((s) => ({
-    kind: "skill" as const,
-    name: s.name,
-    tagline: s.tagline,
-    category: s.category,
-    url: s.url,
-    external: true,
-  })),
-  ...BLOG_POSTS.map((p) => ({
-    kind: "guide" as const,
-    name: p.title,
-    tagline: p.deck,
-    category: p.tag,
-    url: `/blog/${p.slug}`,
-    external: false,
-  })),
-];
-
-const KIND_LABEL: Record<ResultKind, string> = {
-  tool: "Tools & Agents",
-  mcp: "MCP Servers",
-  skill: "AI Skills",
-  guide: "Guides",
-};
-
-const KIND_ORDER: ResultKind[] = ["tool", "mcp", "skill", "guide"];
-
-function faviconFor(url: string): string | null {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    return `/api/favicon?domain=${encodeURIComponent(host)}`;
-  } catch {
-    return null;
-  }
-}
-
-function match(r: SearchResult, q: string): boolean {
-  const hay = `${r.name} ${r.tagline} ${r.category}`.toLowerCase();
-  return hay.includes(q.toLowerCase());
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 function SearchInner() {
   const searchParams = useSearchParams();
@@ -105,17 +27,8 @@ function SearchInner() {
 
   const trimmed = query.trim();
   const hasQuery = trimmed.length >= 2;
-
-  const grouped = hasQuery
-    ? KIND_ORDER.reduce<Record<ResultKind, SearchResult[]>>((acc, k) => {
-        acc[k] = ALL_RESULTS.filter((r) => r.kind === k && match(r, trimmed));
-        return acc;
-      }, { tool: [], mcp: [], skill: [], guide: [] })
-    : null;
-
-  const totalResults = grouped
-    ? KIND_ORDER.reduce((n, k) => n + grouped[k].length, 0)
-    : 0;
+  const grouped = hasQuery ? searchAll(trimmed) : null;
+  const total = grouped ? totalResults(grouped) : 0;
 
   return (
     <main className={styles.main} style={{ paddingTop: "40px", paddingBottom: "60px" }}>
@@ -176,7 +89,7 @@ function SearchInner() {
       )}
 
       {/* No results */}
-      {hasQuery && totalResults === 0 && (
+      {hasQuery && total === 0 && (
         <div style={{ color: TEXT.muted, fontSize: "14px", lineHeight: 1.7 }}>
           <p>No results for <strong style={{ color: TEXT.body }}>&ldquo;{trimmed}&rdquo;</strong>.</p>
           <p>
@@ -190,7 +103,7 @@ function SearchInner() {
       )}
 
       {/* Results */}
-      {grouped && totalResults > 0 && (
+      {grouped && total > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
           {KIND_ORDER.filter((k) => grouped[k].length > 0).map((kind) => (
             <div key={kind}>
@@ -199,24 +112,24 @@ function SearchInner() {
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                 {grouped[kind].map((r) => {
-                  const fav = r.external ? faviconFor(r.url) : null;
-                  const inner = (
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "11px 14px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", textDecoration: "none", color: "inherit" }}>
-                      {fav && <img src={fav} alt="" width={22} height={22} style={{ borderRadius: "6px", flexShrink: 0 }} />}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontFamily: SG, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary }}>{r.name}</span>
-                          <span style={{ fontSize: "11px", fontWeight: 600, color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "1px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{r.category}</span>
+                  const fav = faviconFor(r.siteUrl);
+                  return (
+                    <Link key={r.href} href={r.href} style={{ textDecoration: "none", display: "block" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "11px 14px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", color: "inherit" }}>
+                        {fav && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={fav} alt="" width={22} height={22} style={{ borderRadius: "6px", flexShrink: 0 }} />
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span style={{ fontFamily: SG, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary }}>{r.name}</span>
+                            <span style={{ fontSize: "11px", fontWeight: 600, color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "1px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{r.category}</span>
+                          </div>
+                          <span style={{ fontSize: "12.5px", color: TEXT.muted, display: "block", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.tagline}</span>
                         </div>
-                        <span style={{ fontSize: "12.5px", color: TEXT.muted, display: "block", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.tagline}</span>
+                        <ArrowUpRight size={15} color={TEXT.muted} strokeWidth={2} style={{ flexShrink: 0 }} />
                       </div>
-                      <ArrowUpRight size={15} color={TEXT.muted} strokeWidth={2} style={{ flexShrink: 0 }} />
-                    </div>
-                  );
-                  return r.external ? (
-                    <a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>{inner}</a>
-                  ) : (
-                    <Link key={r.url} href={r.url} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>
+                    </Link>
                   );
                 })}
               </div>

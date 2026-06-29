@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, Compass, Plug, ArrowUpRight } from "lucide-react";
 import posthog from "posthog-js";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
+import { slugForUrl } from "@/lib/tools-registry";
 import {
-  FaceMark, MetricChip, accentFor,
+  FaceMark, MetricChip, CoverImage, accentFor,
   GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
   type RadarThing,
 } from "./radar-shared";
@@ -73,6 +75,7 @@ const PRESS = { type: "spring" as const, stiffness: 440, damping: 28 };
 //     covers). FaceMark renders the brand logo on a light chip, or nothing when
 //     none resolves; the type tag stays right-aligned either way. ────────────────
 function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: CategorySlug | null; onOpen: (t: RadarThing) => void }) {
+  const router = useRouter();
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
   const accent = accentFor(thing.categorySlug ?? catSlug);
@@ -84,12 +87,27 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
     thing.category ||
     "";
 
+  // Curated tools have a static detail page; everything else opens the sheet.
+  const detailSlug = slugForUrl(thing.url);
+  const handleOpen = () => {
+    if (detailSlug) {
+      posthog.capture("radar_tool_opened", { slug: detailSlug, category: thing.category });
+      router.push(`/tools/${detailSlug}`);
+    } else {
+      onOpen(thing);
+    }
+  };
+  const openExternal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (thing.url) window.open(thing.url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <motion.button
       ref={cardRef}
       whileTap={{ scale: 0.97 }}
       transition={PRESS}
-      onClick={() => onOpen(thing)}
+      onClick={handleOpen}
       onMouseMove={(e) => {
         const rect = cardRef.current?.getBoundingClientRect();
         if (rect) setMouse({ x: e.clientX - rect.left, y: e.clientY - rect.top });
@@ -98,45 +116,55 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       style={{
         display: "flex", flexDirection: "column", textAlign: "left",
         background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px",
-        padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
+        padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
         minWidth: 0, width: "100%", position: "relative", overflow: "hidden",
       }}
     >
       {/* Per-category spotlight on hover */}
       {mouse && (
         <div aria-hidden style={{
-          position: "absolute", inset: 0, borderRadius: "16px", pointerEvents: "none",
+          position: "absolute", inset: 0, borderRadius: "16px", pointerEvents: "none", zIndex: 3,
           background: `radial-gradient(160px circle at ${mouse.x}px ${mouse.y}px, ${accent.ring}2a, transparent 65%)`,
         }} />
       )}
-      {/* Subtle category-accent bottom glow — blooms on hover */}
-      <div aria-hidden style={{
-        position: "absolute", bottom: 0, left: "8%", right: "8%", height: "1px",
-        background: `linear-gradient(90deg, transparent, ${accent.ring}60, transparent)`,
-        boxShadow: mouse ? `0 0 14px 2px ${accent.ring}44` : "none",
-        transition: "box-shadow 0.2s ease",
-        pointerEvents: "none",
-      }} />
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px", minHeight: "20px" }}>
-        <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={36} />
+      {/* Screenshot cover — og:image → live screenshot → category gradient */}
+      <CoverImage
+        src={thing.imageUrl}
+        category={thing.categorySlug ?? catSlug}
+        face={thing.face}
+        height={132}
+        radius={11}
+        style={{ marginBottom: "10px" }}
+      />
+
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
+        <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
+        <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
         {thing.typeLabel && (
-          <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
+          <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
         )}
       </div>
-      <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
       {meta && (
-        <span style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "4px", fontSize: "11px", fontWeight: 500, color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "3px", fontSize: "11px", fontWeight: 500, color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           <span aria-hidden style={{ flexShrink: 0, width: "5px", height: "5px", borderRadius: "50%", background: accent.ring }} />
           {meta}
         </span>
       )}
       <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
 
-      {/* Footer — anchored to the bottom so every card reads as header/body/footer */}
+      {/* Footer — metric (left) + open-external affordance (right) */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
         {thing.metric ? <MetricChip>{thing.metric}</MetricChip> : <span />}
-        <ArrowUpRight size={15} strokeWidth={2} color={mouse ? accent.fg : TEXT.muted} style={{ flexShrink: 0, transition: "color 0.2s ease" }} />
+        <span
+          role="button"
+          tabIndex={-1}
+          aria-label="Open website"
+          onClick={openExternal}
+          style={{ flexShrink: 0, display: "inline-flex", padding: "2px", borderRadius: "6px", cursor: "pointer" }}
+        >
+          <ArrowUpRight size={15} strokeWidth={2} color={mouse ? accent.fg : TEXT.muted} style={{ transition: "color 0.2s ease" }} />
+        </span>
       </div>
     </motion.button>
   );
@@ -228,55 +256,92 @@ export function BrowseClient(data: BrowseData) {
           </div>
         </div>
 
-        {/* Sticky category chips — the persistent nav */}
-        <div
-          className="scrollbar-none"
-          style={{ position: "sticky", top: 0, zIndex: 4, display: "grid", gridAutoFlow: "column", gridTemplateRows: "auto auto", gridAutoColumns: "max-content", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: `linear-gradient(to bottom, ${CANVAS} 75%, transparent)` }}
-        >
-          {chips.map((c) => {
-            const active = c.key === activeCat && !query;
-            const emoji = c.key === ALL ? "🧭" : categoryEmoji(c.key);
-            return (
-              <button
-                key={c.key}
-                onClick={() => { setActiveCat(c.key); setQuery(""); posthog.capture("radar_browse_category_tapped", { category: c.key, count: c.count }); }}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "6px",
-                  fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
-                  color: active ? "#ffffff" : TEXT.body,
-                  background: active ? GOLD : "rgba(255,255,255,0.05)",
-                  border: `1px solid ${active ? GOLD : HAIRLINE}`,
-                  borderRadius: "100px", padding: "7px 14px", cursor: "pointer", whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{ fontSize: "13px" }}>{emoji}</span>
-                {c.key}
-                <span style={{ fontSize: "11px", opacity: 0.65, fontVariantNumeric: "tabular-nums" }}>{c.count}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Browse body: category sidebar (desktop) / chips (mobile) + grid */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: isDesktop ? "20px" : "0", padding: isDesktop ? "8px 20px 16px" : "0" }}>
+          {isDesktop && (
+            <aside className="scrollbar-none" style={{ width: "200px", flexShrink: 0, position: "sticky", top: "12px", maxHeight: "calc(100dvh - 24px)", overflowY: "auto" }}>
+              <p style={{ fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: TEXT.muted, margin: "2px 0 8px 8px" }}>Categories</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                {chips.map((c) => {
+                  const active = c.key === activeCat && !query;
+                  const emoji = c.key === ALL ? "🧭" : categoryEmoji(c.key);
+                  return (
+                    <button
+                      key={c.key}
+                      onClick={() => { setActiveCat(c.key); setQuery(""); posthog.capture("radar_browse_category_tapped", { category: c.key, count: c.count }); }}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "8px", width: "100%", textAlign: "left",
+                        fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
+                        color: active ? "#ffffff" : TEXT.body,
+                        background: active ? GOLD : "transparent",
+                        border: `1px solid ${active ? GOLD : "transparent"}`,
+                        borderRadius: "10px", padding: "8px 10px", cursor: "pointer",
+                      }}
+                    >
+                      <span style={{ fontSize: "13px", flexShrink: 0 }}>{emoji}</span>
+                      <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.key}</span>
+                      <span style={{ flexShrink: 0, fontSize: "11px", opacity: 0.6, fontVariantNumeric: "tabular-nums" }}>{c.count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
+          )}
 
-        {/* Card grid */}
-        {visible.length === 0 ? (
-          <div style={{ padding: "40px 32px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <Compass size={28} color="#3a3a3a" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
-            <p style={{ fontSize: "14px", color: "#737373", lineHeight: 1.5, margin: 0, maxWidth: "240px" }}>
-              {query ? <>No matches for &ldquo;{query}&rdquo;.</> : <>Nothing on the radar yet. Check back after the next refresh.</>}
-            </p>
-            {!query && (
-              <Link href="/radar" style={{ marginTop: "16px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "10px 16px", textDecoration: "none" }}>
-                Back to Today
-              </Link>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Mobile category chips */}
+            {!isDesktop && (
+              <div
+                className="scrollbar-none"
+                style={{ position: "sticky", top: 0, zIndex: 4, display: "grid", gridAutoFlow: "column", gridTemplateRows: "auto auto", gridAutoColumns: "max-content", gap: "8px", padding: "8px 20px 12px", overflowX: "auto", background: `linear-gradient(to bottom, ${CANVAS} 75%, transparent)` }}
+              >
+                {chips.map((c) => {
+                  const active = c.key === activeCat && !query;
+                  const emoji = c.key === ALL ? "🧭" : categoryEmoji(c.key);
+                  return (
+                    <button
+                      key={c.key}
+                      onClick={() => { setActiveCat(c.key); setQuery(""); posthog.capture("radar_browse_category_tapped", { category: c.key, count: c.count }); }}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: "6px",
+                        fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
+                        color: active ? "#ffffff" : TEXT.body,
+                        background: active ? GOLD : "rgba(255,255,255,0.05)",
+                        border: `1px solid ${active ? GOLD : HAIRLINE}`,
+                        borderRadius: "100px", padding: "7px 14px", cursor: "pointer", whiteSpace: "nowrap",
+                      }}
+                    >
+                      <span style={{ fontSize: "13px" }}>{emoji}</span>
+                      {c.key}
+                      <span style={{ fontSize: "11px", opacity: 0.65, fontVariantNumeric: "tabular-nums" }}>{c.count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Card grid */}
+            {visible.length === 0 ? (
+              <div style={{ padding: "40px 32px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Compass size={28} color="#3a3a3a" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
+                <p style={{ fontSize: "14px", color: "#737373", lineHeight: 1.5, margin: 0, maxWidth: "240px" }}>
+                  {query ? <>No matches for &ldquo;{query}&rdquo;.</> : <>Nothing on the radar yet. Check back after the next refresh.</>}
+                </p>
+                {!query && (
+                  <Link href="/radar" style={{ marginTop: "16px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "10px 16px", textDecoration: "none" }}>
+                    Back to Today
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: isDesktop ? "0" : "4px 20px 16px" }}>
+                {visible.map((t) => (
+                  <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} />
+                ))}
+              </div>
             )}
           </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "4px 20px 16px" }}>
-            {visible.map((t) => (
-              <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
 
       <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />

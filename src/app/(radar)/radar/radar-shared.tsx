@@ -173,6 +173,11 @@ export function CoverImage({
 }) {
   const accent = category ? accentFor(category) : face ? accentForFace(face) : NEUTRAL;
   const Icon = fallbackIcon ?? (face ? FACE_ICON[face] ?? Sparkles : Sparkles);
+  // A broken/empty image (e.g. the og-image proxy 204s) falls back to the
+  // category gradient — an empty src never reliably fires onError, so we also
+  // branch on falsy src below.
+  const [failed, setFailed] = useState(false);
+  const showImage = !!src && !failed;
   return (
     <div
       style={{
@@ -185,14 +190,15 @@ export function CoverImage({
         ...style,
       }}
     >
-      {src ? (
+      {showImage ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={src}
+            src={src!}
             alt=""
             loading="lazy"
             draggable={false}
+            onError={() => setFailed(true)}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.9)" }}
           />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.94) 22%, rgba(8,8,8,0.1) 60%, transparent 100%)" }} />

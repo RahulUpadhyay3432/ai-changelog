@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Cpu, Compass, Clapperboard, MessageSquare, Check, ArrowRight, ArrowUpRight, Plug, Trophy, type LucideIcon } from "lucide-react";
@@ -11,6 +12,7 @@ import type { Hackathon } from "@/lib/hackathons";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
 import { FaceMark, MetricChip, CoverImage, usePressTap, accentFor, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, logoFor, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
+import { slugForUrl } from "@/lib/tools-registry";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 import { SectionAllSheet } from "./SectionAllSheet";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
@@ -123,20 +125,37 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
+// Curated tools (essentials/MCP/skills) open their detail page; dynamic items
+// (GitHub/Product Hunt/news entities) open the quick sheet via the fallback.
+function useThingNav() {
+  const router = useRouter();
+  return useCallback((thing: RadarThing, fallback: (t: RadarThing) => void) => {
+    const slug = slugForUrl(thing.url);
+    if (slug) {
+      posthog.capture("radar_tool_opened", { slug, from: "today" });
+      router.push(`/tools/${slug}`);
+    } else {
+      fallback(thing);
+    }
+  }, [router]);
+}
+
 function WhatsNewCard({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
-  const tap = usePressTap(() => onOpen(thing));
+  const nav = useThingNav();
+  const tap = usePressTap(() => nav(thing, onOpen));
   const accent = accentFor(thing.categorySlug);
   const meta =
     [thing.recency, thing.storySource].filter(Boolean).join(" · ") ||
     thing.category ||
     "";
   return (
-    <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-        <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={34} />
+    <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, minWidth: 0, overflow: "hidden", width: "100%" }}>
+      <CoverImage src={thing.imageUrl} category={thing.categorySlug} face={thing.face} height={128} radius={11} style={{ marginBottom: "10px" }} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
+        <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
         <SourceMark face={thing.face} size={14} />
       </div>
-      <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+      <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, marginTop: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
       {meta && (
         <span style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "4px", fontSize: "11px", fontWeight: 500, color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           <span aria-hidden style={{ flexShrink: 0, width: "5px", height: "5px", borderRadius: "50%", background: accent.ring }} />
@@ -322,7 +341,8 @@ function CategoryTiles({ sections }: { sections: SectionData[] }) {
 
 // ─── Row + RailCard (buttons → open the sheet) ───────────────────────────────
 function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => void }) {
-  const tap = usePressTap(() => onOpen(thing));
+  const nav = useThingNav();
+  const tap = usePressTap(() => nav(thing, onOpen));
   return (
     <motion.button {...tap} whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: `1px solid ${HAIRLINE}`, cursor: "pointer", color: "inherit" }}>
       <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} />
@@ -336,12 +356,14 @@ function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => 
 }
 
 function RailCard({ thing, wide, fill, onOpen }: { thing: RadarThing; wide: boolean; fill?: boolean; onOpen: (t: RadarThing) => void }) {
-  const tap = usePressTap(() => onOpen(thing));
+  const nav = useThingNav();
+  const tap = usePressTap(() => nav(thing, onOpen));
   return (
-    <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: fill ? "100%" : wide ? "262px" : "210px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "14px", textAlign: "left", cursor: "pointer", color: "inherit" }}>
-      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} />
-      <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, margin: "10px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
-      <p style={{ fontSize: "13px", color: TEXT.body, lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
+    <motion.button {...tap} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-railcard" style={{ flexShrink: 0, scrollSnapAlign: "start", width: fill ? "100%" : wide ? "262px" : "210px", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", textAlign: "left", cursor: "pointer", color: "inherit", overflow: "hidden" }}>
+      <CoverImage src={thing.imageUrl} category={thing.categorySlug} face={thing.face} height={120} radius={11} style={{ marginBottom: "10px" }} />
+      <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
+      <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: TEXT.primary, margin: "8px 0 3px", letterSpacing: "-0.01em" }}>{thing.name}</span>
+      <p style={{ fontSize: "13px", color: TEXT.body, lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</p>
       {thing.metric && <span style={{ display: "block", marginTop: "10px" }}><MetricChip>{thing.metric}</MetricChip></span>}
     </motion.button>
   );

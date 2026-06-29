@@ -183,7 +183,7 @@ export function categoryEmoji(category: string | null | undefined): string {
 
 // Same-origin cover image for a tool's site (og:image → screenshot → gradient).
 // CoverImage falls back to the category gradient if this 204s / fails to load.
-function ogProxy(url: string | null | undefined): string | null {
+export function ogProxy(url: string | null | undefined): string | null {
   return url ? `/api/og-image?url=${encodeURIComponent(url)}` : null;
 }
 

@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plug } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Plug } from "lucide-react";
 import posthog from "posthog-js";
 import {
   MCP_SERVERS, MCP_CATEGORY_ORDER, MCP_CATEGORY_EMOJI, MCP_CATEGORY_SLUG,
@@ -13,8 +14,9 @@ import {
   AI_SKILLS, SKILL_CATEGORY_ORDER, SKILL_CATEGORY_EMOJI, SKILL_CATEGORY_SLUG,
   type AiSkill, type SkillCategory,
 } from "@/lib/radar-skills";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type RadarThing } from "./radar-shared";
-import { logoFor } from "./radar-map";
+import { slugForUrl } from "@/lib/tools-registry";
+import { FaceMark, MetricChip, CoverImage, GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type RadarThing } from "./radar-shared";
+import { logoFor, ogProxy } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 
 export interface McpMeta { stars: number; createdAt: string }
@@ -43,6 +45,7 @@ function mcpThing(s: McpServer): RadarThing {
     metric: null, typeLabel: "MCP server", category: "MCP", url: s.url,
     recency: null, storyTitle: null, storySource: null,
     description: s.description, topics: [], categorySlug: MCP_CATEGORY_SLUG[s.category],
+    imageUrl: ogProxy(s.url),
     logoUrl: logoFor(s.url),
   };
 }
@@ -69,22 +72,42 @@ function sortServers(list: McpServer[], sort: McpSort, meta: Record<string, McpM
 }
 
 function ServerCard({ server, stars, onOpen }: { server: McpServer; stars?: number; onOpen: (t: RadarThing) => void }) {
+  const router = useRouter();
+  const detailSlug = slugForUrl(server.url);
+  const handleOpen = () => {
+    if (detailSlug) {
+      posthog.capture("radar_tool_opened", { slug: detailSlug, from: "mcp" });
+      router.push(`/tools/${detailSlug}`);
+    } else {
+      onOpen(mcpThing(server));
+    }
+  };
+  const openExternal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(server.url, "_blank", "noopener,noreferrer");
+  };
   return (
     <motion.button
-      onClick={() => onOpen(mcpThing(server))}
+      onClick={handleOpen}
       whileTap={{ scale: 0.97 }}
       transition={PRESS}
-      style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+      style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, overflow: "hidden" }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px", minHeight: "20px" }}>
-        <FaceMark face="tool" category={MCP_CATEGORY_SLUG[server.category]} logoUrl={logoFor(server.url)} size={32} />
+      <CoverImage src={ogProxy(server.url)} category={MCP_CATEGORY_SLUG[server.category]} height={132} radius={11} style={{ marginBottom: "10px" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
+        <FaceMark face="tool" category={MCP_CATEGORY_SLUG[server.category]} logoUrl={logoFor(server.url)} size={26} />
+        <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{server.name}</span>
         {server.by === "official" && (
-          <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: GOLD, background: GOLD_SOFT, borderRadius: "100px", padding: "2px 8px" }}>Official</span>
+          <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: GOLD, background: GOLD_SOFT, borderRadius: "100px", padding: "2px 8px" }}>Official</span>
         )}
       </div>
-      <span style={{ fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{server.name}</span>
-      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{server.tagline}</span>
-      {stars != null && stars > 0 && <span style={{ marginTop: "9px" }}><MetricChip>{compact(stars)} stars</MetricChip></span>}
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{server.tagline}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
+        {stars != null && stars > 0 ? <MetricChip>{compact(stars)} stars</MetricChip> : <span />}
+        <span role="button" tabIndex={-1} aria-label="Open website" onClick={openExternal} style={{ flexShrink: 0, display: "inline-flex", padding: "2px", borderRadius: "6px", cursor: "pointer" }}>
+          <ArrowUpRight size={15} strokeWidth={2} color={TEXT.muted} />
+        </span>
+      </div>
     </motion.button>
   );
 }
@@ -96,6 +119,7 @@ function skillThing(s: AiSkill): RadarThing {
     metric: null, typeLabel: `${s.platform} skill`, category: s.category, url: s.url,
     recency: null, storyTitle: null, storySource: null,
     description: s.description, topics: [], categorySlug: SKILL_CATEGORY_SLUG[s.category],
+    imageUrl: ogProxy(s.url),
     logoUrl: logoFor(s.url),
   };
 }
@@ -115,19 +139,39 @@ function sortSkills(list: AiSkill[], sort: SkillSort): AiSkill[] {
 }
 
 function SkillCard({ skill, onOpen }: { skill: AiSkill; onOpen: (t: RadarThing) => void }) {
+  const router = useRouter();
+  const detailSlug = slugForUrl(skill.url);
+  const handleOpen = () => {
+    if (detailSlug) {
+      posthog.capture("radar_tool_opened", { slug: detailSlug, from: "skills" });
+      router.push(`/tools/${detailSlug}`);
+    } else {
+      onOpen(skillThing(skill));
+    }
+  };
+  const openExternal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(skill.url, "_blank", "noopener,noreferrer");
+  };
   return (
     <motion.button
-      onClick={() => onOpen(skillThing(skill))}
+      onClick={handleOpen}
       whileTap={{ scale: 0.97 }}
       transition={PRESS}
-      style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+      style={{ display: "flex", flexDirection: "column", textAlign: "left", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT, overflow: "hidden" }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px", minHeight: "20px" }}>
-        <FaceMark face="essential" category={SKILL_CATEGORY_SLUG[skill.category]} logoUrl={logoFor(skill.url)} size={32} />
-        <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{skill.platform}</span>
+      <CoverImage src={ogProxy(skill.url)} category={SKILL_CATEGORY_SLUG[skill.category]} height={132} radius={11} style={{ marginBottom: "10px" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
+        <FaceMark face="essential" category={SKILL_CATEGORY_SLUG[skill.category]} logoUrl={logoFor(skill.url)} size={26} />
+        <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{skill.name}</span>
+        <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{skill.platform}</span>
       </div>
-      <span style={{ fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{skill.name}</span>
-      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "3px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: "35px" }}>{skill.tagline}</span>
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{skill.tagline}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
+        <span role="button" tabIndex={-1} aria-label="Open website" onClick={openExternal} style={{ flexShrink: 0, display: "inline-flex", padding: "2px", borderRadius: "6px", cursor: "pointer" }}>
+          <ArrowUpRight size={15} strokeWidth={2} color={TEXT.muted} />
+        </span>
+      </div>
     </motion.button>
   );
 }
@@ -223,6 +267,12 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
     ? [{ key: ALL, emoji: "🔌" }, ...mcpCats.map((c) => ({ key: c, emoji: MCP_CATEGORY_EMOJI[c] }))]
     : [{ key: ALL, emoji: "✨" }, ...skillCats.map((c) => ({ key: c, emoji: SKILL_CATEGORY_EMOJI[c] }))];
 
+  // Same items, with counts, for the desktop category sidebar.
+  const sidebarItems = view === "mcp"
+    ? [{ key: ALL, emoji: "🔌", count: MCP_SERVERS.length }, ...mcpCats.map((c) => ({ key: c, emoji: MCP_CATEGORY_EMOJI[c], count: mcpByCat.get(c)?.length ?? 0 }))]
+    : [{ key: ALL, emoji: "✨", count: AI_SKILLS.length }, ...skillCats.map((c) => ({ key: c, emoji: SKILL_CATEGORY_EMOJI[c], count: skillsByCat.get(c)?.length ?? 0 }))];
+  const pickCat = (k: string) => { setActiveCat(k); posthog.capture(view === "mcp" ? "radar_mcp_category" : "radar_skills_category", { category: k }); };
+
   const visibleMcpCats = activeCat === ALL ? mcpCats : (mcpCats.includes(activeCat as McpCategory) ? [activeCat as McpCategory] : []);
   const visibleSkillCats = activeCat === ALL ? skillCats : (skillCats.includes(activeCat as SkillCategory) ? [activeCat as SkillCategory] : []);
 
@@ -258,42 +308,78 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
         </div>
       </div>
 
-      {/* Category chips */}
-      <Chips items={chipItems} active={activeCat} onPick={(k) => { setActiveCat(k); posthog.capture(view === "mcp" ? "radar_mcp_category" : "radar_skills_category", { category: k }); }} />
-
-      {/* Sort */}
-      {view === "mcp" ? (
-        <SortBar items={MCP_SORTS} active={mcpSort} onPick={(k) => { setMcpSort(k as McpSort); posthog.capture("radar_mcp_sort", { sort: k }); }} />
-      ) : (
-        <SortBar items={SKILL_SORTS} active={skillSort} onPick={(k) => { setSkillSort(k as SkillSort); posthog.capture("radar_skills_sort", { sort: k }); }} />
+      {/* Mobile category chips (desktop uses the sidebar below) */}
+      {!isDesktop && (
+        <Chips items={chipItems} active={activeCat} onPick={pickCat} />
       )}
 
-      {/* Sections */}
-      {view === "mcp"
-        ? visibleMcpCats.map((cat) => {
-            const servers = sortServers(mcpByCat.get(cat) ?? [], mcpSort, meta);
-            if (servers.length === 0) return null;
-            return (
-              <section key={cat} style={{ marginBottom: "26px" }}>
-                <SectionHead emoji={MCP_CATEGORY_EMOJI[cat]} title={cat} count={servers.length} />
-                <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
-                  {servers.map((s) => <ServerCard key={s.url} server={s} stars={meta[s.url]?.stars} onOpen={(t) => onOpen(t, "mcp")} />)}
-                </div>
-              </section>
-            );
-          })
-        : visibleSkillCats.map((cat) => {
-            const skills = sortSkills(skillsByCat.get(cat) ?? [], skillSort);
-            if (skills.length === 0) return null;
-            return (
-              <section key={cat} style={{ marginBottom: "26px" }}>
-                <SectionHead emoji={SKILL_CATEGORY_EMOJI[cat]} title={cat} count={skills.length} />
-                <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
-                  {skills.map((s) => <SkillCard key={s.url} skill={s} onOpen={(t) => onOpen(t, "skills")} />)}
-                </div>
-              </section>
-            );
-          })}
+      {/* Body: category sidebar (desktop) + sort + sections */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: isDesktop ? "8px" : "0" }}>
+        {isDesktop && (
+          <aside className="scrollbar-none" style={{ width: "200px", flexShrink: 0, position: "sticky", top: "12px", maxHeight: "calc(100dvh - 24px)", overflowY: "auto", padding: "8px 0 0 20px" }}>
+            <p style={{ fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: TEXT.muted, margin: "2px 0 8px 8px" }}>Categories</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              {sidebarItems.map((c) => {
+                const on = c.key === activeCat;
+                return (
+                  <button
+                    key={c.key}
+                    onClick={() => pickCat(c.key)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "8px", width: "100%", textAlign: "left",
+                      fontFamily: SG, fontSize: "13px", fontWeight: on ? 700 : 500,
+                      color: on ? "#ffffff" : TEXT.body,
+                      background: on ? GOLD : "transparent",
+                      border: `1px solid ${on ? GOLD : "transparent"}`,
+                      borderRadius: "10px", padding: "8px 10px", cursor: "pointer",
+                    }}
+                  >
+                    <span style={{ fontSize: "13px", flexShrink: 0 }}>{c.emoji}</span>
+                    <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.key}</span>
+                    <span style={{ flexShrink: 0, fontSize: "11px", opacity: 0.6, fontVariantNumeric: "tabular-nums" }}>{c.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        )}
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Sort */}
+          {view === "mcp" ? (
+            <SortBar items={MCP_SORTS} active={mcpSort} onPick={(k) => { setMcpSort(k as McpSort); posthog.capture("radar_mcp_sort", { sort: k }); }} />
+          ) : (
+            <SortBar items={SKILL_SORTS} active={skillSort} onPick={(k) => { setSkillSort(k as SkillSort); posthog.capture("radar_skills_sort", { sort: k }); }} />
+          )}
+
+          {/* Sections */}
+          {view === "mcp"
+            ? visibleMcpCats.map((cat) => {
+                const servers = sortServers(mcpByCat.get(cat) ?? [], mcpSort, meta);
+                if (servers.length === 0) return null;
+                return (
+                  <section key={cat} style={{ marginBottom: "26px" }}>
+                    <SectionHead emoji={MCP_CATEGORY_EMOJI[cat]} title={cat} count={servers.length} />
+                    <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
+                      {servers.map((s) => <ServerCard key={s.url} server={s} stars={meta[s.url]?.stars} onOpen={(t) => onOpen(t, "mcp")} />)}
+                    </div>
+                  </section>
+                );
+              })
+            : visibleSkillCats.map((cat) => {
+                const skills = sortSkills(skillsByCat.get(cat) ?? [], skillSort);
+                if (skills.length === 0) return null;
+                return (
+                  <section key={cat} style={{ marginBottom: "26px" }}>
+                    <SectionHead emoji={SKILL_CATEGORY_EMOJI[cat]} title={cat} count={skills.length} />
+                    <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: "0 20px" }}>
+                      {skills.map((s) => <SkillCard key={s.url} skill={s} onOpen={(t) => onOpen(t, "skills")} />)}
+                    </div>
+                  </section>
+                );
+              })}
+        </div>
+      </div>
 
       <RadarDetailSheet thing={detail} onClose={() => setDetail(null)} />
     </div>

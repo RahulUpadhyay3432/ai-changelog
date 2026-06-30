@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { BLOG_POSTS, postTools } from "@/lib/blog-content";
 import { GOLD, SG, TEXT } from "@/lib/design-tokens";
 import { BlogIndexClient } from "@/components/blog/BlogIndexClient";
-import styles from "./blog.module.css";
 
 const APP_URL = "https://kapyn.app";
 
@@ -49,7 +48,7 @@ export default function BlogIndex() {
   };
 
   return (
-    <div className={styles.indexShell}>
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <header style={{ margin: "4px 0 30px" }}>
@@ -65,6 +64,6 @@ export default function BlogIndex() {
       </header>
 
       <BlogIndexClient posts={posts} tags={tags} toolCounts={toolCounts} />
-    </div>
+    </>
   );
 }

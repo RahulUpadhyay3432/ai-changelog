@@ -26,9 +26,13 @@ export const metadata: Metadata = {
 
 export default function BlogIndex() {
   const posts = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
-
   const tags = [...new Set(posts.map((p) => p.tag))].sort();
   const toolCounts = Object.fromEntries(posts.map((p) => [p.slug, postTools(p).length]));
+
+  // Top reads = most comprehensive (most tools), pick 7
+  const topPosts = [...posts]
+    .sort((a, b) => (toolCounts[b.slug] ?? 0) - (toolCounts[a.slug] ?? 0))
+    .slice(0, 7);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -51,19 +55,19 @@ export default function BlogIndex() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <header style={{ margin: "4px 0 30px" }}>
+      <header style={{ margin: "4px 0 36px" }}>
         <span style={{ fontFamily: SG, fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>
           The Kapyn Blog
         </span>
-        <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 42px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.06, margin: "12px 0 0", color: TEXT.primary }}>
-          Guides on the AI and tools worth using
+        <h1 style={{ fontFamily: SG, fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.06, margin: "10px 0 0", color: TEXT.primary }}>
+          Guides on the AI tools worth using
         </h1>
-        <p style={{ fontSize: "16px", color: TEXT.muted, lineHeight: 1.55, margin: "14px 0 0", maxWidth: "560px" }}>
+        <p style={{ fontSize: "15px", color: TEXT.muted, lineHeight: 1.55, margin: "12px 0 0", maxWidth: "520px" }}>
           {DESC}
         </p>
       </header>
 
-      <BlogIndexClient posts={posts} tags={tags} toolCounts={toolCounts} />
+      <BlogIndexClient posts={posts} tags={tags} toolCounts={toolCounts} topPosts={topPosts} />
     </>
   );
 }

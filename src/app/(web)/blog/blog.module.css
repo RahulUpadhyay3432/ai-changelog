@@ -558,34 +558,108 @@
   }
 }
 
-/* ─── Blog index breakout — wider than the 760px reading shell ─────────────── */
-/* The article page already breaks out via BlogReader. The index grid needs
-   the same treatment so it fills the viewport instead of the narrow column. */
-.indexShell {
-  width: min(1280px, 100vw - 48px);
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+/* ─── Blog index 3-column layout ────────────────────────────────────────────── */
+.indexLayout {
+  display: grid;
+  grid-template-columns: 180px 1fr 240px;
+  column-gap: 40px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .indexLayout {
+    grid-template-columns: 1fr 220px;
+  }
+}
+@media (max-width: 760px) {
+  .indexLayout {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* ─── Tag filter bar ───────────────────────────────────────────────────────── */
-.filterBar {
+/* ── Left sidebar ── */
+.leftSidebar {
+  position: sticky;
+  top: 84px;
+}
+@media (max-width: 1100px) {
+  .leftSidebar {
+    display: none;
+  }
+}
+.sidebarLabel {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #525252;
+  margin: 0 0 10px;
+}
+.navTagList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.navTag,
+.navTagActive {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 0 0 24px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.navTag {
+  color: #737373;
+}
+.navTag:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #d4d0ca;
+}
+.navTagActive {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f5f5f5;
+  font-weight: 600;
+}
+.navTagCount {
+  font-size: 11.5px;
+  color: #525252;
+  font-weight: 400;
+}
+
+/* Mobile chips (shown only when left sidebar is hidden) */
+.mobileChips {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .mobileChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 20px;
+  }
 }
 .filterChip {
   display: inline-flex;
   align-items: center;
-  height: 32px;
-  padding: 0 14px;
+  height: 30px;
+  padding: 0 13px;
   border-radius: 100px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: transparent;
   font-family: var(--font-space-grotesk), sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #737373;
   cursor: pointer;
@@ -600,6 +674,51 @@
   color: #f5f5f5;
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Center column ── */
+.centerCol {
+  min-width: 0;
+}
+
+/* ── Right sidebar ── */
+.rightSidebar {
+  position: sticky;
+  top: 84px;
+}
+@media (max-width: 760px) {
+  .rightSidebar {
+    display: none;
+  }
+}
+.topReadsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.topReadCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.topReadCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.topReadRank {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #383530;
+  flex-shrink: 0;
+  margin-top: 2px;
+  min-width: 20px;
 }
 
 /* ─── Index — featured + grid ──────────────────────────────────────────────── */

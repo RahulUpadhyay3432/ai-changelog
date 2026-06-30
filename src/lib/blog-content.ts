@@ -1627,6 +1627,865 @@ limit 8;`,
       },
     ],
   },
+
+  // ─── SEO: Best AI tools for marketing ───────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-marketing-2026",
+    title: "Best AI tools for marketing teams in 2026",
+    deck: "From campaign copy to ad creative to analytics — the AI tools that marketing teams are actually using to ship faster and spend less.",
+    date: "2026-06-14",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1557804506-669a67965ba0"),
+      alt: "Marketing team collaborating around a table with laptops",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for marketing in 2026: **Claude** or **ChatGPT** for copy and strategy, **Midjourney** or **Adobe Firefly** for ad creative, **Perplexity** for competitive research, **HubSpot AI** for CRM-integrated workflows, and **Jasper** for teams that need brand-voice controls across writers. These five cover 90% of what a modern marketing team needs from AI.",
+      },
+      {
+        type: "paragraph",
+        text: "Marketing was the first domain where AI delivered measurable ROI — not because the tools are flashy but because the core task (moving from brief to draft to approved asset) maps perfectly onto what language models do well. The challenge in 2026 isn't \"can AI help?\" — it's figuring out which tools to standardize on so the team isn't running seven different subscriptions with no shared asset library.",
+      },
+      { type: "heading", level: 2, text: "Copywriting and strategy" },
+      {
+        type: "paragraph",
+        text: "**Claude** (Anthropic) is the strongest writer for long-form and nuanced content — brand manifestos, email sequences, white papers, and anything that requires consistent tone over several thousand words. The extended context window means you can paste in an entire brand guide and the output will actually follow it. For structured marketing formats (ad copy, landing page headlines, email subject lines), **ChatGPT** with a custom GPT trained on your brand voice is slightly more flexible.",
+      },
+      {
+        type: "paragraph",
+        text: "**Jasper** earns its price for larger teams because it adds the one thing raw LLMs lack: organizational controls. You can lock in a brand voice, create templates others fill in, and maintain an asset library — so the intern and the CMO are starting from the same place. For a solo marketer, Jasper is overkill; for a 10-person team shipping to multiple markets, it's the missing infrastructure.",
+      },
+      { type: "heading", level: 2, text: "Creative and visual" },
+      {
+        type: "paragraph",
+        text: "**Adobe Firefly** is the pragmatic choice if your team already uses Creative Cloud. The outputs are commercially safe (trained on licensed content), the integration with Photoshop and Illustrator is seamless, and the generative fill for extending or cleaning up photos is genuinely excellent. **Midjourney** produces better raw image quality for concept work and campaign ideation — use it in the exploration phase, Firefly for production.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Creative workflow",
+        text: "Run Midjourney for mood boards and concept exploration. Once direction is locked, move to Firefly for production-ready assets that are safe to license. Don't reverse the order.",
+      },
+      { type: "heading", level: 2, text: "Research and analytics" },
+      {
+        type: "paragraph",
+        text: "**Perplexity** has become the fastest tool for competitive research — it synthesizes up-to-date web results with citations, which means you can ask \"what are Notion's current pricing plans and who's running their newsletter?\" and get a usable answer in 30 seconds instead of 20 minutes of Googling. For deeper market research, **Claude** with the right prompt and source documents is more thorough.",
+      },
+      {
+        type: "paragraph",
+        text: "For analytics, most teams are better served by AI features inside their existing stack (Google Analytics 4's AI insights, HubSpot's predictive scoring) than by a dedicated AI analytics tool. The integrations are better and the learning curve is lower.",
+      },
+      {
+        type: "tools",
+        title: "The marketing AI stack",
+        items: [
+          { name: "Claude", valueLine: "Best for long-form copy, brand strategy, and nuanced brand-voice control.", url: "https://claude.ai" },
+          { name: "Jasper", valueLine: "Brand voice controls and asset management for teams — the infrastructure layer.", url: "https://jasper.ai" },
+          { name: "Adobe Firefly", valueLine: "Commercial-safe AI image generation inside Creative Cloud — production use.", url: "https://firefly.adobe.com" },
+          { name: "Midjourney", valueLine: "Best raw image quality for concept work, mood boards, and campaign ideation.", url: "https://midjourney.com" },
+          { name: "Perplexity", valueLine: "Cited competitive research in seconds — replaces 80% of Google for market research.", url: "https://perplexity.ai" },
+          { name: "HubSpot AI", valueLine: "AI features built into CRM workflows — predictive scoring, email optimization.", url: "https://hubspot.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The highest-ROI move for most marketing teams isn't adopting more tools — it's going deeper on fewer. Pick Claude (or ChatGPT) for copy, Firefly for creative, and Perplexity for research. That stack handles 80% of AI use cases. Add Jasper only when brand-voice drift across writers becomes an actual problem. Find all of these on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI video generators ──────────────────────────────────────────
+  {
+    slug: "best-ai-video-generators-2026",
+    title: "Best AI video generators in 2026",
+    deck: "Runway, Kling, Sora, Pika, and more — which AI video tool to use for which job, and what each can realistically produce.",
+    date: "2026-06-13",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1574717024816-e7e86b06a92a"),
+      alt: "Film camera and production equipment on a professional set",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI video generators in 2026 by use case: **Runway Gen-4** for the highest-quality short-form clips and professional creative work, **Kling 2.0** for the best image-to-video quality at the price, **Sora** (OpenAI) for long prompt fidelity and cinematic scenes, and **Pika** for fast iteration and social media content. None of these replace a production team — but all of them meaningfully accelerate one.",
+      },
+      {
+        type: "paragraph",
+        text: "AI video generation in 2026 has stabilized into a clear pattern: the tools are genuinely useful for B-roll, product demos, social content, and creative exploration — and still unreliable for anything requiring consistent characters, accurate text rendering, or more than 10 seconds of coherent narrative. Understanding which category your project falls into determines which tool to use.",
+      },
+      { type: "heading", level: 2, text: "For professional creative work: Runway" },
+      {
+        type: "paragraph",
+        text: "**Runway Gen-4** is the professional standard for AI-assisted video production. The output quality for short cinematic clips is the best in the class — motion is smooth, lighting is consistent, and the model follows complex style prompts reliably. Runway's editing suite (green screen removal, inpainting, motion brush) adds tools that are genuinely useful mid-production, not just for generation. The pricing reflects the professional tier: $15/month for casual use, $35/month for serious projects.",
+      },
+      { type: "heading", level: 2, text: "For image-to-video: Kling" },
+      {
+        type: "paragraph",
+        text: "**Kling 2.0** (Kuaishou) produces the most realistic image-to-video results — give it a static image and it generates natural, physics-accurate motion that most competitors still can't match. For product shots, fashion, and lifestyle content where you already have an image and want to add life to it, Kling is the clear winner. The pricing is competitive and the international team ships updates fast.",
+      },
+      { type: "heading", level: 2, text: "For long prompts and cinematic scenes: Sora" },
+      {
+        type: "paragraph",
+        text: "**Sora** (OpenAI) handles the most complex prompt descriptions with the most fidelity — if you write a 300-word cinematic scene description, Sora is most likely to produce something that actually matches it. The footage style leans cinematic by default. Sora also supports the longest generation lengths, making it useful for longer-form narrative clips. Available to ChatGPT Plus and Pro subscribers.",
+      },
+      { type: "heading", level: 2, text: "For social media speed: Pika" },
+      {
+        type: "paragraph",
+        text: "**Pika** is the fastest tool for social-first content — short clips, effects, and product animations. The generation speed is significantly faster than Runway or Sora, which matters when you're iterating on 20 variations to find one that works for an ad. The quality ceiling is lower, but for TikTok, Reels, and product ads, it's usually more than good enough.",
+      },
+      {
+        type: "tools",
+        title: "AI video generators by use case",
+        items: [
+          { name: "Runway", valueLine: "Professional-grade AI video — best output quality, full editing suite, consistent motion.", url: "https://runwayml.com" },
+          { name: "Kling", valueLine: "Best image-to-video results — realistic physics, ideal for product and lifestyle content.", url: "https://klingai.com" },
+          { name: "Sora", valueLine: "OpenAI's model — best prompt fidelity for complex cinematic scene descriptions.", url: "https://sora.com" },
+          { name: "Pika", valueLine: "Fast iteration for social content — quick generations, product animations, Reels-ready.", url: "https://pika.art" },
+          { name: "Luma Dream Machine", valueLine: "Free tier, smooth camera motion — good starting point before committing to a paid tool.", url: "https://lumalabs.ai/dream-machine" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The honest summary: start with Kling if you have source images, Runway if you need professional-grade output, Pika if you're producing for social at volume, and Sora if you're writing detailed scene descriptions. Test each on your actual use case before subscribing — the quality gap between them is real but use-case-dependent. Browse video tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI image generators ─────────────────────────────────────────
+  {
+    slug: "best-ai-image-generators-2026",
+    title: "Best AI image generators in 2026",
+    deck: "Midjourney, Ideogram, Adobe Firefly, Flux, and more — which AI image generator to use for each kind of creative work.",
+    date: "2026-06-12",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1547891654-e66ed7ebb968"),
+      alt: "A colorful digital art canvas with abstract shapes and gradients",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI image generators in 2026: **Midjourney v7** for the highest aesthetic quality in any style, **Ideogram 3** for accurate text rendering in images, **Adobe Firefly** for commercially safe assets inside Creative Cloud, **Flux.1** for local/API generation with precise control, and **DALL-E 3** (via ChatGPT) for the best natural-language-to-image prompt handling. Each has a distinct strength — picking the right one for your use case matters more than picking the \"best\" one.",
+      },
+      {
+        type: "paragraph",
+        text: "AI image generation has split into distinct market segments in 2026: aesthetic quality (Midjourney), text accuracy (Ideogram), commercial licensing (Firefly), technical control (Flux), and ease of use (DALL-E 3). The models are close enough in overall quality that your choice should be driven by the one dimension that matters most for your specific project.",
+      },
+      { type: "heading", level: 2, text: "For best overall quality: Midjourney" },
+      {
+        type: "paragraph",
+        text: "**Midjourney v7** still produces the most aesthetically compelling images across styles — photorealism, illustration, concept art, editorial photography. The Discord-based interface is a genuine friction point, but Midjourney is now available via a web app too. The model has excellent taste: even mediocre prompts produce visually coherent results. At $10/month for basic, it's the right starting point for anyone who cares primarily about output quality.",
+      },
+      { type: "heading", level: 2, text: "For text in images: Ideogram" },
+      {
+        type: "paragraph",
+        text: "**Ideogram 3** solved the problem that broke every other image generator: accurate text rendering. It can produce posters, logos, banners, and typographic designs with readable, correctly spelled text — which was essentially impossible with earlier AI image models. For any project where text needs to appear in the image (marketing materials, social cards, presentations), Ideogram is the only tool worth using.",
+      },
+      { type: "heading", level: 2, text: "For commercial use: Adobe Firefly" },
+      {
+        type: "paragraph",
+        text: "**Adobe Firefly** is trained exclusively on licensed Adobe Stock content and public domain imagery, making it the only major AI image generator with a credible commercial indemnity promise. If you're generating assets that go into client work, product packaging, or advertising, Firefly removes the licensing risk that other tools carry. The quality has improved significantly and the Photoshop/Illustrator integration is seamless.",
+      },
+      { type: "heading", level: 2, text: "For API and fine-tuning control: Flux" },
+      {
+        type: "paragraph",
+        text: "**Flux.1** (Black Forest Labs) is the open-weights model that has displaced Stable Diffusion as the preferred foundation for fine-tuning and API-based applications. It produces better default outputs than SDXL, supports LoRA fine-tuning for consistent character/style, and runs efficiently on consumer hardware. For developers building image generation into their own products, Flux is the foundation to build on.",
+      },
+      {
+        type: "tools",
+        title: "AI image generators by use case",
+        items: [
+          { name: "Midjourney", valueLine: "Best overall aesthetic quality — photorealism, illustration, concept art, editorial.", url: "https://midjourney.com" },
+          { name: "Ideogram", valueLine: "Only tool with reliable text rendering — posters, banners, typographic design.", url: "https://ideogram.ai" },
+          { name: "Adobe Firefly", valueLine: "Commercially licensed — safe for client work, ad creative, and product packaging.", url: "https://firefly.adobe.com" },
+          { name: "Flux.1", valueLine: "Open weights, fine-tuning support — the foundation for custom AI image products.", url: "https://blackforestlabs.ai" },
+          { name: "DALL-E 3", valueLine: "Best natural language following — available free via ChatGPT, good for casual use.", url: "https://openai.com/dall-e-3" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Start with Midjourney for quality, switch to Ideogram the moment your project includes text, and use Firefly when commercial licensing matters. For building products, Flux gives you the most control. All five of these tools are moving fast — the quality rankings may shift, but the specialization pattern is stable. Explore AI creative tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI chatbots ───────────────────────────────────────────────────
+  {
+    slug: "best-ai-chatbots-2026",
+    title: "Best AI chatbots in 2026",
+    deck: "Claude, ChatGPT, Gemini, Perplexity, and more — an honest comparison of the top AI assistants and which to choose.",
+    date: "2026-06-11",
+    readingMin: 8,
+    tag: "Comparison",
+    hero: {
+      src: U("1531746790731-6c087fecd65a"),
+      alt: "Abstract chat interface with glowing blue orbs representing AI communication",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI chatbot in 2026 depends on your primary use case: **Claude** (Anthropic) for writing, reasoning, and coding; **ChatGPT** (OpenAI) for the broadest tool ecosystem and plugins; **Gemini** (Google) for Google Workspace integration and real-time web access; and **Perplexity** for research and fact-checked web queries with citations. For most knowledge workers, Claude is the primary tool and Perplexity is the research companion.",
+      },
+      {
+        type: "paragraph",
+        text: "The AI chatbot market has matured to the point where all four major players are good — the question is no longer \"which one works?\" but \"which one is optimized for what I actually do?\" The capability differences are real but narrower than they were in 2024. The bigger differentiators in 2026 are: integrations (what apps does it connect to?), context window (how much can it hold?), and reasoning quality for the specific tasks you run most often.",
+      },
+      { type: "heading", level: 2, text: "Claude — best for writing and reasoning" },
+      {
+        type: "paragraph",
+        text: "**Claude** (Anthropic) is the model most knowledge workers reach for when quality matters. The writing is cleaner and more nuanced than GPT-4o's — Claude doesn't pad, doesn't add unnecessary caveats, and calibrates formality to the context without being told. For coding, Claude Code is the best agentic implementation of any frontier model. The extended thinking mode (Claude Sonnet with `thinking: extended`) produces noticeably better results on hard reasoning problems. The main limitation: no image generation, and the free tier is limited.",
+      },
+      { type: "heading", level: 2, text: "ChatGPT — best for breadth and ecosystem" },
+      {
+        type: "paragraph",
+        text: "**ChatGPT** (OpenAI) has the widest ecosystem: DALL-E 3 for image generation, Code Interpreter for data analysis, a plugin store with hundreds of integrations, and GPT-4o's voice mode for natural conversation. If you need one tool that does everything, ChatGPT Plus is the right choice. The quality ceiling is slightly lower than Claude on writing tasks, but the breadth is genuinely unmatched.",
+      },
+      { type: "heading", level: 2, text: "Gemini — best for Google Workspace users" },
+      {
+        type: "paragraph",
+        text: "**Gemini** (Google) is the right choice if your workflow is built around Google products. The integration with Gmail, Docs, Drive, and Sheets is seamless — Gemini can draft emails, summarize documents, and query your Drive without copy-paste. Gemini 2.0 Pro is a genuinely strong model for reasoning, and the 1 million token context window (Gemini 1.5 Pro) is larger than any competitor. For non-Google users, the integrations are less compelling.",
+      },
+      { type: "heading", level: 2, text: "Perplexity — best for research" },
+      {
+        type: "paragraph",
+        text: "**Perplexity** occupies a distinct niche: it's a search engine with a language model interface. Every answer includes citations, and the results are current (it searches the web in real time). For competitive research, fact-checking, and any question where you need to know where the information came from, Perplexity is faster and more reliable than asking a chatbot that might hallucinate. It's the one AI tool that's genuinely better than Google for research queries.",
+      },
+      {
+        type: "tools",
+        title: "Best AI chatbots by use case",
+        items: [
+          { name: "Claude", valueLine: "Best for writing, coding, and nuanced reasoning — the quality benchmark in 2026.", url: "https://claude.ai" },
+          { name: "ChatGPT", valueLine: "Broadest ecosystem — image gen, code interpreter, plugin store, voice mode.", url: "https://chatgpt.com" },
+          { name: "Gemini", valueLine: "Google Workspace integration — Gmail, Docs, Drive, Sheets; massive context window.", url: "https://gemini.google.com" },
+          { name: "Perplexity", valueLine: "Real-time cited search — the best tool for research, fact-checking, competitive intel.", url: "https://perplexity.ai" },
+          { name: "Mistral Le Chat", valueLine: "Fast European alternative — strong coding model, GDPR-friendly data handling.", url: "https://chat.mistral.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Use Claude as your primary writing and reasoning tool, Perplexity for research, and ChatGPT when you need the plugin ecosystem or image generation. Gemini is the right swap for Claude if your life runs in Google Docs. You don't need all four — pick two and build fluency. Compare all AI assistants on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for SEO ─────────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-seo-2026",
+    title: "Best AI tools for SEO in 2026",
+    deck: "The AI tools that actually move rankings — from keyword research to content briefs to technical audits and internal linking.",
+    date: "2026-06-10",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1562577309-4932a82f7e4c"),
+      alt: "Analytics dashboard showing SEO performance graphs on a laptop",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for SEO in 2026: **Semrush** or **Ahrefs** (both have AI features now) for keyword research and competitive analysis, **Surfer SEO** for content optimization briefs, **Claude** for writing content that ranks, **Screaming Frog** with AI integration for technical audits, and **Perplexity** for understanding what searchers actually want from a query. The hardest SEO work — finding the right angle for a topic — is still human judgment.",
+      },
+      {
+        type: "paragraph",
+        text: "AI has changed two things in SEO: it has dramatically lowered the cost of producing content, which means quality differentiation matters more than ever, and it has improved the tooling around keyword research and content briefs to the point where an individual can compete with much larger teams. What AI hasn't changed: Google still rewards expertise, authoritativeness, and trustworthiness — and none of those are automatable.",
+      },
+      { type: "heading", level: 2, text: "Keyword research and competitive analysis" },
+      {
+        type: "paragraph",
+        text: "**Semrush** added AI-powered keyword clustering and topic modeling in 2025, which makes it significantly faster to go from \"I want to write about AI tools\" to a structured content calendar organized around search intent clusters. **Ahrefs** has comparable AI features and slightly better backlink data. Both cost $100-200/month — if you can only afford one research tool, Ahrefs tends to edge out Semrush on data quality.",
+      },
+      {
+        type: "paragraph",
+        text: "For budget-constrained teams, **Google Search Console** with AI analysis (paste your data into Claude) gets you 80% of the value for the cost of your Claude subscription. The data is first-party and trustworthy; you're just not getting competitor intelligence.",
+      },
+      { type: "heading", level: 2, text: "Content briefs and optimization" },
+      {
+        type: "paragraph",
+        text: "**Surfer SEO** is the most direct translation of \"what does Google want to see on this page?\" — it analyzes the top-ranking pages for a keyword and produces a brief with recommended word count, headings, and semantic terms to include. The AI content editor shows you a score as you write. The caveat: following Surfer too literally produces generic content that matches competitors. Use it for structure, not voice.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The AI content trap",
+        text: "AI-generated content that exactly matches Surfer recommendations tends to look identical to 10 other articles on the same topic. Google's Helpful Content Update penalizes thin, pattern-matched content. Use AI for research and structure, but add unique insight, data, or perspective that competitors don't have.",
+      },
+      { type: "heading", level: 2, text: "Writing the content" },
+      {
+        type: "paragraph",
+        text: "**Claude** writes the cleanest SEO content of any current model — it doesn't default to listicles, doesn't over-pad, and follows nuanced style instructions. The right workflow: use Surfer or Ahrefs for the brief, write the outline yourself, and use Claude to draft sections. Then edit to add original insight, examples, and your own perspective. Fully AI-written content from a brief rarely ranks well in 2026 — Google has gotten good at detecting it.",
+      },
+      {
+        type: "tools",
+        title: "AI SEO tool stack",
+        items: [
+          { name: "Ahrefs", valueLine: "Best backlink data + AI keyword clustering — the research foundation.", url: "https://ahrefs.com" },
+          { name: "Surfer SEO", valueLine: "Content briefs from top-ranking competitors — structure optimization, not voice.", url: "https://surferseo.com" },
+          { name: "Claude", valueLine: "Best model for writing content that reads naturally — essential for quality differentiation.", url: "https://claude.ai" },
+          { name: "Semrush", valueLine: "Competitive analysis, topic modeling, AI-powered content calendar planning.", url: "https://semrush.com" },
+          { name: "Screaming Frog", valueLine: "Technical SEO audit — crawl issues, broken links, internal link analysis.", url: "https://screamingfrog.co.uk" },
+          { name: "Perplexity", valueLine: "Understand searcher intent — see what real AI-generated answers say about your topic.", url: "https://perplexity.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The highest-leverage AI SEO workflow: Ahrefs for keyword clusters → Claude to understand search intent → Surfer for content structure → Claude to draft → human editing for unique perspective. AI handles the scaffolding; your expertise is still the differentiator. Find SEO tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for social media ────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-social-media-2026",
+    title: "Best AI tools for social media in 2026",
+    deck: "From caption writing to scheduling to analytics — the AI tools that help individuals and teams show up consistently on social.",
+    date: "2026-06-09",
+    readingMin: 6,
+    tag: "Guide",
+    hero: {
+      src: U("1611162617213-7d7a39e9b1d7"),
+      alt: "Person holding a smartphone showing colorful social media feed",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for social media in 2026: **Buffer** with AI Assistant for scheduling and caption suggestions, **Claude** for writing posts that sound like you instead of a content calendar, **Canva AI** for graphics and carousels, **Taplio** for LinkedIn specifically, and **Opus Clip** for automatically cutting long videos into short-form clips. The biggest unlock isn't any single tool — it's a workflow where AI handles the first draft and you provide the voice.",
+      },
+      {
+        type: "paragraph",
+        text: "The pattern across every successful social media AI use case in 2026 is the same: AI dramatically compresses the time between \"I have something to say\" and \"this is ready to post.\" The voice and ideas still need to be yours — pure AI-generated social content is recognizable and tends to underperform. The right question is: what's the smallest AI intervention that makes you 3x more consistent?",
+      },
+      { type: "heading", level: 2, text: "Content creation" },
+      {
+        type: "paragraph",
+        text: "**Claude** is the best tool for writing social media posts that don't sound AI-written. Give it your raw notes or a voice memo transcript and ask it to draft a LinkedIn post in your established style — it will produce something you'll recognize as close to your voice. **Taplio** is a more opinionated choice for LinkedIn specifically: it has a built-in post library, AI suggestions, and scheduling, which makes it faster if LinkedIn is your main channel.",
+      },
+      {
+        type: "paragraph",
+        text: "For graphics, **Canva AI** adds generative features (background generation, image expansion, AI text effects) directly inside Canva — no context switching. For Reels and TikToks, **Opus Clip** watches a long video (a podcast, a talk, a webinar) and automatically extracts the best 30-90 second clips with captions. One 60-minute podcast episode can become 15 short-form clips in under 10 minutes.",
+      },
+      { type: "heading", level: 2, text: "Scheduling and analytics" },
+      {
+        type: "paragraph",
+        text: "**Buffer** remains the cleanest scheduling tool with the most sensible AI features: it suggests posting times based on your historical performance, drafts caption variations, and has a content repurposing feature that turns a blog post into Twitter/X threads and LinkedIn posts. **Later** is the stronger choice for Instagram-heavy workflows — the visual grid preview and hashtag suggestions are better.",
+      },
+      {
+        type: "tools",
+        title: "AI social media tool stack",
+        items: [
+          { name: "Buffer", valueLine: "Scheduling + AI caption suggestions — smart posting times, content repurposing.", url: "https://buffer.com" },
+          { name: "Claude", valueLine: "Best for writing posts that sound like you — paste notes, get a real post.", url: "https://claude.ai" },
+          { name: "Canva AI", valueLine: "AI graphics inside Canva — background gen, image expand, text effects.", url: "https://canva.com" },
+          { name: "Opus Clip", valueLine: "Auto-cut long videos into short clips with captions — one podcast to 15 Reels.", url: "https://opus.pro" },
+          { name: "Taplio", valueLine: "LinkedIn-first — post library, AI suggestions, scheduling, engagement analytics.", url: "https://taplio.com" },
+          { name: "Later", valueLine: "Instagram-focused scheduler — visual grid preview, hashtag suggestions.", url: "https://later.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The minimal viable AI social stack: Buffer for scheduling, Claude for first drafts, Canva AI for graphics, Opus Clip if you produce video. Add Taplio only if LinkedIn is your primary channel. Keep your voice and ideas front and center — that's still the part AI can't replace. Browse social media tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for customer support ────────────────────────────────
+  {
+    slug: "best-ai-tools-for-customer-support-2026",
+    title: "Best AI tools for customer support in 2026",
+    deck: "Intercom, Zendesk AI, Freshdesk, and more — which AI support tools actually deflect tickets and which just add complexity.",
+    date: "2026-06-08",
+    readingMin: 6,
+    tag: "Guide",
+    hero: {
+      src: U("1521737604010-e75b0a476be0"),
+      alt: "Customer support agent working at a desk with headset and computer",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for customer support in 2026: **Intercom Fin** for the highest-quality AI resolution rate, **Zendesk AI** for teams already on Zendesk, **Freshdesk Freddy** for mid-market teams on a budget, and **Claude API** (via a custom integration) for teams who need full control over the resolution logic. The key metric to track before buying any of these: how many tickets are actually deflectable by AI? Start there.",
+      },
+      {
+        type: "paragraph",
+        text: "AI customer support has divided into two clear markets: all-in-one platforms with built-in AI (Intercom, Zendesk, Freshdesk) and custom builds using foundation models via API. The platform tools are faster to deploy and good enough for most use cases; the custom build is worth it only when your product is complex enough that canned answers consistently fail.",
+      },
+      { type: "heading", level: 2, text: "All-in-one platforms" },
+      {
+        type: "paragraph",
+        text: "**Intercom Fin** (powered by Claude) consistently achieves the highest deflection rates in the category — independent comparisons put it at 45-65% ticket deflection for typical SaaS products. It pulls from your help documentation, gives confident answers, and escalates to a human when it's uncertain. The pricing is per-resolution ($0.99 per AI resolution), which aligns costs with outcomes. At scale, this is more expensive than per-seat pricing — calculate your expected volume before committing.",
+      },
+      {
+        type: "paragraph",
+        text: "**Zendesk AI** (powered by OpenAI) integrates more deeply with Zendesk's existing workflow automation, routing, and CSAT tools. If you're already on Zendesk and your team lives in Zendesk, the AI feels native rather than bolted-on. **Freshdesk Freddy** is the right choice for teams who want AI support without enterprise pricing — the deflection rates are lower than Fin but the cost is significantly lower too.",
+      },
+      { type: "heading", level: 2, text: "Custom builds" },
+      {
+        type: "paragraph",
+        text: "For complex products — developer tools, enterprise software, anything with extensive APIs and configuration options — canned AI responses from a help doc corpus frequently fail on edge cases. Building a custom support bot on the **Anthropic API** with RAG over your documentation, changelogs, and support history typically outperforms off-the-shelf tools for these use cases. The investment is 4-8 weeks of engineering; the quality ceiling is much higher.",
+      },
+      {
+        type: "tools",
+        title: "AI customer support tools",
+        items: [
+          { name: "Intercom Fin", valueLine: "Highest deflection rates — Claude-powered, per-resolution pricing, pulls from your help docs.", url: "https://intercom.com/fin" },
+          { name: "Zendesk AI", valueLine: "Native Zendesk integration — best for teams already in the Zendesk ecosystem.", url: "https://zendesk.com/ai" },
+          { name: "Freshdesk Freddy", valueLine: "Mid-market budget option — lower deflection than Fin but much lower price.", url: "https://freshworks.com/freshdesk/freddy-ai" },
+          { name: "Anthropic API", valueLine: "Foundation model for custom support bots — best quality ceiling for complex products.", url: "https://anthropic.com/api" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Before evaluating any AI support tool: audit your last 200 tickets and count how many had clear, documentable answers. If it's less than 40%, AI deflection won't move your metrics much regardless of the tool. If it's over 60%, Intercom Fin is likely the fastest path to ROI. Find all customer support AI tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Claude vs Gemini ───────────────────────────────────────────────────
+  {
+    slug: "claude-vs-gemini-which-to-use-2026",
+    title: "Claude vs Gemini: which AI model should you use in 2026?",
+    deck: "An honest comparison of Anthropic's Claude and Google's Gemini across writing, coding, research, and integrations.",
+    date: "2026-06-07",
+    readingMin: 7,
+    tag: "Comparison",
+    hero: {
+      src: U("1485827404703-89b55fcc595e"),
+      alt: "Two laptops side by side with glowing screens representing a comparison",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "**Claude** wins for writing quality, coding, and nuanced reasoning. **Gemini** wins for Google Workspace integration, real-time web search, and the largest context window (1M tokens in Gemini 1.5 Pro). If you live in Google Docs and Gmail and care most about web access, use Gemini. If you care most about the quality of what you produce — prose, code, analysis — use Claude. Both are genuinely good; the choice is about your workflow, not about one being broken.",
+      },
+      {
+        type: "paragraph",
+        text: "The Claude vs. Gemini comparison is increasingly about ecosystem fit rather than raw model capability. Both models are frontier-class in 2026 — the capability gap has narrowed. The differences that remain are meaningful but narrow: writing quality, instruction following, and coding favor Claude; real-time information, Google integration, and context length favor Gemini.",
+      },
+      { type: "heading", level: 2, text: "Writing quality" },
+      {
+        type: "paragraph",
+        text: "Claude's writing is consistently more natural and better-calibrated to context. It doesn't pad, avoids clichéd phrasings, and matches formality to the situation without being instructed. Gemini's writing is competent but tends toward a slightly more formal, report-like tone that requires more instruction to adjust. For anything where the quality of the prose matters — marketing, essays, documentation — Claude produces better first drafts.",
+      },
+      { type: "heading", level: 2, text: "Coding" },
+      {
+        type: "paragraph",
+        text: "Claude Sonnet is the preferred model among developers for coding tasks — the instruction following on complex multi-file changes is more reliable, and the error messages when something goes wrong are more specific and actionable. Gemini 2.0 Pro is a strong coder, but independent benchmarks and developer feedback consistently put Claude ahead on real-world coding tasks (as opposed to benchmark tests). Claude Code (the agentic CLI) is a significant capability that Gemini has no equivalent for.",
+      },
+      { type: "heading", level: 2, text: "Research and web access" },
+      {
+        type: "paragraph",
+        text: "Gemini has real-time Google Search integration that Claude lacks. For questions where current information matters — recent news, live stock prices, recent product releases — Gemini is more reliable because it actually searches the web rather than relying on training data. Claude's knowledge has a cutoff; Gemini's doesn't when search is enabled.",
+      },
+      { type: "heading", level: 2, text: "Google Workspace integration" },
+      {
+        type: "paragraph",
+        text: "If your work lives in Google Docs, Gmail, Sheets, and Drive, Gemini's integration advantage is real and significant. It can draft emails, summarize Google Docs, analyze Sheets data, and search your Drive — all without copy-paste. Claude has no equivalent deep integration with Google products. For Google-heavy workflows, this is often the deciding factor.",
+      },
+      {
+        type: "tools",
+        title: "Claude vs Gemini by use case",
+        items: [
+          { name: "Claude", valueLine: "Best for writing, coding, and reasoning — Anthropic's frontier model, excellent instruction following.", url: "https://claude.ai" },
+          { name: "Gemini", valueLine: "Best for Google Workspace users — real-time search, 1M token context, Gmail/Docs integration.", url: "https://gemini.google.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The honest answer: use both. Claude for writing and coding, Gemini when you need current information or are working inside Google products. At $20/month each, using both is the right call for professional use. See both on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for education ───────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-education-2026",
+    title: "Best AI tools for teachers and students in 2026",
+    deck: "From lesson planning to personalized tutoring to research — the AI tools that are actually changing how people teach and learn.",
+    date: "2026-06-06",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1503676260728-1c00da094a0b"),
+      alt: "Student studying at a desk surrounded by books and a laptop",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for education in 2026: **Khan Academy Khanmigo** for personalized tutoring and homework help, **Claude** for essay writing assistance and research summaries, **Notebook LM** (Google) for synthesizing study materials from PDFs and notes, **Diffit** for teachers creating differentiated reading materials, and **Perplexity** for cited research that's safer than Wikipedia. The biggest shift: AI tutors are replacing office hours for accessible, immediate explanations.",
+      },
+      {
+        type: "paragraph",
+        text: "Education is one of the domains where the productivity-vs-learning tension is sharpest: AI can write a student's essay, but doing so removes the learning that writing produces. The tools that are genuinely valuable in education are the ones that help you understand things faster and better — not the ones that do the work for you. This distinction matters when evaluating which AI tool to use and how.",
+      },
+      { type: "heading", level: 2, text: "For tutoring and homework help" },
+      {
+        type: "paragraph",
+        text: "**Khan Academy Khanmigo** is the most pedagogically thoughtful AI tutor available — it's designed to guide you toward understanding rather than just giving answers. When a student asks \"what's the answer to this math problem?\", Khanmigo asks questions back to help them work through the reasoning. It covers K-12 subjects and SAT/ACT prep. For younger students especially, this approach produces better learning outcomes than just asking ChatGPT.",
+      },
+      {
+        type: "paragraph",
+        text: "For university-level and adult learning, **Claude** is the better tutor for complex topics. It explains things at the right level when you specify your background, generates examples tailored to your situation, and can work through problems step-by-step without just stating the answer. The \"explain this like I have a background in X but not Y\" pattern works extremely well with Claude.",
+      },
+      { type: "heading", level: 2, text: "For research and note-taking" },
+      {
+        type: "paragraph",
+        text: "**NotebookLM** (Google) is genuinely transformative for research-heavy students. Upload your lecture notes, textbook chapters, and research papers, and NotebookLM lets you ask questions against the full corpus — it answers from your sources and cites them. No more rereading a 300-page book to find the passage you half-remember. For exam preparation, the ability to generate study guides, practice questions, and summaries from your own notes is powerful.",
+      },
+      { type: "heading", level: 2, text: "For teachers" },
+      {
+        type: "paragraph",
+        text: "**Diffit** is the most practical AI tool for teachers who need to differentiate materials for different reading levels. Give it any text or a topic, and it generates a version at any Lexile level with comprehension questions, vocabulary lists, and discussion prompts. What used to take 2 hours takes 5 minutes. **Claude** is the right tool for lesson planning, writing assessment rubrics, and generating a variety of practice problems on a topic.",
+      },
+      {
+        type: "tools",
+        title: "AI education tools",
+        items: [
+          { name: "Khan Academy Khanmigo", valueLine: "Socratic AI tutor for K-12 — guides toward understanding, doesn't give direct answers.", url: "https://khanacademy.org/khanmigo" },
+          { name: "NotebookLM", valueLine: "Q&A over your own notes and PDFs — cited answers from your source materials.", url: "https://notebooklm.google.com" },
+          { name: "Diffit", valueLine: "Differentiated reading materials for any Lexile level — lesson planning time-saver for teachers.", url: "https://diffit.me" },
+          { name: "Claude", valueLine: "University-level tutoring, essay feedback, step-by-step explanations calibrated to your level.", url: "https://claude.ai" },
+          { name: "Perplexity", valueLine: "Cited research — safer than Wikipedia, faster than library databases, sources included.", url: "https://perplexity.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The most important rule for using AI in education: use it to understand things better, not to skip understanding entirely. Khanmigo and NotebookLM are designed around this principle. Claude and Perplexity are powerful but require self-discipline to use in a way that deepens rather than replaces learning. Browse education AI tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for data analysis ───────────────────────────────────
+  {
+    slug: "best-ai-tools-for-data-analysis-2026",
+    title: "Best AI tools for data analysis in 2026",
+    deck: "From CSV analysis to BI dashboards to Python notebooks — the AI tools that compress the time from question to insight.",
+    date: "2026-06-05",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1551288049-bebda4e38f71"),
+      alt: "Data visualization charts and graphs on a screen with glowing colors",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for data analysis in 2026: **ChatGPT Code Interpreter** for one-off CSV and Excel analysis without writing code, **Claude** for explaining what your data means and drafting analysis plans, **Julius AI** for fast conversational data analysis and chart generation, **Hex** for collaborative data notebooks with AI assistance, and the **Anthropic API** for building automated analysis pipelines. The right tool depends on whether you're a technical or non-technical analyst.",
+      },
+      {
+        type: "paragraph",
+        text: "The clearest AI improvement in data work is the elimination of the code barrier. In 2022, running a correlation analysis or generating a chart required either writing Python/R or knowing how to use a BI tool. In 2026, you can upload a CSV and ask in plain English. The quality is good enough for exploratory analysis — the caveat is that AI-generated code needs review before being used in production or reports.",
+      },
+      { type: "heading", level: 2, text: "For non-technical users" },
+      {
+        type: "paragraph",
+        text: "**ChatGPT Code Interpreter** (part of ChatGPT Plus) is the most widely used tool for non-technical data analysis. Upload a CSV or Excel file, ask questions in plain English, and it writes and runs Python code to answer. The output includes both the code and the result — a chart, a table, a correlation matrix. It handles surprisingly complex analyses. The limitation: it runs in an isolated session, so you can't build on results across sessions without re-uploading data.",
+      },
+      {
+        type: "paragraph",
+        text: "**Julius AI** is built specifically for data analysis with a faster, more focused interface than ChatGPT. It generates charts, runs statistical tests, and handles common analysis patterns quickly. For a non-technical analyst who just needs to answer business questions from data, Julius is often faster than ChatGPT's Code Interpreter.",
+      },
+      { type: "heading", level: 2, text: "For technical analysts" },
+      {
+        type: "paragraph",
+        text: "**Hex** is the right tool for data teams who already work in notebooks. It adds AI autocomplete, explanation, and query generation directly into a collaborative notebook environment — the team can share and build on each other's work. The AI features are integrated rather than bolted-on. **Claude** paired with a Python environment (or Claude Code) is the best tool for complex analysis where you need to reason about methodology, not just generate code.",
+      },
+      { type: "heading", level: 2, text: "Understanding your data" },
+      {
+        type: "paragraph",
+        text: "The underused AI use case in data analysis: pasting your analysis results into **Claude** and asking \"what does this tell me?\" and \"what might I be missing?\" Claude is good at identifying confounders, suggesting additional cuts of data to look at, and explaining statistical results to non-technical stakeholders. The model can also write the narrative around your findings in plain language.",
+      },
+      {
+        type: "tools",
+        title: "AI data analysis tools",
+        items: [
+          { name: "ChatGPT Code Interpreter", valueLine: "Natural language to Python analysis — upload CSV, ask questions, get charts and tables.", url: "https://chatgpt.com" },
+          { name: "Julius AI", valueLine: "Fast conversational data analysis — focused interface, good chart generation.", url: "https://julius.ai" },
+          { name: "Hex", valueLine: "AI-assisted collaborative notebooks for data teams — integrated, not bolted-on.", url: "https://hex.tech" },
+          { name: "Claude", valueLine: "Best for reasoning about data, planning methodology, and explaining findings.", url: "https://claude.ai" },
+          { name: "Tableau Pulse", valueLine: "AI-powered insight summaries inside Tableau — explains what changed and why.", url: "https://tableau.com/products/tableau-pulse" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Non-technical analyst: start with ChatGPT Code Interpreter for any CSV analysis — it covers 80% of business questions. Technical analyst: Hex for collaborative notebooks, Claude for methodology and interpretation. The real leverage isn't the tool — it's learning to ask better questions of your data. Find all data tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for email ───────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-email-2026",
+    title: "Best AI tools for email writing in 2026",
+    deck: "Superhuman AI, Gmail's Help Me Write, Claude, and more — how to actually use AI to spend less time in your inbox.",
+    date: "2026-06-04",
+    readingMin: 6,
+    tag: "Guide",
+    hero: {
+      src: U("1596526131083-e8c633c948d2"),
+      alt: "Open laptop showing an email inbox with morning light",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for email in 2026: **Superhuman AI** for power users who process hundreds of emails daily, **Gmail's Help Me Write** for anyone already in Google Workspace, **Claude** for drafting nuanced or high-stakes emails outside the inbox, and **Shortwave** as a Gmail client alternative with strong AI triage features. The practical unlock isn't AI writing your emails — it's AI triaging your inbox so you only write the ones that require your judgment.",
+      },
+      {
+        type: "paragraph",
+        text: "Email is where the gap between AI hype and AI utility is clearest. Most AI email tools spend marketing budget on \"write a whole email from a two-word prompt\" — which produces generic, easily ignored emails. The genuinely useful AI email features are triage (what actually needs my attention?), summarization (what is this long thread saying?), and drafting (a first draft I can edit, not a finished email I send as-is).",
+      },
+      { type: "heading", level: 2, text: "AI email clients" },
+      {
+        type: "paragraph",
+        text: "**Superhuman** is the best email client for people who treat email as a core workflow. The AI features — auto-summarization of long threads, split inbox with AI triage, AI reply drafting — are well-integrated and fast. The price ($30/month) is hard to justify unless you spend 2+ hours daily in email and you're willing to move your entire inbox. For the right user, the time savings are real.",
+      },
+      {
+        type: "paragraph",
+        text: "**Shortwave** is a Gmail-compatible client with strong AI features at a lower price point. The AI summaries, follow-up reminders, and scheduling assistance are good. It's a better starting point than Superhuman for people who want to try an AI email client without the full switching cost.",
+      },
+      { type: "heading", level: 2, text: "Built-in AI features" },
+      {
+        type: "paragraph",
+        text: "**Gmail's Help Me Write** (Gemini) is built directly into Google Workspace and is free with a Workspace subscription. For standard professional emails, it's often good enough — the drafts need editing but are a reasonable starting point. The integration is seamless: you don't switch context to use it. **Outlook Copilot** is the equivalent for Microsoft 365 users.",
+      },
+      { type: "heading", level: 2, text: "For high-stakes emails" },
+      {
+        type: "paragraph",
+        text: "For important emails — a pitch to an investor, a difficult conversation with a customer, a negotiation — built-in AI email assistants are too shallow. The right tool is **Claude**: paste the context (\"I need to decline this partnership offer without damaging the relationship, here's the background\"), and it will draft something that actually accounts for the nuance. Then edit it until it sounds like you. For these emails, AI is a drafting partner, not an autocomplete.",
+      },
+      {
+        type: "tools",
+        title: "AI email tools",
+        items: [
+          { name: "Superhuman", valueLine: "Power user email client — AI triage, thread summaries, fast keyboard-driven inbox.", url: "https://superhuman.com" },
+          { name: "Shortwave", valueLine: "Gmail client with AI summaries and scheduling — Superhuman alternative at lower price.", url: "https://shortwave.com" },
+          { name: "Gmail Help Me Write", valueLine: "Free for Workspace users — drafts standard professional emails, no context switching.", url: "https://workspace.google.com" },
+          { name: "Claude", valueLine: "Best for nuanced high-stakes emails — paste context, get a thoughtful first draft.", url: "https://claude.ai" },
+        ],
+      },
+      { type: "divider" },
+        {
+          type: "paragraph",
+          text: "The practical advice: use whatever email client you already have with its built-in AI for routine emails. Switch to Superhuman only if you're spending 2+ hours daily in email. For emails that matter — the pitch, the apology, the negotiation — use Claude and take the 5 minutes to get the draft right. Find email and productivity tools on the [Radar](/radar/browse).",
+        },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for research ────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-research-2026",
+    title: "Best AI tools for research in 2026",
+    deck: "Perplexity, NotebookLM, Elicit, Consensus, and more — the AI research stack for analysts, academics, and curious generalists.",
+    date: "2026-06-03",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1507003211169-0a1dd7228f2d"),
+      alt: "Stack of research papers and books on a desk with warm afternoon light",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI research tools in 2026: **Perplexity** for fast, cited web research; **NotebookLM** for synthesizing your own document corpus; **Elicit** for searching and analyzing academic papers; **Consensus** for answering questions with peer-reviewed evidence; and **Claude** for reasoning about complex topics, synthesizing multiple sources, and writing up findings. Together these tools replace most of what used to require hours in a library or database.",
+      },
+      {
+        type: "paragraph",
+        text: "Research has two distinct phases: finding information and making sense of it. Different AI tools are optimized for each. Perplexity and Elicit are retrieval tools — they help you find things faster. NotebookLM and Claude are synthesis tools — they help you understand what you found. A complete AI research stack uses both types.",
+      },
+      { type: "heading", level: 2, text: "Finding information" },
+      {
+        type: "paragraph",
+        text: "**Perplexity** is the most useful everyday research tool because it answers questions with real-time web sources and cites them. The citations make it far more trustworthy than asking a chatbot that might confabulate facts — you can verify every claim immediately. Perplexity Pro adds deeper search modes, Claude and GPT-4o as optional models, and file upload for document-based queries.",
+      },
+      {
+        type: "paragraph",
+        text: "For academic research specifically, **Elicit** and **Consensus** search peer-reviewed literature rather than the web. Elicit returns relevant papers with AI-extracted summaries of methodology and findings — the equivalent of reading 50 abstracts in 5 minutes. Consensus answers research questions with a consensus assessment from the literature. Both are better than Google Scholar for most literature search tasks.",
+      },
+      { type: "heading", level: 2, text: "Synthesizing your documents" },
+      {
+        type: "paragraph",
+        text: "**NotebookLM** (Google) lets you upload up to 50 documents — research papers, interview transcripts, reports, meeting notes — and then ask questions that synthesize across all of them. The answers are grounded in your sources (it won't hallucinate information from outside your uploads) and cited to specific documents. For any project where you're processing a corpus of material, NotebookLM compresses days of reading into hours.",
+      },
+      { type: "heading", level: 2, text: "Reasoning and writing up" },
+      {
+        type: "paragraph",
+        text: "**Claude** is the best tool for the final phase of research: making sense of what you've found, identifying gaps, and writing it up. Paste in your notes, your Perplexity summaries, and your Elicit results, and ask Claude to synthesize them into a coherent narrative or identify the key open questions. For academic and analytical writing, Claude's ability to maintain precision and avoid overstating claims is particularly valuable.",
+      },
+      {
+        type: "tools",
+        title: "AI research tool stack",
+        items: [
+          { name: "Perplexity", valueLine: "Cited web research in real time — the fastest way to get answers with sources.", url: "https://perplexity.ai" },
+          { name: "NotebookLM", valueLine: "Q&A over your own document corpus — grounded, cited synthesis across 50 uploads.", url: "https://notebooklm.google.com" },
+          { name: "Elicit", valueLine: "Academic literature search — extracts methods and findings from peer-reviewed papers.", url: "https://elicit.com" },
+          { name: "Consensus", valueLine: "Evidence-based answers from the scientific literature — what does research say about X?", url: "https://consensus.app" },
+          { name: "Claude", valueLine: "Best for synthesis and writing up — reason across sources, identify gaps, draft reports.", url: "https://claude.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The AI research workflow: Perplexity for initial orientation → Elicit for academic literature → NotebookLM to synthesize your source corpus → Claude to reason and write. Each tool handles the phase it's designed for. Combining them is more powerful than using any single one. Find all research tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for project management ──────────────────────────────
+  {
+    slug: "best-ai-tools-for-project-management-2026",
+    title: "Best AI tools for project management in 2026",
+    deck: "Linear, Notion AI, ClickUp AI, and more — which AI PM tools actually reduce coordination overhead and which are features looking for a use case.",
+    date: "2026-06-02",
+    readingMin: 6,
+    tag: "Guide",
+    hero: {
+      src: U("1552664730-d307ca884978"),
+      alt: "Project planning whiteboard with sticky notes and timelines in a modern office",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for project management in 2026: **Linear** for software teams (AI issue triage and prioritization), **Notion AI** for teams whose project management lives in Notion documents, **ClickUp AI** for teams that want AI embedded across task, doc, and time-tracking workflows, and **Claude** for the meta-work — summarizing standups, drafting project briefs, writing post-mortems. The most valuable AI PM feature isn't any of these tools' built-in AI: it's using Claude to compress the writing overhead of running a project.",
+      },
+      {
+        type: "paragraph",
+        text: "Project management AI has mostly followed the pattern of adding AI drafting and summarization to existing PM tools — which is genuinely useful, but represents incremental improvement rather than a category shift. The larger opportunity is using general-purpose AI (Claude, GPT-4o) for the high-cognitive-overhead parts of PM: structuring ambiguity, communicating to stakeholders, and writing up what happened and why.",
+      },
+      { type: "heading", level: 2, text: "For software teams: Linear" },
+      {
+        type: "paragraph",
+        text: "**Linear** is the best project management tool for software teams and has integrated AI thoughtfully rather than superficially. The AI auto-generates issue titles and descriptions from rough notes, suggests priority and team assignment based on similar historical issues, and can identify duplicate tickets. The core Linear experience (fast, keyboard-driven, cycle-based) remains unchanged — the AI features are accelerants, not a new UX paradigm.",
+      },
+      { type: "heading", level: 2, text: "For doc-centric teams: Notion AI" },
+      {
+        type: "paragraph",
+        text: "If your project management already happens in Notion pages — meeting notes, project briefs, roadmaps — **Notion AI** is the natural choice because it operates inside your existing workspace. It can summarize long document trees, generate action items from meeting notes, and draft project briefs from a few bullet points. The AI add-on ($10/month per user) is meaningful overhead for small teams, but the integration value is real.",
+      },
+      { type: "heading", level: 2, text: "Using Claude for PM work" },
+      {
+        type: "paragraph",
+        text: "The highest-ROI AI investment for most project managers isn't a PM tool's AI feature — it's using **Claude** directly for the writing-intensive parts of the job. Draft the project brief by pasting in the requirements doc and asking Claude to structure it. Paste the Slack thread from the incident and ask Claude to write the post-mortem. Paste the meeting transcript and ask for action items and decisions. These tasks take 30 minutes each manually; they take 5 minutes with Claude.",
+      },
+      {
+        type: "tools",
+        title: "AI project management tools",
+        items: [
+          { name: "Linear", valueLine: "Best for software teams — AI issue triage, priority suggestions, clean cycle-based workflow.", url: "https://linear.app" },
+          { name: "Notion AI", valueLine: "AI inside your Notion workspace — summaries, action items, project brief drafts.", url: "https://notion.so/product/ai" },
+          { name: "ClickUp AI", valueLine: "AI across tasks, docs, and time tracking — good for teams that run everything in ClickUp.", url: "https://clickup.com/features/ai" },
+          { name: "Claude", valueLine: "Best for PM writing — briefs, post-mortems, stakeholder updates, meeting summaries.", url: "https://claude.ai" },
+          { name: "Asana Intelligence", valueLine: "AI goal tracking and status summaries inside Asana — useful for cross-functional teams.", url: "https://asana.com/product/ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Use Linear or Notion AI for the tool you already live in. Layer Claude on top for the writing work: briefs, updates, post-mortems, and stakeholder communication. That combination covers the two highest-leverage PM AI use cases without adopting a new tool stack. Browse PM tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for content creators ────────────────────────────────
+  {
+    slug: "best-ai-tools-for-content-creators-2026",
+    title: "Best AI tools for content creators in 2026",
+    deck: "For YouTubers, podcasters, newsletters, and social creators — the AI tools that make consistent content output achievable without burning out.",
+    date: "2026-06-01",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1593697820426-173399a34e96"),
+      alt: "Content creator recording a video in a home studio with lighting and camera",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI tools for content creators in 2026: **Descript** for video and podcast editing with AI transcription and filler word removal, **Opus Clip** for repurposing long videos into short-form clips, **Claude** for scriptwriting and newsletter drafts, **ElevenLabs** for voice synthesis and dubbing, and **Midjourney** for thumbnail and cover art. These five tools form the core AI stack for solo creators who need to publish across multiple platforms without a team.",
+      },
+      {
+        type: "paragraph",
+        text: "The economics of solo content creation have fundamentally changed with AI. Tasks that required a team (video editing, transcript generation, repurposing across formats, thumbnail design) can now be handled by one person with the right tools. The question is no longer \"can I do this alone?\" but \"what's the right tool for each part of the workflow?\"",
+      },
+      { type: "heading", level: 2, text: "Video and podcast production" },
+      {
+        type: "paragraph",
+        text: "**Descript** is the most powerful all-in-one tool for audio and video creators. It transcribes your recording automatically, lets you edit by editing the transcript (cut a word from the transcript and it removes it from the audio/video), removes filler words in bulk, and adds captions automatically. For solo podcasters and YouTubers, Descript compresses 3-4 hours of editing into 30-45 minutes. It's the single highest-leverage tool in this list for audio/video creators.",
+      },
+      {
+        type: "paragraph",
+        text: "**Opus Clip** handles content repurposing: feed it a long YouTube video, podcast episode, or webinar, and it automatically identifies the best 30-90 second clips and formats them for TikTok, Reels, and YouTube Shorts — with captions, aspect ratio conversion, and speaker tracking. One hour of content becomes 10-15 short-form clips in 15 minutes.",
+      },
+      { type: "heading", level: 2, text: "Writing and scripting" },
+      {
+        type: "paragraph",
+        text: "**Claude** is the strongest AI for scriptwriting and newsletter drafts. Give it your rough outline, talking points, or voice memo transcript, and it produces a draft that reads naturally rather than like generated content. For newsletters, the right workflow is to draft your main idea in bullet points and ask Claude to expand it into prose — then edit heavily to add your specific examples, voice, and personality. Pure AI-generated newsletters are recognizable and tend to lose subscribers.",
+      },
+      { type: "heading", level: 2, text: "Voice and visuals" },
+      {
+        type: "paragraph",
+        text: "**ElevenLabs** is the state of the art for AI voice synthesis. For creators who want to clone their own voice for dubbing in other languages, generate voiceover for videos, or produce audio content at scale, the voice quality is genuinely impressive. **Midjourney** produces the best AI thumbnails and cover art — a bold, high-contrast image with text overlay (designed in Canva) from a well-crafted Midjourney prompt typically outperforms stock photos for click-through rates.",
+      },
+      {
+        type: "tools",
+        title: "AI creator tool stack",
+        items: [
+          { name: "Descript", valueLine: "Edit audio/video by editing transcript — filler word removal, captions, 3 hours to 30 min.", url: "https://descript.com" },
+          { name: "Opus Clip", valueLine: "Long video to short-form clips — auto identifies best moments, adds captions, Reels-ready.", url: "https://opus.pro" },
+          { name: "Claude", valueLine: "Scripts, newsletters, outlines — strong first draft that you edit into your voice.", url: "https://claude.ai" },
+          { name: "ElevenLabs", valueLine: "Voice cloning and synthesis — dub into other languages, voiceover at scale.", url: "https://elevenlabs.io" },
+          { name: "Midjourney", valueLine: "Thumbnails and cover art — high-quality concept images that outperform stock photos.", url: "https://midjourney.com" },
+          { name: "Canva AI", valueLine: "Design and text overlay for thumbnails, social graphics, and channel art.", url: "https://canva.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The minimum viable creator AI stack: Descript for production, Opus Clip for repurposing, Claude for scripts and newsletters. Add ElevenLabs if you produce voice content, Midjourney if thumbnails are a bottleneck. The tools are ready; the remaining variable is the ideas and perspective — that's still entirely yours. Browse all creator tools on the [Radar](/radar/browse).",
+      },
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

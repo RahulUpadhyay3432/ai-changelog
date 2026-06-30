@@ -30,6 +30,12 @@
   color: #e8e4de;
   letter-spacing: -0.02em;
   text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.wordmark:hover {
+  color: #ffffff;
 }
 
 .nav {

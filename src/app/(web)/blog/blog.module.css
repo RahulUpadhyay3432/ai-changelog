@@ -558,6 +558,16 @@
   }
 }
 
+/* ─── Blog index breakout — wider than the 760px reading shell ─────────────── */
+/* The article page already breaks out via BlogReader. The index grid needs
+   the same treatment so it fills the viewport instead of the narrow column. */
+.indexShell {
+  width: min(1280px, 100vw - 48px);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 /* ─── Tag filter bar ───────────────────────────────────────────────────────── */
 .filterBar {
   display: flex;

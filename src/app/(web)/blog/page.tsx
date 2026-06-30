@@ -60,7 +60,7 @@ export default function BlogIndex() {
           The Kapyn Blog
         </span>
         <h1 style={{ fontFamily: SG, fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.06, margin: "10px 0 0", color: TEXT.primary }}>
-          Guides on the AI tools worth using
+          Guides on the AI tools worth using.
         </h1>
         <p style={{ fontSize: "15px", color: TEXT.muted, lineHeight: 1.55, margin: "12px 0 0", maxWidth: "520px" }}>
           {DESC}

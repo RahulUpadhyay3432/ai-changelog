@@ -66,15 +66,24 @@ export default async function BlogPostPage({ params }: Props) {
 
   const articleJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     headline: post.title,
     description: post.deck,
-    image: post.hero?.src,
+    image: post.hero?.src ? [{ "@type": "ImageObject", url: post.hero.src }] : undefined,
     datePublished: post.date,
     dateModified: post.date,
     author: { "@type": "Organization", name: "Kapyn", url: APP_URL },
-    publisher: { "@type": "Organization", name: "Kapyn", url: APP_URL },
+    publisher: {
+      "@type": "Organization",
+      name: "Kapyn",
+      url: APP_URL,
+      logo: { "@type": "ImageObject", url: `${APP_URL}/icon-192.png` },
+    },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    url,
+    articleSection: post.tag,
+    wordCount: post.readingMin * 250,
+    inLanguage: "en-US",
   };
   const listJsonLd = {
     "@context": "https://schema.org",

@@ -696,6 +696,937 @@ limit 8;`,
       },
     ],
   },
+
+  // ─── SEO: Best AI coding assistants ─────────────────────────────────────────
+  {
+    slug: "best-ai-coding-assistants-2026",
+    title: "Best AI coding assistants in 2026",
+    deck: "The five tools that actually belong in a developer's workflow — ranked by what they do best, not by hype cycle position.",
+    date: "2026-06-25",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1461749280684-dccba630e2f6"),
+      alt: "Code editor open on a laptop screen",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI coding assistant in 2026 depends on what you're doing: **Cursor** wins for interactive editing inside a large codebase; **Claude Code** wins for long-horizon agentic tasks you hand off from the terminal; **GitHub Copilot** is still the safest choice for teams with strict data-governance requirements. The rest of this article explains the tradeoffs so you can stop re-evaluating and start building.",
+      },
+      {
+        type: "paragraph",
+        text: "AI coding tools have split into two distinct categories: editors (where you work alongside the model in real time) and agents (where you describe a task, walk away, and come back to a diff). The best workflow in 2026 combines one from each column — they do genuinely different jobs and don't cannibalize each other.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How this list is structured",
+        text: "Each tool is assessed on three axes: **quality of suggestions**, **context window / codebase understanding**, and **agentic capability**. A tool that scores high on all three doesn't exist yet — but the combinations that cover all three do.",
+      },
+
+      { type: "heading", level: 2, text: "Cursor — best for interactive editing" },
+      {
+        type: "paragraph",
+        text: "Cursor is an AI-native fork of VS Code. It ships with a composer panel (multi-file context), an inline edit command (`Cmd+K`), and a chat sidebar that can reference the entire codebase. The core innovation is that Cursor treats the whole repo as context rather than just the open file — so \"how does this relate to the auth middleware?\" is a question it can actually answer.",
+      },
+      {
+        type: "paragraph",
+        text: "The model underneath is your choice: Claude Sonnet, GPT-4o, or Cursor's own fine-tuned model. In practice, Claude Sonnet gives the most coherent multi-file edits; the fine-tuned model is faster for quick completions. Pricing is $20/month for Pro, which includes unlimited slow requests and 500 fast ones — most developers hit the fast limit mid-month and barely notice.",
+      },
+      {
+        type: "paragraph",
+        text: "The main weakness: Cursor's composer will sometimes go far off-track on complex refactors, making changes you didn't ask for. You need to review every diff. That's true of every AI editor, but Cursor's confidence can make it more aggressive than alternatives.",
+      },
+      { type: "heading", level: 2, text: "Claude Code — best for agentic tasks" },
+      {
+        type: "paragraph",
+        text: "Claude Code is a terminal-first agent from Anthropic. You give it a task in plain language — \"add pagination to the dashboard, write tests, make sure the existing tests still pass\" — and it works through the codebase independently: reading files, writing code, running commands, checking its own output. It's the closest thing to delegating a whole feature to a junior engineer who actually delivers.",
+      },
+      {
+        type: "paragraph",
+        text: "What separates it from similar tools is the context window and the instruction-following. Claude holds much longer chains of reasoning without losing the plot, which matters enormously on tasks that touch more than three files. It's slower than Cursor for quick edits and has no GUI, but for the kind of work you'd previously batch up for a contractor, it's the right tool.",
+      },
+      {
+        type: "quote",
+        text: "The mental model shift: Cursor is a faster keyboard. Claude Code is a colleague you can assign a ticket to.",
+      },
+      { type: "heading", level: 2, text: "GitHub Copilot — best for teams" },
+      {
+        type: "paragraph",
+        text: "Copilot's competitive moat is trust and integration, not raw quality. It plugs into VS Code, JetBrains, Visual Studio, Neovim, and the GitHub web editor. It has enterprise data-handling agreements that meet most corporate compliance requirements. And it's where most developers first encountered AI completion — which means less re-training friction on a team.",
+      },
+      {
+        type: "paragraph",
+        text: "The suggestion quality has improved significantly with Copilot's upgrade to Claude and GPT-4o as underlying models. It's no longer the quality-laggard it was in 2023. For an organization that needs single-vendor, audited, SLA-backed AI tooling, it's the clear answer.",
+      },
+      { type: "heading", level: 2, text: "Windsurf — best Cursor alternative" },
+      {
+        type: "paragraph",
+        text: "Windsurf (from Codeium) is the closest full-feature alternative to Cursor. It has a similar composer panel, the same model choices, and a free tier that's genuinely useful — unlimited slow requests on the Claude Haiku level model. The UX philosophy is slightly different: Windsurf leans more into long-running flows it calls \"Cascade\", which track your intent across multiple files and many turns.",
+      },
+      {
+        type: "paragraph",
+        text: "If Cursor's pricing is a blocker, or if you want to evaluate the field before committing, Windsurf is the right test drive. Most developers who switch stay.",
+      },
+      { type: "heading", level: 2, text: "Aider — best for the command line" },
+      {
+        type: "paragraph",
+        text: "Aider is open-source, runs in the terminal, and is the choice for developers who want full control over which model they use and exactly what context they pass. It has a `--model` flag that accepts any OpenAI-compatible endpoint — meaning you can point it at Ollama for local models, or the Anthropic API, or OpenRouter. No subscription, no vendor lock-in, no data sent to a third-party editor.",
+        },
+      {
+        type: "paragraph",
+        text: "The tradeoff: Aider is more work to set up, has no GUI, and requires you to manage your own API spend. For developers with those skills and that preference, it's the most flexible option in the category.",
+      },
+      {
+        type: "tools",
+        title: "The coding assistants worth using",
+        items: [
+          { name: "Cursor", valueLine: "AI-native code editor — multi-file context, inline edit, best for interactive codebase work.", url: "https://cursor.com" },
+          { name: "Claude Code", valueLine: "Terminal-first AI agent — hand it a task, come back to a diff. Best for long-horizon agentic work.", url: "https://www.anthropic.com/claude-code" },
+          { name: "GitHub Copilot", valueLine: "Enterprise-grade AI completion across every major IDE — the safe, auditable choice for teams.", url: "https://github.com/features/copilot" },
+          { name: "Windsurf", valueLine: "Cursor alternative from Codeium — generous free tier, strong multi-file Cascade flows.", url: "https://codeium.com/windsurf" },
+          { name: "Aider", valueLine: "Open-source terminal AI agent — use any model, full control, no subscription.", url: "https://aider.chat" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The answer to \"which AI coding assistant should I use?\" is rarely one tool. Pick an editor for your day-to-day work and an agent for the tasks you'd otherwise batch. For most developers that's Cursor + Claude Code, or Windsurf + Claude Code if you want to keep the bill lower. Find all of them and more on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for designers ────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-designers-2026",
+    title: "Best AI tools for designers in 2026",
+    deck: "Which AI tools actually save design time — and which ones produce work you'll have to redo. A no-hype breakdown.",
+    date: "2026-06-24",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1561070791-2526d30994b5"),
+      alt: "Design work on a screen showing UI components",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The AI tools that actually belong in a designer's stack in 2026 are: **Figma AI** for in-context design work, **Midjourney** for reference imagery and mood boards, **Framer AI** for shipping interactive prototypes without engineering hand-off, and **Galileo AI** for generating editable UI scaffolds from text. Everything else is either a toy or a novelty that breaks down on real work.",
+      },
+      {
+        type: "paragraph",
+        text: "The failure mode for most designers adopting AI tools is treating them as final-output machines. They are not. The output of an AI image tool is raw material — a starting point for refinement, not a deliverable. Designers who understand this use AI tools to move 3x faster. Those who don't produce work that looks generically AI-flavored and requires more cleanup than it saved.",
+      },
+      { type: "heading", level: 2, text: "For UI and product design: Figma AI" },
+      {
+        type: "paragraph",
+        text: "Figma's AI features (First Draft, Auto Layout suggestions, content fill) are the lowest-friction way to add AI to an existing design workflow because they're already inside the tool you use all day. First Draft generates a UI scaffold from a text prompt — not final-quality, but a skeleton you can iterate from. Auto Layout suggestions help with responsive structure. Content fill replaces placeholder text and images with realistic dummy content, which significantly cuts the time between wireframe and stakeholder presentation.",
+      },
+      {
+        type: "paragraph",
+        text: "The important nuance: Figma AI generates work in Figma's component system, so the output is editable vector layers rather than a rasterized image. That's what makes it useful for production design. Compare this to Canva AI or Adobe Firefly, which generate images you then need to re-implement.",
+      },
+      { type: "heading", level: 2, text: "For imagery and references: Midjourney" },
+      {
+        type: "paragraph",
+        text: "Midjourney is still the best image generation model for design work — not because of resolution or speed, but because of aesthetic quality and controllability at the mood board stage. The `/imagine` command is useful; the real power is in `--style`, `--sref` (style reference), and `--cref` (character reference), which let you lock in visual identity across a series of images.",
+      },
+      {
+        type: "paragraph",
+        text: "The practical workflow: generate 20 variants from a brief, pull the three that read strongest, use those as reference in your actual design file. You're not shipping Midjourney output — you're using it to resolve visual direction decisions faster than a Pinterest rabbit hole would.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Where Midjourney breaks down",
+        text: "Text rendering inside images is still unreliable. For any image that needs readable words — UI screenshots, product mockups, social cards — generate the image without text in Midjourney, then add the type in Figma or your design tool.",
+      },
+      { type: "heading", level: 2, text: "For prototyping and shipping: Framer AI" },
+      {
+        type: "paragraph",
+        text: "Framer sits at the intersection of design tool and web builder. The AI layer lets you describe a section in text and generate interactive, responsive HTML/CSS that's ready to publish — not a mockup, but a real live page. For landing pages, portfolios, and marketing sites, the gap between design and shipping has collapsed to nearly zero.",
+      },
+      {
+        type: "paragraph",
+        text: "The constraint: Framer is a CMS-hosted tool, not a component library you bring into an existing codebase. It's right for self-contained sites. For complex product UI, you still need Figma and an engineering handoff.",
+      },
+      { type: "heading", level: 2, text: "For generating UI scaffolds: Galileo AI and v0" },
+      {
+        type: "paragraph",
+        text: "**Galileo AI** generates multi-screen UI from a brief and exports to Figma as editable components. It's useful in the earliest stage of a product — when you need something to react to, not something finished. **v0 by Vercel** does the same thing but outputs React/Tailwind code rather than a Figma file, which makes it the right tool when you're building a product and want to skip the handoff entirely.",
+      },
+      {
+        type: "paragraph",
+        text: "Both tools produce work that requires significant refinement. But they eliminate the blank-canvas problem — having something specific to react to is consistently faster than starting from nothing.",
+      },
+      {
+        type: "tools",
+        title: "The AI design tools worth using",
+        items: [
+          { name: "Figma AI", valueLine: "First Draft, Auto Layout, and content fill — AI inside the design tool you're already using.", url: "https://figma.com/ai" },
+          { name: "Midjourney", valueLine: "Best aesthetic quality for reference imagery and mood boards — strongest style control in the category.", url: "https://midjourney.com" },
+          { name: "Framer", valueLine: "AI-powered web builder — describe a section and get live, responsive HTML. Collapses design-to-publish.", url: "https://framer.com" },
+          { name: "v0 by Vercel", valueLine: "Generate React/Tailwind UI from a prompt — skip the Figma-to-code handoff entirely.", url: "https://v0.dev" },
+          { name: "Adobe Firefly", valueLine: "Commercially safe image generation inside the Creative Cloud ecosystem — generative fill in Photoshop.", url: "https://firefly.adobe.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "AI doesn't replace design judgment — it removes friction from the parts that don't require it. The designers who get the most from these tools are the ones who keep a clear line between AI-generated starting material and finished work. All of these tools are on the [Radar](/radar/browse) if you want to explore further.",
+      },
+    ],
+  },
+
+  // ─── SEO: Best MCP servers ───────────────────────────────────────────────────
+  {
+    slug: "best-mcp-servers-for-claude-2026",
+    title: "Best MCP servers for Claude in 2026",
+    deck: "MCP turns Claude from a chatbot into an agent that can read your files, query your database, and call your APIs. Here are the servers worth wiring up.",
+    date: "2026-06-23",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1558494949-ef010cbdcc31"),
+      alt: "Server racks in a data center with blue lighting",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best MCP servers to install in 2026 are: **Filesystem** (read and write local files), **Fetch** (make HTTP requests), **Supabase MCP** (query your database), **Playwright MCP** (control a browser), and **GitHub MCP** (manage repos and PRs from the conversation). These five cover 90% of real agentic workflows. Everything else is additive.",
+      },
+      {
+        type: "paragraph",
+        text: "Model Context Protocol (MCP) is the open standard that lets AI models communicate with external tools. Instead of copy-pasting data into a chat window, an MCP server exposes tools the model can call natively — read a file, run a query, submit a form — and get structured results back. The practical effect: Claude can operate your development environment, not just advise on it.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "Setup: where does MCP config live?",
+        text: "MCP servers are configured in `~/Library/Application Support/Claude/claude_desktop_config.json` on Mac (or the equivalent path on Windows/Linux). Most servers run via `npx` with no separate install step — just add the config and restart Claude Desktop.",
+      },
+      { type: "heading", level: 2, text: "The core three: Filesystem, Fetch, and Memory" },
+      {
+        type: "paragraph",
+        text: "The **Filesystem** server is non-negotiable for any coding or file-management workflow. It gives Claude read and write access to specified directories — meaning it can read a config file, edit a component, and create a new file in one conversation turn. The security model lets you restrict access to specific paths, so you don't need to give it access to your whole machine.",
+      },
+      {
+        type: "paragraph",
+        text: "The **Fetch** server lets Claude make HTTP requests and parse the responses. This turns it into a capable API tester, web researcher, and scraper. \"Check the status of this endpoint\" or \"fetch the docs for this library and summarize the auth section\" go from multi-step copy-paste exercises to single instructions.",
+      },
+      {
+        type: "paragraph",
+        text: "The **Memory** server maintains a persistent knowledge graph across conversations. By default, Claude forgets everything between sessions. With Memory, it can store facts, preferences, and working knowledge that carry forward — making it far more useful as a long-running assistant on a project.",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: `{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/you/projects"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}`,
+      },
+      { type: "heading", level: 2, text: "For developers: GitHub and Supabase" },
+      {
+        type: "paragraph",
+        text: "The **GitHub MCP** server exposes the GitHub API as tools Claude can call directly: create a branch, open a PR, read issue comments, push a commit. This is the bridge between an AI that can write code and one that can actually participate in a development workflow. It's particularly powerful combined with Claude Code — describe a feature, have it implement and commit, then open the PR from the same conversation.",
+      },
+      {
+        type: "paragraph",
+        text: "The **Supabase MCP** server connects Claude to your Supabase database. It can read and write rows, run SQL queries, and introspect the schema. The most useful pattern: describe a data migration in plain English, have Claude write and validate the SQL, then execute it — all inside the conversation, with the SQL visible for review before it runs.",
+      },
+      { type: "heading", level: 2, text: "For research and automation: Playwright and Brave Search" },
+      {
+        type: "paragraph",
+        text: "**Playwright MCP** gives Claude control of a real browser — it can navigate to URLs, click elements, fill forms, and extract page content. This is qualitatively different from the Fetch server, which only retrieves raw HTML. Playwright handles JavaScript-rendered pages, can log into services, and can automate multi-step web workflows. The obvious power tool for QA automation and web scraping.",
+      },
+      {
+        type: "paragraph",
+        text: "**Brave Search MCP** connects Claude to Brave's search API (requires a free API key). Useful for any research workflow where the model needs current information beyond its training cutoff — competitive analysis, recent product releases, latest documentation.",
+      },
+      {
+        type: "tools",
+        title: "MCP servers worth installing",
+        items: [
+          { name: "MCP Filesystem", valueLine: "Read and write local files by path — the foundation of any coding or file-management workflow.", url: "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem" },
+          { name: "MCP Fetch", valueLine: "Make HTTP requests from the conversation — API testing, web research, live docs.", url: "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch" },
+          { name: "GitHub MCP", valueLine: "Manage repos, branches, PRs, and issues from the Claude conversation.", url: "https://github.com/github/github-mcp-server" },
+          { name: "Supabase MCP", valueLine: "Query and mutate your Supabase database directly from an AI conversation.", url: "https://github.com/supabase-community/supabase-mcp" },
+          { name: "Playwright MCP", valueLine: "Give Claude full browser control — navigation, clicks, forms, and JS-rendered page extraction.", url: "https://github.com/microsoft/playwright-mcp" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Start with Filesystem and Fetch. Add GitHub or Supabase once your codebase is involved. Add Playwright when you need real browser automation. The full MCP catalog — with hundreds of community servers for Slack, Linear, Notion, AWS, and more — lives on the [Radar](/radar/mcp).",
+      },
+    ],
+  },
+
+  // ─── SEO: What is MCP ────────────────────────────────────────────────────────
+  {
+    slug: "what-is-mcp-model-context-protocol",
+    title: "What is MCP? The Model Context Protocol explained",
+    deck: "MCP is the USB-C of AI tooling — a single standard that lets any model talk to any tool. Here's what it is, why it matters, and how to get started in 10 minutes.",
+    date: "2026-06-22",
+    readingMin: 7,
+    tag: "Explainer",
+    hero: {
+      src: U("1558494949-ef010cbdcc31"),
+      alt: "Abstract network connections representing data flow",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "MCP (Model Context Protocol) is an open standard, created by Anthropic in late 2024, that defines how AI models communicate with external tools and data sources. In plain terms: instead of manually copying context into a chat window, MCP lets Claude (or any MCP-compatible model) call tools directly — read a file, query a database, run a browser — and get structured results back. It's the difference between an AI advisor and an AI that can actually do things.",
+      },
+      {
+        type: "paragraph",
+        text: "The analogy that sticks: MCP is the USB-C of AI tooling. Before USB-C, every device had its own proprietary connector. USB-C created one standard that works everywhere. MCP does the same for AI tools — one integration protocol, usable across Claude, GPT-4, Gemini, and any model that adopts the spec. A server you build once works with every MCP client.",
+      },
+      { type: "heading", level: 2, text: "How MCP works, without the jargon" },
+      {
+        type: "paragraph",
+        text: "An MCP setup has two parts: a **client** (the AI model) and a **server** (the thing that exposes tools). The server declares what it can do — \"I can read files\", \"I can run SQL queries\", \"I can fetch web pages\" — and the client can call those tools during a conversation. The AI decides when to use them based on context.",
+      },
+      {
+        type: "paragraph",
+        text: "Concretely: you're talking to Claude in Claude Desktop and you ask \"how many users signed up this week?\". Without MCP, Claude can only answer if you paste in the data. With a Supabase MCP server configured, Claude calls the query tool, gets the number from your database, and answers directly. The conversation never left Claude's interface.",
+      },
+      {
+        type: "diagram",
+        chart: `graph LR
+  A[Claude Desktop] -->|tool call| B[MCP Server]
+  B -->|reads| C[Files / DB / APIs]
+  C -->|structured result| B
+  B -->|response| A`,
+        caption: "MCP flow: the model calls a server tool, gets a result, uses it in the response.",
+      },
+      { type: "heading", level: 2, text: "MCP vs function calling: what's the difference?" },
+      {
+        type: "paragraph",
+        text: "If you've used OpenAI's function calling or Claude's tool use, MCP will feel familiar — but there's a key architectural difference. Function calling defines tools inline in the API request (each call, each time). MCP is a persistent, separate process: you run a server, the client connects to it, and the connection stays open across the whole conversation. This means MCP servers can maintain state, hold open connections, and be shared across multiple clients and models.",
+      },
+      {
+        type: "paragraph",
+        text: "Another difference: MCP is local-first. Most MCP servers run on your machine as a subprocess, which means your data never leaves your environment unless the tool explicitly calls an external service. This is important for developers who need to keep code or data local.",
+      },
+      { type: "heading", level: 2, text: "Getting started: 10 minutes to your first server" },
+      {
+        type: "paragraph",
+        text: "The fastest path to MCP is Claude Desktop + the official filesystem server. Install [Claude Desktop](https://claude.ai/download), then add this to your config file (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac):",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: `{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/yourname/projects"
+      ]
+    }
+  }
+}`,
+      },
+      {
+        type: "paragraph",
+        text: "Restart Claude Desktop and the model now has read/write access to your projects folder. Ask it to \"list all TypeScript files in my current project\" or \"read the README and summarize the setup steps\" — it'll call the filesystem tools and answer from the actual files.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Security model",
+        text: "MCP servers only have access to what you explicitly grant. The filesystem server only reads/writes paths you specify in the config. No tool can access anything outside its declared scope — the model cannot \"jailbreak\" a server to access your whole machine.",
+      },
+      { type: "heading", level: 2, text: "The MCP ecosystem in 2026" },
+      {
+        type: "paragraph",
+        text: "When Anthropic open-sourced MCP in November 2024, the ecosystem was a handful of official servers. By mid-2026, there are hundreds: Slack, Linear, Notion, GitHub, AWS, Google Drive, Postgres, MongoDB, Stripe, and more. The community has built servers for almost every developer tool and SaaS product.",
+      },
+      {
+        type: "paragraph",
+        text: "Adoption has spread beyond Claude too. OpenAI added MCP support to their agents framework. Google's Gemini supports MCP in Vertex AI. The standard is becoming the default integration layer for agentic AI across the industry.",
+      },
+      {
+        type: "tools",
+        title: "MCP servers to start with",
+        items: [
+          { name: "MCP Filesystem", valueLine: "Read and write local files — the first server to install.", url: "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem" },
+          { name: "MCP Fetch", valueLine: "HTTP requests and web content from the conversation.", url: "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch" },
+          { name: "MCP Memory", valueLine: "Persistent knowledge graph — context that survives across sessions.", url: "https://github.com/modelcontextprotocol/servers/tree/main/src/memory" },
+          { name: "GitHub MCP", valueLine: "Repos, PRs, and issues from the Claude conversation.", url: "https://github.com/github/github-mcp-server" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "MCP is the biggest practical upgrade to daily AI use since streaming responses. Once you have one server running, the question of \"what else can I connect?\" becomes an interesting one. The full catalog of community MCP servers is on the [Radar](/radar/mcp).",
+      },
+    ],
+  },
+
+  // ─── SEO: Claude vs GPT-4o ───────────────────────────────────────────────────
+  {
+    slug: "claude-vs-gpt4o-which-to-use-2026",
+    title: "Claude vs GPT-4o: Which AI model should you use in 2026?",
+    deck: "The honest comparison. Not a benchmark table — a breakdown of which tasks each model handles better, and when the difference actually matters.",
+    date: "2026-06-21",
+    readingMin: 8,
+    tag: "Comparison",
+    hero: {
+      src: U("1677442135703-1787eea5ce01"),
+      alt: "Two abstract AI network visualizations side by side",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "For most developers in 2026: use **Claude Sonnet** for coding, reasoning, and anything that requires following long, nuanced instructions; use **GPT-4o** for multimodal tasks (image analysis, voice), for workflows deeply integrated with the OpenAI ecosystem, and for high-volume low-cost work via GPT-4o mini. The two models are closer in quality than they've ever been — the choice is increasingly about workflow fit, not raw capability.",
+      },
+      {
+        type: "paragraph",
+        text: "Benchmark tables are useful for headline numbers but misleading for actual decisions. A model that scores 3% better on MMLU might produce worse output on your specific task — because prompting style, instruction format, and task type all interact with model strengths in ways benchmarks don't capture. This comparison focuses on the differences that practitioners actually notice.",
+      },
+      { type: "heading", level: 2, text: "Where Claude is better" },
+      {
+        type: "paragraph",
+        text: "**Code quality and architecture**: Claude reliably writes code that follows the conventions of an existing codebase. Ask it to add a feature to a Next.js app and it will match the file structure, import style, naming conventions, and error handling patterns already present — without being told to. GPT-4o produces correct code more often than not, but is more likely to introduce new patterns or miss contextual norms.",
+      },
+      {
+        type: "paragraph",
+        text: "**Long document processing**: Claude's 200K context window handles a full codebase or a 300-page PDF without losing coherence. GPT-4o's 128K context is usually enough, but Claude edges ahead on tasks that require holding many inter-related facts simultaneously — financial document analysis, codebase-wide refactors, legal contract review.",
+      },
+      {
+        type: "paragraph",
+        text: "**Instruction following**: Multi-step, conditional instructions (\"if the user is a new account, do X; if returning, do Y; and in both cases, never do Z\") are handled more consistently by Claude. The failure mode for GPT-4o is selectively ignoring constraints mid-response, especially in long outputs. Claude's refusal to override its instructions can feel frustrating in creative tasks, but makes it more reliable in production.",
+      },
+      {
+        type: "quote",
+        text: "Claude writes code that fits your codebase. GPT-4o writes code that works. The difference shows up at scale.",
+      },
+      { type: "heading", level: 2, text: "Where GPT-4o is better" },
+      {
+        type: "paragraph",
+        text: "**Multimodal tasks**: GPT-4o's vision capability is more polished for complex image analysis — reading dense charts, interpreting screenshots, describing UI for accessibility. Claude's vision is capable but the gap narrows significantly on straightforward image tasks. If you're building a pipeline that processes images at scale, test both and measure.",
+      },
+      {
+        type: "paragraph",
+        text: "**Ecosystem integration**: The OpenAI ecosystem is larger. More third-party tools, libraries, and hosted solutions default to the OpenAI API. LangChain, LlamaIndex, and most RAG frameworks have better first-party support for OpenAI. If you're integrating into an existing stack, the path of least resistance often runs through GPT-4o.",
+      },
+      {
+        type: "paragraph",
+        text: "**Cost at volume**: GPT-4o mini is the most cost-effective capable model in the category. For high-volume pipelines — content classification, extraction, summarization at scale — mini is hard to beat on the $/token/quality ratio. Claude Haiku is the equivalent offer from Anthropic, but GPT-4o mini has a larger track record in production.",
+      },
+      { type: "heading", level: 2, text: "The verdict by use case" },
+      {
+        type: "list",
+        items: [
+          "**Coding assistant / agent**: Claude Sonnet — better instruction following and context retention",
+          "**High-volume extraction / classification**: GPT-4o mini — cheaper and fast enough",
+          "**Long document analysis**: Claude — 200K context, coherent over long spans",
+          "**Image analysis**: GPT-4o — better multimodal pipeline support",
+          "**Creative writing**: Similar quality; Claude has more consistent voice",
+          "**Existing OpenAI stack**: GPT-4o — less migration friction",
+          "**MCP / agentic workflows**: Claude — native MCP origin, better tool use on complex chains",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Test on your actual task",
+        text: "The single best way to choose is to run 50 examples from your real use case through both models, score the outputs, and pick the winner. Benchmarks tell you nothing about performance on your specific data and task.",
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "Anthropic API", valueLine: "Claude Sonnet and Haiku — best for coding, long-context reasoning, and agentic chains.", url: "https://www.anthropic.com/api" },
+          { name: "OpenAI API", valueLine: "GPT-4o and mini — best multimodal support, widest ecosystem, cheapest at volume.", url: "https://platform.openai.com" },
+          { name: "OpenRouter", valueLine: "Single API for 200+ models — test Claude and GPT-4o side by side with one integration.", url: "https://openrouter.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The \"which model?\" question will be irrelevant within a year as quality converges further. What won't converge is the ecosystem and the workflow fit. Build integrations with the API abstraction layer (Vercel AI SDK, OpenRouter) rather than the provider directly, and switching when the quality picture shifts will cost you an afternoon, not a sprint.",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for startups ────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-startups-2026",
+    title: "Best AI tools for startups and founders in 2026",
+    deck: "The tools worth paying for when your runway is finite and your time is more finite. Sorted by where they save the most hours.",
+    date: "2026-06-20",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1559136555-9303badefddc"),
+      alt: "A startup workspace with laptops and whiteboards",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The AI tools that actually matter for founders in 2026: **Claude Code** for building product 5x faster than a traditional dev workflow, **Cursor** for the in-editor experience, **Notion AI** for writing and documentation, **Perplexity** for research, and **ElevenLabs** for voice content. Beyond these five, most AI tools for founders are either nice-to-haves or solutions to problems a small team doesn't yet have.",
+      },
+      {
+        type: "paragraph",
+        text: "The framing that works: AI tools are leverage multipliers, not headcount replacements. A founder using Claude Code effectively can build and iterate on product at a pace that would previously have required two senior engineers. The constraint is no longer \"can I afford to build this?\" — it's \"do I understand what to build?\"",
+      },
+      { type: "heading", level: 2, text: "Building product: the dev stack" },
+      {
+        type: "paragraph",
+        text: "The most impactful AI use for a technical founder is in the development workflow. **Cursor** handles day-to-day editing — multi-file context, inline corrections, code explanation. **Claude Code** handles the bigger tasks: \"add stripe billing to the app\", \"migrate the database schema\", \"write the full test suite for this module\". Together they eliminate the bottleneck of coding velocity for anyone who can think in systems.",
+      },
+      {
+        type: "paragraph",
+        text: "For non-technical founders, the combination of **v0** (AI-generated React components), **Supabase** (backend as a service), and **Vercel** (zero-config deployment) means the gap between an idea and a working prototype is now measured in days. You don't need to be a strong engineer to ship a real product in 2026 — you need to be a strong product thinker.",
+      },
+      { type: "heading", level: 2, text: "Writing and communication" },
+      {
+        type: "paragraph",
+        text: "**Notion AI** is the most practical writing tool for founders because it's embedded inside the tool most teams already use for documentation and planning. Ask it to draft a spec from bullet points, rewrite a paragraph for clarity, or generate a first draft of an investor update — the context from surrounding notes makes the output materially better than a blank-slate chat.",
+      },
+      {
+        type: "paragraph",
+        text: "For customer-facing copy — landing pages, emails, pitch decks — **Claude (the web interface)** with the project feature (persistent system prompt) is the fastest path to consistent brand voice. Build a project once with your positioning, voice guidelines, and examples. Every piece of copy you generate from it stays on-brand without repeated prompting.",
+      },
+      { type: "heading", level: 2, text: "Research and competitive intelligence" },
+      {
+        type: "paragraph",
+        text: "**Perplexity** is the best research tool available because it combines web search with synthesis — you get an answer with cited sources, not a list of links to open. For market research, competitor tracking, technical deep dives, and anything that needs current information, it beats a Google search + GPT-4o workflow for speed.",
+      },
+      {
+        type: "paragraph",
+        text: "For deeper competitive analysis, **Claude with a long context window** and uploaded documents outperforms any search-based tool. Paste in three competitor homepages and a set of user reviews and ask \"what's the narrative gap I can exploit?\" — the synthesis that comes back is often better-structured than a consultant's deliverable.",
+      },
+      { type: "heading", level: 2, text: "Sales and outreach" },
+      {
+        type: "paragraph",
+        text: "**Clay** is the AI-native tool for outbound sales at a startup that can't afford a full GTM team. It enriches contact data, writes personalized emails at scale based on real signals (funding announcements, LinkedIn posts, job changes), and integrates with most CRMs. The cost-per-qualified-meeting drops substantially when personalization is automated at this level.",
+      },
+      {
+        type: "paragraph",
+        text: "**Apollo.io** still leads on the data side (contact database, firmographics), but its AI writing features are weaker than Clay. The practical approach: use Apollo for prospecting, export to Clay for enrichment and email generation.",
+      },
+      {
+        type: "tools",
+        title: "The founder's AI stack",
+        items: [
+          { name: "Claude Code", valueLine: "Terminal-first AI coding agent — delegate features, migrations, and test suites as tasks.", url: "https://www.anthropic.com/claude-code" },
+          { name: "Cursor", valueLine: "AI-native code editor for day-to-day editing — multi-file context and inline corrections.", url: "https://cursor.com" },
+          { name: "Notion AI", valueLine: "AI writing inside your docs and wikis — drafts, rewrites, and summaries in context.", url: "https://notion.so/product/ai" },
+          { name: "Perplexity", valueLine: "AI search with citations — faster than Google + GPT for research and competitive intelligence.", url: "https://perplexity.ai" },
+          { name: "v0 by Vercel", valueLine: "Generate React/Tailwind UI from a prompt — ship without a designer or frontend engineer.", url: "https://v0.dev" },
+          { name: "Clay", valueLine: "AI-powered outbound — enrich contacts, write personalized emails at scale, fill your pipeline.", url: "https://clay.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The ROI on AI tools compounds with usage — teams that build fluency early have a durable speed advantage over those who treat them as occasional utilities. The full catalog, including everything mentioned here, is on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI writing tools ─────────────────────────────────────────────
+  {
+    slug: "best-ai-writing-tools-2026",
+    title: "Best AI writing tools in 2026",
+    deck: "Which AI writing tools actually improve your output — and which ones produce forgettable prose that sounds like everyone else. An honest ranking.",
+    date: "2026-06-19",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1455390582262-044cdead277a"),
+      alt: "A person writing in a notebook at a desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI writing tools in 2026 are: **Claude** for long-form, nuanced writing that requires following a specific voice; **Notion AI** for writing inside your existing docs workflow; **Perplexity** for research-backed writing; and **Grammarly** for final-pass editing. The tools to avoid are the ones trained purely on marketing copy — their output is grammatically correct and completely forgettable.",
+      },
+      {
+        type: "paragraph",
+        text: "The most common failure mode with AI writing tools is using them to write from scratch. They produce text that's structurally sound, inoffensive, and indistinct from the median of everything they've trained on. The better frame: AI writing tools are at their best as collaborators — you bring the ideas and distinctive perspective, they handle the structural scaffolding, the first draft, the rewrite on request.",
+      },
+      { type: "heading", level: 2, text: "For long-form and nuanced writing: Claude" },
+      {
+        type: "paragraph",
+        text: "Claude is the best general-purpose writing assistant because it follows tone, voice, and format instructions more precisely than any alternative. Give it a 500-word sample of your own writing as a style reference, specify what you're writing and who it's for, and the drafts it produces are genuinely close to your voice rather than a generic approximation of it. This is the difference between \"this could have been written by anyone\" and \"this sounds like me\".",
+      },
+      {
+        type: "paragraph",
+        text: "The pattern that works: use Claude's Projects feature to create a persistent context with your brand voice guide, example copy, and any constraints (no exclamation marks, always active voice, etc.). Every piece you generate from that project inherits the style without you restating it each time.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The best prompt for a first draft",
+        text: "Don't start with \"write me an article about X\". Start with: \"Here are my main points: [bullet list]. My audience is [description]. My voice is [3 adjectives]. Write a first draft that I'll revise — don't polish, just get the structure right.\" Revision of a rough draft is 3x faster than iterating on an over-polished first attempt.",
+      },
+      { type: "heading", level: 2, text: "For in-context documentation: Notion AI" },
+      {
+        type: "paragraph",
+        text: "Notion AI's strength is access to context — it can read the surrounding document, the database, and linked pages. Asking it to \"summarize this meeting notes page into three action items\" or \"write the spec based on the notes in this project\" produces output that's materially better than a chat assistant that starts cold. If your team lives in Notion, the AI features are worth enabling for the context awareness alone.",
+      },
+      { type: "heading", level: 2, text: "For research-backed writing: Perplexity" },
+      {
+        type: "paragraph",
+        text: "Perplexity generates text that is sourced and current — it fetches from the live web and cites every claim. For any writing that requires up-to-date facts, statistics, or references (technical articles, market analysis, newsletters), starting a draft in Perplexity gives you a sourced skeleton to build on rather than having to research and write in separate passes.",
+      },
+      { type: "heading", level: 2, text: "For editing: Grammarly and Hemingway" },
+      {
+        type: "paragraph",
+        text: "**Grammarly** is still the best final-pass editing tool — it catches comma splices, passive voice, wordiness, and inconsistencies that a first reader would notice. The premium tier adds style and clarity suggestions that go beyond grammar. **Hemingway Editor** is the blunter instrument: it highlights long sentences, adverbs, and passive constructions in-line, forcing you to simplify. Use Hemingway if your writing tends toward complexity; skip it if your voice is already direct.",
+      },
+      {
+        type: "tools",
+        title: "AI writing tools worth using",
+        items: [
+          { name: "Claude", valueLine: "Best long-form AI writing assistant — follows voice instructions, excellent at tone matching.", url: "https://claude.ai" },
+          { name: "Notion AI", valueLine: "AI writing inside your docs — leverages surrounding context for much better output.", url: "https://notion.so/product/ai" },
+          { name: "Perplexity", valueLine: "Research-backed writing with citations — the right starting point for fact-dense content.", url: "https://perplexity.ai" },
+          { name: "Grammarly", valueLine: "Final-pass editing for grammar, clarity, and style — still the benchmark for text polish.", url: "https://grammarly.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The writers who get the most from AI tools are the ones who have something to say and use AI to say it faster — not the ones who outsource the having-something-to-say part. Use AI to move from \"blank page\" to \"rough draft\" faster; keep the revision and judgment work to yourself.",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI agents ─────────────────────────────────────────────────────
+  {
+    slug: "best-ai-agents-2026",
+    title: "Best AI agents in 2026",
+    deck: "AI agents that can actually complete tasks end-to-end — not chatbots with extra steps. The ones worth building with, and the ones worth deploying.",
+    date: "2026-06-18",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1620712943543-bcc4688e7485"),
+      alt: "Robot arm working autonomously in a digital environment",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best AI agents in 2026: **Claude Code** for software development tasks, **Devin** for fully autonomous engineering work, **Operator** (OpenAI) for web-based tasks and form-filling, **Lindy** for business process automation without code, and **CrewAI** for building multi-agent workflows in Python. The category has matured enough that \"agent\" means something specific now — a system that plans, executes, observes, and iterates without a human in the loop.",
+      },
+      {
+        type: "paragraph",
+        text: "The definition of an AI agent that actually holds up: an agent is an LLM that can use tools, observe the results of those tools, and plan its next action based on what it observed — iterating until a task is complete or it needs human input. This is qualitatively different from a chatbot. The output isn't text, it's work.",
+      },
+      { type: "heading", level: 2, text: "For software development: Claude Code and Devin" },
+      {
+        type: "paragraph",
+        text: "**Claude Code** is Anthropic's terminal-first coding agent. You give it a task in natural language — \"implement the search feature from the spec\", \"fix the failing CI tests\" — and it reads your codebase, writes code, runs tests, and iterates. The critical differentiator is its ability to hold a large codebase in context and make changes that are coherent across many files. Most developers using it report getting 5-10x more code written per hour than with a non-agentic workflow.",
+      },
+      {
+        type: "paragraph",
+        text: "**Devin** (Cognition AI) is the more fully autonomous option — designed to work asynchronously on a GitHub issue and produce a PR with minimal supervision. For tasks that are well-specified and don't require novel judgment, Devin's output quality is remarkable. The limitation: less-specified tasks produce less-reliable outputs. It's most useful as the right tool for tasks with a clear success criterion (tests pass, endpoint returns 200) rather than open-ended product work.",
+      },
+      { type: "heading", level: 2, text: "For web tasks: Operator and Browser Use" },
+      {
+        type: "paragraph",
+        text: "**Operator** (OpenAI) and **Browser Use** (open-source alternative) are agents that control a web browser to complete tasks. \"Book a meeting on Calendly\", \"fill out this grant application\", \"check my order status on three suppliers\" — tasks that require navigating the real web are now delegatable. The current limitation is reliability on complex multi-step web flows, but for simple structured tasks the failure rate is low enough for production use.",
+      },
+      { type: "heading", level: 2, text: "For business automation without code: Lindy" },
+      {
+        type: "paragraph",
+        text: "**Lindy** is the most accessible agent builder for non-developers. You describe a workflow in natural language — \"when I get an email from a customer asking for a refund, check their order history in Shopify, draft a response based on our policy, and flag it for my review if the order is over $200\" — and Lindy builds and runs the automation. Integrations include Gmail, Slack, Notion, CRMs, and most SaaS tools. No code, no YAML.",
+      },
+      { type: "heading", level: 2, text: "For building custom agents: CrewAI and LangGraph" },
+      {
+        type: "paragraph",
+        text: "**CrewAI** is the most intuitive Python framework for multi-agent systems — you define agents with roles, goals, and tools, then define a crew (how they collaborate). It handles the orchestration: which agent speaks when, how they hand off tasks, how to pool their outputs. The abstraction level is right for most use cases without needing to hand-code a state machine.",
+      },
+      {
+        type: "paragraph",
+        text: "**LangGraph** (from LangChain) is lower-level — you define agent behavior as a directed graph with explicit nodes and edges. More control, more code. Right when you need deterministic flow, retry logic, or complex conditional behavior that CrewAI's higher-level API doesn't expose.",
+      },
+      {
+        type: "tools",
+        title: "AI agents worth deploying",
+        items: [
+          { name: "Claude Code", valueLine: "Terminal-first coding agent — plans, writes, tests, and iterates on software tasks end-to-end.", url: "https://www.anthropic.com/claude-code" },
+          { name: "Devin", valueLine: "Fully autonomous software engineer — takes a GitHub issue, produces a PR.", url: "https://cognition.ai/devin" },
+          { name: "Lindy", valueLine: "No-code AI agent builder — automate business workflows across email, CRM, and SaaS tools.", url: "https://lindy.ai" },
+          { name: "CrewAI", valueLine: "Python framework for multi-agent systems — define roles, goals, and crew collaboration.", url: "https://crewai.com" },
+          { name: "LangGraph", valueLine: "Low-level agent orchestration as a directed graph — full control over flow and state.", url: "https://langchain-ai.github.io/langgraph/" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The meaningful shift in 2026 is that agents are reliable enough for production use on well-defined tasks. The design challenge has moved from \"can the agent do this?\" to \"how do I define the task precisely enough that the agent can succeed consistently?\" That's a product problem, not a technology problem — and it's a solvable one.",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI productivity tools ────────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-productivity-2026",
+    title: "Best AI tools for productivity in 2026",
+    deck: "The tools that actually reclaim hours — not the ones that add a chat window to something that was already working fine.",
+    date: "2026-06-17",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1484480974693-6ca0a78fb36b"),
+      alt: "A clean desk with a laptop and a notebook",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The AI productivity tools that actually save time in 2026: **Notion AI** for thinking and documentation, **Superhuman** for email, **Otter.ai** for meetings, **Perplexity** for research, and **Claude with Projects** for any recurring writing task that benefits from consistent context. Productivity tools that add AI to an interface you'd stop using if the AI were removed are not productivity tools — they're AI demos.",
+      },
+      {
+        type: "paragraph",
+        text: "The question worth asking about any AI productivity tool: does using it mean you finish something that mattered faster, or does it mean you spend the same time producing more output that doesn't matter? Tools that automate low-value work are valuable. Tools that accelerate the production of low-value work are not.",
+      },
+      { type: "heading", level: 2, text: "For thinking and documentation: Notion AI" },
+      {
+        type: "paragraph",
+        text: "Notion AI earns its place because it's embedded in the tool most knowledge workers use for notes and wikis. The context access is what makes it useful — it can summarize a meeting note, extract action items from a project page, or draft a document from bullet points you've already written. The blank-page problem effectively goes away for any structured document type.",
+      },
+      {
+        type: "paragraph",
+        text: "The specific feature worth using: the Notion AI database feature, which lets you generate summaries and extractions across all records in a database. For a CRM database with raw meeting notes, it can generate a structured summary column across hundreds of rows — tasks that would take hours of manual work.",
+      },
+      { type: "heading", level: 2, text: "For email: Superhuman" },
+      {
+        type: "paragraph",
+        text: "Superhuman is the only email client where AI is native to the interaction model, not bolted on. The AI features — smart summaries, reply drafts, auto-categorization, follow-up reminders — are integrated into a keyboard-first interface designed around reaching inbox zero faster. The $30/month pricing is steep, but for anyone who spends more than 90 minutes a day on email, the time recovery usually justifies it.",
+      },
+      {
+        type: "paragraph",
+        text: "If Superhuman is out of budget, **Google Workspace's Gemini features** in Gmail have improved enough to be genuinely useful — summary of long threads, draft suggestions, and smart reply. Not as polished, but included in a subscription most businesses already have.",
+      },
+      { type: "heading", level: 2, text: "For meetings: Otter.ai and Fireflies" },
+      {
+        type: "paragraph",
+        text: "The highest-leverage AI productivity intervention for most teams is automatic meeting transcription and summarization. **Otter.ai** joins your calls, transcribes in real time, identifies speakers, and generates a summary with action items afterward. The output isn't perfect, but it eliminates the \"who said what?\" archaeology that follows undocumented meetings. **Fireflies** offers similar functionality with stronger CRM integration.",
+      },
+      {
+        type: "paragraph",
+        text: "The cultural change this enables: no one needs to take notes, so everyone can be present. The transcript is searchable. The action items get assigned. For teams with a heavy meeting load, this category is the highest ROI AI intervention available.",
+      },
+      { type: "heading", level: 2, text: "For research: Perplexity" },
+      {
+        type: "paragraph",
+        text: "Perplexity collapses the research workflow: instead of opening five tabs, reading each one, and synthesizing manually, you ask a question and get a sourced synthesis. For anyone whose job involves staying current — market analysts, journalists, technical leads tracking the field — it replaces 30-minute rabbit holes with a 2-minute briefing. The paid Pro tier adds access to more sources and longer responses.",
+      },
+      {
+        type: "tools",
+        title: "The AI productivity stack",
+        items: [
+          { name: "Notion AI", valueLine: "AI inside your docs and wikis — summaries, drafts, and database-wide extractions.", url: "https://notion.so/product/ai" },
+          { name: "Superhuman", valueLine: "AI-native email client — designed around reaching inbox zero faster.", url: "https://superhuman.com" },
+          { name: "Otter.ai", valueLine: "Automatic meeting transcription and action-item extraction — eliminate note-taking entirely.", url: "https://otter.ai" },
+          { name: "Perplexity", valueLine: "AI search with citations — research in 2 minutes instead of 30.", url: "https://perplexity.ai" },
+          { name: "Reclaim.ai", valueLine: "AI calendar manager — schedules focus time, buffers, and habits automatically.", url: "https://reclaim.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The AI productivity tools with the highest leverage are the ones embedded in high-frequency activities — email, meetings, documentation. Start there before exploring tools that solve problems you encounter once a week. All of these are on the [Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── SEO: Best free AI tools ─────────────────────────────────────────────────
+  {
+    slug: "best-free-ai-tools-2026",
+    title: "Best free AI tools in 2026",
+    deck: "The AI tools with meaningful free tiers — ranked by how far you can actually get before hitting a paywall.",
+    date: "2026-06-16",
+    readingMin: 7,
+    tag: "Guide",
+    hero: {
+      src: U("1432888498266-38ffec3eaf0a"),
+      alt: "A laptop and coffee cup on a desk with bright light",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The best free AI tools in 2026 — tools with genuinely useful free tiers, not crippled demos: **Claude.ai** (free tier covers most personal use), **Gemini 2.5 Flash** via Google AI Studio (free with a Google account), **Perplexity** (free tier good enough for most research), **Windsurf** (generous free coding tier), and **Canva AI** (free image generation in a full design tool). Every tool on this list is usable without a credit card for real work.",
+      },
+      {
+        type: "paragraph",
+        text: "The landscape for free AI tools has improved significantly in 2026. Competition has forced providers to offer more on free tiers to acquire users, and the cost of inference has dropped enough that free usage is sustainable for high-traffic products. The caveat: free tiers usually mean rate limits, smaller models, or no access to the latest release. Know the constraint before you depend on it.",
+      },
+      { type: "heading", level: 2, text: "AI assistants and chat" },
+      {
+        type: "paragraph",
+        text: "**Claude.ai** free tier gives you access to Claude Sonnet with a daily usage limit — enough for most personal tasks: writing, research, coding questions, document analysis. The context window on the free tier (32K) is smaller than Pro (200K), which matters for long documents but not for typical Q&A use. **ChatGPT** (GPT-4o) has a similar free structure. **Google Gemini** via the Gemini web interface is fully free with a Google account and uses the Gemini 1.5 Flash model.",
+      },
+      { type: "heading", level: 2, text: "AI coding tools" },
+      {
+        type: "paragraph",
+        text: "**Windsurf** (Codeium) has the most generous free tier in the AI code editor category: unlimited autocomplete and a set of free AI calls per month on the Cascade agent. For developers who need an AI editor but can't justify $20/month for Cursor, Windsurf free is a genuinely useful tool rather than a taste. **GitHub Copilot** also has a free tier with 2,000 completions per month — enough to evaluate whether it's worth paying for.",
+      },
+      {
+        type: "paragraph",
+        text: "**Google AI Studio** lets you use Gemini 2.5 Flash and Pro via the API for free up to the quota limit — and Gemini 2.5 Flash is a legitimately capable model, not a stripped-down freeware version. For developers who want to experiment with AI features in their own apps without a billing commitment, this is the lowest-friction starting point.",
+      },
+      { type: "heading", level: 2, text: "Image generation" },
+      {
+        type: "paragraph",
+        text: "**Canva's AI features** (Magic Media, text-to-image, background removal) are available on the free Canva plan — and because they're embedded in a full design tool, they're more useful than standalone free image generators. The quality isn't Midjourney-level, but it's good enough for social media assets, presentations, and basic marketing material. **Adobe Firefly** also offers 25 free generative credits per month with an Adobe account.",
+      },
+      { type: "heading", level: 2, text: "Research and search" },
+      {
+        type: "paragraph",
+        text: "**Perplexity** free tier covers daily research use — up to 5 Pro searches per day (which use the better models) and unlimited standard searches. For most people this is sufficient; power users who do research-intensive work will hit the limit. **You.com** is a free Perplexity alternative with similar capabilities and no daily cap on standard searches.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "When to upgrade",
+        text: "Upgrade from a free tier when: you hit rate limits mid-task more than twice a week, you need the larger context window for documents you regularly work with, or you need API access for something you're building. The threshold is clear once you reach it.",
+      },
+      {
+        type: "tools",
+        title: "Free AI tools worth bookmarking",
+        items: [
+          { name: "Claude", valueLine: "Free tier covers most personal use — Sonnet model, daily limit, 32K context.", url: "https://claude.ai" },
+          { name: "Google AI Studio", valueLine: "Gemini 2.5 Flash free via API — best free starting point for developers building AI features.", url: "https://aistudio.google.com" },
+          { name: "Windsurf", valueLine: "Free AI code editor with unlimited autocomplete — the best free Cursor alternative.", url: "https://codeium.com/windsurf" },
+          { name: "Perplexity", valueLine: "Free AI research with citations — 5 Pro searches/day, unlimited standard.", url: "https://perplexity.ai" },
+          { name: "Canva AI", valueLine: "Free AI image generation inside a full design tool — better than a standalone generator.", url: "https://canva.com" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Free tiers are good enough to build a meaningful daily AI workflow. Start with Claude for reasoning, Windsurf or Copilot for coding, and Perplexity for research — and upgrade only when a specific tool has clearly earned the spend by recovering more time than the subscription costs.",
+      },
+    ],
+  },
+
+  // ─── SEO: Best AI tools for developers ──────────────────────────────────────
+  {
+    slug: "best-ai-tools-for-developers-2026",
+    title: "Best AI tools for developers in 2026",
+    deck: "The complete developer AI stack — editors, agents, APIs, testing, and infrastructure tools that belong in every engineering workflow.",
+    date: "2026-06-15",
+    readingMin: 10,
+    tag: "Guide",
+    hero: {
+      src: U("1555066931-bf19f8fd1085"),
+      alt: "A developer working at a desk with multiple monitors showing code",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The essential AI tools for developers in 2026: **Cursor** or **Windsurf** for daily editing, **Claude Code** for agentic tasks, **GitHub Copilot** for team environments, **Vercel AI SDK** for building AI features into products, and the **Anthropic API** (Claude) or **OpenAI API** (GPT-4o) as the model layer. Beyond these, the right additions depend on your stack — here's what to add and when.",
+      },
+      {
+        type: "paragraph",
+        text: "Developer AI tooling has stratified into three distinct layers in 2026: the editor layer (tools that help you write and edit code), the agent layer (tools that execute multi-step development tasks), and the integration layer (SDKs and APIs for building AI into your own products). A complete developer stack typically includes one tool from each layer.",
+      },
+      { type: "heading", level: 2, text: "The editor layer: where you spend your time" },
+      {
+        type: "paragraph",
+        text: "**Cursor** is the dominant AI-native code editor — built on VS Code, with a multi-file composer, inline edit (`Cmd+K`), and a chat panel that can reference the whole repo. The quality of edits is notably better than Copilot for complex multi-file changes because Cursor was designed around codebase-level context, not file-level completion.",
+      },
+      {
+        type: "paragraph",
+        text: "**Windsurf** (Codeium) is the strongest alternative with a more generous free tier. Its Cascade agent handles long, multi-step editing flows well. If you want to evaluate before committing to Cursor's $20/month, Windsurf is the right test drive.",
+      },
+      {
+        type: "paragraph",
+        text: "**GitHub Copilot** is the right choice for teams with existing Microsoft/GitHub infrastructure, compliance requirements, or a need for IDE diversity (it supports VS Code, JetBrains, Neovim, and Visual Studio). The quality gap with Cursor has closed significantly in 2026.",
+      },
+      { type: "heading", level: 2, text: "The agent layer: tasks you delegate" },
+      {
+        type: "paragraph",
+        text: "**Claude Code** is the terminal-first agent for tasks you'd otherwise batch up: \"implement the payment flow\", \"add tests for the auth module\", \"migrate the database schema and update all the queries\". The instruction-following quality and context retention on multi-file tasks is the best in the category. It integrates with MCP servers, so it can also query your database, fetch documentation, and interact with external services during a task.",
+      },
+      {
+        type: "paragraph",
+        text: "For fully autonomous tasks on a clearly-specified GitHub issue, **Devin** (Cognition) produces higher-quality autonomous output than any other system. The constraint: it works best on tasks with clear success criteria, not open-ended product work. Use it for the kind of work where you'd write a detailed spec and hand it to a contractor.",
+      },
+      { type: "heading", level: 2, text: "The integration layer: building AI into your product" },
+      {
+        type: "paragraph",
+        text: "The **Vercel AI SDK** is the right abstraction for any Next.js or Node.js project. It provides streaming, tool calling, multi-step agent loops, and RAG primitives behind a clean API — and it's maintained by the same team as Vercel, so it tracks Next.js improvements closely. Call it with Claude, GPT-4o, or Gemini with the same interface.",
+      },
+      {
+        type: "paragraph",
+        text: "For Python, **LangChain** is the most widely adopted framework, but its abstraction cost is real — prefer calling the provider SDK directly for simple use cases. **LlamaIndex** is the right choice specifically for RAG (retrieval-augmented generation) pipelines — its chunking, embedding, and retrieval abstractions are more mature than LangChain's equivalents.",
+      },
+      { type: "heading", level: 2, text: "Testing and observability" },
+      {
+        type: "paragraph",
+        text: "**Braintrust** is the best evaluation framework for AI features — it lets you run prompts across versions, score outputs, and track quality regressions as you change models or prompts. For any AI feature in production, \"does this still work?\" needs a quantitative answer. Braintrust provides the infrastructure to get one.",
+      },
+      {
+        type: "paragraph",
+        text: "**LangSmith** (from LangChain) provides traces and evaluation for LangChain-based applications. If you're on LangChain, it's the natural observability layer. If you're not, Braintrust is more model-agnostic.",
+      },
+      {
+        type: "tools",
+        title: "The full developer AI stack",
+        items: [
+          { name: "Cursor", valueLine: "AI-native code editor — multi-file composer, inline edit, codebase-level context.", url: "https://cursor.com" },
+          { name: "Claude Code", valueLine: "Terminal-first AI agent — delegates multi-step development tasks end-to-end.", url: "https://www.anthropic.com/claude-code" },
+          { name: "GitHub Copilot", valueLine: "AI coding assistant for teams — every major IDE, enterprise data handling.", url: "https://github.com/features/copilot" },
+          { name: "Vercel AI SDK", valueLine: "Streaming, tool use, and agent loops for Next.js — model-agnostic, well-maintained.", url: "https://sdk.vercel.ai" },
+          { name: "Anthropic API", valueLine: "Claude Sonnet — best for coding tasks, long-context reasoning, and agent chains.", url: "https://www.anthropic.com/api" },
+          { name: "Braintrust", valueLine: "Evaluation framework for AI features — run prompts across versions, track quality regressions.", url: "https://braintr.us" },
+          { name: "Windsurf", valueLine: "Cursor alternative — strong free tier, Cascade multi-step agent flows.", url: "https://codeium.com/windsurf" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The developer AI stack has stabilized enough that the core choices — editor, agent, model API — are worth making once and committing to for at least a quarter. Constant tool-switching is its own productivity tax. Pick the stack, build fluency, and revisit at the next natural inflection point. Everything here is on the [Radar](/radar/browse).",
+      },
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

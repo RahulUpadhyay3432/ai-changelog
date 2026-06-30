@@ -22,9 +22,12 @@ export function RadarSideNav() {
   return (
     <aside className={styles.sideNav}>
       {/* Wordmark */}
-      <div style={{ padding: "0 20px 20px", fontFamily: SG, fontSize: "20px", fontWeight: 800, color: "#f6f4f0", letterSpacing: "-0.04em" }}>
+      <Link href="/" style={{ padding: "0 20px 20px", fontFamily: SG, fontSize: "20px", fontWeight: 800, color: "#f6f4f0", letterSpacing: "-0.04em", textDecoration: "none", cursor: "pointer", transition: "opacity 0.15s ease" }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+      >
         kapyn
-      </div>
+      </Link>
 
       {/* Radar nav items */}
       {NAV_ITEMS.map(({ href, label, Icon, exact }) => {

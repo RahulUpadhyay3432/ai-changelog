@@ -49,7 +49,10 @@ export function AppSideNav() {
 
   return (
     <>
-      <Link href="/home" style={{ fontFamily: SG, fontSize: "21px", fontWeight: 800, letterSpacing: "-0.04em", color: TEXT.primary, textDecoration: "none", padding: "0 12px 22px" }}>
+      <Link href="/" style={{ fontFamily: SG, fontSize: "21px", fontWeight: 800, letterSpacing: "-0.04em", color: TEXT.primary, textDecoration: "none", padding: "0 12px 22px", transition: "opacity 0.15s ease" }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+      >
         kapyn
       </Link>
       <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>

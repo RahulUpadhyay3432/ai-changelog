@@ -98,6 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     })),
     { url: `${APP_URL}/explore`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
+    { url: `${APP_URL}/compare`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${APP_URL}/trending`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
     { url: `${APP_URL}/categories`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.4 },
     { url: `${APP_URL}/okf`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.6 },

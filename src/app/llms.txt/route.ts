@@ -43,6 +43,7 @@ export async function GET() {
     `- [MCP servers](${APP_URL}/mcp): directory of Model Context Protocol servers, by category`,
     `- [AI tools](${APP_URL}/tools): the essential AI tools worth knowing, by category`,
     `- [AI skills](${APP_URL}/skills): custom GPTs, Claude Skills & Gemini Gems, by use case`,
+    `- [Compare AI models](${APP_URL}/compare): Claude, GPT, Gemini, Llama and more side by side — context, cost, modalities, best-for`,
     `- [Blog](${APP_URL}/blog): guides on the AI and tools worth using`,
     `- [Kapyn](${APP_URL}): the swipeable AI/tech news feed`,
     ""

@@ -64,7 +64,7 @@ export default function ComparePage() {
         <p style={{ fontSize: "15px", color: TEXT.muted, lineHeight: 1.55, margin: "12px 0 0", maxWidth: "620px" }}>
           {DESC}
         </p>
-        <p style={{ fontSize: "12.5px", color: "#8a857c", lineHeight: 1.5, margin: "12px 0 0", maxWidth: "620px" }}>
+        <p style={{ fontSize: "12.5px", color: "var(--kt-text-muted, #8a857c)", lineHeight: 1.5, margin: "12px 0 0", maxWidth: "620px" }}>
           Cost is shown as a tier, not a live price — model pricing moves often, so always confirm current rates on the
           provider&apos;s page before you commit. Last updated {LAST_UPDATED}.
         </p>
@@ -73,7 +73,7 @@ export default function ComparePage() {
       <CompareClient />
 
       {/* Deeper reads */}
-      <section style={{ margin: "40px 0 0", paddingTop: "28px", borderTop: "1px solid rgba(255,255,255,0.09)" }}>
+      <section style={{ margin: "40px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Go deeper</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 0", maxWidth: "620px" }}>
           The matrix is the quick answer. For the reasoning behind a pick, read{" "}
@@ -85,12 +85,12 @@ export default function ComparePage() {
       </section>
 
       {/* Embed */}
-      <section style={{ margin: "36px 0 0", paddingTop: "28px", borderTop: "1px solid rgba(255,255,255,0.09)" }}>
+      <section style={{ margin: "36px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Embed this comparison</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 14px", maxWidth: "620px" }}>
           Free to use on your own site — paste this snippet where you want the live, auto-updating matrix to appear.
         </p>
-        <pre style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: "12px", color: TEXT.body, background: "#141310", border: "1px solid rgba(255,255,255,0.09)", borderRadius: "12px", padding: "16px", overflowX: "auto", lineHeight: 1.6, margin: 0, userSelect: "all" }}>
+        <pre style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: "12px", color: TEXT.body, background: "var(--kt-code-bg, #141310)", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))", borderRadius: "12px", padding: "16px", overflowX: "auto", lineHeight: 1.6, margin: 0, userSelect: "all" }}>
           {EMBED_SNIPPET}
         </pre>
       </section>

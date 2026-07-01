@@ -58,7 +58,7 @@ export default function McpHub() {
         <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 42px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.08, margin: "12px 0 0", color: "#f5f5f5" }}>
           Best MCP servers
         </h1>
-        <p style={{ fontSize: "16px", color: "#a3a3a3", lineHeight: 1.55, margin: "14px 0 0", maxWidth: "600px" }}>{DESC}</p>
+        <p style={{ fontSize: "16px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.55, margin: "14px 0 0", maxWidth: "600px" }}>{DESC}</p>
       </header>
 
       <section style={{ margin: "0 0 30px", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "20px 22px" }}>
@@ -81,9 +81,9 @@ export default function McpHub() {
                   <Link href={`/mcp/${slugify(s.name)}`} style={{ display: "block", textDecoration: "none", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "14px 16px" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ fontFamily: SG, fontSize: "15.5px", fontWeight: 600, color: "#f5f5f5" }}>{s.name}</span>
-                      <span style={{ fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase", color: s.by === "official" ? GOLD : "#a3a3a3", background: s.by === "official" ? GOLD_SOFT : "rgba(255,255,255,0.05)", border: `1px solid ${s.by === "official" ? GOLD_BORDER : HAIRLINE}`, borderRadius: "100px", padding: "2px 8px" }}>{s.by}</span>
+                      <span style={{ fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase", color: s.by === "official" ? GOLD : "var(--kt-text-muted, #a3a3a3)", background: s.by === "official" ? GOLD_SOFT : "rgba(255,255,255,0.05)", border: `1px solid ${s.by === "official" ? GOLD_BORDER : HAIRLINE}`, borderRadius: "100px", padding: "2px 8px" }}>{s.by}</span>
                     </span>
-                    <span style={{ display: "block", fontSize: "13.5px", color: "#a3a3a3", lineHeight: 1.45, marginTop: "4px" }}>{s.tagline}</span>
+                    <span style={{ display: "block", fontSize: "13.5px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.45, marginTop: "4px" }}>{s.tagline}</span>
                   </Link>
                 </li>
               ))}
@@ -95,7 +95,7 @@ export default function McpHub() {
       <div style={{ margin: "10px 0 0", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "20px 22px" }}>
         <div style={{ flex: 1, minWidth: "220px" }}>
           <h2 style={{ fontFamily: SG, fontSize: "17px", fontWeight: 700, color: "#f5f5f5", margin: 0 }}>Browse them interactively</h2>
-          <p style={{ fontSize: "14px", color: "#a3a3a3", margin: "6px 0 0", lineHeight: 1.5 }}>Sort by popularity and recency, filter by category, and save servers into a Loadout on the Radar.</p>
+          <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #a3a3a3)", margin: "6px 0 0", lineHeight: 1.5 }}>Sort by popularity and recency, filter by category, and save servers into a Loadout on the Radar.</p>
         </div>
         <Link href="/radar/mcp" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "12px 20px", textDecoration: "none" }}>
           Open the MCP market <ArrowUpRight size={16} strokeWidth={2.4} />

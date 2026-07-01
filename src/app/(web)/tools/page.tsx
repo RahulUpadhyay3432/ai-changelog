@@ -77,7 +77,7 @@ export default function ToolsHub() {
         <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 42px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.08, margin: "12px 0 0", color: "#f5f5f5" }}>
           Best AI tools
         </h1>
-        <p style={{ fontSize: "16px", color: "#a3a3a3", lineHeight: 1.55, margin: "14px 0 0", maxWidth: "600px" }}>{DESC}</p>
+        <p style={{ fontSize: "16px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.55, margin: "14px 0 0", maxWidth: "600px" }}>{DESC}</p>
       </header>
 
       <section style={{ margin: "0 0 30px", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "20px 22px" }}>
@@ -102,7 +102,7 @@ export default function ToolsHub() {
                       {t.name}
                       <ArrowUpRight size={13} strokeWidth={2.2} color="#737373" style={{ flexShrink: 0 }} />
                     </span>
-                    <span style={{ display: "block", fontSize: "13.5px", color: "#a3a3a3", lineHeight: 1.45, marginTop: "4px" }}>{t.valueLine}</span>
+                    <span style={{ display: "block", fontSize: "13.5px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.45, marginTop: "4px" }}>{t.valueLine}</span>
                   </a>
                 </li>
               ))}
@@ -114,7 +114,7 @@ export default function ToolsHub() {
       <div style={{ margin: "10px 0 0", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", background: "rgba(255,255,255,0.025)", border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "20px 22px" }}>
         <div style={{ flex: 1, minWidth: "220px" }}>
           <h2 style={{ fontFamily: SG, fontSize: "17px", fontWeight: 700, color: "#f5f5f5", margin: 0 }}>Browse them interactively</h2>
-          <p style={{ fontSize: "14px", color: "#a3a3a3", margin: "6px 0 0", lineHeight: 1.5 }}>See what is trending, filter by what you build, and save tools into a Loadout on the Radar.</p>
+          <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #a3a3a3)", margin: "6px 0 0", lineHeight: 1.5 }}>See what is trending, filter by what you build, and save tools into a Loadout on the Radar.</p>
         </div>
         <Link href="/radar/browse" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "12px 20px", textDecoration: "none" }}>
           Open the Radar <ArrowUpRight size={16} strokeWidth={2.4} />

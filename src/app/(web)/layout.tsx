@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { CommandPalette } from "@/components/CommandPalette";
+import { ThemeShell, ThemeToggle } from "./theme-shell";
 import styles from "./layout.module.css";
 
 // Nested layout for the (web) route group — sits under the root layout (html/
-// body/fonts) but outside the (app) phone frame. Plain scrolling document.
+// body/fonts) but outside the (app) phone frame. ThemeShell scopes an optional
+// light theme to these reading surfaces only (data-theme lives on its div).
 export default function WebLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={styles.shell}>
+    <ThemeShell>
       <header className={styles.header}>
         <Link href="/" className={styles.wordmark}>
           kapyn
@@ -27,6 +29,7 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
             Open app
             <ArrowUpRight size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
           </Link>
+          <ThemeToggle />
         </nav>
       </header>
 
@@ -40,6 +43,6 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
       </footer>
 
       <CommandPalette />
-    </div>
+    </ThemeShell>
   );
 }

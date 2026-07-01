@@ -70,6 +70,61 @@
   --sidebar-ring: rgba(255, 255, 255, 0.3);
 }
 
+/* ── Kapyn theme tokens (default: DARK) ──────────────────────────────────────
+   The (web) reading surfaces (blog, compare, learn, explore, tools) can flip to
+   LIGHT by setting data-theme="light" on the (web) shell element. Because the
+   attribute lives on that shell — not on <html> — the phone feed, Radar, and
+   landing stay on these :root dark defaults and never flip. design-tokens.ts
+   points at these vars, so inline-styled surfaces theme automatically. */
+:root {
+  --kt-canvas: #0c0b0a;
+  --kt-surface: #1b1a17;
+  --kt-surface-raised: #24221d;
+  --kt-hairline: rgba(255, 255, 255, 0.09);
+  --kt-text-primary: #f6f4f0;
+  --kt-text-body: #d6d2ca;
+  --kt-text-muted: #bcb7ad;
+  --kt-accent: #3b82f6;
+  --kt-web-bg: #100f0d;
+  --kt-web-header-bg: rgba(16, 15, 13, 0.82);
+  --kt-web-border: rgba(255, 248, 235, 0.07);
+  --kt-code-bg: #141310;
+  /* Blog reading palette (mirrors blog/theme.ts READING + blog.module.css) */
+  --kt-read-ink: #e4dfd4;
+  --kt-read-lead: #f3efe7;
+  --kt-read-heading: #fbfaf7;
+  --kt-read-muted: #9e988c;
+  --kt-read-accent: #5b9bff;
+  --kt-read-hairline: rgba(255, 255, 255, 0.1);
+  --kt-read-surface: rgba(255, 255, 255, 0.025);
+  --kt-read-surface-2: rgba(255, 255, 255, 0.06);
+  --kt-read-code-bg: #1a1815;
+}
+
+[data-theme="light"] {
+  --kt-canvas: #f7f5f1;
+  --kt-surface: #ffffff;
+  --kt-surface-raised: #efece5;
+  --kt-hairline: rgba(0, 0, 0, 0.10);
+  --kt-text-primary: #1c1a17;
+  --kt-text-body: #403c36;
+  --kt-text-muted: #6d675f;
+  --kt-accent: #2563eb;
+  --kt-web-bg: #f7f5f1;
+  --kt-web-header-bg: rgba(247, 245, 241, 0.85);
+  --kt-web-border: rgba(0, 0, 0, 0.08);
+  --kt-code-bg: #f0ede6;
+  --kt-read-ink: #3a3733;
+  --kt-read-lead: #1c1a17;
+  --kt-read-heading: #17140f;
+  --kt-read-muted: #6d675f;
+  --kt-read-accent: #2563eb;
+  --kt-read-hairline: rgba(0, 0, 0, 0.1);
+  --kt-read-surface: rgba(0, 0, 0, 0.03);
+  --kt-read-surface-2: rgba(0, 0, 0, 0.05);
+  --kt-read-code-bg: #f0ede6;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

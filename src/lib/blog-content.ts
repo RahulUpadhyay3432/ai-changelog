@@ -3504,6 +3504,345 @@ limit 8;`,
       },
     ],
   },
+
+  // ─── Opinion: the AI tool graveyard ────────────────────────────────────────
+  {
+    slug: "ai-tool-graveyard-2026",
+    title: "The AI tool graveyard: how to spot a dying tool before you build on it",
+    deck:
+      "AI tools shut down, get acquired, and quietly rot all the time — and the directories won't warn you, because they're paid to promote. Here's how to read the signs yourself.",
+    date: "2026-07-01",
+    readingMin: 10,
+    tag: "Opinion",
+    hero: {
+      src: U("1561070791-2526d30994b5"),
+      alt: "A dim workspace with a single screen glowing",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "For every AI tool that becomes a household name, dozens quietly die. They run out of funding, get acquired and shut down, have their one feature absorbed by a model provider, or slowly rot — no updates, rising prices, support that stops answering. The tool directories will never tell you which ones are dying, because their business is promoting tools, not burying them. A directory that only celebrates winners isn't a directory. It's a sales brochure.",
+      },
+      {
+        type: "paragraph",
+        text: "That leaves you to read the signs yourself — before you build a workflow, a product, or a business on something that won't be here next year. This is the field guide the directories won't write: why AI tools die, the warning signs that show up early, and how to protect yourself from betting on a ghost.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "Why this matters now",
+        text: "The AI tool boom means an unusually high birth rate — and an unusually high death rate. More tools launched means more tools abandoned. The half-life of a hot AI tool is short, and the cost of building on the wrong one is measured in rewrites and dead integrations.",
+      },
+
+      { type: "heading", level: 2, text: "How AI tools actually die" },
+      {
+        type: "paragraph",
+        text: "Death comes in a handful of recognizable shapes. Knowing them helps you see it coming.",
+      },
+      {
+        type: "list",
+        items: [
+          "**The feature gets absorbed.** A tool does one useful thing on top of a model — and then the model provider ships that exact thing natively. Overnight, the tool's reason to exist evaporates. This is the most common AI-specific death.",
+          "**The funding runs out.** A venture-backed tool priced below cost to grow, never found a business model, and the runway ended. The app keeps working for a while, then the servers go quiet.",
+          "**Acquired and killed.** A bigger company buys the tool for its team or technology and shuts the product down. Your data and workflow go with it, usually on a short notice period.",
+          "**Enshittification.** The tool doesn't die so much as decay: the free tier vanishes, prices climb, the best features move behind an enterprise wall, and the thing you loved becomes something you tolerate, then leave.",
+          "**Quiet abandonment.** No announcement, just entropy. Updates stop, the docs go stale, bugs pile up, support stops replying. It's technically alive and functionally dead.",
+        ],
+      },
+
+      { type: "heading", level: 2, text: "The warning signs (read these before you commit)" },
+      {
+        type: "paragraph",
+        text: "Dying tools signal it early if you know where to look. Run down this list before you build anything important on a tool — and again every few months for the ones you already depend on.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Stalled updates.** Check the changelog, release notes, or GitHub activity. A tool that hasn't shipped anything in months is coasting, and coasting precedes stopping.",
+          "**Pricing moving the wrong way.** Free tier removed, prices hiked, features shifted to enterprise-only. These are the moves of a company trying to survive on its existing users rather than grow — a late-stage signal.",
+          "**Founder or team exodus.** Key people leaving, especially quietly, is often the earliest real signal. Watch who's still shipping and speaking for the product.",
+          "**An acquisition with no roadmap.** \"We're joining [BigCo]\" with no clear commitment to keep the product running usually means a wind-down is coming.",
+          "**Community mood souring.** Rising complaints, unanswered support threads, people openly asking for alternatives. The community feels a death before the company admits it.",
+          "**Docs and support rot.** Outdated documentation, broken links, a support inbox that goes silent. Neglect of the unglamorous parts is a reliable tell.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "The community always feels a tool dying before the company announces it. Rising complaints and \"anyone know an alternative?\" threads are the obituary written in advance.",
+      },
+
+      { type: "heading", level: 2, text: "How to protect yourself" },
+      {
+        type: "paragraph",
+        text: "You can't avoid every dying tool, but you can make their death survivable. The whole game is refusing to be locked in.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Prefer tools you can leave.** Favor ones with data export, open formats, and standard interfaces. If leaving is a click, a shutdown is an inconvenience, not a catastrophe.",
+          "**Keep your data yours.** Export regularly. If a tool holds something you can't get out, you don't own it — the tool does, and so does whoever acquires it.",
+          "**Favor tools with a real business model.** A tool that charges a fair price and clearly makes money is far more likely to be here next year than one burning venture cash to stay free.",
+          "**Abstract the critical dependencies.** If a tool sits at the center of your product, wrap it so you can swap it. The model or service being replaceable is what lets you survive its death.",
+          "**Re-check the signs on a schedule.** Once a quarter, run the warning-sign list on the tools you depend on. Migrating early and calmly beats migrating in a panic when the shutdown email lands.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The same test that saves your product saves your stack",
+        text: "The tools most likely to survive are the ones with a moat — real data, a real business, a defensible niche. It's the same lens you'd use on your own product. If you want the framework, our [wrapper defensibility test](/blog/is-your-ai-wrapper-defensible-2026) works just as well for judging what to build on as what to build.",
+      },
+
+      { type: "heading", level: 2, text: "Why nobody else publishes this" },
+      {
+        type: "paragraph",
+        text: "It's worth saying plainly. The big AI directories run on affiliate deals and paid placement — some literally auction front-page rank to the highest bidder. Their revenue comes from the tools they list, so they structurally cannot tell you a tool is dying, overpriced, or a bad bet. The honest version — which tools to avoid, which are decaying, which just got worse — is exactly the content their business model forbids. That's the gap this exists to fill.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "How do I know if an AI tool is going to shut down?" },
+      {
+        type: "paragraph",
+        text: "Watch for stalled updates, pricing moving the wrong way (free tier removed, hikes, enterprise-only features), team departures, souring community mood, and rotting docs or support. No single sign is proof, but two or three together mean it's time to plan an exit — while it's calm, not when the shutdown email arrives.",
+      },
+      { type: "heading", level: 3, text: "Why do so many AI tools die?" },
+      {
+        type: "paragraph",
+        text: "The boom produced an enormous number of tools built on the same models, many with no real moat or business model. When a model provider absorbs the feature, or the funding runs out, or a bigger company acquires and shelves it, the tool goes. High birth rate, high death rate — it's the shape of a gold rush.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: AI tools die constantly, and the people ranking them won't warn you. Read the signs yourself — stalled updates, wrong-way pricing, team exodus, souring community — and protect yourself by refusing lock-in and keeping your data portable. Build on things you can leave. More honest tooling guidance on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Pillar: AI for legal ──────────────────────────────────────────────────
+  {
+    slug: "ai-for-legal-2026",
+    title: "AI for legal work in 2026: where it helps, where it's dangerous",
+    deck:
+      "AI is genuinely useful across legal research, contract review, and drafting — but the cost of a confident hallucination is a sanction. The honest guide to using it well.",
+    date: "2026-07-01",
+    readingMin: 12,
+    tag: "Guide",
+    hero: {
+      src: U("1460925895917-afdab827c52f"),
+      alt: "A desk with documents, a laptop, and a pen",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Legal work is unusually well-suited to AI — it's language-heavy, pattern-rich, and buried in documents nobody has time to read. And it's unusually dangerous to get wrong: a fabricated case citation doesn't just embarrass you, it can get you sanctioned. Lawyers have already been penalized for filing briefs citing cases that an AI invented and they never checked. That tension — real usefulness, real stakes — is the whole story of AI in law, and it's why the honest guide matters more here than almost anywhere.",
+      },
+      {
+        type: "paragraph",
+        text: "This piece covers where AI genuinely helps a legal team today, where it will burn you if you trust it blindly, and how to adopt it without risking your license or your client's confidence. It's written for lawyers, legal ops, and anyone building legal tools — calm about the upside and honest about the edges.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The rule that comes before everything",
+        text: "AI in legal work **assists**, it does not **decide**. Every citation, every clause, every factual claim it produces must be verified by a human who is accountable for it. The moment you file something an AI wrote without checking, you have outsourced your judgment to a system that cannot be sanctioned in your place.",
+      },
+
+      { type: "heading", level: 2, text: "Where AI genuinely helps" },
+      {
+        type: "paragraph",
+        text: "Used as a fast, tireless assistant on the language-heavy grunt work, AI earns its place. The strongest uses are the ones where a human reviews the output before it matters.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Legal research, accelerated.** AI can find relevant cases, statutes, and secondary sources far faster than manual search — as a starting point you then verify, not a final answer you cite.",
+          "**Contract review and analysis.** Surfacing risky clauses, comparing a contract against a standard, flagging missing terms, and summarizing a stack of agreements. This is where the time savings are largest and the risk is manageable.",
+          "**First-draft drafting.** Generating a first pass at a clause, a memo, or a routine document that a lawyer then edits into shape. The draft is a scaffold, not a filing.",
+          "**Document review and e-discovery.** Sorting and prioritizing large document sets, finding the relevant few among the thousands — a job that scales badly with humans and well with machines.",
+          "**Summarizing and translating complexity.** Turning a dense contract or a long deposition into a plain-language summary for a client or a colleague.",
+        ],
+      },
+      {
+        type: "tools",
+        title: "AI tools built for legal work",
+        items: [
+          { name: "Harvey", valueLine: "AI assistant built for law firms — research, drafting, and analysis on legal-specific workflows.", url: "https://www.harvey.ai" },
+          { name: "CoCounsel", valueLine: "Legal AI from Thomson Reuters/Casetext — research, review, and summarizing grounded in legal sources.", url: "https://www.thomsonreuters.com/en/cocounsel" },
+          { name: "Spellbook", valueLine: "AI for contract drafting and review inside the word processor lawyers already use.", url: "https://www.spellbook.legal" },
+          { name: "Claude", valueLine: "Strong general reasoning for summarizing, drafting, and analysis — with a human verifying every output.", url: "https://claude.ai" },
+        ],
+      },
+
+      { type: "heading", level: 2, text: "Where it's dangerous" },
+      {
+        type: "paragraph",
+        text: "The failure modes in legal work are specific and severe, and pretending otherwise is how people get hurt.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Hallucinated citations.** A general model will invent plausible-looking cases, complete with fake citations, and state them with total confidence. This is the single most dangerous behavior in legal AI, and it has already led to real sanctions. Every citation must be checked against a real database.",
+          "**Confidentiality and privilege.** Pasting client information into a consumer AI tool may waive privilege or breach your duty of confidentiality. Use tools with the right data handling, and understand where the data goes before it leaves your control.",
+          "**Confident wrongness on the law.** Models can misstate a legal standard as fluently as they state a correct one. Without a lawyer who knows the area checking the substance, fluent and wrong is indistinguishable from fluent and right.",
+          "**Jurisdiction blindness.** The law differs by jurisdiction and changes over time; a model may blend or use outdated rules. Currency and jurisdiction have to be verified, not assumed.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "In most fields, a confident AI mistake costs you an edit. In law, it can cost you a sanction, a client, or a case. The verification step isn't optional overhead — it's the practice of law.",
+      },
+
+      { type: "heading", level: 2, text: "How to adopt AI responsibly in a legal practice" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Use legal-specific tools for legal-specific work.** Tools grounded in real legal databases hallucinate citations far less than a general chatbot. Reserve general models for drafting and summarizing, not for finding law.",
+          "**Verify every citation and factual claim, always.** Make it a hard rule, not a best effort. Nothing an AI produces reaches a filing or a client without a human confirming it against a real source.",
+          "**Protect confidentiality by design.** Know where your data goes. Use tools with appropriate confidentiality guarantees, and never paste privileged information into a consumer tool.",
+          "**Keep the human accountable and in the loop.** AI drafts; a named lawyer owns the output. Accountability cannot be delegated to a model.",
+          "**Train the team on the failure modes.** The lawyers who get burned are the ones who didn't know citations could be fabricated. Awareness of how AI fails is the cheapest safeguard you have.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The mental model",
+        text: "Treat legal AI like a brilliant, fast, occasionally-lying junior. You'd never file a first-year associate's memo without reading it. Extend that exact discipline to AI and you get the speed without the malpractice risk.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Can AI replace lawyers?" },
+      {
+        type: "paragraph",
+        text: "No — but it changes what lawyers spend time on. AI handles the language-heavy grunt work faster, which frees lawyers for judgment, strategy, and client relationships. The parts that require accountability, advocacy, and being trusted with a decision remain human. AI is leverage, not a replacement.",
+      },
+      { type: "heading", level: 3, text: "Is it safe to use ChatGPT for legal work?" },
+      {
+        type: "paragraph",
+        text: "For drafting and summarizing with careful review, general tools can help — but never for finding law, because they invent citations, and never with confidential client data in a consumer tool. For research, use legal-specific tools grounded in real databases, and verify everything regardless.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: AI is a genuine force multiplier for legal work — research, review, drafting, discovery — as long as a human verifies every citation and claim and confidentiality is protected by design. The upside is real and so are the stakes. If you're evaluating which legal AI to trust, our guide on [spotting a dying tool](/blog/ai-tool-graveyard-2026) and the [wrapper defensibility test](/blog/is-your-ai-wrapper-defensible-2026) both apply. Track legal and vertical AI tools on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Pillar: AI for healthcare ─────────────────────────────────────────────
+  {
+    slug: "ai-for-healthcare-2026",
+    title: "AI in healthcare 2026: where it's real, where it's hype, where it's risky",
+    deck:
+      "AI is quietly transforming the paperwork side of medicine and cautiously entering the clinical side. An honest look at what works, what's regulated, and what to be careful with.",
+    date: "2026-07-01",
+    readingMin: 12,
+    tag: "Guide",
+    hero: {
+      src: U("1487058792275-0ad4aaf24ca7"),
+      alt: "A clinician's desk with a laptop and notes",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The most important thing AI is doing in healthcare right now isn't diagnosing disease — it's giving clinicians their time back. The biggest, most proven wins are in the paperwork: the documentation, the notes, the administrative grind that burns doctors out. The clinical frontier — decision support, imaging, triage — is real and advancing, but it's rightly gated by regulation and the simple fact that a confident error can hurt a patient. Separating the proven from the promised is what this guide is for.",
+      },
+      {
+        type: "paragraph",
+        text: "Written for clinicians, health-tech builders, and operators, this is the honest map: where AI genuinely helps today, where it's still hype, and where the risk is high enough that caution isn't optional. Healthcare is the domain where \"move fast and break things\" is exactly the wrong instinct, and the good tools know it.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "The one distinction that matters",
+        text: "Split healthcare AI into **administrative** (documentation, scheduling, billing, summarizing) and **clinical** (diagnosis, treatment decisions, imaging). The administrative side is proven and low-risk today. The clinical side is powerful but regulated, and always keeps a clinician accountable for the decision.",
+      },
+
+      { type: "heading", level: 2, text: "Where AI is already delivering" },
+      {
+        type: "paragraph",
+        text: "The wins that are real today cluster on the side of medicine that doesn't touch a diagnosis directly — and they're substantial precisely because that work consumes so much of a clinician's day.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Ambient clinical documentation.** AI that listens to a visit and drafts the clinical note is the standout success story. It gives clinicians back hours a week and reduces the after-hours \"pajama time\" charting that drives burnout.",
+          "**Summarizing patient records.** Distilling a long, messy chart into the relevant history before a visit — a genuine time-saver that helps clinicians walk in informed.",
+          "**Administrative automation.** Scheduling, prior authorization, coding, and billing support — the bureaucratic weight of healthcare, lightened.",
+          "**Literature and evidence search.** Helping clinicians find and synthesize relevant research quickly, as a starting point they then verify.",
+          "**Patient-facing triage and answers.** Carefully-scoped tools that help patients understand symptoms or navigate care — useful as guidance, never as a substitute for a clinician.",
+        ],
+      },
+      {
+        type: "tools",
+        title: "Healthcare AI tools in real use",
+        items: [
+          { name: "Abridge", valueLine: "Ambient AI that turns a clinical conversation into a structured note — a leading documentation tool.", url: "https://www.abridge.com" },
+          { name: "Nuance DAX Copilot", valueLine: "Ambient clinical documentation integrated into the EHR workflow clinicians already use.", url: "https://www.nuance.com/healthcare/dragon-ai-clinical-solutions/dax-copilot.html" },
+          { name: "OpenEvidence", valueLine: "Clinical evidence search grounded in the medical literature, built for point-of-care questions.", url: "https://www.openevidence.com" },
+        ],
+      },
+
+      { type: "heading", level: 2, text: "Where it's still hype" },
+      {
+        type: "paragraph",
+        text: "Some of the loudest claims are ahead of reality. \"AI will replace doctors\" is not happening — the hard parts of medicine are judgment, uncertainty, physical examination, and the human relationship, none of which a model holds. Fully-autonomous diagnosis remains largely a demo, not a deployed reality, because the regulatory bar and the safety bar are both high, and correctly so. Treat sweeping replacement claims as marketing until a regulator and a peer-reviewed study say otherwise.",
+      },
+
+      { type: "heading", level: 2, text: "Where the risk is high" },
+      {
+        type: "list",
+        items: [
+          "**Patient safety from confident errors.** A model that states a wrong dose or a wrong interaction as fluently as a right one is dangerous in a way a wrong summary never is. Clinical outputs need clinician verification, every time.",
+          "**Privacy and regulation.** Health data is among the most protected there is. Tools must handle it under the relevant rules, and pasting patient data into a consumer chatbot is a serious breach waiting to happen.",
+          "**Bias and equity.** Models trained on skewed data can perform worse for under-represented groups, quietly widening gaps in care. This has to be tested for, not assumed away.",
+          "**Automation complacency.** The subtler risk: clinicians trusting the AI too much and skipping their own check. The tool is a second opinion, not the final word.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "In healthcare, the goal isn't AI that decides. It's AI that hands a clinician more time, better-organized information, and a useful second opinion — while the human stays accountable for the patient.",
+      },
+
+      { type: "heading", level: 2, text: "How to adopt AI responsibly in healthcare" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Start on the administrative side.** Documentation and paperwork are where the proven, low-risk wins live. Earn trust there before anything clinical.",
+          "**Keep a clinician accountable for every clinical output.** AI assists the decision; a named human owns it. That line does not move.",
+          "**Use compliant, purpose-built tools for patient data.** Confirm the data handling meets your regulatory obligations before anything touches a real record.",
+          "**Test for bias and safety on your own population.** Vendor benchmarks aren't enough; validate on the patients you actually serve.",
+          "**Measure the real outcome — clinician time and patient safety — not the demo.** The point is less burnout and better care, not an impressive pilot.",
+        ],
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Will AI replace doctors?" },
+      {
+        type: "paragraph",
+        text: "No. AI is taking over the documentation and administrative burden and offering decision support, which frees clinicians for the judgment, examination, and human connection that medicine depends on. The parts requiring accountability and trust stay human. AI is leverage for clinicians, not a substitute.",
+      },
+      { type: "heading", level: 3, text: "Is it safe to use AI for medical advice?" },
+      {
+        type: "paragraph",
+        text: "As carefully-scoped guidance that points you toward professional care, some patient-facing tools are useful. As a replacement for a clinician, no — models can be confidently wrong about health in dangerous ways. Anything clinical should involve a qualified human, and patient data should never go into a consumer tool.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: healthcare AI's real, proven value today is giving clinicians their time back — ambient notes, record summaries, administrative relief — while the clinical frontier advances carefully behind regulation and human accountability. Start administrative, keep humans in charge, and protect patient data by design. Track healthcare and vertical AI on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

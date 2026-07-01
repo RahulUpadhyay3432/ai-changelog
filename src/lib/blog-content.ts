@@ -3101,6 +3101,409 @@ limit 8;`,
       },
     ],
   },
+
+  // ─── Opinion: wrapper defensibility ────────────────────────────────────────
+  {
+    slug: "is-your-ai-wrapper-defensible-2026",
+    title: "Is your AI wrapper dead on arrival? A 5-question defensibility test",
+    deck:
+      "Most 'AI startups' are a prompt and a payment form, and the model provider can ship your feature overnight. Here's the honest test for whether yours survives.",
+    date: "2026-07-01",
+    readingMin: 10,
+    tag: "Opinion",
+    hero: {
+      src: U("1460925895917-afdab827c52f"),
+      alt: "A person working at a desk with charts on a laptop",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Every few weeks a founder tells the same story on Indie Hackers: built an AI tool, got a few thousand users, felt like it was working — then the model provider shipped the exact same feature inside their own app, and the user count fell off a cliff in about two weeks. This is the defining risk of building on AI in 2026, and most of the advice about it is useless: either doom (\"90% of wrappers are dead\") or a sales pitch (\"build on our platform instead\").",
+      },
+      {
+        type: "paragraph",
+        text: "The truth is more useful and less dramatic. Some wrappers are genuinely fragile and will die. Others are real businesses that happen to use a model the way every software business uses a database. The difference isn't whether you \"wrap\" a model — almost everything does now — it's whether anything else about your product is hard to copy. Here's a five-question test to find out which one you're building, before you spend a year on the wrong one.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "What \"wrapper\" really means",
+        text: "A **thin** wrapper adds nothing the model provider couldn't add themselves in a sprint — a prompt, a nice UI, a subscription. A **thick** wrapper owns something the provider doesn't: proprietary data, a workflow, a distribution channel, a regulated niche. The word \"wrapper\" is not the problem. Thinness is.",
+      },
+
+      { type: "heading", level: 2, text: "The 5-question defensibility test" },
+      {
+        type: "paragraph",
+        text: "Score your product honestly on each. There's no total to hit — but if you can't answer \"yes\" to at least two of these, you're building something the model provider can erase on a Tuesday.",
+      },
+      { type: "heading", level: 3, text: "1. Do you own data the model provider can't get?" },
+      {
+        type: "paragraph",
+        text: "Proprietary data is the strongest moat there is. If your product gets better because of data you've collected — user corrections, a specialized corpus, labeled examples from a niche nobody else serves — then a general model can't replicate the result, because it doesn't have your data. If your product is exactly as good on day one as it is on day one thousand, you have no data moat.",
+      },
+      { type: "heading", level: 3, text: "2. Are you embedded in a workflow that's painful to leave?" },
+      {
+        type: "paragraph",
+        text: "A model in a chat window is easy to switch away from. A tool that lives inside how a team already works — integrated with their systems, holding their history, wired into their approvals — is not. The deeper you sit in a workflow, the less a marginally-better model matters, because switching means ripping out plumbing. Ask whether leaving your product is a click or a project.",
+      },
+      { type: "heading", level: 3, text: "3. Do you serve a niche too small or too regulated for the giants?" },
+      {
+        type: "paragraph",
+        text: "The big model providers chase big, horizontal markets. A tool built for the specific, unglamorous needs of, say, dental-practice billing or municipal permit review is beneath their attention and often above their willingness to handle the compliance. Narrow and boring is a genuine moat: it's defensible precisely because it isn't worth the giant's time to copy.",
+      },
+      { type: "heading", level: 3, text: "4. Do you have a distribution advantage they don't?" },
+      {
+        type: "paragraph",
+        text: "Sometimes the moat isn't the product at all — it's that you can reach a specific audience better than anyone. An existing community, a content engine that ranks, a partnership, a brand a niche trusts. If you can put your product in front of the right people repeatedly and cheaply, the underlying model being commoditized matters far less.",
+      },
+      { type: "heading", level: 3, text: "5. Would you survive the model getting 10x cheaper and better?" },
+      {
+        type: "paragraph",
+        text: "This is the acid test. Imagine the best model becomes free and twice as capable tomorrow. Does that kill you, or help you? If cheaper, better models are an existential threat, your value was the model. If they're a tailwind — because your value is the data, the workflow, the niche, the distribution — you're building something real.",
+      },
+      {
+        type: "quote",
+        text: "The question isn't \"am I a wrapper?\" Everyone is a wrapper now. The question is: if the thing I wrap becomes free tomorrow, do I still have a business?",
+      },
+
+      { type: "heading", level: 2, text: "What the model providers can and can't take" },
+      {
+        type: "paragraph",
+        text: "It helps to be clear-eyed about the threat. Model providers will absolutely absorb generic, horizontal features — summarize this, rewrite that, answer questions about a document. If your whole product is one of those, assume it becomes a checkbox in ChatGPT eventually. What they won't do is your customers' specific, messy, integrated work. They build platforms; they don't build the thousand narrow tools on top of them. Your safety is in being one of those thousand, deeply.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The trap that catches everyone",
+        text: "Building the impressive general thing feels smart and is fragile. Building the boring specific thing feels small and is defensible. Founders repeatedly pick the first because it demos better — and then get erased when the provider ships it natively.",
+      },
+
+      { type: "heading", level: 2, text: "If you failed the test" },
+      {
+        type: "paragraph",
+        text: "A low score isn't a death sentence — it's a direction. You don't need to abandon the idea; you need to add a moat to it. Start collecting the data only your users generate. Go deeper into one workflow instead of broader across many. Pick a narrower, more specific customer. Or build the distribution advantage now, while you still have time. The wrappers that survive rarely started defensible — they added defensibility deliberately, before the provider caught up.",
+      },
+      {
+        type: "paragraph",
+        text: "If you're building solo, this connects directly to two other realities worth reading honestly about: what your [AI stack should actually be](/blog/ai-stack-for-indie-hackers-2026) as an indie hacker, and the [tools every vibe coder should know](/blog/tools-every-vibe-coder-should-know) if you're shipping without a deep engineering background.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Is it still worth building an AI wrapper in 2026?" },
+      {
+        type: "paragraph",
+        text: "Yes — if it's a thick wrapper. A thin one (prompt plus payment form) is a bad bet because the model provider can replicate it. A thick one, with a data, workflow, niche, or distribution moat, is a genuinely good business. The label doesn't matter; the defensibility does.",
+      },
+      { type: "heading", level: 3, text: "Won't OpenAI or Anthropic just copy my product?" },
+      {
+        type: "paragraph",
+        text: "They'll copy generic, horizontal features — assume that. They won't build your specific, integrated, niche tool, because it isn't worth their time. The way to be safe is to be too specific and too embedded to be worth copying.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: stop asking whether you're a wrapper and start asking whether you'd survive the model becoming free. Score yourself on data, workflow, niche, distribution, and the 10x test — and if you come up short, add a moat now, deliberately, while you still can. More honest guides for builders on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Opinion: distribution specificity ─────────────────────────────────────
+  {
+    slug: "distribution-specificity-problem-2026",
+    title: "You don't have a distribution problem. You have a specificity problem.",
+    deck:
+      "\"Nobody's using my app\" almost never gets fixed by more channels. It gets fixed by which subreddit, which keyword, which thread. Here's how to get specific.",
+    date: "2026-07-01",
+    readingMin: 10,
+    tag: "Opinion",
+    hero: {
+      src: U("1561070791-2526d30994b5"),
+      alt: "A person looking at analytics on a screen in a dim room",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The most common post in indie founder communities is some version of \"I built something good and nobody is using it.\" Twenty signups, zero paying. Three days live, silence. Ninety days of posting on Reddit, exactly zero customers. The instinct is to blame distribution and reach for more of it — more channels, more posting, more platforms. That instinct is wrong, and it's why so many founders burn out shouting into the void.",
+      },
+      {
+        type: "paragraph",
+        text: "You almost never have a distribution problem. You have a specificity problem. \"Try content marketing\" is not a strategy — it's a category. The founders who break through don't do more; they do it far more specifically. The right subreddit, not Reddit. The right keyword, not SEO. The right ten people, not \"an audience.\" This is the piece nobody writes, because specificity is harder to sell than a generic playbook.",
+      },
+      {
+        type: "quote",
+        text: "Generic advice is worse than no advice. When someone tells you to \"try content marketing,\" they've given you a category, not a plan. You need to know which subreddit, which keyword, which thread. The specifics are everything.",
+      },
+
+      { type: "heading", level: 2, text: "Why \"post on Reddit\" fails" },
+      {
+        type: "paragraph",
+        text: "There's a widely-shared story of a founder who posted daily on Reddit for three months and got zero paying customers. The diagnosis, in their own words: they were posting where founders hang out, not where their customers hang out. r/SaaS is full of other builders, not buyers. This is the specificity failure in its purest form — the right activity (Reddit) aimed at exactly the wrong place.",
+      },
+      {
+        type: "paragraph",
+        text: "Builders gravitate to builder spaces because they're comfortable and familiar. But your customers are almost never other founders. They're in the niche community for the problem you solve — the subreddit for the hobby, the forum for the profession, the Discord for the specific pain. Distribution doesn't fail because you didn't post enough. It fails because you posted to people who will never buy.",
+      },
+
+      { type: "heading", level: 2, text: "How to get specific" },
+      {
+        type: "paragraph",
+        text: "Specificity is a process, not a talent. Here's how to replace \"I need more users\" with a list of exact places, words, and people.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Name the person, not the market.** Not \"small businesses\" — \"a solo bookkeeper with 15 clients who dreads month-end.\" You can't find a market. You can find a person, and once you can picture them, you can find where they already are.",
+          "**Find the exact rooms they're in.** The specific subreddits, forums, Discords, Slack groups, and newsletters for that person's actual problem — not for building startups. Make a list of ten. These are your channels.",
+          "**Search for the pain in their words.** In those communities, search the phrases they use — \"I wish there was a tool that,\" \"how do you all deal with,\" the specific complaint. Those threads are where demand is already stated out loud.",
+          "**Show up as a helper, not a seller.** Answer the specific question fully, for free, before you ever mention your product. In a niche room, genuine help travels; a pitch gets ignored or removed.",
+          "**Talk to ten of them by name.** Not a survey — ten real conversations. The patterns across ten specific people tell you more than a thousand pageviews, and a few of them become your first customers.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The specificity test",
+        text: "If your growth plan contains the words \"social media,\" \"content,\" \"SEO,\" or \"community\" without naming the exact account, keyword, or room — it's a category, not a plan. Rewrite it until every line names a specific place, phrase, or person.",
+      },
+
+      { type: "heading", level: 2, text: "It's usually one channel, done deeply" },
+      {
+        type: "paragraph",
+        text: "Founders imagine they need to be everywhere. In reality, most early traction comes from a single channel worked deeply — one community where you become a known, helpful regular; one keyword you genuinely own; one newsletter that reaches exactly your person. Spreading thin across five platforms produces five shallow, ignorable presences. Going deep on one produces a reputation. Pick the single room where your specific person is most concentrated, and live there.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Marketing isn't a phase after building",
+        text: "The founders who struggle treat marketing as something that starts after the product is done. But finding the specific person and their specific rooms is how you learn what to build. Distribution and product are the same conversation, and delaying it is why so many good products find no one.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "How do I get my first 100 users?" },
+      {
+        type: "paragraph",
+        text: "Not with a broad campaign. Name your exact customer, find the ten specific communities where they already gather, help genuinely in those rooms, and have real conversations with the first ten people. A hundred users is a hundred specific humans reached deliberately, not a number you hit by posting more widely.",
+      },
+      { type: "heading", level: 3, text: "Why is nobody using my app even though it's good?" },
+      {
+        type: "paragraph",
+        text: "Almost always because the right people haven't seen it — and the fix is specificity, not volume. If you've been posting where builders gather rather than where your buyers gather, that alone explains the silence. Find your customer's actual rooms and show up there as a helper first.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: more channels won't save a product no one specific has seen. Name the person, find their exact rooms, speak their exact words, and go deep on one channel instead of thin on five. Specificity is the whole game. If you're figuring out what to build for that person, our [defensibility test](/blog/is-your-ai-wrapper-defensible-2026) and the [indie hacker AI stack](/blog/ai-stack-for-indie-hackers-2026) are the companion reads.",
+      },
+    ],
+  },
+
+  // ─── Opinion: is it too late to learn AI ───────────────────────────────────
+  {
+    slug: "is-it-too-late-to-learn-ai-2026",
+    title: "Is it too late to get into AI in 2026? A calm, honest answer",
+    deck:
+      "Not a course ad and not doom. The real state of the entry-level market, where demand actually is, and how to learn AI in a way that still leads somewhere.",
+    date: "2026-07-01",
+    readingMin: 11,
+    tag: "Opinion",
+    hero: {
+      src: U("1487058792275-0ad4aaf24ca7"),
+      alt: "An open notebook, laptop, and coffee on a wooden desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "If you search whether it's too late to get into AI in 2026, you'll get two kinds of answers, both useless. One is reassurance that turns out to be a sales funnel — \"it's never too late, and here's our course.\" The other is fear — \"the entry level is dead, don't bother.\" Neither is honest, because honesty doesn't sell courses or drive outrage clicks. This is the calm version.",
+      },
+      {
+        type: "paragraph",
+        text: "The short answer: no, it's not too late — but the easy version is over. The path of \"finish a course, put it on a resume, get an entry-level ML job\" has genuinely narrowed. What's replaced it is harder to fake and, if anything, more durable. If you want the real map instead of a pep talk or a scare, here it is.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "The honest one-liner",
+        text: "It's not too late to become valuable with AI. It is late to become valuable the lazy way. The people struggling most aren't unqualified — they're **indistinguishable**, because they all did the same course and the same projects.",
+      },
+
+      { type: "heading", level: 2, text: "What's actually true about the entry-level market" },
+      {
+        type: "paragraph",
+        text: "The uncomfortable reality is that the generic entry level got crowded and squeezed at once. Junior openings in many markets have contracted, and the applicants who remain are, in the words of one market analysis, not unqualified but indistinguishable — thousands of candidates with the same certificate, the same Titanic and MNIST projects, the same resume. When everyone completed the same path, the path stops being a signal.",
+      },
+      {
+        type: "paragraph",
+        text: "At the same time, the tools got good enough to do the most junior version of the work — the boilerplate, the first-pass analysis, the simple scripts. That doesn't remove the need for people; it raises the floor of what a person needs to bring. The demand didn't vanish. It moved.",
+      },
+
+      { type: "heading", level: 2, text: "Where the demand actually went" },
+      {
+        type: "paragraph",
+        text: "This is the part the fear articles skip. AI didn't reduce the total need for people who understand it — it redistributed it toward places that are harder to commoditize.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Domain-embedded AI.** The person who understands AI *and* a specific field — healthcare, law, logistics, manufacturing — is in demand precisely because the general models don't understand that field's messy reality. Depth in a domain plus AI beats AI alone.",
+          "**The plumbing (AI infrastructure and ops).** Making AI systems reliable, cheap, observable, and safe in production is where a lot of the real work is. It's less glamorous than training models and much harder to automate away.",
+          "**Building with AI, not just studying it.** People who can actually ship useful things — wire models into products, make agents reliable, solve a real problem end to end — are valued over people who can only describe how a transformer works.",
+          "**Judgment and evaluation.** As models generate more, the scarce skill becomes knowing whether the output is any good. Being the person who can evaluate, correct, and be accountable for AI's work is increasingly the job.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "The market didn't stop wanting people who understand AI. It stopped wanting people who only understand AI in the abstract, exactly like everyone else does.",
+      },
+
+      { type: "heading", level: 2, text: "How to learn AI so it still leads somewhere" },
+      {
+        type: "paragraph",
+        text: "Given all that, the goal isn't to complete a curriculum — it's to become distinguishable. That changes how you should learn.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Pair AI with something you already know.** Your old field, hobby, or job is an asset, not a detour. AI plus a domain you understand is far rarer than AI alone.",
+          "**Build things that aren't the tutorial.** Skip Titanic and MNIST. Build something specific and a little weird that solves a real problem you actually have — it's the only thing on a resume that isn't identical to everyone else's.",
+          "**Learn by shipping, not just watching.** The most-repeated advice from people who made the jump is that implementing something — even badly — teaches more than any number of lectures. Lectures are words until you build.",
+          "**Go deep enough to have judgment.** You don't need a PhD's math, but you need enough understanding to know when an AI output is wrong. That judgment is the scarce, durable skill.",
+          "**Learn in public.** Write up what you build. It compounds into the exact distinguishability the crowded entry level lacks — and it's how people find you.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Builder or user — decide first",
+        text: "\"Learn AI\" hides two different goals. **Using** AI well (prompting, building with APIs, shipping products) is fast to start and immediately useful. **Building** AI (the math, training, research) is a longer road. Most people who say \"learn AI\" want the first and accidentally sign up for the second. Pick deliberately.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Is it too late to get an AI job in 2026?" },
+      {
+        type: "paragraph",
+        text: "No, but the generic entry-level path is crowded. The openings are increasingly for people who pair AI with a specific domain, who can ship real systems, or who can evaluate and be accountable for AI's output. Aim there rather than at the saturated \"junior ML\" lane and it's very much still open.",
+      },
+      { type: "heading", level: 3, text: "Do I need a degree or expensive course to learn AI?" },
+      {
+        type: "paragraph",
+        text: "No. Most of what matters can be learned free, and courses are commodities now — everyone has the same certificate. What's scarce is building distinctive things and pairing AI with a domain. Spend your effort there, not on collecting credentials.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: it's not too late, but the lazy path is closed. Become distinguishable — pair AI with a domain, build things that aren't the tutorial, learn by shipping, and learn in public. If you're building rather than researching, the [tools every vibe coder should know](/blog/tools-every-vibe-coder-should-know) and our guide to [agentic AI](/blog/what-is-agentic-ai-2026) are good next steps.",
+      },
+    ],
+  },
+
+  // ─── Guide: AI credit burn ─────────────────────────────────────────────────
+  {
+    slug: "control-ai-credit-burn-2026",
+    title: "Your Bolt bill went from $20 to $847: a field guide to AI credit burn",
+    deck:
+      "AI builders charge by usage, and every revision burns tokens. Why the bills spike, and the concrete tactics to keep a vibe-coded project from wrecking your budget.",
+    date: "2026-07-01",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1517180102446-f3ece451e9d8"),
+      alt: "A glowing circuit board representing compute cost",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "A pattern shows up again and again in vibe-coding communities: someone starts a project on a $20 plan, and three weeks later they're staring at a bill for several hundred dollars. Reports of $340 after week three, $847 for a three-week project, hundreds in overage in a single week after a pricing change. Nobody warned them, because the tools are happy to let you spend. Here's why it happens and how to stop it.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the cost side of vibe coding that the marketing skips. The advertised subscription is a floor, not a ceiling — most AI builders charge by consumption, and consumption is easy to run up without noticing. Understanding the mechanics is the whole defense.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "Why the sticker price lies",
+        text: "The monthly plan buys you a bucket of **credits or tokens**. Every AI action — every generation, every revision, every \"actually, change that\" — draws from the bucket. Refill it enough times and the real bill is many times the advertised subscription.",
+      },
+
+      { type: "heading", level: 2, text: "Why the bill spikes" },
+      {
+        type: "paragraph",
+        text: "The single biggest cause is the revision loop. When you ask an AI builder to change something, it often re-reads and regenerates large parts of your project to make one edit — and each pass costs. \"Move the button, no not there, make it blue, actually the old blue\" is four expensive round-trips for a change that touched a few lines. The more you iterate conversationally, the faster the bucket drains.",
+      },
+      {
+        type: "paragraph",
+        text: "It compounds as the project grows. A bigger codebase means more context the model has to process on every request, so the same edit costs more in month two than in month one. And buggy generations are the cruelest version: you pay to generate broken code, then pay again to fix it, with no refund for the model's mistake. That's the exact complaint that fills the pricing threads — paying twice for the tool's own errors.",
+      },
+      {
+        type: "quote",
+        text: "You're not billed for the app you built. You're billed for every attempt, including the ones the AI got wrong. Iteration is the product and iteration is the cost.",
+      },
+
+      { type: "heading", level: 2, text: "How to control the burn" },
+      {
+        type: "paragraph",
+        text: "You don't have to stop iterating — you have to iterate deliberately. These tactics cut most of the waste.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Plan the change before you prompt.** Decide exactly what you want in full — layout, color, behavior — and ask for it once, instead of discovering it live across ten billed revisions.",
+          "**Batch related edits into one request.** \"Make the button blue, move it right, and add a hover state\" is one round-trip. Three separate messages are three.",
+          "**Stop the revision spiral.** If two or three attempts haven't fixed something, don't keep re-prompting — the model is stuck and you're paying for it. Step back, describe the problem differently, or fix that one piece by hand.",
+          "**Keep scope small.** A smaller project costs less per edit because there's less context to reprocess every time. Ship the core, then grow it — don't build the whole thing in one sprawling session.",
+          "**Watch the meter, not the month.** Check your credit or token usage daily, not when the bill arrives. Most spikes are a bad afternoon of revision loops that you'd have caught in real time.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "When a flat rate wins",
+        text: "If you're doing heavy, sustained iteration, a **flat-rate or bring-your-own-key** setup can be far cheaper than per-credit billing. AI-native editors like Cursor, where you can iterate a lot for a predictable fee, often beat consumption-priced builders once a project gets real. Match the pricing model to how much you iterate.",
+      },
+
+      { type: "heading", level: 2, text: "What Reddit says about the bills" },
+      {
+        type: "paragraph",
+        text: "The pricing threads on r/SaaS, r/nocode, and the tool-specific subreddits are remarkably consistent, and worth reading before you commit to a plan.",
+      },
+      {
+        type: "list",
+        items: [
+          "**\"The revision loop is the killer.\"** The recurring diagnosis: costs blow up not from building, but from endlessly tweaking. The advice is always to plan more and prompt less.",
+          "**\"No refunds for buggy output\" is the top grievance.** Users repeatedly object to paying to generate broken code and paying again to fix it. It's the single biggest source of resentment toward consumption pricing.",
+          "**\"Credit pricing changes hurt.\"** When tools switch from predictable subscriptions to variable credit consumption, the community backlash is loud and immediate — people hate not being able to predict the bill.",
+        ],
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Why is my Bolt / Lovable / Cursor bill so high?" },
+      {
+        type: "paragraph",
+        text: "Almost always the revision loop: every change re-processes part of your project and draws from your credits, so lots of small conversational tweaks add up fast. Larger projects cost more per edit, and buggy generations make you pay twice. Plan changes before prompting, batch edits, and watch your usage daily.",
+      },
+      { type: "heading", level: 3, text: "How do I stop AI tools from burning through credits?" },
+      {
+        type: "paragraph",
+        text: "Iterate deliberately: decide the full change before you ask, batch related edits into one request, stop re-prompting after a couple of failed attempts, keep scope small, and monitor usage in real time. For heavy iteration, a flat-rate tool often beats a per-credit one.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: the subscription is a floor, and every revision draws from your credits — so plan before you prompt, batch edits, break the revision spiral, and watch the meter daily. Match the pricing model to how much you iterate. Before you ship, don't forget the [security check for vibe-coded apps](/blog/vibe-coding-security-checklist-2026) — the other thing the tools won't warn you about.",
+      },
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

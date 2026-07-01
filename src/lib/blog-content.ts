@@ -2486,6 +2486,621 @@ limit 8;`,
       },
     ],
   },
+
+  // ─── Pillar: Agentic AI ────────────────────────────────────────────────────
+  {
+    slug: "what-is-agentic-ai-2026",
+    title: "Agentic AI, explained: what changed and how to actually use it",
+    deck:
+      "Agents went from demo to production in one year. What an AI agent really is, how the frameworks compare, where it breaks, and how to build your first one without getting burned.",
+    date: "2026-07-01",
+    readingMin: 14,
+    tag: "Explainer",
+    hero: {
+      src: U("1451187580459-43490279c0fa"),
+      alt: "An abstract network of connected nodes on a dark background",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "A year ago, \"AI agent\" mostly meant a demo that worked once on stage and fell apart the moment you gave it a real task. In 2026 that changed. Agents are running in production — closing support tickets, refactoring codebases, moving money, booking meetings — and the shift is big enough that Gartner now expects 40% of enterprise applications to embed task-specific agents by the end of the year, up from under 5% in 2025.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the page to send someone who asks \"what is agentic AI, really?\" It covers what an agent actually is (stripped of the marketing), why the shift happened now, how the main frameworks differ, where agents still break, and how to build your first one. Where there's a real disagreement in the community, this piece says so instead of pretending the answer is settled.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "The one-sentence version",
+        text: "An AI agent is a language model given a **goal**, a set of **tools**, and a **loop** — it decides what to do next, does it, looks at the result, and repeats until the goal is met or it gives up.",
+      },
+
+      { type: "heading", level: 2, text: "What an AI agent actually is" },
+      {
+        type: "paragraph",
+        text: "Strip away the branding and an agent is three things wrapped around a model. A **goal** you hand it in plain language. A set of **tools** it's allowed to call — search the web, run code, query a database, hit an API, read a file. And a **loop** that lets it act, observe what happened, and decide the next step rather than producing one answer and stopping.",
+      },
+      {
+        type: "paragraph",
+        text: "That loop is the whole difference. A normal LLM call is a function: text in, text out. An agent is a process: it plans, takes an action, reads the result, corrects course, and keeps going. When people say a task \"needed an agent,\" they mean it couldn't be solved in a single shot — it required several steps, and the right step at each stage depended on what the previous one returned.",
+      },
+      {
+        type: "diagram",
+        chart:
+          "flowchart TD\n  A[Goal from user] --> B[Model plans next step]\n  B --> C{Needs a tool?}\n  C -->|Yes| D[Call tool: search, code, API, DB]\n  D --> E[Observe result]\n  E --> B\n  C -->|No| F[Return answer]\n  F --> G{Goal met?}\n  G -->|No| B\n  G -->|Yes| H[Done]",
+        caption: "The agent loop: plan → act → observe → repeat. The loop, not the model, is what makes it an agent.",
+      },
+      {
+        type: "paragraph",
+        text: "The most common pattern under the hood is still **ReAct** — the model reasons about what to do, acts by calling a tool, and reads the observation before reasoning again. Newer systems layer memory, planning, and multiple specialized agents on top, but almost everything is a variation on that plan-act-observe cycle.",
+      },
+
+      { type: "heading", level: 2, text: "Why agents work now when they didn't in 2024" },
+      {
+        type: "paragraph",
+        text: "Three things changed at once. Models got dramatically better at **tool use** — they now emit well-formed function calls reliably instead of hallucinating arguments. Context windows grew large enough to hold a real task's worth of state, so an agent can remember what it's already tried. And a genuine standard emerged for connecting models to tools: the [Model Context Protocol](/blog/what-is-mcp-model-context-protocol), which turned \"wire this model to that system\" from a bespoke integration into a plug-in.",
+      },
+      {
+        type: "paragraph",
+        text: "None of these alone would have mattered. Together they crossed a threshold: agents became reliable enough that the failure rate dropped below the point where a human babysitter erased all the value. That's the quiet story behind the 2026 boom — not a single breakthrough model, but the boring reliability work finally paying off.",
+      },
+      {
+        type: "quote",
+        text: "The question stopped being \"can we build an agent?\" and became \"can we trust this agent to run without someone watching it?\" Everything shipping in 2026 is an answer to the second question.",
+      },
+
+      { type: "heading", level: 2, text: "The frameworks, and how to choose" },
+      {
+        type: "paragraph",
+        text: "You do not have to pick a framework to build an agent — plenty of production agents are a few hundred lines of plain code around a model and a tool-calling loop. But frameworks save you the plumbing, and four have real traction. Here's the honest split.",
+      },
+      {
+        type: "paragraph",
+        text: "**LangChain** is still the default connective tissue — every new framework integrates with it, and its abstractions are everywhere. **LangGraph**, its graph-based sibling, is what serious teams reach for when an agent needs explicit control flow and state. **Dify** and **Langflow** are the low-code builders: drag-and-drop canvases that let non-engineers assemble agents and RAG pipelines, with Dify leaning production and Langflow leaning prototype. **CrewAI** and **AutoGen** specialize in multi-agent orchestration — several agents with distinct roles collaborating on one job.",
+      },
+      {
+        type: "tools",
+        title: "Agent frameworks worth knowing",
+        items: [
+          { name: "LangChain", valueLine: "The standard framework — modular components for chains, tools, and memory. Start here to understand the vocabulary.", url: "https://www.langchain.com" },
+          { name: "LangGraph", valueLine: "Graph-based agent orchestration with explicit state — for agents that need real control flow, not a black box.", url: "https://www.langchain.com/langgraph" },
+          { name: "Dify", valueLine: "Low-code, production-minded platform for building and deploying agents and RAG apps with a visual builder.", url: "https://dify.ai" },
+          { name: "Langflow", valueLine: "Drag-and-drop canvas for designing agents fast — best for prototyping and letting non-engineers build.", url: "https://www.langflow.org" },
+          { name: "CrewAI", valueLine: "Multi-agent orchestration — define agents with roles and let them collaborate on a shared goal.", url: "https://www.crewai.com" },
+          { name: "AutoGen", valueLine: "Microsoft's multi-agent framework for conversations between specialized agents and tools.", url: "https://microsoft.github.io/autogen/" },
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "If you're just starting",
+        text: "Build one agent, from scratch, in plain code, before you touch a framework. You'll understand what every framework is abstracting — and you'll often find you didn't need one. Then reach for **LangGraph** if you want structure or **Dify** if you want a visual builder.",
+      },
+
+      { type: "heading", level: 2, text: "What Reddit and Quora actually say about agents" },
+      {
+        type: "paragraph",
+        text: "Search \"best AI agent framework reddit\" and a few themes repeat across r/LocalLLaMA, r/MachineLearning, and the LangChain community itself. They're worth knowing before you commit, because the loudest marketing and the actual practitioner consensus point in different directions.",
+      },
+      {
+        type: "list",
+        items: [
+          "**\"Frameworks over-abstract.\"** The most common complaint about LangChain on Reddit is that its abstractions hide what's happening, making debugging painful. A recurring piece of advice: build the loop yourself first, adopt a framework only when the plumbing genuinely hurts.",
+          "**\"Multi-agent is oversold.\"** Practitioners repeatedly warn that spinning up five agents to do one job usually adds failure modes, not intelligence. The consensus: reach for a single well-instrumented agent before a swarm.",
+          "**\"Reliability is the real problem.\"** On Quora and Hacker News alike, the question that keeps coming up isn't which model to use — it's how to stop an agent from silently going off the rails on step seven. Observability and guardrails, not raw capability, are what people say separates a demo from production.",
+          "**\"Start with a narrow task.\"** The advice that gets upvoted is always the same: pick one boring, well-defined job, automate that, and expand only once it's trustworthy.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The signal underneath all of it: the hard part of agents in 2026 is not building one, it's trusting one. Everyone who has shipped agrees the work is in the guardrails.",
+      },
+
+      { type: "heading", level: 2, text: "Where agents still break" },
+      {
+        type: "paragraph",
+        text: "Being honest about the failure modes is what separates a useful guide from a hype piece. Agents drift — a small error on an early step compounds into nonsense by the end. They can loop, burning tokens retrying the same failing action. They're vulnerable to prompt injection when they read untrusted content, which matters enormously the moment an agent can take real actions like sending email or moving money. And they fail silently: a confident wrong answer is more dangerous than an obvious crash.",
+      },
+      {
+        type: "paragraph",
+        text: "The fixes are all forms of the same discipline. Give an agent the narrowest set of tools it needs, not every tool you have. Put hard limits on steps and spend. Log every action so you can see where it went wrong. Keep a human in the loop for anything irreversible. This is why an entire category of \"agent observability\" tools appeared in 2026 — the market worked out that watching agents is the product.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The rule that matters most",
+        text: "Never give an agent the ability to take an irreversible action — spend money, delete data, send an external message — without a human approval step, until you have watched it succeed hundreds of times on that exact task.",
+      },
+
+      { type: "heading", level: 2, text: "How to build your first agent" },
+      {
+        type: "paragraph",
+        text: "The fastest way to actually understand agents is to build a small one. You don't need a framework or a GPU. Pick a task that takes several steps and a tool or two — for example, \"given a company name, find its pricing page, extract the plans, and summarize them.\" That needs search, a fetch, and reasoning: a real agent, small enough to finish in an afternoon.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Pick one narrow, multi-step task.** Something a single prompt can't do but a person could in five minutes.",
+          "**Give the model two or three tools.** Web search, a fetch, maybe a calculator. No more. Every extra tool is a new way to fail.",
+          "**Write the loop.** Call the model, let it choose a tool, run the tool, feed the result back, repeat. Cap it at, say, ten steps.",
+          "**Log everything.** Print each thought, each tool call, each result. You cannot debug what you can't see.",
+          "**Add limits before you add power.** Max steps, max spend, and a human check on anything that touches the outside world.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Once that works, the natural next step is connecting your agent to real systems — your files, your database, your SaaS tools — which is exactly what MCP is for. Our guide to the [best MCP servers for Claude](/blog/best-mcp-servers-for-claude-2026) covers the connectors worth adding first, and if you want a curated list of the agents and frameworks shipping right now, the [best AI agents of 2026](/blog/best-ai-agents-2026) is the companion to this piece.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Is agentic AI the same as AGI?" },
+      {
+        type: "paragraph",
+        text: "No. Agentic AI is a practical architecture — a model in a loop with tools. AGI is a hypothetical system with general human-level intelligence. Agents are useful precisely because they don't require anything close to AGI; they get leverage from letting a capable-but-narrow model take several steps instead of one.",
+      },
+      { type: "heading", level: 3, text: "Do I need a framework to build an agent?" },
+      {
+        type: "paragraph",
+        text: "No, and many experienced builders recommend against starting with one. A basic agent is a model, a few tools, and a loop — a couple hundred lines of code. Adopt a framework once you feel the plumbing pain, not before.",
+      },
+      { type: "heading", level: 3, text: "What's the difference between an agent and a chatbot?" },
+      {
+        type: "paragraph",
+        text: "A chatbot responds. An agent acts. A chatbot answers your question in text; an agent takes your goal, uses tools, and changes something in the world — files a ticket, edits code, sends a message — before reporting back.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The one-line takeaway: agents are just models given a goal, tools, and a loop — and in 2026 the hard, valuable work is no longer building them but making them trustworthy enough to run unwatched. Start narrow, log everything, and add power only after you've earned trust. Track the frameworks and agents worth using on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Pillar: Vibe coding ───────────────────────────────────────────────────
+  {
+    slug: "vibe-coding-explained-2026",
+    title: "Vibe coding, explained: how non-engineers ship real software now",
+    deck:
+      "You describe what you want, the AI writes the code. Here's what vibe coding actually is, the stack that works, where it falls apart, and how to ship something real without a CS degree.",
+    date: "2026-07-01",
+    readingMin: 12,
+    tag: "Guide",
+    hero: {
+      src: U("1498050108023-c5249f4df085"),
+      alt: "A laptop open to a code editor on a desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Vibe coding is building software by describing what you want in plain language and letting an AI write the code. You stay in the loop — steering, testing, correcting — but you're no longer typing every line. In 2026 it stopped being a novelty: non-engineers are shipping real, paying products this way, and the tools finally make it possible to go from an idea to a live app in an afternoon.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the honest guide. Vibe coding is genuinely powerful and genuinely has limits, and most of what's written about it oversells one and hides the other. Here's what it actually is, the stack that works today, the failure modes nobody warns you about, and a realistic path to shipping your first thing.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "The term",
+        text: "\"Vibe coding\" was coined for the flow state of building by intent rather than syntax — describing the vibe of what you want and iterating. It doesn't mean \"no thinking.\" The people who ship still understand what they're building; they've just offloaded the typing.",
+      },
+
+      { type: "heading", level: 2, text: "What vibe coding actually is (and isn't)" },
+      {
+        type: "paragraph",
+        text: "It **is** this: you open a tool like Cursor, Lovable, or Bolt, describe a feature — \"add a signup form that saves emails to a database\" — and the AI writes and wires the code. You run it, see what's broken, describe the fix, and repeat. The skill shifts from remembering syntax to describing intent clearly, spotting when something's wrong, and knowing what to ask for next.",
+      },
+      {
+        type: "paragraph",
+        text: "It **isn't** magic, and it isn't \"AI builds my startup while I sleep.\" You still make the product decisions. You still test. And when the AI gets stuck — which it does — you need enough judgment to notice, and enough patience to steer it out. The people who fail at vibe coding are the ones who accept whatever the model produces without ever checking whether it's right.",
+      },
+      {
+        type: "quote",
+        text: "Vibe coding doesn't remove the need to think. It removes the need to type. Those are very different things, and confusing them is why some people ship and others end up with a pile of code they don't understand.",
+      },
+
+      { type: "heading", level: 2, text: "The vibe coding stack that works" },
+      {
+        type: "paragraph",
+        text: "There are two families of tools, and which you want depends on how much control you're willing to trade for speed. **Prompt-to-app builders** (Lovable, Bolt, v0, Replit Agent) take you from a description to a deployed app fastest — great for prototypes, landing pages, and internal tools. **AI-native editors** (Cursor, Windsurf) give you a real codebase you own, with the AI editing inside it — slower to start, but the right call the moment you want to grow the thing.",
+      },
+      {
+        type: "tools",
+        title: "The vibe coding toolkit",
+        items: [
+          { name: "Lovable", valueLine: "Describe an app, get a deployed full-stack app with a database. Fastest idea-to-live path for non-engineers.", url: "https://lovable.dev" },
+          { name: "Bolt", valueLine: "Browser-based full-stack builder — prompt to working app, edit live, deploy in one place.", url: "https://bolt.new" },
+          { name: "v0", valueLine: "Vercel's prompt-to-UI tool — generate polished React interfaces from a description, copy the code out.", url: "https://v0.dev" },
+          { name: "Cursor", valueLine: "AI-native editor — the tool to graduate to when you want a real codebase you own and can grow.", url: "https://cursor.com" },
+          { name: "Replit Agent", valueLine: "Describe an app and it builds, runs, and hosts it in the browser — no local setup at all.", url: "https://replit.com" },
+          { name: "Claude", valueLine: "The reasoning partner — paste an error, ask why, get an explanation you actually learn from.", url: "https://claude.ai" },
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The pragmatic path",
+        text: "Start in a **prompt-to-app builder** to validate the idea fast. The moment it has real users or needs custom logic the builder can't express, export or rebuild in **Cursor**, where you own the code. Don't start in Cursor if you've never coded — start where the feedback loop is fastest.",
+      },
+
+      { type: "heading", level: 2, text: "What Reddit and Quora actually say about vibe coding" },
+      {
+        type: "paragraph",
+        text: "Search \"vibe coding reddit\" and the conversation on r/vibecoding, r/SideProject, and r/webdev is refreshingly blunt. The enthusiasm is real, but so are the warnings — and the warnings are the useful part.",
+      },
+      {
+        type: "list",
+        items: [
+          "**\"It's amazing until it isn't.\"** The recurring story: the first 80% flies, then you hit a bug the AI can't fix because you don't understand the code well enough to guide it. The advice that follows is always the same — learn enough to read what you're shipping.",
+          "**\"Security is the sharp edge.\"** Experienced devs on Reddit repeatedly flag that AI-generated apps often ship with exposed keys, missing auth, and open databases. The consensus fix: never put a vibe-coded app in front of real users' data without someone checking the basics.",
+          "**\"Small scope wins.\"** The projects people actually finish are narrow — one tool, one job. Ambitious \"build me a marketplace\" prompts are where threads describe getting stuck.",
+          "**\"You're learning whether you like it or not.\"** A common Quora take: the builders who succeed treat every AI fix as a lesson, gradually understanding more, rather than staying dependent forever.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The honest synthesis: vibe coding lowers the barrier to starting, not the barrier to shipping something safe and real. The gap is closed with a little judgment and a habit of checking the AI's work.",
+      },
+
+      { type: "heading", level: 2, text: "Where it falls apart — and how to stay out of trouble" },
+      {
+        type: "paragraph",
+        text: "The failure modes are predictable. AI-generated code often has security holes a beginner won't spot — hardcoded secrets, no input validation, databases open to the world. It accumulates complexity you don't understand, so a small change late in the project breaks things you can't diagnose. And it's confidently wrong: the model will happily explain why its broken code is correct.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Never ship real user data without a security check.** At minimum: no keys in the frontend, authentication on anything private, and database access rules turned on. If you don't know how to verify this, ask the AI to audit it — and then ask a second tool to check the first.",
+          "**Keep scope brutally small.** One feature that works beats ten that half-work. You can always add more once the core is solid.",
+          "**Read the code the AI writes, even if slowly.** You don't need to write it, but you need to recognize what it does. This is the single habit that separates people who ship from people who get stuck.",
+          "**Test the unhappy path.** Empty inputs, wrong inputs, someone clicking twice. AI writes for the happy path by default.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The one that catches everyone",
+        text: "Vibe-coded apps routinely leak API keys and leave databases wide open because the AI put credentials in the frontend or skipped access rules. Before anyone real touches your app, confirm no secrets are exposed and your database isn't publicly readable. This is non-negotiable.",
+      },
+
+      { type: "heading", level: 2, text: "Your first real project, realistically" },
+      {
+        type: "paragraph",
+        text: "Pick something small and personal — a tool you'd actually use. A habit tracker, a tip calculator for your side gig, a landing page with an email signup. Small enough to finish, real enough to care about. Then follow the loop: describe, run, break, fix, repeat.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Write down what it does in three sentences** before you prompt anything. Clarity in equals clarity out.",
+          "**Build the smallest version first** — just the one core thing, no extras.",
+          "**Get it running before you make it pretty.** Working and ugly beats beautiful and broken.",
+          "**Fix one thing at a time.** When something breaks, describe exactly what you expected versus what happened.",
+          "**Do a security pass before you share it.** Keys, auth, database rules. Every time.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "For the specific tools to reach for at each step, our list of [tools every vibe coder should know](/blog/tools-every-vibe-coder-should-know) is the companion to this piece, and the [vibe coding design checklist](/blog/vibe-coding-design-checklist) covers making what you build actually look good. If you're ready to graduate to a real editor, start with the [best AI coding assistants of 2026](/blog/best-ai-coding-assistants-2026).",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Can you really build a real app with vibe coding?" },
+      {
+        type: "paragraph",
+        text: "Yes — people ship real, paying products this way. The catch is that \"real\" means secure and maintainable, and getting there requires a little judgment: checking the AI's work, keeping scope tight, and learning enough to read your own code. The tools handle the typing; you handle the direction.",
+      },
+      { type: "heading", level: 3, text: "Do I need to learn to code first?" },
+      {
+        type: "paragraph",
+        text: "No, but you'll learn as you go, and that's the point. You don't need to write code from memory, but you do need to gradually understand what the AI produces. Treat every fix as a lesson and you'll get more capable with each project.",
+      },
+      { type: "heading", level: 3, text: "What's the best tool to start with?" },
+      {
+        type: "paragraph",
+        text: "For a complete beginner, a prompt-to-app builder like Lovable or Bolt gives the fastest feedback loop. Once you want more control, move to Cursor. Start where you'll see results quickest — momentum matters more than picking the theoretically best tool.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: vibe coding is real and it works, but it lowers the barrier to starting, not the barrier to shipping something safe. Keep scope small, read what the AI writes, and always do a security pass. Do that and you can build things that used to require a team. Find every tool mentioned here on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Pillar: Local LLMs ────────────────────────────────────────────────────
+  {
+    slug: "run-llms-locally-2026",
+    title: "Running LLMs locally in 2026: the complete, honest guide",
+    deck:
+      "Why enterprises and developers are moving models onto their own machines, which tools to use, what hardware you actually need, and how to get a private model running today.",
+    date: "2026-07-01",
+    readingMin: 13,
+    tag: "Guide",
+    hero: {
+      src: U("1558655146-9f40138edfeb"),
+      alt: "Rows of server hardware with blue indicator lights",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Running a large language model on your own hardware — no API, no cloud, no data leaving the building — went from a hobbyist experiment to a mainstream decision in 2026. Tools like Ollama and Open WebUI turned local models into something you can set up in minutes, and enterprises with real compliance requirements started moving workloads off hosted APIs. The reasons are practical, not ideological: privacy, cost, and control.",
+      },
+      {
+        type: "paragraph",
+        text: "This guide is the whole picture, honestly told. Why local models are winning, where they still can't match a frontier API, which tools to actually use, what hardware you need, and a concrete path to running a private model today. If you've been curious but assumed it needs a data center, this will surprise you.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "Local vs. hosted, in one line",
+        text: "A **hosted** model (Claude, GPT, Gemini) is more capable and requires zero setup, but your data goes to a third party and you pay per token. A **local** model runs on your machine — private, free to run, offline-capable — at the cost of some capability and some setup.",
+      },
+
+      { type: "heading", level: 2, text: "Why local models are winning" },
+      {
+        type: "paragraph",
+        text: "Three forces are pushing adoption, and none of them is hype. **Privacy and sovereignty**: for healthcare, legal, finance, and government work, data that can't leave the premises rules out hosted APIs entirely — a local model is the only option. **Cost**: at high volume, per-token API bills add up fast, and a model running on hardware you already own is effectively free per call. **Control**: no rate limits, no surprise deprecations, no model changing behavior under you overnight, and it keeps working with the internet down.",
+      },
+      {
+        type: "paragraph",
+        text: "What changed is that the open models got good enough. Llama, Qwen, DeepSeek, and Mistral now produce output that, for most everyday tasks — summarizing, drafting, extraction, coding help — is genuinely hard to distinguish from a hosted model. The quality gap that made local models a toy in 2024 has narrowed to the point where, for a large class of work, it no longer matters.",
+      },
+      {
+        type: "quote",
+        text: "The enterprise shift to local models isn't about saving money or making a statement. It's that a closed system in someone else's cloud can't connect to infrastructure it isn't allowed to see — and for regulated work, that's disqualifying.",
+      },
+
+      { type: "heading", level: 2, text: "The tools, from easiest to most powerful" },
+      {
+        type: "paragraph",
+        text: "You do not need to touch a command line to run a local model anymore, though you can if you want the control. The ecosystem now spans one-click desktop apps to low-level engines, and the right choice depends on how much you want to see under the hood.",
+      },
+      {
+        type: "tools",
+        title: "The local LLM stack",
+        items: [
+          { name: "Ollama", valueLine: "The standard. One command to download and run any open model locally, with a clean API. Start here.", url: "https://ollama.com" },
+          { name: "LM Studio", valueLine: "A polished desktop app — browse, download, and chat with local models, zero command line. Best for beginners.", url: "https://lmstudio.ai" },
+          { name: "Open WebUI", valueLine: "A self-hosted ChatGPT-style interface on top of Ollama — RAG, multi-user, roles. The front end for a private setup.", url: "https://openwebui.com" },
+          { name: "llama.cpp", valueLine: "The low-level inference engine most tools are built on — maximum control and efficiency for the technical.", url: "https://github.com/ggml-org/llama.cpp" },
+          { name: "Jan", valueLine: "An open-source, offline-first desktop assistant — a private alternative to ChatGPT that runs fully local.", url: "https://jan.ai" },
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The fastest start",
+        text: "Install **Ollama**, then run `ollama run llama3.2` in a terminal. That's it — you have a private model answering questions offline. Want a ChatGPT-like window instead of a terminal? Add **Open WebUI** on top, or skip straight to **LM Studio** for a full desktop app.",
+      },
+
+      { type: "heading", level: 2, text: "What hardware you actually need" },
+      {
+        type: "paragraph",
+        text: "This is where people over-worry. You do not need a rack of GPUs. The single most important number is memory — RAM on most machines, unified memory on Apple Silicon — because the whole model has to fit in it. A useful rule of thumb: a quantized model needs roughly its parameter count in gigabytes. A 7-8B model wants about 8GB free; a 70B model wants around 40GB.",
+      },
+      {
+        type: "list",
+        items: [
+          "**A modern laptop (16GB+):** runs 7-8B models comfortably — Llama 3.2, Qwen, Mistral. This covers most everyday use: drafting, summarizing, coding help, chat.",
+          "**Apple Silicon (M-series, 32GB+):** unified memory makes Macs unusually good at this — a 32GB Mac runs mid-size models at genuinely usable speeds with no discrete GPU.",
+          "**A gaming PC with a recent GPU:** an NVIDIA card with 12-24GB of VRAM runs larger models fast. This is the sweet spot for people who already have the hardware.",
+          "**No special hardware at all:** smaller quantized models run on ordinary machines, just slower. Fine for non-realtime work.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "**Quantization** is the trick that makes this work. It compresses a model's weights to smaller numbers — a 4-bit quantization (look for `Q4_K_M`) cuts memory use dramatically with only a small quality loss. It's the difference between a model that fits on your laptop and one that doesn't, and for most tasks the quality drop is imperceptible.",
+      },
+
+      { type: "heading", level: 2, text: "What Reddit actually says about running models locally" },
+      {
+        type: "paragraph",
+        text: "r/LocalLLaMA is one of the most useful communities on the internet for this, and the recurring wisdom there is worth more than any spec sheet. Search \"best local LLM reddit\" and these themes dominate.",
+      },
+      {
+        type: "list",
+        items: [
+          "**\"Memory is everything.\"** The most repeated beginner correction: stop worrying about raw GPU speed and check whether the model fits in your memory first. A model that fits and runs slowly beats one that doesn't fit at all.",
+          "**\"Quantization is free lunch, mostly.\"** The consensus is that Q4_K_M quantization is the default sweet spot — big memory savings, quality loss you won't notice for everyday work. Go higher-precision only if you're doing something demanding.",
+          "**\"Match the model to the job.\"** Practitioners push back hard on chasing the biggest model. A well-chosen 8B model for a specific task often beats a 70B model you can barely run.",
+          "**\"Apple Silicon punches above its weight.\"** A steady stream of posts noting that Macs with lots of unified memory run mid-size models better than people expect, thanks to the memory architecture.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The through-line: local LLMs reward matching the tool to the task over buying the most powerful thing. The community's best advice is almost always \"start smaller than you think.\"",
+      },
+
+      { type: "heading", level: 2, text: "Where local models still can't compete" },
+      {
+        type: "paragraph",
+        text: "Honesty matters here. For the hardest reasoning, the largest context windows, and the absolute frontier of capability, hosted models like Claude and GPT still lead, and it isn't close. If your task genuinely needs the best reasoning available, a local model will frustrate you. Local models also take setup, and you own the maintenance — updates, storage, the occasional troubleshooting.",
+      },
+      {
+        type: "paragraph",
+        text: "The right mental model is not local-versus-hosted but local-and-hosted. Use a local model for the high-volume, privacy-sensitive, everyday work — and reach for a frontier API for the occasional task that needs the very best. Many serious setups route between them automatically. Local models also pair naturally with [agentic workflows](/blog/what-is-agentic-ai-2026): a private model in a loop, doing repetitive work on data that never leaves your machine.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Set expectations correctly",
+        text: "A local 8B model is not GPT or Claude, and expecting it to be is the fastest route to disappointment. Judge it against the task, not against the frontier. For summarizing, drafting, and everyday coding help it's excellent; for the hardest reasoning, it isn't there yet.",
+      },
+
+      { type: "heading", level: 2, text: "Get a private model running today" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Install Ollama** from ollama.com — one download, works on Mac, Windows, and Linux.",
+          "**Pull a model** sized to your machine: `ollama run llama3.2` for a laptop, a larger model if you have the memory.",
+          "**Chat in the terminal** to confirm it works — you're now running a model with nothing leaving your computer.",
+          "**Add a real interface** if you want one: install Open WebUI for a ChatGPT-style window, or use LM Studio instead for an all-in-one app.",
+          "**Point your own projects at it** — Ollama exposes a local API, so your scripts and tools can use your private model exactly like a hosted one.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "For more free and self-hostable tools in the same spirit, see the [best free AI tools of 2026](/blog/best-free-ai-tools-2026), and if you're wiring a local model into your development workflow, the [best AI tools for developers](/blog/best-ai-tools-for-developers-2026) covers what to pair it with.",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Is running an LLM locally actually free?" },
+      {
+        type: "paragraph",
+        text: "The software and open models are free, and there's no per-token cost — you pay only for electricity and the hardware you already own. The trade is setup time and some capability compared with a frontier API. For high-volume everyday work, the economics strongly favor local.",
+      },
+      { type: "heading", level: 3, text: "What's the best local model right now?" },
+      {
+        type: "paragraph",
+        text: "It depends on your memory budget and task, but Llama, Qwen, DeepSeek, and Mistral families are all strong. For most people, a recent 7-8B model (like Llama 3.2) is the right starting point — capable, fast, and comfortable on a normal laptop.",
+      },
+      { type: "heading", level: 3, text: "Do I need a powerful GPU?" },
+      {
+        type: "paragraph",
+        text: "No. A modern laptop with 16GB of memory runs useful models today, and Apple Silicon Macs are especially good thanks to unified memory. A discrete GPU makes larger models faster, but it's an upgrade, not a requirement.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: local LLMs are private, cheap to run, and finally good enough for most everyday work — and getting started is one download away. Start smaller than you think, judge the model against the task, and keep a frontier API around for the hardest jobs. Track the local-model tooling worth using on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Cluster: vibe coding security ─────────────────────────────────────────
+  {
+    slug: "vibe-coding-security-checklist-2026",
+    title: "You didn't write the code, but you own the breach: a security check for vibe-coded apps",
+    deck:
+      "AI-built apps routinely ship with leaked keys, open databases, and auth you can bypass. Here's the 15-minute, no-code check to run before anyone real touches your app.",
+    date: "2026-07-01",
+    readingMin: 10,
+    tag: "Guide",
+    hero: {
+      src: U("1499750310107-5fef28a66643"),
+      alt: "A laptop and notebook on a desk, dim lighting",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Here is the uncomfortable truth about vibe coding: you may not have written a single line of the code, but if your app leaks your users' data, the breach is yours. The tools that let non-engineers ship apps also quietly provision databases, authentication, and API keys — and they do not make sure any of it is secure. That's your job, and almost nobody tells you so until it's too late.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the plain-English security check every vibe coder should run before launch. No jargon, no code — just a series of things to look at and fix. It takes about fifteen minutes, and it is the difference between shipping safely and becoming the next cautionary tale. If you've built something with Lovable, Bolt, Replit, v0, or Cursor and real people are about to use it, start here.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Why this matters more than you think",
+        text: "In 2025, security researchers repeatedly found vibe-coded apps exposing user data through missing access rules, and one widely-reported incident saw an AI coding agent delete a live production database. These weren't careless people — they were builders who didn't know a security surface had been created on their behalf.",
+      },
+
+      { type: "heading", level: 2, text: "Why AI-built apps are insecure by default" },
+      {
+        type: "paragraph",
+        text: "The pattern is consistent. AI writes for the happy path — the version where everything works and everyone behaves — because that's what you asked for. It puts secret keys where they're convenient, not where they're safe. It wires up a login without necessarily protecting the data behind it. And the tools provision a real database and real infrastructure automatically, without ever explaining that you now own the responsibility for locking it down.",
+      },
+      {
+        type: "paragraph",
+        text: "The cruel part is that none of this shows up in the demo. Your app works. It looks finished. The security holes are invisible until someone — a curious user, a bot scanning the internet, an attacker — finds them. By then your database of emails is public and there's nothing to undo.",
+      },
+      {
+        type: "quote",
+        text: "The builders who get burned aren't reckless. They just never knew a database was created, that it was public by default, and that closing it was on them.",
+      },
+
+      { type: "heading", level: 2, text: "The 15-minute security check" },
+      {
+        type: "paragraph",
+        text: "Run these five checks in order. For each, if you can't confirm it's safe, that's your next fix. You don't need to know how to code — you need to know what to look for and what to ask the AI to fix.",
+      },
+      { type: "heading", level: 3, text: "1. No secret keys in the frontend" },
+      {
+        type: "paragraph",
+        text: "Secret API keys — for your AI provider, your payment processor, your database's admin access — must live on the server, never in the code that ships to the browser. If a key is in the frontend, anyone can open their browser's developer tools, read it, and run up your bill or access your data. Ask your AI tool directly: \"Are any secret or private API keys exposed in the frontend or client-side code? List every key and where it lives.\" Then have a second tool verify the answer.",
+      },
+      { type: "heading", level: 3, text: "2. Your database isn't open to the world" },
+      {
+        type: "paragraph",
+        text: "Most AI builders use a database (often Supabase) that is public by default until you turn on access rules — called Row Level Security, or RLS. Without them, anyone who finds your database address can read and write everything in it. This is the single most common vibe-coding breach. Ask: \"Is Row Level Security enabled on every table? Which tables can be read or written by anyone?\" If the answer is that any table holding user data is open, that's a launch-blocker.",
+      },
+      { type: "heading", level: 3, text: "3. Authentication actually protects private data" },
+      {
+        type: "paragraph",
+        text: "A login screen is not the same as protection. The real question is whether a logged-in user can reach data that isn't theirs — or whether someone can skip the login entirely by hitting the right address. Test it yourself: log in as one test user, note what you can see, then try to view another user's data by changing the URL or IDs. If it works, your auth is decorative.",
+      },
+      { type: "heading", level: 3, text: "4. Payments can't be bypassed" },
+      {
+        type: "paragraph",
+        text: "If you charge money, the check for whether someone has paid must happen on the server, tied to their actual account — not in the browser, where it can be edited away. A well-documented failure mode is an app where anyone can unlock the paid features by tweaking what the browser sends. Ask: \"Is the paid/unpaid check enforced on the server and tied to the authenticated user, or can it be bypassed from the client?\"",
+      },
+      { type: "heading", level: 3, text: "5. Nothing sensitive is logged or exposed in errors" },
+      {
+        type: "paragraph",
+        text: "Error messages and logs sometimes spill secrets — keys, tokens, other users' details. Trigger a few errors (wrong inputs, empty forms) and read what comes back. If an error message contains anything that looks like a key or private data, that needs to be hidden before launch.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The two-tool trick",
+        text: "AI is confidently wrong about its own security. When you ask one tool \"is this safe?\", paste its answer into a **second** tool and ask it to find the holes the first one missed. Adversarial checking catches far more than trusting a single model's self-assessment.",
+      },
+
+      { type: "heading", level: 2, text: "What Reddit and Hacker News actually say" },
+      {
+        type: "paragraph",
+        text: "Search for vibe-coding security stories and the community verdict is blunt and consistent. It's worth hearing, because it's the part the tool marketing leaves out.",
+      },
+      {
+        type: "list",
+        items: [
+          "**\"There's no way around learning the basics.\"** The most-upvoted take on Hacker News threads about vibe-coding breaches is that no amount of AI removes the need to understand, at least a little, what a database and authentication are. You can offload the typing, not the responsibility.",
+          "**\"You never see the warning.\"** A recurring observation: because these tools provision infrastructure behind the scenes, builders never open the database dashboard where the security warnings live — so the alerts that would have saved them are never seen.",
+          "**\"It's not the tool's fault, but it is the tool's design.\"** Practitioners note the builders make insecure defaults easy and secure setup invisible. The fix is on you, but the trap is structural — which is exactly why a checklist like this exists.",
+        ],
+      },
+
+      { type: "heading", level: 2, text: "If you find a problem" },
+      {
+        type: "paragraph",
+        text: "Don't panic, and don't ignore it. Fix one issue at a time, starting with anything that exposes user data or secret keys. Describe the exact problem to your AI tool and ask for the specific fix, then verify with a second tool. If the app already has real users and you find a serious leak, take it offline while you fix it — a temporarily-down app is far better than a permanently-breached one.",
+      },
+      {
+        type: "paragraph",
+        text: "And if this feels over your head, that's a signal, not a failure. It may be the moment to bring in someone who can read the code — the natural graduation point covered in our guide to [vibe coding](/blog/vibe-coding-explained-2026). For the tools that make each of these checks easier, see [the tools every vibe coder should know](/blog/tools-every-vibe-coder-should-know).",
+      },
+
+      { type: "heading", level: 2, text: "Common questions" },
+      { type: "heading", level: 3, text: "Can I get hacked if I built my app with AI?" },
+      {
+        type: "paragraph",
+        text: "Yes — AI-built apps are hacked regularly, almost always through leaked keys, open databases, or bypassable authentication. The good news is these are the same handful of issues every time, so a fifteen-minute check catches the vast majority before anyone can exploit them.",
+      },
+      { type: "heading", level: 3, text: "Do I need to understand code to secure my app?" },
+      {
+        type: "paragraph",
+        text: "Not to run this check — it's about knowing what to look for and what to ask the AI to fix. But the community consensus is real: learning the basics of how databases and authentication work makes you dramatically safer, and it's worth doing as you build.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The takeaway: the tool built your app, but you own its safety. Run the five checks — keys, database access, real authentication, payment enforcement, error leaks — before anyone real touches it, and verify every answer with a second tool. Fifteen minutes now beats an irreversible breach later. More guides for building safely on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

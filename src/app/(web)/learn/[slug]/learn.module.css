@@ -1,10 +1,20 @@
 /* Reading craft for /learn concept pages — see docs/design-foundations.md §6/§7.
-   Editorial deceleration on dark: 18px / 1.7 / ~68ch measure, warm off-white text,
-   one accent (KB purple), depth via surface-stepping + warm-tinted borders. */
+   Two-column on desktop (article + sticky sidebar), single column on mobile.
+   Editorial deceleration on dark: 18px / 1.7 / ~68ch measure, warm off-white
+   text, one accent (per-concept color), depth via surface-stepping. */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 48px;
+  align-items: start;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
 .article {
-  max-width: 680px; /* ~68ch at 18px — Bringhurst optimal, capped even with dark space to spare */
-  margin: 0 auto;
+  min-width: 0;
+  max-width: 680px; /* ~68ch at 18px — Bringhurst optimal */
 }
 
 /* ── Back link ──────────────────────────────────────────────────────────── */
@@ -19,78 +29,117 @@
   transition: color 0.15s ease;
 }
 .back:hover {
-  color: #c4b5fd;
+  color: var(--kt-accent, #3b82f6);
 }
 
 /* ── Hero ───────────────────────────────────────────────────────────────── */
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
 .eyebrow {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #c4b5fd;
-  background: rgba(124, 58, 237, 0.1);
-  border: 1px solid rgba(124, 58, 237, 0.22);
   padding: 4px 11px;
   border-radius: 100px;
-  margin-bottom: 18px;
 }
 
 .title {
   font-size: clamp(34px, 6vw, 52px);
-  font-weight: 700; /* dramatic weight contrast vs 400 body — the hierarchy carrier */
-  color: var(--kt-text-primary, #e8e4de);
+  font-weight: 700; /* the hierarchy carrier */
+  color: var(--kt-text-primary, #f6f4f0);
   line-height: 1.08;
-  letter-spacing: -0.03em; /* tighten at large sizes — default tracking reads cheap */
-  margin: 0 0 20px;
+  letter-spacing: -0.03em;
+  margin: 0 0 18px;
 }
 
 .deck {
   font-size: 20px;
   line-height: 1.5;
-  color: var(--kt-text-body, #d4cec4);
+  color: var(--kt-text-body, #d6d2ca);
   font-weight: 400;
-  margin: 0 0 14px;
+  margin: 0 0 16px;
 }
 
-/* Signature hairline — accent fades to nothing. The one decorative moment. */
+/* Signature payoff line — the one warm-accent flourish (§7). */
+.payoff {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 0 0 22px;
+}
+
+/* Signature hairline — accent fades to nothing (inline gradient sets the color). */
 .rule {
   height: 1px;
   border: 0;
   margin: 0;
-  background: linear-gradient(
-    to right,
-    rgba(124, 58, 237, 0.55),
-    var(--kt-hairline, rgba(255, 248, 235, 0.07)) 55%,
-    transparent
-  );
 }
 
-/* ── Reading sections (Why it matters / How it works / What's happening now) ─ */
+/* ── Reading sections ───────────────────────────────────────────────────── */
 .section {
-  margin-top: 44px; /* space above a heading ≈ 3× space below — grouping signal */
+  margin-top: 44px; /* space above ≈ 3× below — grouping signal */
+  scroll-margin-top: 90px; /* anchor lands below sticky header */
 }
 
 .sectionHeading {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
   font-weight: 700;
-  color: var(--kt-text-primary, #e8e4de);
+  color: var(--kt-text-primary, #f6f4f0);
   line-height: 1.2;
   letter-spacing: -0.01em;
   margin: 0 0 12px;
 }
 
+.sectionMark {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 .body {
   font-size: 18px;
-  line-height: 1.7; /* dark backgrounds need extra leading to track lines */
-  color: var(--kt-text-body, #c9c3b7);
+  line-height: 1.7;
+  color: var(--kt-text-body, #d6d2ca);
   margin: 0;
 }
 
-/* ── Meta sections (In the news / Related) — small-caps labels, not headings ─ */
+/* Pending state — thin concept, explainer not yet generated. */
+.pending {
+  margin-top: 32px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--kt-read-surface-2, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.09));
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--kt-text-body, #d6d2ca);
+}
+
+/* ── In the news ────────────────────────────────────────────────────────── */
 .metaBlock {
   margin-top: 48px;
+  scroll-margin-top: 90px;
 }
 
 .metaHeading {
@@ -98,68 +147,159 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--kt-text-muted, #737373);
-  margin: 0 0 8px;
+  color: var(--kt-text-muted, #bcb7ad);
+  margin: 0 0 10px;
 }
 
-/* In the news — provenance-forward story cards */
+.storyList {
+  border-top: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.07));
+}
+
 .storyLink {
   display: block;
   text-decoration: none;
-  padding: 16px 2px;
-  border-bottom: 1px solid var(--kt-hairline, rgba(255, 248, 235, 0.07));
+  padding: 15px 4px;
+  border-bottom: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.07));
   transition: padding-left 0.15s ease;
 }
-.storyLink:first-of-type {
-  border-top: 1px solid var(--kt-hairline, rgba(255, 248, 235, 0.07));
-}
 .storyLink:hover {
-  padding-left: 6px;
+  padding-left: 10px;
 }
 .storyTitle {
   font-size: 16px;
   font-weight: 600;
-  color: var(--kt-text-primary, #e8e4de);
+  color: var(--kt-text-primary, #f6f4f0);
   line-height: 1.4;
   margin-bottom: 5px;
   transition: color 0.15s ease;
 }
 .storyLink:hover .storyTitle {
-  color: #c4b5fd;
+  color: var(--kt-accent, #3b82f6);
 }
 .storyMeta {
   font-size: 12.5px;
-  color: var(--kt-text-muted, #8a857c);
+  color: var(--kt-text-muted, #bcb7ad);
 }
 
-/* Related — concept chips */
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.chip {
-  font-size: 14px;
-  color: var(--kt-text-body, #d4cec4);
-  text-decoration: none;
-  background: var(--kt-read-surface, rgba(255, 248, 235, 0.035));
-  border: 1px solid var(--kt-hairline, rgba(255, 248, 235, 0.09));
-  border-radius: 100px;
-  padding: 7px 15px;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-.chip:hover {
-  border-color: rgba(124, 58, 237, 0.5);
-  color: var(--kt-text-primary, #e8e4de);
-  background: rgba(124, 58, 237, 0.08);
-}
-
-/* ── Provenance footer — the anti-AI-slop trust signal (the moat) ─────────── */
+/* ── Provenance footer ──────────────────────────────────────────────────── */
 .provenance {
   margin-top: 56px;
   padding-top: 18px;
-  border-top: 1px solid var(--kt-hairline, rgba(255, 248, 235, 0.07));
-  font-size: 12.5px;
+  border-top: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.07));
+  font-size: 13px;
   line-height: 1.6;
-  color: var(--kt-text-muted, #78736b);
+  color: var(--kt-text-muted, #9e988c);
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebarLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kt-text-muted, #bcb7ad);
+  margin: 0 0 10px;
+}
+
+.toc {
+  display: flex;
+  flex-direction: column;
+}
+.tocLink {
+  font-size: 13.5px;
+  color: var(--kt-text-muted, #bcb7ad);
+  text-decoration: none;
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid var(--kt-hairline, rgba(255, 255, 255, 0.12));
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tocLink:hover {
+  color: var(--kt-text-primary, #f6f4f0);
+  border-left-color: var(--kt-accent, #3b82f6);
+}
+
+.trust {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--kt-surface, #1b1a17);
+  border: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.09));
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kt-text-body, #d6d2ca);
+  line-height: 1.4;
+}
+.trustSub {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--kt-text-muted, #bcb7ad);
+  margin-top: 3px;
+}
+
+.relatedBlock {
+  display: flex;
+  flex-direction: column;
+}
+.relatedCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 9px 10px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+.relatedCard:hover {
+  background: var(--kt-read-surface-2, rgba(255, 255, 255, 0.05));
+}
+.relatedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.relatedName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--kt-text-body, #d6d2ca);
+}
+.relatedArrow {
+  color: var(--kt-text-muted, #8a857c);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.relatedCard:hover .relatedName {
+  color: var(--kt-text-primary, #f6f4f0);
+}
+
+/* ── Responsive: collapse to single column ──────────────────────────────── */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .sidebar {
+    position: static;
+    top: auto;
+  }
+  /* A bottom-of-page TOC is noise on mobile — the content is right there. */
+  .toc {
+    display: none;
+  }
 }

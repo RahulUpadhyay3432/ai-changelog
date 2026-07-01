@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { entityHref } from "@/lib/entities";
 import { getLearnEntities } from "@/lib/knowledge";
-import styles from "./explore.module.css";
+import { ExploreClient, type EntityLite } from "./ExploreClient";
 
 const APP_URL = "https://kapyn.app";
 
@@ -26,32 +25,32 @@ export const metadata: Metadata = {
 export default async function ExplorePage() {
   const entities = await getLearnEntities(60);
 
+  const items: EntityLite[] = entities.map((e) => ({
+    slug: e.slug,
+    canonicalName: e.canonicalName,
+    entityType: e.entityType,
+    shortDesc: e.shortDesc,
+    mentionCount: e.mentionCount,
+  }));
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name: "Kapyn AI Glossary",
+    description:
+      "Plain-English explainers for the concepts and techniques shaping AI, each tied to the latest news.",
+    url: `${APP_URL}/explore`,
+    hasDefinedTerm: items.map((e) => ({
+      "@type": "DefinedTerm",
+      name: e.canonicalName,
+      url: `${APP_URL}${entityHref(e)}`,
+    })),
+  };
+
   return (
     <>
-      <header className={styles.hero}>
-        <h1 className={styles.title}>The AI glossary</h1>
-        <p className={styles.deck}>
-          Plain-English explainers for the concepts and techniques shaping AI — each one tied to the
-          latest news as it happens.
-        </p>
-      </header>
-
-      {entities.length === 0 ? (
-        <p className={styles.empty}>Concepts are being generated. Check back shortly.</p>
-      ) : (
-        <div className={styles.grid}>
-          {entities.map((e) => (
-            <Link key={e.slug} href={entityHref(e)} className={styles.card}>
-              <div className={styles.cardName}>{e.canonicalName}</div>
-              {e.shortDesc && (
-                <div className={styles.cardDesc}>
-                  {e.shortDesc.length > 96 ? e.shortDesc.slice(0, 93) + "…" : e.shortDesc}
-                </div>
-              )}
-            </Link>
-          ))}
-        </div>
-      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ExploreClient entities={items} />
     </>
   );
 }

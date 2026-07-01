@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { SEED_SLUGS, entityHref, type EntityType } from "@/lib/entities";
+import { conceptVisual } from "@/lib/learn-visuals";
 import {
   getEntityBySlug,
   getPublishedExplainer,
@@ -88,6 +89,9 @@ export default async function LearnPage({ params }: Props) {
     : [];
 
   const lead = explainer?.definition ?? entity.shortDesc ?? "";
+  const visual = conceptVisual(entity.slug, entity.entityType);
+  const { Icon, accent, soft } = visual;
+  const typeLabel = entity.entityType === "technique" ? "Technique" : "Concept";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -111,80 +115,144 @@ export default async function LearnPage({ params }: Props) {
       : {}),
   };
 
-  const sections: { heading: string; body: string | null | undefined }[] = [
-    { heading: "Why it matters", body: explainer?.whyItMatters },
-    { heading: "How it works", body: explainer?.howItWorks },
-    { heading: "What's happening now", body: explainer?.currentDevelopments },
+  const sectionDefs: { id: string; heading: string; body: string | null | undefined }[] = [
+    { id: "why-it-matters", heading: "Why it matters", body: explainer?.whyItMatters },
+    { id: "how-it-works", heading: "How it works", body: explainer?.howItWorks },
+    { id: "whats-happening-now", heading: "What's happening now", body: explainer?.currentDevelopments },
+  ];
+  const sections = sectionDefs.filter((s) => s.body);
+
+  const toc = [
+    ...sections.map((s) => ({ id: s.id, label: s.heading })),
+    ...(stories.length > 0 ? [{ id: "in-the-news", label: "In the news" }] : []),
   ];
 
   return (
-    <article className={styles.article}>
+    <div className={styles.layout}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <Link href="/explore" className={styles.back}>
-        <ChevronLeft size={14} strokeWidth={2.5} />
-        Explore
-      </Link>
+      <article className={styles.article}>
+        <Link href="/explore" className={styles.back}>
+          <ChevronLeft size={14} strokeWidth={2.5} />
+          Explore
+        </Link>
 
-      <div>
-        <span className={styles.eyebrow}>{entity.entityType}</span>
-      </div>
+        {/* ── Hero ── */}
+        <div className={styles.headerRow}>
+          <span className={styles.iconBadge} style={{ background: soft, color: accent }}>
+            <Icon size={26} strokeWidth={2} />
+          </span>
+          <span className={styles.eyebrow} style={{ color: accent, background: soft }}>
+            {typeLabel}
+          </span>
+        </div>
 
-      <h1 className={styles.title}>{entity.canonicalName}</h1>
+        <h1 className={styles.title}>{entity.canonicalName}</h1>
 
-      {lead && <p className={styles.deck}>{lead}</p>}
+        {lead && <p className={styles.deck}>{lead}</p>}
 
-      <hr className={styles.rule} />
+        {explainer && (
+          <p className={styles.payoff} style={{ color: accent }}>
+            You can now explain {entity.canonicalName} — what it is, how it works, and why it matters.
+          </p>
+        )}
 
-      {sections.map((s) =>
-        s.body ? (
-          <section key={s.heading} className={styles.section}>
-            <h2 className={styles.sectionHeading}>{s.heading}</h2>
+        <hr className={styles.rule} style={{ background: `linear-gradient(to right, ${accent}, transparent)` }} />
+
+        {sections.map((s) => (
+          <section key={s.id} id={s.id} className={styles.section}>
+            <h2 className={styles.sectionHeading}>
+              <span className={styles.sectionMark} style={{ background: accent }} />
+              {s.heading}
+            </h2>
             <p className={styles.body}>{s.body}</p>
           </section>
-        ) : null
-      )}
+        ))}
 
-      {stories.length > 0 && (
-        <section className={styles.metaBlock}>
-          <h2 className={styles.metaHeading}>In the news</h2>
-          {stories.map((story) => (
-            <Link key={story.id} href={`/story/${story.id}`} className={styles.storyLink}>
-              <div className={styles.storyTitle}>{story.title}</div>
-              <div className={styles.storyMeta}>
-                {story.sourceName} · {formatDate(story.publishedAt)}
-              </div>
-            </Link>
-          ))}
-        </section>
-      )}
+        {!explainer && (
+          <p className={styles.pending}>
+            A full explainer for this concept is being written. In the meantime, here&apos;s what&apos;s
+            in the news.
+          </p>
+        )}
 
-      {related.length > 0 && (
-        <section className={styles.metaBlock}>
-          <h2 className={styles.metaHeading}>Related</h2>
-          <div className={styles.chips}>
-            {related.map((r) => (
-              <Link key={r.slug} href={entityHref(r)} className={styles.chip}>
-                {r.canonicalName}
-              </Link>
+        {stories.length > 0 && (
+          <section id="in-the-news" className={styles.metaBlock}>
+            <h2 className={styles.metaHeading}>In the news</h2>
+            <div className={styles.storyList}>
+              {stories.map((story) => (
+                <Link key={story.id} href={`/story/${story.id}`} className={styles.storyLink}>
+                  <div className={styles.storyTitle}>{story.title}</div>
+                  <div className={styles.storyMeta}>
+                    {story.sourceName} · {formatDate(story.publishedAt)}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Provenance — the trust signal AI chat structurally cannot offer. */}
+        {explainer && (
+          <p className={styles.provenance}>
+            Auto-generated from Kapyn&apos;s news stream
+            {stories.length > 0
+              ? ` · grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
+              : ""}
+            {` · updated ${formatDate(explainer.updatedAt)}`}
+          </p>
+        )}
+      </article>
+
+      {/* ── Sidebar ── */}
+      <aside className={styles.sidebar}>
+        {toc.length > 0 && (
+          <nav className={styles.toc}>
+            <div className={styles.sidebarLabel}>On this page</div>
+            {toc.map((t) => (
+              <a key={t.id} href={`#${t.id}`} className={styles.tocLink}>
+                {t.label}
+              </a>
             ))}
-          </div>
-        </section>
-      )}
+          </nav>
+        )}
 
-      {/* Provenance — the trust signal AI chat structurally cannot offer. */}
-      {explainer && (
-        <p className={styles.provenance}>
-          Auto-generated from Kapyn&apos;s news stream
-          {stories.length > 0
-            ? ` · grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
-            : ""}
-          {` · updated ${formatDate(explainer.updatedAt)}`}
-        </p>
-      )}
-    </article>
+        {explainer && (
+          <div className={styles.trust}>
+            <ShieldCheck size={17} strokeWidth={2} style={{ color: accent, flexShrink: 0 }} />
+            <div>
+              {stories.length > 0
+                ? `Grounded in ${stories.length} source${stories.length === 1 ? "" : "s"}`
+                : "From Kapyn's news stream"}
+              <span className={styles.trustSub}>Updated {formatDate(explainer.updatedAt)}</span>
+            </div>
+          </div>
+        )}
+
+        {related.length > 0 && (
+          <div className={styles.relatedBlock}>
+            <div className={styles.sidebarLabel}>Related</div>
+            {related.map((r) => {
+              const rv = conceptVisual(r.slug, r.entityType);
+              return (
+                <Link key={r.slug} href={entityHref(r)} className={styles.relatedCard}>
+                  <span
+                    className={styles.relatedIcon}
+                    style={{ background: rv.soft, color: rv.accent }}
+                  >
+                    <rv.Icon size={16} strokeWidth={2} />
+                  </span>
+                  <span className={styles.relatedName}>{r.canonicalName}</span>
+                  <ArrowUpRight size={14} strokeWidth={2} className={styles.relatedArrow} />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </aside>
+    </div>
   );
 }

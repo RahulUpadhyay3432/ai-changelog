@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug } from "lucide-react";
+import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug, Newspaper } from "lucide-react";
 import styles from "./layout.module.css";
 
 const NAV_ITEMS = [
@@ -60,7 +60,7 @@ export function RadarSideNav() {
       {/* Divider */}
       <div style={{ margin: "12px 20px", height: "1px", background: "rgba(255,255,255,0.07)" }} />
 
-      {/* Back to Feed */}
+      {/* Exit affordances — Feed (phone app) + Home (landing hub) */}
       <Link
         href="/"
         style={{
@@ -72,13 +72,32 @@ export function RadarSideNav() {
           fontFamily: SG,
           fontSize: "14px",
           fontWeight: 450,
-          color: "#615c57",
+          color: "#a29d94",
+          borderLeft: "2px solid transparent",
+          transition: "color 0.15s ease",
+        }}
+      >
+        <Newspaper size={17} strokeWidth={1.7} />
+        Feed
+      </Link>
+      <Link
+        href="/home"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "10px 20px",
+          textDecoration: "none",
+          fontFamily: SG,
+          fontSize: "14px",
+          fontWeight: 450,
+          color: "#a29d94",
           borderLeft: "2px solid transparent",
           transition: "color 0.15s ease",
         }}
       >
         <Home size={17} strokeWidth={1.7} />
-        Feed
+        Home
       </Link>
     </aside>
   );

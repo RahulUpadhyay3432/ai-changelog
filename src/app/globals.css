@@ -85,6 +85,8 @@
   --kt-text-body: #d6d2ca;
   --kt-text-muted: #bcb7ad;
   --kt-accent: #3b82f6;
+  --kt-accent-soft: rgba(59, 130, 246, 0.12);
+  --kt-accent-border: rgba(59, 130, 246, 0.30);
   --kt-web-bg: #100f0d;
   --kt-web-header-bg: rgba(16, 15, 13, 0.82);
   --kt-web-border: rgba(255, 248, 235, 0.07);
@@ -110,6 +112,8 @@
   --kt-text-body: #403c36;
   --kt-text-muted: #6d675f;
   --kt-accent: #2563eb;
+  --kt-accent-soft: rgba(37, 99, 235, 0.10);
+  --kt-accent-border: rgba(37, 99, 235, 0.28);
   --kt-web-bg: #f7f5f1;
   --kt-web-header-bg: rgba(247, 245, 241, 0.85);
   --kt-web-border: rgba(0, 0, 0, 0.08);

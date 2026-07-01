@@ -238,8 +238,8 @@ export function CardStack({
   if (items.length === 0) {
     return (
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", padding: "0 32px", textAlign: "center" }}>
-        <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 500 }}>No stories yet</p>
-        <p style={{ fontSize: "13.5px", color: "#737373", margin: 0, lineHeight: 1.5 }}>Fresh dispatches land here as they break. Check back soon.</p>
+        <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 600 }}>No stories yet</p>
+        <p style={{ fontSize: "13.5px", color: "#a29d94", margin: 0, lineHeight: 1.5 }}>Fresh dispatches land here as they break. Check back soon.</p>
       </div>
     );
   }

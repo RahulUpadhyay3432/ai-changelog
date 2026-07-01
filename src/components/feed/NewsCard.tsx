@@ -339,7 +339,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             {category?.name ?? item.categorySlug}
           </span>
           <span
-            style={{ fontSize: "10px", color: "#555", fontWeight: 500 }}
+            style={{ fontSize: "10px", color: "#8f8a82", fontWeight: 500 }}
             suppressHydrationWarning
           >
             {timeAgo}
@@ -364,7 +364,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           className="news-title-link"
           style={{
             fontSize: "clamp(20px, 2.8dvh, 26px)",
-            fontWeight: 500,
+            fontWeight: 600,
             lineHeight: 1.3,
             color: "#E8E4DE",
             margin: 0,
@@ -431,7 +431,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
               <p style={{
                 fontSize: "clamp(13px, 1.7dvh, 16px)",
                 lineHeight: 1.6,
-                color: "#9A9A9A",
+                color: "#cbc7bf",
                 fontWeight: 400,
                 margin: 0,
                 minHeight: 0,
@@ -465,7 +465,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           <span
             style={{
               fontSize: "10px",
-              color: "#444",
+              color: "#9a948b",
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.06em",
@@ -473,7 +473,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           >
             {item.sourceName}
           </span>
-          <span style={{ fontSize: "9px", color: "#555", fontWeight: 500 }}>
+          <span style={{ fontSize: "9px", color: "#8f8a82", fontWeight: 500 }}>
             AI summary · {SUMMARY_MODEL}
           </span>
         </div>

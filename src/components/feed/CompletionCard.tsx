@@ -90,7 +90,7 @@ export function CompletionCard({
           transition={{ delay: baseDelay + 0.1, duration: 0.35, ease: "easeOut" }}
           style={{
             fontSize: "26px",
-            fontWeight: 500,
+            fontWeight: 600,
             color: "#E8E4DE",
             margin: "0 0 8px",
             letterSpacing: "-0.01em",
@@ -109,7 +109,7 @@ export function CompletionCard({
           style={{
             fontSize: "14px",
             fontWeight: 400,
-            color: "#525252",
+            color: "#a29d94",
             margin: "0 0 20px",
             textAlign: "center",
           }}
@@ -144,7 +144,7 @@ export function CompletionCard({
           transition={{ delay: baseDelay + 0.4, duration: 0.4 }}
           style={{
             fontSize: "12px",
-            color: "#2a2a2a",
+            color: "#8f8a82",
             margin: "0 0 24px",
             textAlign: "center",
             lineHeight: 1.5,
@@ -214,7 +214,7 @@ export function CompletionCard({
               gap: "5px",
               background: "none",
               border: "none",
-              color: "#4a4a4a",
+              color: "#9a948b",
               fontSize: "13px",
               fontWeight: 500,
               cursor: "pointer",
@@ -243,7 +243,7 @@ export function CompletionCard({
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.07)",
                   borderRadius: "20px",
-                  color: "#525252",
+                  color: "#a29d94",
                   fontSize: "12px",
                   fontWeight: 500,
                   cursor: "pointer",
@@ -277,7 +277,7 @@ export function CompletionCard({
               background: "rgba(255,255,255,0.08)",
               backdropFilter: "blur(16px)",
               WebkitBackdropFilter: "blur(16px)",
-              color: "#737373",
+              color: "#a29d94",
               padding: "6px 16px",
               borderRadius: "20px",
               fontSize: "12px",

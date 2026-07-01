@@ -24,6 +24,6 @@ export const INNER_HIGHLIGHT = "inset 0 1px 0 rgba(255,255,255,0.08)";
 // Warm text ramp — the only greys used on dark.
 export const TEXT = {
   primary: "#f6f4f0",
-  body: "#cbc7bf",
-  muted: "#a29d94",
+  body: "#d6d2ca", // was #cbc7bf — a touch more presence for body copy
+  muted: "#bcb7ad", // was #a29d94 — stronger secondary text for readability on near-black
 } as const;

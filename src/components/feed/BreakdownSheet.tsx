@@ -212,7 +212,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
               marginTop: "2px",
             }}
           >
-            <X size={16} color="#666" strokeWidth={2} />
+            <X size={16} color="#8f8a82" strokeWidth={2} />
           </button>
         </div>
 
@@ -259,7 +259,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   to { opacity: 1; transform: translateY(0); }
                 }
               `}</style>
-              <p style={{ fontSize: "12px", color: "#555", marginTop: "8px" }}>
+              <p style={{ fontSize: "12px", color: "#8f8a82", marginTop: "8px" }}>
                 This can take a few seconds.
               </p>
               <div
@@ -277,7 +277,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                     fontWeight: 700,
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
-                    color: "#444",
+                    color: "#9a948b",
                     margin: "0 0 6px",
                   }}
                 >
@@ -288,7 +288,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   style={{
                     fontSize: "13px",
                     lineHeight: 1.55,
-                    color: "#7a7a7a",
+                    color: "#a29d94",
                     margin: 0,
                     animation: "factIn 0.5s ease",
                   }}
@@ -301,7 +301,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
 
           {error && !loading && (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <p style={{ color: "#666", fontSize: "14px", marginBottom: "16px" }}>
+              <p style={{ color: "#8f8a82", fontSize: "14px", marginBottom: "16px" }}>
                 Couldn't load explanation
               </p>
               <button

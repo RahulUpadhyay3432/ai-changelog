@@ -259,9 +259,16 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   to { opacity: 1; transform: translateY(0); }
                 }
               `}</style>
-              <p style={{ fontSize: "12px", color: "#8f8a82", marginTop: "8px" }}>
-                This can take a few seconds.
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+                <span className="kt-loader" aria-hidden>
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                <p style={{ fontSize: "12px", color: "#8f8a82", margin: 0 }}>
+                  This can take a few seconds.
+                </p>
+              </div>
               <div
                 style={{
                   marginTop: "16px",
@@ -302,7 +309,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
           {error && !loading && (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <p style={{ color: "#8f8a82", fontSize: "14px", marginBottom: "16px" }}>
-                Couldn't load explanation
+                Couldn&apos;t load explanation
               </p>
               <button
                 onClick={fetchBreakdown}

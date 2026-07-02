@@ -149,6 +149,27 @@
   100% { transform: translate3d(4%, -1%, 0) scale(1.07); opacity: 0.8; }
 }
 
+/* Faint grid texture behind the hero (MCP-Market style) — masked to fade at the
+   edges, breathes slowly. Sits above the glow, below the content. */
+.heroGrid {
+  position: absolute;
+  inset: -25% -10% auto -10%;
+  height: 760px;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(115% 78% at 50% 6%, #000 28%, transparent 74%);
+  mask-image: radial-gradient(115% 78% at 50% 6%, #000 28%, transparent 74%);
+  animation: heroGridBreathe 11s ease-in-out infinite alternate;
+}
+@keyframes heroGridBreathe {
+  0%   { opacity: 0.45; }
+  100% { opacity: 0.85; }
+}
+
 /* ─── Marquee (hero catalog wall) ──────────────────────────────────────────── */
 .marqueeViewport {
   overflow: hidden;
@@ -268,7 +289,8 @@
   .marqueeRow,
   .fadeUp,
   .livePulse,
-  .heroGlow {
+  .heroGlow,
+  .heroGrid {
     animation: none !important;
   }
   .marqueeRow {

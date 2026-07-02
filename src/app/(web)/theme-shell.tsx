@@ -53,10 +53,18 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-pressed={!isDark}
       title={isDark ? "Light mode" : "Dark mode"}
       className={styles.themeToggle}
+      data-dark={isDark ? "true" : "false"}
     >
-      {isDark ? <Sun size={16} strokeWidth={2} /> : <Moon size={16} strokeWidth={2} />}
+      <span className={styles.themeKnob} aria-hidden />
+      <span className={styles.themeIcon} aria-hidden>
+        <Moon size={13} strokeWidth={2} />
+      </span>
+      <span className={styles.themeIcon} aria-hidden>
+        <Sun size={13} strokeWidth={2} />
+      </span>
     </button>
   );
 }

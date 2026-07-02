@@ -78,6 +78,7 @@ export function EmailCapture({ source = "web" }: { source?: string }) {
         <button
           type="submit"
           disabled={state === "loading"}
+          className="kt-cta"
           style={{
             display: "inline-flex",
             alignItems: "center",

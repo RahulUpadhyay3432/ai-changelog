@@ -201,6 +201,7 @@ export default async function LandingPage() {
       {/* 1 · Hero ──────────────────────────────────────────────────────────── */}
       <header className={styles.heroWrap}>
         <div className={styles.heroGlow} aria-hidden />
+        <div className={styles.heroGrid} aria-hidden />
         <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
@@ -210,7 +211,7 @@ export default async function LandingPage() {
                 Agents, models, tools, MCP servers and skills — curated, kept current by a calm daily signal. No noise, no paywall, ever.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "28px 0 0" }}>
-                <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
+                <Link className="kt-cta" href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
                   Open the Radar <ArrowRight size={17} strokeWidth={2.4} />
                 </Link>
                 <Link href="/?app=1" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.body, background: "transparent", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
@@ -423,7 +424,7 @@ export default async function LandingPage() {
               <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.55, margin: "10px 0 18px", maxWidth: "420px" }}>
                 Save any agent, model, MCP server or skill into a named <strong style={{ color: TEXT.primary, fontWeight: 600 }}>Loadout</strong> — a RAG stack, a hackathon kit, a video pipeline. Yours, on-device, no signup.
               </p>
-              <Link href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
+              <Link className="kt-cta" href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
                 Start a Loadout <ArrowRight size={16} strokeWidth={2.4} />
               </Link>
             </div>

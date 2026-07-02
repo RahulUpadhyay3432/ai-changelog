@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { isGenericEntityName, type EntityType } from "./entities";
 import { CURATED_ESSENTIALS } from "./radar-essentials";
 import { MCP_CATEGORY_ORDER, type McpServer, type McpCategory } from "./radar-mcp";
+import { SKILL_CATEGORY_ORDER, type AiSkill, type SkillCategory, type SkillPlatform } from "./radar-skills";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -452,6 +453,40 @@ export async function getRadarMcpServers(): Promise<RadarMcp> {
     meta[r.url] = { stars: r.score ?? 0, createdAt: r.gh_created_at ?? "" };
   }
   return { servers, meta };
+}
+
+// ── AI skills (curated featured + official-discovered) ───────────────────────
+interface RadarSkillRow {
+  name: string;
+  tagline: string;
+  description: string | null;
+  category: string;
+  platform: string;
+  url: string;
+}
+
+const VALID_SKILL_CATEGORIES = new Set<string>(SKILL_CATEGORY_ORDER);
+const VALID_SKILL_PLATFORMS = new Set<string>(["Claude", "GPT", "Gemini", "Multi"]);
+
+// Reads radar_skills (populated by /api/radar/skills). Returns [] when the table
+// is missing/empty so the page falls back to the static curated list.
+export async function getRadarSkills(): Promise<AiSkill[]> {
+  const { data, error } = await supabase
+    .from("radar_skills")
+    .select("name, tagline, description, category, platform, url, kind, sort_rank")
+    .order("kind", { ascending: false }) // 'featured' before 'discovered'
+    .order("sort_rank", { ascending: true })
+    .order("name", { ascending: true });
+  if (error || !data) return [];
+
+  return (data as RadarSkillRow[]).map((r) => ({
+    name: r.name,
+    tagline: r.tagline,
+    description: r.description ?? "",
+    category: (VALID_SKILL_CATEGORIES.has(r.category) ? r.category : "Coding & dev") as SkillCategory,
+    platform: (VALID_SKILL_PLATFORMS.has(r.platform) ? r.platform : "Claude") as SkillPlatform,
+    url: r.url,
+  }));
 }
 
 // "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),

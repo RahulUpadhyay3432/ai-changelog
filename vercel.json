@@ -25,6 +25,10 @@
       "schedule": "30 6 * * *"
     },
     {
+      "path": "/api/radar/skills",
+      "schedule": "45 6 * * *"
+    },
+    {
       "path": "/api/radar/hackathons",
       "schedule": "0 5 * * *"
     }

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { fetchReposMeta } from "@/lib/github";
 import { MCP_SERVERS, githubFullName } from "@/lib/radar-mcp";
-import { getRadarMcpServers } from "@/lib/knowledge";
+import { AI_SKILLS } from "@/lib/radar-skills";
+import { getRadarMcpServers, getRadarSkills } from "@/lib/knowledge";
 import { McpMarketClient, type McpMeta } from "../McpMarketClient";
 
-// MCP market — MCP servers grouped by category. Reads radar_mcp (curated featured
-// set + registry-discovered servers, populated by /api/radar/mcp) and falls back
-// to the static curated catalog if the table is empty. Stars come from the DB
-// (cron-enriched) when available; only the static fallback stars at render time.
-// ISR-cached.
+// MCP + skills market, grouped by category. Reads radar_mcp / radar_skills
+// (curated featured set + registry/official discoveries, populated by the radar
+// crons) and falls back to the static curated catalogs if a table is empty.
+// Stars come from the DB (cron-enriched) when available; only the static
+// fallback stars at render time. ISR-cached.
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
@@ -24,19 +25,21 @@ export default async function McpMarketPage({
   const { tab } = await searchParams;
   const initialView = tab === "skills" ? "skills" : "mcp";
 
+  const [db, dbSkills] = await Promise.all([getRadarMcpServers(), getRadarSkills()]);
+
+  const skills = dbSkills.length > 0 ? dbSkills : AI_SKILLS;
   const meta: Record<string, McpMeta> = {};
 
-  // Prefer the live table (curated + registry-discovered, stars pre-enriched by
-  // the cron — no render-time GitHub calls).
-  const db = await getRadarMcpServers();
+  // Prefer the live MCP table (curated + registry-discovered, stars pre-enriched
+  // by the cron — no render-time GitHub calls).
   if (db.servers.length > 0) {
     for (const [url, m] of Object.entries(db.meta)) {
       meta[url] = { stars: m.stars, createdAt: m.createdAt };
     }
-    return <McpMarketClient meta={meta} servers={db.servers} initialView={initialView} />;
+    return <McpMarketClient meta={meta} servers={db.servers} skills={skills} initialView={initialView} />;
   }
 
-  // Fallback: static curated catalog, enriched with GitHub stars at render.
+  // Fallback: static curated MCP catalog, enriched with GitHub stars at render.
   const fullByUrl = new Map<string, string>();
   for (const s of MCP_SERVERS) {
     const fn = githubFullName(s.url);
@@ -52,5 +55,5 @@ export default async function McpMarketPage({
     // stars are optional — the market still renders without them
   }
 
-  return <McpMarketClient meta={meta} servers={MCP_SERVERS} initialView={initialView} />;
+  return <McpMarketClient meta={meta} servers={MCP_SERVERS} skills={skills} initialView={initialView} />;
 }

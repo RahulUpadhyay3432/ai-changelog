@@ -232,7 +232,7 @@ function SectionHead({ emoji, title, count }: { emoji: string; title: string; co
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
-export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_SERVERS }: { meta?: Record<string, McpMeta>; initialView?: View; servers?: McpServer[] }) {
+export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_SERVERS, skills = AI_SKILLS }: { meta?: Record<string, McpMeta>; initialView?: View; servers?: McpServer[]; skills?: AiSkill[] }) {
   const isDesktop = useIsDesktop();
   const [view, setView] = useState<View>(initialView);
   const [activeCat, setActiveCat] = useState<string>(ALL);
@@ -251,9 +251,9 @@ export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_
   // Skills grouping
   const skillsByCat = useMemo(() => {
     const m = new Map<SkillCategory, AiSkill[]>();
-    for (const s of AI_SKILLS) { if (!m.has(s.category)) m.set(s.category, []); m.get(s.category)!.push(s); }
+    for (const s of skills) { if (!m.has(s.category)) m.set(s.category, []); m.get(s.category)!.push(s); }
     return m;
-  }, []);
+  }, [skills]);
   const skillCats = useMemo(() => SKILL_CATEGORY_ORDER.filter((c) => skillsByCat.has(c)), [skillsByCat]);
 
   const switchView = (v: View) => { setView(v); setActiveCat(ALL); posthog.capture("radar_catalog_view", { view: v }); };
@@ -270,7 +270,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_
   // Same items, with counts, for the desktop category sidebar.
   const sidebarItems = view === "mcp"
     ? [{ key: ALL, emoji: "🔌", count: servers.length }, ...mcpCats.map((c) => ({ key: c, emoji: MCP_CATEGORY_EMOJI[c], count: mcpByCat.get(c)?.length ?? 0 }))]
-    : [{ key: ALL, emoji: "✨", count: AI_SKILLS.length }, ...skillCats.map((c) => ({ key: c, emoji: SKILL_CATEGORY_EMOJI[c], count: skillsByCat.get(c)?.length ?? 0 }))];
+    : [{ key: ALL, emoji: "✨", count: skills.length }, ...skillCats.map((c) => ({ key: c, emoji: SKILL_CATEGORY_EMOJI[c], count: skillsByCat.get(c)?.length ?? 0 }))];
   const pickCat = (k: string) => { setActiveCat(k); posthog.capture(view === "mcp" ? "radar_mcp_category" : "radar_skills_category", { category: k }); };
 
   const visibleMcpCats = activeCat === ALL ? mcpCats : (mcpCats.includes(activeCat as McpCategory) ? [activeCat as McpCategory] : []);

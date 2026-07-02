@@ -1,4 +1,5 @@
 import { BottomNav } from "@/components/layout/BottomNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { AppSideNav } from "./AppSideNav";
 import { RadarRailPanel } from "./RadarRailPanel";
 import styles from "./layout.module.css";
@@ -30,8 +31,12 @@ export default function AppLayout({
         </div>
       </div>
 
-      {/* Right rail — live "On the Radar today" + Trending (≥1080px) */}
+      {/* Right rail — live "On the Radar today" + Trending (≥1080px).
+          Theme toggle sits top-right of the page, per convention. */}
       <aside className={styles.sideRight}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+          <ThemeToggle />
+        </div>
         <RadarRailPanel />
       </aside>
 

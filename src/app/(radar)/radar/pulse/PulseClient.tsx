@@ -11,6 +11,7 @@ import {
 } from "../radar-shared";
 import { toolThing, logoFor, brandLogoFor } from "../radar-map";
 import { EmailCapture } from "@/components/EmailCapture";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import styles from "./pulse.module.css";
 
 const GRAIN =
@@ -157,9 +158,12 @@ export function PulseClient({
     <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS }}>
       <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
       <div className={styles.wrap} style={{ position: "relative", zIndex: 2 }}>
-        {/* Header */}
-        <div style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>
-          Pulse · {weekOf} · refreshed daily
+        {/* Header — kicker left, theme toggle top-right */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+          <div style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>
+            Pulse · {weekOf} · refreshed daily
+          </div>
+          <ThemeToggle />
         </div>
         <h1 style={{ fontFamily: SG, fontSize: "clamp(30px, 5vw, 40px)", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.035em", lineHeight: 1.04, margin: "10px 0 0" }}>
           This week in AI

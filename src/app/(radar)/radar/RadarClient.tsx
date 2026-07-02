@@ -13,6 +13,7 @@ import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
 import { FaceMark, MetricChip, CoverImage, usePressTap, accentFor, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, logoFor, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { slugForUrl } from "@/lib/tools-registry";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { RadarDetailSheet } from "./RadarDetailSheet";
 import { SectionAllSheet } from "./SectionAllSheet";
 import { HackathonDetailSheet } from "./HackathonDetailSheet";
@@ -686,13 +687,16 @@ export function RadarClient(data: RadarData) {
               <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{headline}</h1>
               <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>What&apos;s new and worth knowing in AI, tuned to you.</p>
             </div>
-            <button
-              onClick={() => { setShowFeedback(true); posthog.capture("radar_feedback_opened", { from: "today_header" }); }}
-              aria-label="Send feedback"
-              style={{ flexShrink: 0, marginTop: "2px", display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "100px", background: SURFACE, border: `1px solid ${HAIRLINE}`, padding: "8px 14px", cursor: "pointer", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, boxShadow: INNER_HIGHLIGHT }}
-            >
-              <MessageSquare size={15} strokeWidth={2} /> Feedback
-            </button>
+            <div style={{ flexShrink: 0, marginTop: "2px", display: "inline-flex", alignItems: "center", gap: "10px" }}>
+              <ThemeToggle />
+              <button
+                onClick={() => { setShowFeedback(true); posthog.capture("radar_feedback_opened", { from: "today_header" }); }}
+                aria-label="Send feedback"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "100px", background: SURFACE, border: `1px solid ${HAIRLINE}`, padding: "8px 14px", cursor: "pointer", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, boxShadow: INNER_HIGHLIGHT }}
+              >
+                <MessageSquare size={15} strokeWidth={2} /> Feedback
+              </button>
+            </div>
           </div>
 
           {/* Lens switcher + Hackathons entry. The two toggles tune the content

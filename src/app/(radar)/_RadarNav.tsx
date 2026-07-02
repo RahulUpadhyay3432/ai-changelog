@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug, Newspaper, Activity } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import styles from "./layout.module.css";
 
 const NAV_ITEMS = [
@@ -101,11 +100,6 @@ export function RadarSideNav() {
         <Home size={17} strokeWidth={1.7} />
         Home
       </Link>
-
-      {/* Theme */}
-      <div style={{ marginTop: "auto", padding: "16px 20px 0" }}>
-        <ThemeToggle />
-      </div>
     </aside>
   );
 }

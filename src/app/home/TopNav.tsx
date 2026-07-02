@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight, Search } from "lucide-react";
 import { GOLD, HAIRLINE, TEXT, SG } from "@/lib/design-tokens";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import styles from "./landing.module.css";
 
 // Top-nav for the landing. Tabs link out to the real product surfaces (UX +
@@ -13,6 +14,7 @@ import styles from "./landing.module.css";
 const TABS: { label: string; href: string }[] = [
   { label: "Feed", href: "/?app=1" },
   { label: "Radar", href: "/radar" },
+  { label: "Pulse", href: "/radar/pulse" },
   { label: "Tools & Agents", href: "/radar/browse" },
   { label: "Skills", href: "/radar/mcp?tab=skills" },
   { label: "MCP", href: "/radar/mcp" },
@@ -100,6 +102,8 @@ export function TopNav() {
           <Search size={16} strokeWidth={2} />
         </Link>
 
+        <ThemeToggle />
+
         {/* Desktop "Open" pill */}
         <Link
           href="/?app=1"
@@ -152,7 +156,8 @@ export function TopNav() {
               {t.label}
             </Link>
           ))}
-          <div style={{ display: "flex", gap: "10px", marginTop: "14px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: "10px", marginTop: "14px", flexWrap: "wrap", alignItems: "center" }}>
+            <ThemeToggle />
             <Link
               href="/search"
               onClick={() => setOpen(false)}

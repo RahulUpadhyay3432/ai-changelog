@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug, Newspaper, Activity } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import styles from "./layout.module.css";
 
 const NAV_ITEMS = [
@@ -23,7 +24,7 @@ export function RadarSideNav() {
   return (
     <aside className={styles.sideNav}>
       {/* Wordmark */}
-      <Link href="/" style={{ padding: "0 20px 20px", fontFamily: SG, fontSize: "20px", fontWeight: 800, color: "#f6f4f0", letterSpacing: "-0.04em", textDecoration: "none", cursor: "pointer", transition: "opacity 0.15s ease" }}
+      <Link href="/" style={{ padding: "0 20px 20px", fontFamily: SG, fontSize: "20px", fontWeight: 800, color: "var(--kt-text-primary, #f6f4f0)", letterSpacing: "-0.04em", textDecoration: "none", cursor: "pointer", transition: "opacity 0.15s ease" }}
         onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
         onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       >
@@ -46,7 +47,7 @@ export function RadarSideNav() {
               fontFamily: SG,
               fontSize: "14px",
               fontWeight: active ? 600 : 450,
-              color: active ? GOLD : "#a29d94",
+              color: active ? GOLD : "var(--kt-text-muted, #a29d94)",
               background: active ? "rgba(59,130,246,0.08)" : "transparent",
               borderLeft: active ? `2px solid ${GOLD}` : "2px solid transparent",
               transition: "color 0.15s ease, background 0.15s ease",
@@ -59,7 +60,7 @@ export function RadarSideNav() {
       })}
 
       {/* Divider */}
-      <div style={{ margin: "12px 20px", height: "1px", background: "rgba(255,255,255,0.07)" }} />
+      <div style={{ margin: "12px 20px", height: "1px", background: "var(--kt-hairline, rgba(255,255,255,0.07))" }} />
 
       {/* Exit affordances — Feed (phone app) + Home (landing hub) */}
       <Link
@@ -73,7 +74,7 @@ export function RadarSideNav() {
           fontFamily: SG,
           fontSize: "14px",
           fontWeight: 450,
-          color: "#a29d94",
+          color: "var(--kt-text-muted, #a29d94)",
           borderLeft: "2px solid transparent",
           transition: "color 0.15s ease",
         }}
@@ -92,7 +93,7 @@ export function RadarSideNav() {
           fontFamily: SG,
           fontSize: "14px",
           fontWeight: 450,
-          color: "#a29d94",
+          color: "var(--kt-text-muted, #a29d94)",
           borderLeft: "2px solid transparent",
           transition: "color 0.15s ease",
         }}
@@ -100,6 +101,11 @@ export function RadarSideNav() {
         <Home size={17} strokeWidth={1.7} />
         Home
       </Link>
+
+      {/* Theme */}
+      <div style={{ marginTop: "auto", padding: "16px 20px 0" }}>
+        <ThemeToggle />
+      </div>
     </aside>
   );
 }

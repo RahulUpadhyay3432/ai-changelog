@@ -63,7 +63,7 @@ export interface Accent {
   ring: string;
 }
 
-const NEUTRAL: Accent = { fg: TEXT.body, bg: "rgba(255,255,255,0.05)", ring: "rgba(255,255,255,0.16)" };
+const NEUTRAL: Accent = { fg: TEXT.body, bg: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", ring: "var(--kt-hairline, rgba(255,255,255,0.16))" };
 
 export function accentFor(slug: CategorySlug | string | null | undefined): Accent {
   if (!slug) return NEUTRAL;

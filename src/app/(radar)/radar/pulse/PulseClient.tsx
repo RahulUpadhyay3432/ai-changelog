@@ -5,7 +5,7 @@ import { ArrowRight, Flame } from "lucide-react";
 import type { RadarTool, RadarItem, DiscoveredMcp } from "@/lib/knowledge";
 import { entityHref, type EntityType } from "@/lib/entities";
 import {
-  FaceMark, MetricChip, CoverImage, accentFor,
+  FaceMark, MetricChip, CoverImage, accentFor, accentForFace,
   GOLD, GOLD_SOFT, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT,
   type RadarThing,
 } from "../radar-shared";
@@ -34,49 +34,54 @@ function Kicker({ children, count }: { children: React.ReactNode; count?: number
   );
 }
 
-// ── #1 hero — the signature moment ──
+// ── #1 hero — compact split card: content left, slim media panel right.
+//    Never a full-width cover band (an unresolved og-image made that a giant
+//    empty slab). The media panel is a fixed ~150px accent, desktop-only.
 function HeroCard({ thing }: { thing: RadarThing }) {
-  const accent = accentFor(thing.categorySlug);
+  // toolThing doesn't set categorySlug — fall back to the face-based accent so
+  // the ring is a real hex (the `${ring}1f` alpha suffix needs hex, not var()).
+  const accent = thing.categorySlug ? accentFor(thing.categorySlug) : accentForFace(thing.face);
   const cover = thing.imageUrl && thing.imageUrl.startsWith("http") ? thing.imageUrl : undefined;
   return (
     <a
       href={thing.url ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="radar-hero"
+      className={`radar-hero ${styles.heroSplit}`}
       style={{
-        display: "block", width: "100%", textDecoration: "none", color: "inherit",
-        position: "relative", overflow: "hidden", borderRadius: "20px",
+        textDecoration: "none", color: "inherit", overflow: "hidden", borderRadius: "18px",
         background: `linear-gradient(135deg, ${accent.ring}1f 0%, ${SURFACE} 60%)`,
-        border: `1px solid ${HAIRLINE}`, boxShadow: INNER_HIGHLIGHT, marginBottom: "40px",
+        border: `1px solid ${HAIRLINE}`, boxShadow: INNER_HIGHLIGHT, marginBottom: "28px",
       }}
     >
-      <CoverImage src={cover} category={thing.categorySlug} face={thing.face} height={196} radius={0} />
-      <span
-        style={{
-          position: "absolute", top: "12px", left: "12px", display: "inline-flex", alignItems: "center", gap: "5px",
-          fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase",
-          color: "#fff", background: GOLD, borderRadius: "100px", padding: "5px 11px", backdropFilter: "blur(6px)",
-        }}
-      >
-        <Flame size={12} strokeWidth={2.4} /> #1 this week
-      </span>
-      <div style={{ padding: "18px 20px 20px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-          <FaceMark logoUrl={thing.logoUrl} label={thing.name} size={44} />
-          <span style={{ fontFamily: SG, fontSize: "23px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", lineHeight: 1.1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ padding: "18px 20px", minWidth: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+        <span
+          style={{
+            alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "5px",
+            fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase",
+            color: "#fff", background: GOLD, borderRadius: "100px", padding: "4px 10px",
+          }}
+        >
+          <Flame size={12} strokeWidth={2.4} /> #1 this week
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <FaceMark logoUrl={thing.logoUrl} label={thing.name} size={40} />
+          <span style={{ fontFamily: SG, fontSize: "22px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", lineHeight: 1.1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {thing.name}
           </span>
         </div>
-        <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.55, margin: "0 0 16px", maxWidth: "640px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+        <p style={{ fontSize: "14.5px", color: TEXT.body, lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {thing.valueLine}
         </p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginTop: "auto" }}>
           {thing.metric ? <MetricChip>{thing.metric}</MetricChip> : <span />}
           <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: GOLD }}>
             Take a look <ArrowRight size={15} strokeWidth={2.3} />
           </span>
         </div>
+      </div>
+      <div className={styles.heroMedia}>
+        <CoverImage src={cover} category={thing.categorySlug} face={thing.face} height={150} radius={14} />
       </div>
     </a>
   );
@@ -147,9 +152,11 @@ export function PulseClient({
   const rest = things.slice(1, 9);
 
   return (
-    <div style={{ position: "relative", background: CANVAS, minHeight: "100%" }}>
-      <div aria-hidden style={{ position: "absolute", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 0 }} />
-      <div className={styles.wrap} style={{ position: "relative", zIndex: 1 }}>
+    // The (radar) layout shell is overflow:hidden — this page must own its own
+    // scrolling (same contract as RadarClient's root).
+    <div className="scrollbar-none" style={{ position: "relative", height: "100%", overflowY: "auto", overflowX: "hidden", background: CANVAS }}>
+      <div aria-hidden style={{ position: "fixed", inset: 0, backgroundImage: GRAIN, opacity: 0.035, mixBlendMode: "overlay", pointerEvents: "none", zIndex: 1 }} />
+      <div className={styles.wrap} style={{ position: "relative", zIndex: 2 }}>
         {/* Header */}
         <div style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>
           Pulse · {weekOf} · refreshed daily
@@ -178,7 +185,7 @@ export function PulseClient({
 
         {/* Trending leaderboard */}
         {rest.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
+          <section style={{ marginBottom: "34px" }}>
             <Kicker>Trending tools</Kicker>
             <div style={{ borderTop: `1px solid ${HAIRLINE}` }}>
               {rest.map((t, i) => <LeaderRow key={t.id} rank={i + 2} thing={t} />)}
@@ -188,7 +195,7 @@ export function PulseClient({
 
         {/* New MCP servers */}
         {mcp.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
+          <section style={{ marginBottom: "34px" }}>
             <Kicker count={mcp.length}>New MCP servers</Kicker>
             <div className={styles.grid}>{mcp.map((m) => <McpCard key={m.url} m={m} />)}</div>
           </section>
@@ -196,7 +203,7 @@ export function PulseClient({
 
         {/* In the conversation */}
         {entities.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
+          <section style={{ marginBottom: "34px" }}>
             <Kicker>In the conversation</Kicker>
             <div className={styles.grid}>{entities.map((e) => <EntCard key={e.entity.id} e={e} />)}</div>
           </section>

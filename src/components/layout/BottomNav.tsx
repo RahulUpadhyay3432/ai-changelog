@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid, Plug } from "lucide-react";
+import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid, Plug, Activity, Newspaper } from "lucide-react";
 
 const GLOBAL_NAV = [
   { href: "/", label: "Home", Icon: Home },
@@ -14,13 +14,16 @@ const GLOBAL_NAV = [
 ] as const;
 
 // Radar is its own space — entering it swaps the nav to Radar-specific
-// sections (Today / Toolkit) plus an exit back to the main app.
+// sections (Today / Pulse / Browse / MCP) plus an exit back to the feed.
+// "Feed" (not "Home") — Home means the landing everywhere else; the exit
+// here goes to the news app at "/". Toolkit stays reachable via desktop
+// side nav and /radar/toolkit.
 const RADAR_NAV = [
   { href: "/radar", label: "Today", Icon: Radar },
+  { href: "/radar/pulse", label: "Pulse", Icon: Activity },
   { href: "/radar/browse", label: "Browse", Icon: LayoutGrid },
   { href: "/radar/mcp", label: "MCP", Icon: Plug },
-  { href: "/radar/toolkit", label: "Toolkit", Icon: Bookmark },
-  { href: "/", label: "Home", Icon: Home },
+  { href: "/", label: "Feed", Icon: Newspaper },
 ] as const;
 
 export function BottomNav() {
@@ -59,7 +62,7 @@ export function BottomNav() {
             )}
             <Link
               href={href}
-              aria-label={isExit ? "Leave Radar — back to Home" : label}
+              aria-label={isExit ? "Leave Radar — back to the Feed" : label}
               style={{
                 display: "flex",
                 flexDirection: "column",

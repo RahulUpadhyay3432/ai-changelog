@@ -11,12 +11,24 @@
 .statStrip {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 28px;
-  padding: 16px 20px;
-  margin: 22px 0 32px;
+  gap: 10px 26px;
+  padding: 13px 18px;
+  margin: 18px 0 24px;
   border: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.09));
   border-radius: 14px;
   background: var(--kt-surface, #1b1a17);
+}
+
+/* #1 hero — content left, slim media panel right (desktop only). The media is a
+   fixed ~150px accent so an unresolved og-image can never become a giant void. */
+.heroSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: stretch;
+}
+
+.heroMedia {
+  padding: 14px 14px 14px 0;
 }
 
 /* Rich card grid (MCP + conversation). */
@@ -24,6 +36,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .heroSplit {
+    grid-template-columns: 1fr;
+  }
+  .heroMedia {
+    display: none;
+  }
 }
 
 @media (max-width: 520px) {

@@ -5,16 +5,16 @@
    (CSS can't import TS) — canonical source is @/lib/design-tokens. */
 
 .root {
-  --gold: #3b82f6;
-  --gold-soft: rgba(59, 130, 246, 0.12);
-  --gold-border: rgba(59, 130, 246, 0.28);
-  --canvas: #0c0b0a;
-  --surface: #1b1a17;
-  --surface-raised: #24221d;
-  --hairline: rgba(255, 255, 255, 0.09);
-  --text-1: #f6f4f0;
-  --text-2: #cbc7bf;
-  --text-3: #a29d94;
+  --gold: var(--kt-accent, #3b82f6);
+  --gold-soft: var(--kt-accent-soft, rgba(59, 130, 246, 0.12));
+  --gold-border: var(--kt-accent-border, rgba(59, 130, 246, 0.28));
+  --canvas: var(--kt-canvas, #0c0b0a);
+  --surface: var(--kt-surface, #1b1a17);
+  --surface-raised: var(--kt-surface-raised, #24221d);
+  --hairline: var(--kt-hairline, rgba(255, 255, 255, 0.09));
+  --text-1: var(--kt-text-primary, #f6f4f0);
+  --text-2: var(--kt-text-body, #cbc7bf);
+  --text-3: var(--kt-text-muted, #a29d94);
 
   background: var(--canvas);
   color: var(--text-2);
@@ -42,7 +42,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(12, 11, 10, 0.85);
+  background: var(--kt-web-header-bg, rgba(12, 11, 10, 0.85));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--hairline);

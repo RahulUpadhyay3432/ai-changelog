@@ -107,11 +107,19 @@ export default function RootLayout({
         <body
           style={{
             margin: 0,
-            background: "#0a0a0a",
+            background: "var(--kt-canvas, #0a0a0a)",
             fontFamily:
               '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
           }}
         >
+          {/* Pre-paint theme: set data-theme on <html> from localStorage before
+              anything renders, so a light-mode user never sees a dark flash. */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                '(function(){try{var t=localStorage.getItem("kapyn_theme")||localStorage.getItem("kapyn_web_theme");if(t==="light")document.documentElement.dataset.theme="light";}catch(e){}})();',
+            }}
+          />
           <ServiceWorkerRegistrar />
           <script
             type="application/ld+json"

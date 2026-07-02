@@ -35,7 +35,7 @@ export default function SavedPage() {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
       }}
     >
       <div
@@ -47,12 +47,12 @@ export default function SavedPage() {
           flexShrink: 0,
         }}
       >
-        <Bookmark size={20} color="#f5f5f5" strokeWidth={2} />
+        <Bookmark size={20} color="var(--kt-text-primary, #f5f5f5)" strokeWidth={2} />
         <h1
           style={{
             fontSize: "22px",
             fontWeight: 700,
-            color: "#f5f5f5",
+            color: "var(--kt-text-primary, #f5f5f5)",
             margin: 0,
             letterSpacing: "-0.03em",
           }}
@@ -62,7 +62,7 @@ export default function SavedPage() {
       </div>
 
       {isLoading ? (
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#525252" }}>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--kt-text-muted, #525252)" }}>
           <div className="refresh-spinner" />
         </div>
       ) : savedStories.length === 0 ? (
@@ -74,7 +74,7 @@ export default function SavedPage() {
             alignItems: "center",
             justifyContent: "center",
             gap: "16px",
-            color: "#a3a3a3",
+            color: "var(--kt-text-muted, #a3a3a3)",
             padding: "40px 24px",
             textAlign: "center",
           }}
@@ -101,19 +101,19 @@ export default function SavedPage() {
                 width: "60px",
                 height: "60px",
                 borderRadius: "50%",
-                background: "rgba(255, 255, 255, 0.05)",
+                background: "var(--kt-read-surface-2, rgba(255, 255, 255, 0.05))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                border: "1px solid var(--kt-hairline, rgba(255, 255, 255, 0.1))",
               }}
             >
               <Bookmark size={28} className="animate-pulse" style={{ color: "rgba(255, 255, 255, 0.4)" }} />
             </div>
-            <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 700, color: "var(--kt-text-primary, #f5f5f5)", letterSpacing: "-0.02em" }}>
               Your Archive is Empty
             </h2>
-            <p style={{ fontSize: "14px", margin: 0, color: "#737373", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "14px", margin: 0, color: "var(--kt-text-muted, #737373)", lineHeight: 1.5 }}>
               Stories you bookmark will appear here in a premium, swipeable stack. Keep track of what matters.
             </p>
           </div>

@@ -57,7 +57,7 @@ export default async function CategoryPage({ params }: Props) {
       style={{
         height: "100%",
         overflowY: "auto",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -71,7 +71,7 @@ export default async function CategoryPage({ params }: Props) {
             display: "inline-flex",
             alignItems: "center",
             gap: "2px",
-            color: "#525252",
+            color: "var(--kt-text-muted, #525252)",
             fontSize: "13px",
             textDecoration: "none",
             marginBottom: "20px",
@@ -102,7 +102,7 @@ export default async function CategoryPage({ params }: Props) {
         <p
           style={{
             fontSize: "13px",
-            color: "#525252",
+            color: "var(--kt-text-muted, #525252)",
             margin: "0 0 4px",
             lineHeight: 1.55,
           }}
@@ -113,7 +113,7 @@ export default async function CategoryPage({ params }: Props) {
         <p
           style={{
             fontSize: "11px",
-            color: "#404040",
+            color: "var(--kt-text-muted, #404040)",
             margin: "0 0 16px",
             fontWeight: 500,
           }}
@@ -124,7 +124,7 @@ export default async function CategoryPage({ params }: Props) {
         <div
           style={{
             height: "1px",
-            background: "rgba(255,255,255,0.05)",
+            background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
             margin: "0 -20px",
           }}
         />
@@ -138,7 +138,7 @@ export default async function CategoryPage({ params }: Props) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#404040",
+            color: "var(--kt-text-muted, #404040)",
             fontSize: "14px",
             padding: "40px 24px",
             textAlign: "center",
@@ -167,7 +167,7 @@ export default async function CategoryPage({ params }: Props) {
                   style={{
                     fontSize: "15px",
                     fontWeight: 600,
-                    color: "#E8E4DE",
+                    color: "var(--kt-text-primary, #E8E4DE)",
                     lineHeight: 1.35,
                     margin: "0 0 6px",
                     letterSpacing: "-0.01em",
@@ -179,7 +179,7 @@ export default async function CategoryPage({ params }: Props) {
                 <p
                   style={{
                     fontSize: "13px",
-                    color: "#737373",
+                    color: "var(--kt-text-muted, #737373)",
                     lineHeight: 1.55,
                     margin: "0 0 10px",
                   }}
@@ -195,14 +195,14 @@ export default async function CategoryPage({ params }: Props) {
                     alignItems: "center",
                     gap: "6px",
                     fontSize: "11px",
-                    color: "#404040",
+                    color: "var(--kt-text-muted, #404040)",
                     fontWeight: 500,
                   }}
                 >
                   <span style={{ color: category.colorLabel }}>
                     {story.sourceName}
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.12)" }}>·</span>
+                  <span style={{ color: "var(--kt-hairline, rgba(255,255,255,0.12))" }}>·</span>
                   <span>
                     {new Date(story.publishedAt).toLocaleDateString("en-US", {
                       month: "short",

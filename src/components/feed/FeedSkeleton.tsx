@@ -6,7 +6,7 @@ export function FeedSkeleton() {
   return (
     <div
       aria-hidden
-      style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: "#0a0a0a" }}
+      style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: "var(--kt-canvas, #0a0a0a)" }}
     >
       {/* Hero — matches NewsCard's flex 0 0 42% */}
       <div className="skeleton-block" style={{ flex: "0 0 42%", borderRadius: "12px 12px 0 0" }} />

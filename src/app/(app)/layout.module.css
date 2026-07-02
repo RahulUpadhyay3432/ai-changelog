@@ -9,7 +9,7 @@
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background: #050505;
+  background: var(--kt-canvas, #050505);
   /* Column direction so .column fills height, centred horizontally */
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@
     background: oklch(5.5% 0 0);
     border-radius: 42px;
     padding: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.035));
     overflow: hidden;
   }
 
@@ -116,7 +116,7 @@
     padding: 0;
     background:
       radial-gradient(36% 40% at 16% 6%, rgba(59, 130, 246, 0.10), transparent 70%),
-      #050505;
+      var(--kt-canvas, #050505);
   }
 
   .phoneShell {
@@ -130,7 +130,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    border-right: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.07));
     padding: 26px 16px 22px;
     overflow-y: auto;
   }
@@ -140,7 +140,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.07));
     padding: 26px 20px 24px;
     overflow-y: auto;
   }

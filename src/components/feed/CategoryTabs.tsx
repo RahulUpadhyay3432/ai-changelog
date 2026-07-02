@@ -53,9 +53,9 @@ export function CategoryTabs({ activeSlug, onChange }: CategoryTabsProps) {
               border: "1px solid",
               borderColor: active
                 ? "transparent"
-                : "rgba(255, 255, 255, 0.08)",
+                : "var(--kt-hairline, rgba(255, 255, 255, 0.08))",
               background: active ? "#1565C0" : "transparent",
-              color: active ? "#fff" : "#9a948b",
+              color: active ? "#fff" : "var(--kt-text-muted, #9a948b)",
               cursor: "pointer",
               transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
               letterSpacing: active ? "0.01em" : "0.015em",

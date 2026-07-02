@@ -246,7 +246,7 @@ export function HomeFeed() {
   const tabIdx = tabs.findIndex((t) => t.slug === activeCategory);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "#0a0a0a" }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "var(--kt-canvas, #0a0a0a)" }}>
       {/* Top bar */}
       <div style={{
         padding: "2px 16px 6px 20px",
@@ -256,7 +256,7 @@ export function HomeFeed() {
         justifyContent: "space-between",
       }}>
         <h1 style={{
-          fontSize: "26px", fontWeight: 500, color: "#E8E4DE",
+          fontSize: "26px", fontWeight: 500, color: "var(--kt-text-primary, #E8E4DE)",
           margin: 0, letterSpacing: "-0.02em",
           fontFamily: "var(--font-space-grotesk), sans-serif",
         }}>
@@ -277,15 +277,15 @@ export function HomeFeed() {
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             gap: "12px", padding: "0 32px", textAlign: "center",
           }}>
-            <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 500 }}>Couldn&apos;t load stories</p>
-            <p style={{ fontSize: "13.5px", color: "#737373", margin: 0, lineHeight: 1.5, maxWidth: "260px" }}>
+            <p style={{ fontSize: "15px", color: "var(--kt-text-primary, #E8E4DE)", margin: 0, fontWeight: 500 }}>Couldn&apos;t load stories</p>
+            <p style={{ fontSize: "13.5px", color: "var(--kt-text-muted, #737373)", margin: 0, lineHeight: 1.5, maxWidth: "260px" }}>
               Something went wrong reaching the feed. Check your connection and try again.
             </p>
             <button
               onClick={handleRetry}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "7px", marginTop: "4px",
-                fontSize: "14px", fontWeight: 600, color: "#0a0a0a", background: "#E8E4DE",
+                fontSize: "14px", fontWeight: 600, color: "var(--kt-canvas, #0a0a0a)", background: "var(--kt-text-primary, #E8E4DE)",
                 border: "none", borderRadius: "100px", padding: "10px 20px", cursor: "pointer",
                 fontFamily: "var(--font-space-grotesk), sans-serif",
               }}
@@ -301,8 +301,8 @@ export function HomeFeed() {
                 position: "absolute", inset: 0,
                 display: "flex", alignItems: "center", justifyContent: "flex-end",
                 gap: "6px", paddingRight: "24px",
-                background: "#0a0a0a",
-                color: "#333",
+                background: "var(--kt-canvas, #0a0a0a)",
+                color: "var(--kt-text-muted, #333)",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em",
                 textTransform: "uppercase",
               }}>
@@ -316,8 +316,8 @@ export function HomeFeed() {
                 position: "absolute", inset: 0,
                 display: "flex", alignItems: "center", justifyContent: "flex-start",
                 gap: "6px", paddingLeft: "24px",
-                background: "#0a0a0a",
-                color: "#333",
+                background: "var(--kt-canvas, #0a0a0a)",
+                color: "var(--kt-text-muted, #333)",
                 fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em",
                 textTransform: "uppercase",
               }}>
@@ -367,10 +367,10 @@ export function HomeFeed() {
                     style={{
                       width: "100%",
                       maxWidth: "380px",
-                      background: "rgba(15,15,15,0.96)",
+                      background: "var(--kt-surface-raised, rgba(15,15,15,0.96))",
                       backdropFilter: "blur(20px)",
                       WebkitBackdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      border: "1px solid var(--kt-hairline, rgba(255,255,255,0.1))",
                       borderRadius: "16px",
                       boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
                       display: "flex",
@@ -394,11 +394,11 @@ export function HomeFeed() {
                         gap: "3px",
                       }}
                     >
-                      <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#e5e5e5", letterSpacing: "-0.01em" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "var(--kt-text-primary, #e5e5e5)", letterSpacing: "-0.01em" }}>
                         <Sparkles size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
                         Customize your feed
                       </span>
-                      <span style={{ fontSize: "12px", color: "#525252", fontWeight: 400 }}>
+                      <span style={{ fontSize: "12px", color: "var(--kt-text-muted, #525252)", fontWeight: 400 }}>
                         Pick the topics you care about in Profile
                       </span>
                     </button>
@@ -413,7 +413,7 @@ export function HomeFeed() {
                         height: "100%",
                         minHeight: "52px",
                         cursor: "pointer",
-                        color: "#404040",
+                        color: "var(--kt-text-muted, #404040)",
                         fontSize: "18px",
                         lineHeight: 1,
                         flexShrink: 0,

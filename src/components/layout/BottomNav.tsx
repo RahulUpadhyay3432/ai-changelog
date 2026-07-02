@@ -36,7 +36,7 @@ export function BottomNav() {
       style={{
         flexShrink: 0,
         height: "calc(48px + env(safe-area-inset-bottom, 0px))",
-        background: "rgba(10, 10, 10, 0.96)",
+        background: "var(--kt-web-header-bg, rgba(10, 10, 10, 0.96))",
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
         borderTop: "1px solid rgba(255, 255, 255, 0.05)",
@@ -54,11 +54,11 @@ export function BottomNav() {
         // In Radar, "Home" is the way *out* — set it apart with a divider and a
         // brighter-than-inactive tint so "how do I get back" is always answerable.
         const isExit = inRadar && href === "/";
-        const color = isExit ? (active ? "#e8e8e8" : "#7d7d7d") : active ? "#e8e8e8" : isRadar ? "#8a8a8a" : "#404040";
+        const color = isExit ? (active ? "var(--kt-text-primary, #e8e8e8)" : "var(--kt-text-muted, #7d7d7d)") : active ? "var(--kt-text-primary, #e8e8e8)" : isRadar ? "var(--kt-text-muted, #8a8a8a)" : "var(--kt-text-muted, #404040)";
         return (
           <Fragment key={href}>
             {isExit && (
-              <span aria-hidden style={{ alignSelf: "center", width: "1px", height: "22px", background: "rgba(255,255,255,0.10)" }} />
+              <span aria-hidden style={{ alignSelf: "center", width: "1px", height: "22px", background: "var(--kt-hairline, rgba(255,255,255,0.10))" }} />
             )}
             <Link
               href={href}

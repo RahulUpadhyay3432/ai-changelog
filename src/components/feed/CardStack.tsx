@@ -244,8 +244,8 @@ export function CardStack({
   if (items.length === 0) {
     return (
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "6px", padding: "0 32px", textAlign: "center" }}>
-        <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 600 }}>No stories yet</p>
-        <p style={{ fontSize: "13.5px", color: "#a29d94", margin: 0, lineHeight: 1.5 }}>Fresh dispatches land here as they break. Check back soon.</p>
+        <p style={{ fontSize: "15px", color: "var(--kt-text-primary, #E8E4DE)", margin: 0, fontWeight: 600 }}>No stories yet</p>
+        <p style={{ fontSize: "13.5px", color: "var(--kt-text-muted, #a29d94)", margin: 0, lineHeight: 1.5 }}>Fresh dispatches land here as they break. Check back soon.</p>
       </div>
     );
   }
@@ -319,11 +319,11 @@ export function CardStack({
             exit={{ opacity: 0, y: 4, x: "-50%", transition: { duration: 0.3 } }}
             style={{
               position: "absolute", bottom: 80, left: "50%",
-              background: "rgba(255,255,255,0.10)", backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)", color: "#a3a3a3",
+              background: "var(--kt-hairline, rgba(255,255,255,0.10))", backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)", color: "var(--kt-text-muted, #a3a3a3)",
               padding: "6px 16px", borderRadius: "20px", fontSize: "12px",
               fontWeight: 500, zIndex: 50, whiteSpace: "nowrap",
-              border: "1px solid rgba(255,255,255,0.10)", pointerEvents: "none",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.10))", pointerEvents: "none",
             }}
           >
             Feed Updated

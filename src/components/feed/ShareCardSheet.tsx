@@ -86,7 +86,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
         }}
         style={{
           position: "relative",
-          background: "#111111",
+          background: "var(--kt-surface, #111111)",
           borderRadius: "20px 20px 0 0",
           padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 28px)",
           pointerEvents: "all",
@@ -109,7 +109,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
               width: "36px",
               height: "4px",
               borderRadius: "2px",
-              background: "rgba(255,255,255,0.15)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.15))",
             }}
           />
         </div>
@@ -129,14 +129,14 @@ function SheetContent({ onClose }: { onClose: () => void }) {
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#E8E4DE",
+                color: "var(--kt-text-primary, #E8E4DE)",
                 margin: "0 0 2px",
                 letterSpacing: "-0.01em",
               }}
             >
               Today&apos;s top 3
             </p>
-            <p style={{ fontSize: "12px", color: "#525252", margin: 0 }}>
+            <p style={{ fontSize: "12px", color: "var(--kt-text-muted, #525252)", margin: 0 }}>
               Share to Instagram, Twitter, or WhatsApp
             </p>
           </div>
@@ -146,7 +146,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
               width: "32px",
               height: "32px",
               borderRadius: "50%",
-              background: "rgba(255,255,255,0.08)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.08))",
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -162,7 +162,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
         <div
           style={{
             height: "1px",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--kt-read-surface-2, rgba(255,255,255,0.06))",
             flexShrink: 0,
           }}
         />
@@ -183,14 +183,14 @@ function SheetContent({ onClose }: { onClose: () => void }) {
               style={{
                 width: "100%",
                 aspectRatio: "9/16",
-                background: "rgba(255,255,255,0.04)",
+                background: "var(--kt-read-surface, rgba(255,255,255,0.04))",
                 borderRadius: "12px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <p style={{ fontSize: "13px", color: "#404040" }}>
+              <p style={{ fontSize: "13px", color: "var(--kt-text-muted, #404040)" }}>
                 Generating card…
               </p>
             </div>
@@ -213,7 +213,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
         <div
           style={{
             height: "1px",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--kt-read-surface-2, rgba(255,255,255,0.06))",
             flexShrink: 0,
           }}
         />
@@ -228,10 +228,10 @@ function SheetContent({ onClose }: { onClose: () => void }) {
               padding: "14px",
               borderRadius: "14px",
               background: sharing
-                ? "rgba(255,255,255,0.04)"
+                ? "var(--kt-read-surface, rgba(255,255,255,0.04))"
                 : "rgba(255,255,255,0.09)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              color: sharing ? "#525252" : "#E8E4DE",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.12))",
+              color: sharing ? "var(--kt-text-muted, #525252)" : "var(--kt-text-primary, #E8E4DE)",
               fontSize: "15px",
               fontWeight: 600,
               cursor: sharing ? "default" : "pointer",

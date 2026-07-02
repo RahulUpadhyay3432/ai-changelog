@@ -88,6 +88,10 @@
   --kt-accent-soft: rgba(59, 130, 246, 0.12);
   --kt-accent-border: rgba(59, 130, 246, 0.30);
   --kt-deck-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.45);
+  /* Image→card fade stops (NewsCard scrims) — must match the card canvas. */
+  --kt-fade-solid: rgba(10, 10, 10, 1);
+  --kt-fade-mid: rgba(10, 10, 10, 0.35);
+  --kt-fade-clear: rgba(10, 10, 10, 0);
   --kt-web-bg: #100f0d;
   --kt-web-header-bg: rgba(16, 15, 13, 0.82);
   --kt-web-border: rgba(255, 248, 235, 0.07);
@@ -116,6 +120,9 @@
   --kt-accent-soft: rgba(37, 99, 235, 0.10);
   --kt-accent-border: rgba(37, 99, 235, 0.28);
   --kt-deck-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --kt-fade-solid: rgba(247, 245, 241, 1);
+  --kt-fade-mid: rgba(247, 245, 241, 0.35);
+  --kt-fade-clear: rgba(247, 245, 241, 0);
   --kt-web-bg: #f7f5f1;
   --kt-web-header-bg: rgba(247, 245, 241, 0.85);
   --kt-web-border: rgba(0, 0, 0, 0.08);

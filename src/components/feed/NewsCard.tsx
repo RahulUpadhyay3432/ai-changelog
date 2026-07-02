@@ -189,7 +189,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
         userSelect: "none",
         position: "relative",
       }}
@@ -223,7 +223,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.35) 55%, rgba(10,10,10,0) 100%)",
+              "linear-gradient(to top, var(--kt-fade-solid, rgba(10,10,10,1)) 0%, var(--kt-fade-mid, rgba(10,10,10,0.35)) 55%, var(--kt-fade-clear, rgba(10,10,10,0)) 100%)",
             zIndex: 2,
             pointerEvents: "none",
           }}
@@ -325,13 +325,13 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
               fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: category?.colorLabel ?? "#a3a3a3",
+              color: category?.colorLabel ?? "var(--kt-text-muted, #a3a3a3)",
               background: category
                 ? `${category.colorAccent}12`
-                : "rgba(255,255,255,0.04)",
+                : "var(--kt-read-surface, rgba(255,255,255,0.04))",
               border: category
                 ? `1px solid ${category.colorAccent}20`
-                : "1px solid rgba(255,255,255,0.07)",
+                : "1px solid var(--kt-hairline, rgba(255,255,255,0.07))",
               padding: "2px 8px",
               borderRadius: "100px",
             }}
@@ -339,7 +339,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             {category?.name ?? item.categorySlug}
           </span>
           <span
-            style={{ fontSize: "10px", color: "#8f8a82", fontWeight: 500 }}
+            style={{ fontSize: "10px", color: "var(--kt-text-muted, #8f8a82)", fontWeight: 500 }}
             suppressHydrationWarning
           >
             {timeAgo}
@@ -366,7 +366,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             fontSize: "clamp(20px, 2.8dvh, 26px)",
             fontWeight: 600,
             lineHeight: 1.3,
-            color: "#E8E4DE",
+            color: "var(--kt-text-primary, #E8E4DE)",
             margin: 0,
             marginBottom: "8px",
             letterSpacing: "0",
@@ -420,7 +420,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
                 <p style={{
                   fontSize: "clamp(14px, 1.85dvh, 17px)",
                   lineHeight: 1.45,
-                  color: "#D4D0CA",
+                  color: "var(--kt-text-body, #D4D0CA)",
                   fontWeight: 500,
                   margin: 0,
                   flexShrink: 0,
@@ -431,7 +431,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
               <p style={{
                 fontSize: "clamp(13px, 1.7dvh, 16px)",
                 lineHeight: 1.6,
-                color: "#cbc7bf",
+                color: "var(--kt-text-body, #cbc7bf)",
                 fontWeight: 400,
                 margin: 0,
                 minHeight: 0,
@@ -455,7 +455,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           right: 0,
           padding: "8px 20px 12px",
           borderTop: "1px solid rgba(255, 255, 255, 0.04)",
-          background: "linear-gradient(to top, rgba(10,10,10,1) 70%, rgba(10,10,10,0))",
+          background: "linear-gradient(to top, var(--kt-fade-solid, rgba(10,10,10,1)) 70%, var(--kt-fade-clear, rgba(10,10,10,0)))",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -465,7 +465,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           <span
             style={{
               fontSize: "10px",
-              color: "#9a948b",
+              color: "var(--kt-text-muted, #9a948b)",
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.06em",
@@ -473,7 +473,7 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           >
             {item.sourceName}
           </span>
-          <span style={{ fontSize: "9px", color: "#8f8a82", fontWeight: 500 }}>
+          <span style={{ fontSize: "9px", color: "var(--kt-text-muted, #8f8a82)", fontWeight: 500 }}>
             AI summary · {SUMMARY_MODEL}
           </span>
         </div>
@@ -492,15 +492,15 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
             display: "flex",
             alignItems: "center",
             gap: "5px",
-            background: category ? `${category.colorAccent}2e` : "rgba(255,255,255,0.10)",
+            background: category ? `${category.colorAccent}2e` : "var(--kt-hairline, rgba(255,255,255,0.10))",
             border: category
               ? `1px solid ${category.colorAccent}66`
-              : "1px solid rgba(255,255,255,0.2)",
+              : "1px solid var(--kt-hairline, rgba(255,255,255,0.2))",
             borderRadius: "20px",
             padding: "6px 13px",
             fontSize: "13px",
             fontWeight: 600,
-            color: category?.colorLabel ?? "#d4d4d4",
+            color: category?.colorLabel ?? "var(--kt-text-body, #d4d4d4)",
             cursor: "pointer",
             letterSpacing: "0.01em",
           }}

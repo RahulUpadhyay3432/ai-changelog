@@ -124,7 +124,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
         }}
         style={{
           position: "relative",
-          background: "#111111",
+          background: "var(--kt-surface, #111111)",
           borderRadius: "20px 20px 0 0",
           padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 32px)",
           pointerEvents: "all",
@@ -147,7 +147,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
               width: "36px",
               height: "4px",
               borderRadius: "2px",
-              background: "rgba(255,255,255,0.15)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.15))",
             }}
           />
         </div>
@@ -169,13 +169,13 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: category?.colorLabel ?? "#a3a3a3",
+                color: category?.colorLabel ?? "var(--kt-text-muted, #a3a3a3)",
                 background: category
                   ? `${category.colorAccent}12`
-                  : "rgba(255,255,255,0.04)",
+                  : "var(--kt-read-surface, rgba(255,255,255,0.04))",
                 border: category
                   ? `1px solid ${category.colorAccent}20`
-                  : "1px solid rgba(255,255,255,0.07)",
+                  : "1px solid var(--kt-hairline, rgba(255,255,255,0.07))",
                 padding: "2px 8px",
                 borderRadius: "100px",
                 display: "inline-block",
@@ -188,7 +188,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
               style={{
                 fontSize: "15px",
                 fontWeight: 600,
-                color: "#E8E4DE",
+                color: "var(--kt-text-primary, #E8E4DE)",
                 margin: 0,
                 lineHeight: 1.35,
               }}
@@ -202,7 +202,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
               width: "32px",
               height: "32px",
               borderRadius: "50%",
-              background: "rgba(255,255,255,0.08)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.08))",
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -212,7 +212,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
               marginTop: "2px",
             }}
           >
-            <X size={16} color="#8f8a82" strokeWidth={2} />
+            <X size={16} color="var(--kt-text-muted, #8f8a82)" strokeWidth={2} />
           </button>
         </div>
 
@@ -220,7 +220,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
         <div
           style={{
             height: "1px",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--kt-read-surface-2, rgba(255,255,255,0.06))",
             flexShrink: 0,
           }}
         />
@@ -242,7 +242,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   style={{
                     height: "14px",
                     borderRadius: "7px",
-                    background: "rgba(255,255,255,0.07)",
+                    background: "var(--kt-hairline, rgba(255,255,255,0.07))",
                     width: `${w}%`,
                     animation: "pulse 1.5s ease-in-out infinite",
                     animationDelay: `${i * 0.1}s`,
@@ -265,7 +265,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   <span />
                   <span />
                 </span>
-                <p style={{ fontSize: "12px", color: "#8f8a82", margin: 0 }}>
+                <p style={{ fontSize: "12px", color: "var(--kt-text-muted, #8f8a82)", margin: 0 }}>
                   This can take a few seconds.
                 </p>
               </div>
@@ -273,8 +273,8 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                 style={{
                   marginTop: "16px",
                   padding: "12px 14px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "var(--kt-read-surface, rgba(255,255,255,0.03))",
+                  border: "1px solid var(--kt-hairline, rgba(255,255,255,0.07))",
                   borderRadius: "10px",
                 }}
               >
@@ -284,7 +284,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                     fontWeight: 700,
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
-                    color: "#9a948b",
+                    color: "var(--kt-text-muted, #9a948b)",
                     margin: "0 0 6px",
                   }}
                 >
@@ -295,7 +295,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
                   style={{
                     fontSize: "13px",
                     lineHeight: 1.55,
-                    color: "#a29d94",
+                    color: "var(--kt-text-muted, #a29d94)",
                     margin: 0,
                     animation: "factIn 0.5s ease",
                   }}
@@ -308,7 +308,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
 
           {error && !loading && (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <p style={{ color: "#8f8a82", fontSize: "14px", marginBottom: "16px" }}>
+              <p style={{ color: "var(--kt-text-muted, #8f8a82)", fontSize: "14px", marginBottom: "16px" }}>
                 Couldn&apos;t load explanation
               </p>
               <button
@@ -341,7 +341,7 @@ function SheetContent({ item, onClose }: { item: NewsItem; onClose: () => void }
             >
               {explanation.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
                 part.startsWith("**") && part.endsWith("**") ? (
-                  <strong key={i} style={{ color: "#E8E4DE", fontWeight: 600 }}>
+                  <strong key={i} style={{ color: "var(--kt-text-primary, #E8E4DE)", fontWeight: 600 }}>
                     {part.slice(2, -2)}
                   </strong>
                 ) : (

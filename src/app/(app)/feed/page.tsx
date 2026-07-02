@@ -11,8 +11,8 @@ export default function FeedPage() {
             height: "100%",
             alignItems: "center",
             justifyContent: "center",
-            background: "#0a0a0a",
-            color: "#525252",
+            background: "var(--kt-canvas, #0a0a0a)",
+            color: "var(--kt-text-muted, #525252)",
             fontSize: "14px",
           }}
         >

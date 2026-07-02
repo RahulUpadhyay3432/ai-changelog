@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Newspaper, Radar, TrendingUp, Bookmark, User, FileText, Home, type LucideIcon } from "lucide-react";
 import { GOLD, TEXT, SG } from "@/lib/design-tokens";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // Desktop-only left rail for the app shell — the same nav language as the Radar
 // sidebar, so the feed and Radar read as one product. Hidden below the desktop
@@ -35,7 +36,7 @@ export function AppSideNav() {
           display: "flex", alignItems: "center", gap: "12px", padding: "11px 12px",
           borderRadius: "10px", textDecoration: "none", fontFamily: SG, fontSize: "14.5px",
           fontWeight: on ? 600 : 500,
-          color: on ? GOLD : dim ? "#615c57" : TEXT.muted,
+          color: on ? GOLD : dim ? "var(--kt-text-muted, #615c57)" : TEXT.muted,
           background: on ? "rgba(59,130,246,0.10)" : "transparent",
           borderLeft: on ? `2px solid ${GOLD}` : "2px solid transparent",
           transition: "color 0.15s ease, background 0.15s ease",
@@ -58,12 +59,15 @@ export function AppSideNav() {
       <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
         {PRIMARY.map((i) => item(i, false))}
       </div>
-      <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "12px 12px" }} />
+      <div style={{ height: "1px", background: "var(--kt-hairline, rgba(255,255,255,0.08))", margin: "12px 12px" }} />
       <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
         {SECONDARY.map((i) => item(i, true))}
       </div>
-      <div style={{ marginTop: "auto", padding: "0 12px", fontSize: "12px", color: "#615c57", lineHeight: 1.5 }}>
-        Calm intelligence for AI.<br />No paywall, ever.
+      <div style={{ marginTop: "auto", padding: "0 12px", display: "flex", flexDirection: "column", gap: "14px" }}>
+        <ThemeToggle />
+        <div style={{ fontSize: "12px", color: "var(--kt-text-muted, #615c57)", lineHeight: 1.5 }}>
+          Calm intelligence for AI.<br />No paywall, ever.
+        </div>
       </div>
     </>
   );

@@ -26,20 +26,20 @@ export function TrendingClient({ top, rest }: Props) {
   const empty = top.length === 0;
 
   return (
-    <div className="scrollbar-none" style={{ height: "100%", overflowY: "auto", background: "#0a0a0a", paddingBottom: "24px" }}>
+    <div className="scrollbar-none" style={{ height: "100%", overflowY: "auto", background: "var(--kt-canvas, #0a0a0a)", paddingBottom: "24px" }}>
       {/* Header */}
       <div style={{ padding: "18px 20px 6px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <TrendingUp size={20} color="#f5f5f5" strokeWidth={2} />
-          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#f5f5f5", margin: 0, letterSpacing: "-0.03em" }}>Trending</h1>
+          <TrendingUp size={20} color="var(--kt-text-primary, #f5f5f5)" strokeWidth={2} />
+          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--kt-text-primary, #f5f5f5)", margin: 0, letterSpacing: "-0.03em" }}>Trending</h1>
         </div>
-        <p style={{ fontSize: "13px", color: "#737373", margin: "5px 0 0", lineHeight: 1.5 }}>
+        <p style={{ fontSize: "13px", color: "var(--kt-text-muted, #737373)", margin: "5px 0 0", lineHeight: 1.5 }}>
           The stories the most sources are covering right now.
         </p>
       </div>
 
       {empty ? (
-        <div style={{ padding: "48px 32px", textAlign: "center", color: "#525252", fontSize: "14px", lineHeight: 1.6 }}>
+        <div style={{ padding: "48px 32px", textAlign: "center", color: "var(--kt-text-muted, #525252)", fontSize: "14px", lineHeight: 1.6 }}>
           Nothing trending yet. Check back after the next refresh.
         </div>
       ) : (
@@ -54,10 +54,10 @@ export function TrendingClient({ top, rest }: Props) {
           {top[0] && (() => {
             const s = top[0];
             const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
-            const accent = cat?.colorAccent ?? "#737373";
+            const accent = cat?.colorAccent ?? "var(--kt-text-muted, #737373)";
             return (
               <div style={{ padding: "4px 20px 0" }}>
-                <button onClick={() => open(s, "top3")} style={{ display: "block", width: "100%", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
+                <button onClick={() => open(s, "top3")} style={{ display: "block", width: "100%", textAlign: "left", background: "var(--kt-surface, #111111)", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.07))", borderRadius: "18px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
                   <CoverImage src={s.imageUrl} category={s.categorySlug as CategorySlug} height={160} radius={0} />
                   <div style={{ padding: "14px 16px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
@@ -73,7 +73,7 @@ export function TrendingClient({ top, rest }: Props) {
                         </span>
                       )}
                     </div>
-                    <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#E8E4DE", margin: 0, lineHeight: 1.3, letterSpacing: "-0.02em" }}>{s.title}</h2>
+                    <h2 style={{ fontSize: "18px", fontWeight: 600, color: "var(--kt-text-primary, #E8E4DE)", margin: 0, lineHeight: 1.3, letterSpacing: "-0.02em" }}>{s.title}</h2>
                     <p style={{ fontSize: "13.5px", color: "#9a9a9a", lineHeight: 1.5, margin: "7px 0 0", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.summary}</p>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
                       <span style={{ fontSize: "11.5px", color: "#6a6a6a" }}>{s.sourceName} · {formatTimeAgo(s.publishedAt)}</span>
@@ -92,9 +92,9 @@ export function TrendingClient({ top, rest }: Props) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", padding: "10px 20px 4px" }}>
               {top.slice(1, 3).map((s, idx) => {
                 const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
-                const accent = cat?.colorAccent ?? "#737373";
+                const accent = cat?.colorAccent ?? "var(--kt-text-muted, #737373)";
                 return (
-                  <button key={s.id} onClick={() => open(s, "top3")} style={{ display: "block", textAlign: "left", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
+                  <button key={s.id} onClick={() => open(s, "top3")} style={{ display: "block", textAlign: "left", background: "var(--kt-surface, #111111)", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.07))", borderRadius: "14px", overflow: "hidden", cursor: "pointer", color: "inherit" }}>
                     <CoverImage src={s.imageUrl} category={s.categorySlug as CategorySlug} height={88} radius={0} />
                     <div style={{ padding: "10px 12px 12px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "6px" }}>
@@ -103,7 +103,7 @@ export function TrendingClient({ top, rest }: Props) {
                           <span style={{ marginLeft: "auto", fontSize: "10px", fontWeight: 600, color: "#E8B25C", background: "rgba(232,178,92,0.12)", borderRadius: "100px", padding: "1px 6px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{s.sources}×</span>
                         )}
                       </div>
-                      <h3 style={{ fontSize: "13.5px", fontWeight: 600, color: "#E8E4DE", margin: 0, lineHeight: 1.35, letterSpacing: "-0.01em", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.title}</h3>
+                      <h3 style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--kt-text-primary, #E8E4DE)", margin: 0, lineHeight: 1.35, letterSpacing: "-0.01em", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.title}</h3>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "11px", fontWeight: 600, color: accent, marginTop: "8px" }}>
                         <Sparkles size={11} strokeWidth={2} /> Why
                       </span>
@@ -118,12 +118,12 @@ export function TrendingClient({ top, rest }: Props) {
           {rest.length > 0 && (
             <>
               <div style={{ padding: "22px 20px 4px" }}>
-                <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#525252" }}>More trending today</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--kt-text-muted, #525252)" }}>More trending today</span>
               </div>
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", margin: "6px 0 0" }}>
                 {rest.map((s) => {
                   const cat = getCategoryBySlug(s.categorySlug as CategorySlug);
-                  const accent = cat?.colorAccent ?? "#737373";
+                  const accent = cat?.colorAccent ?? "var(--kt-text-muted, #737373)";
                   return (
                     <button
                       key={s.id}

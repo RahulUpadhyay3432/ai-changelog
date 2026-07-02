@@ -41,7 +41,7 @@ export function CompletionCard({
       style={{
         height: "100%",
         width: "100%",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -91,7 +91,7 @@ export function CompletionCard({
           style={{
             fontSize: "26px",
             fontWeight: 600,
-            color: "#E8E4DE",
+            color: "var(--kt-text-primary, #E8E4DE)",
             margin: "0 0 8px",
             letterSpacing: "-0.01em",
             textAlign: "center",
@@ -109,7 +109,7 @@ export function CompletionCard({
           style={{
             fontSize: "14px",
             fontWeight: 400,
-            color: "#a29d94",
+            color: "var(--kt-text-muted, #a29d94)",
             margin: "0 0 20px",
             textAlign: "center",
           }}
@@ -144,7 +144,7 @@ export function CompletionCard({
           transition={{ delay: baseDelay + 0.4, duration: 0.4 }}
           style={{
             fontSize: "12px",
-            color: "#8f8a82",
+            color: "var(--kt-text-muted, #8f8a82)",
             margin: "0 0 24px",
             textAlign: "center",
             lineHeight: 1.5,
@@ -172,10 +172,10 @@ export function CompletionCard({
               setShowShareCard(true);
             }}
             style={{
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.14)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.07))",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.14))",
               borderRadius: "20px",
-              color: "#E8E4DE",
+              color: "var(--kt-text-primary, #E8E4DE)",
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
@@ -193,10 +193,10 @@ export function CompletionCard({
           <button
             onClick={() => setShowFeedback(true)}
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.1))",
               borderRadius: "20px",
-              color: "#a3a3a3",
+              color: "var(--kt-text-muted, #a3a3a3)",
               fontSize: "13px",
               fontWeight: 500,
               cursor: "pointer",
@@ -214,7 +214,7 @@ export function CompletionCard({
               gap: "5px",
               background: "none",
               border: "none",
-              color: "#9a948b",
+              color: "var(--kt-text-muted, #9a948b)",
               fontSize: "13px",
               fontWeight: 500,
               cursor: "pointer",
@@ -240,10 +240,10 @@ export function CompletionCard({
                   alignItems: "center",
                   gap: "4px",
                   marginTop: "20px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "var(--kt-read-surface, rgba(255,255,255,0.03))",
+                  border: "1px solid var(--kt-hairline, rgba(255,255,255,0.07))",
                   borderRadius: "20px",
-                  color: "#a29d94",
+                  color: "var(--kt-text-muted, #a29d94)",
                   fontSize: "12px",
                   fontWeight: 500,
                   cursor: "pointer",
@@ -274,16 +274,16 @@ export function CompletionCard({
               position: "absolute",
               bottom: "80px",
               left: "50%",
-              background: "rgba(255,255,255,0.08)",
+              background: "var(--kt-hairline, rgba(255,255,255,0.08))",
               backdropFilter: "blur(16px)",
               WebkitBackdropFilter: "blur(16px)",
-              color: "#a29d94",
+              color: "var(--kt-text-muted, #a29d94)",
               padding: "6px 16px",
               borderRadius: "20px",
               fontSize: "12px",
               fontWeight: 500,
               whiteSpace: "nowrap",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.08))",
               pointerEvents: "none",
             }}
           >

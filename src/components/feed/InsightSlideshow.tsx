@@ -66,7 +66,7 @@ function SlideshowContent({ insight, onClose }: { insight: Insight; onClose: () 
         style={{
           position: "absolute",
           inset: 0,
-          background: "#0a0a0a",
+          background: "var(--kt-canvas, #0a0a0a)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -76,7 +76,7 @@ function SlideshowContent({ insight, onClose }: { insight: Insight; onClose: () 
         <div
           style={{
             height: "3px",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--kt-read-surface-2, rgba(255,255,255,0.06))",
             flexShrink: 0,
             position: "relative",
             zIndex: 2,
@@ -114,7 +114,7 @@ function SlideshowContent({ insight, onClose }: { insight: Insight; onClose: () 
               background: "rgba(0,0,0,0.5)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid var(--kt-hairline, rgba(255,255,255,0.1))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

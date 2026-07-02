@@ -47,7 +47,7 @@ export function NotificationCard({ onDone }: NotificationCardProps) {
         alignItems: "center",
         justifyContent: "center",
         padding: "32px 32px 48px",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
       }}
     >
       {/* Icon */}
@@ -73,7 +73,7 @@ export function NotificationCard({ onDone }: NotificationCardProps) {
           margin: "0 0 12px",
           fontSize: "24px",
           fontWeight: 600,
-          color: "#E8E4DE",
+          color: "var(--kt-text-primary, #E8E4DE)",
           letterSpacing: "-0.02em",
           textAlign: "center",
           lineHeight: 1.2,
@@ -87,7 +87,7 @@ export function NotificationCard({ onDone }: NotificationCardProps) {
         style={{
           margin: "0 0 48px",
           fontSize: "15px",
-          color: "#525252",
+          color: "var(--kt-text-muted, #525252)",
           textAlign: "center",
           lineHeight: 1.65,
           maxWidth: "260px",
@@ -125,7 +125,7 @@ export function NotificationCard({ onDone }: NotificationCardProps) {
         style={{
           background: "none",
           border: "none",
-          color: "#404040",
+          color: "var(--kt-text-muted, #404040)",
           fontSize: "13px",
           cursor: "pointer",
           padding: "10px 20px",

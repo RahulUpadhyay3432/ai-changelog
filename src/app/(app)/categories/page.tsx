@@ -16,7 +16,7 @@ export default function CategoriesPage() {
       style={{
         height: "100%",
         overflowY: "auto",
-        background: "#0a0a0a",
+        background: "var(--kt-canvas, #0a0a0a)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -49,7 +49,7 @@ export default function CategoriesPage() {
             fontSize: "11px",
             fontWeight: 500,
             letterSpacing: "0.12em",
-            color: "#737373",
+            color: "var(--kt-text-muted, #737373)",
             textTransform: "uppercase",
             margin: "0 0 24px",
           }}
@@ -81,9 +81,9 @@ export default function CategoriesPage() {
                   fontSize: "12px",
                   fontWeight: isActive ? 600 : 400,
                   border: "1px solid",
-                  borderColor: isActive ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
-                  background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.02)",
-                  color: isActive ? "#ffffff" : "#a3a3a3",
+                  borderColor: isActive ? "rgba(255,255,255,0.25)" : "var(--kt-hairline, rgba(255,255,255,0.08))",
+                  background: isActive ? "var(--kt-hairline, rgba(255,255,255,0.12))" : "rgba(255,255,255,0.02)",
+                  color: isActive ? "#ffffff" : "var(--kt-text-muted, #a3a3a3)",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                   transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",

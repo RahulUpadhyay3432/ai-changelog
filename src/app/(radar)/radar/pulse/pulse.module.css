@@ -160,6 +160,31 @@
   padding: 8px 0;
 }
 
+.subscribe {
+  margin-top: 52px;
+  padding: 28px 24px;
+  border-radius: 18px;
+  background: var(--kt-surface, #1b1a17);
+  border: 1px solid var(--kt-hairline, rgba(255, 255, 255, 0.09));
+}
+
+.subTitle {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--kt-text-primary, #f6f4f0);
+  margin: 0;
+}
+
+.subDeck {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--kt-text-muted, #bcb7ad);
+  margin: 8px 0 18px;
+  max-width: 520px;
+}
+
 .foot {
   margin-top: 52px;
   padding-top: 20px;

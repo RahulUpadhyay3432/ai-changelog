@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { entityHref, type EntityType } from "@/lib/entities";
 import { getRadarTools, getRadarCards, getRadarMcpDiscovered } from "@/lib/knowledge";
+import { EmailCapture } from "@/components/EmailCapture";
 import styles from "./pulse.module.css";
 
 const APP_URL = "https://kapyn.app";
@@ -160,6 +161,15 @@ export default async function PulsePage() {
           </div>
         </section>
       )}
+
+      {/* ── Weekly digest opt-in ── */}
+      <section className={styles.subscribe}>
+        <h2 className={styles.subTitle}>Get this weekly, in your inbox</h2>
+        <p className={styles.subDeck}>
+          One calm email every Monday — the AI stories and tools that actually mattered. No hype, no noise.
+        </p>
+        <EmailCapture source="pulse" />
+      </section>
 
       <p className={styles.foot}>
         Refreshed daily from GitHub, Product Hunt, the official MCP registry, and Kapyn&apos;s news stream.

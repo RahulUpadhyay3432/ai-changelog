@@ -455,6 +455,41 @@ export async function getRadarMcpServers(): Promise<RadarMcp> {
   return { servers, meta };
 }
 
+// Registry-discovered MCP servers only (kind='discovered'), most-starred first —
+// powers the "new MCP servers" strip on the weekly Pulse. Empty until the cron runs.
+export interface DiscoveredMcp {
+  name: string;
+  tagline: string;
+  url: string;
+  score: number;
+  category: string;
+}
+
+interface DiscoveredMcpRow {
+  name: string;
+  tagline: string;
+  url: string;
+  score: number;
+  category: string;
+}
+
+export async function getRadarMcpDiscovered(limit = 8): Promise<DiscoveredMcp[]> {
+  const { data, error } = await supabase
+    .from("radar_mcp")
+    .select("name, tagline, url, score, category")
+    .eq("kind", "discovered")
+    .order("score", { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+  return (data as DiscoveredMcpRow[]).map((r) => ({
+    name: r.name,
+    tagline: r.tagline,
+    url: r.url,
+    score: r.score ?? 0,
+    category: r.category,
+  }));
+}
+
 // ── AI skills (curated featured + official-discovered) ───────────────────────
 interface RadarSkillRow {
   name: string;

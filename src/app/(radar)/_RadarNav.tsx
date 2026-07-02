@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug, Newspaper } from "lucide-react";
+import { Radar, LayoutGrid, Bookmark, Home, Trophy, Plug, Newspaper, Activity } from "lucide-react";
 import styles from "./layout.module.css";
 
 const NAV_ITEMS = [
   { href: "/radar", label: "Today", Icon: Radar, exact: true },
+  { href: "/radar/pulse", label: "Pulse", Icon: Activity, exact: true },
   { href: "/radar/browse", label: "Browse", Icon: LayoutGrid, exact: true },
   { href: "/radar/mcp", label: "MCP", Icon: Plug, exact: true },
   { href: "/radar/toolkit", label: "Toolkit", Icon: Bookmark, exact: false },

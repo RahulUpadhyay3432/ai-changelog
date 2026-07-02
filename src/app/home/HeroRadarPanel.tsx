@@ -56,11 +56,12 @@ const INTERVAL_MS = 3200;
 
 const CARD_STYLE: React.CSSProperties = {
   // Fully opaque — the deck stacks, so the front card must completely hide
-  // whatever sits behind it (no translucency, no bleed-through).
-  background: "linear-gradient(180deg, #201e1a, #161411)",
+  // whatever sits behind it (no translucency, no bleed-through). Surfaces +
+  // shadow are themable so the panel reads correctly in light mode too.
+  background: "linear-gradient(180deg, var(--kt-surface-raised, #201e1a), var(--kt-surface, #161411))",
   border: `1px solid ${HAIRLINE}`,
   borderRadius: "18px",
-  boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)",
+  boxShadow: "var(--kt-deck-shadow, 0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.45)), inset 0 1px 0 rgba(255,255,255,0.07)",
   padding: "18px 18px 14px",
 };
 
@@ -89,7 +90,7 @@ function CapabilityCard({
           <Icon size={21} strokeWidth={2} color={GOLD} />
         </span>
         <span style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ display: "block", fontFamily: SG, fontSize: "19px", fontWeight: 700, color: "#ffffff", lineHeight: 1.18, letterSpacing: "-0.015em" }}>{title}</span>
+          <span style={{ display: "block", fontFamily: SG, fontSize: "19px", fontWeight: 700, color: TEXT.primary, lineHeight: 1.18, letterSpacing: "-0.015em" }}>{title}</span>
           <span style={{ display: "block", fontSize: "13px", color: TEXT.body, lineHeight: 1.45, marginTop: "5px" }}>{line}</span>
         </span>
       </div>
@@ -237,7 +238,7 @@ export function HeroRadarPanel({
               width: i === activeIndex ? "22px" : "6px",
               height: "6px",
               borderRadius: "100px",
-              background: i === activeIndex ? GOLD : "rgba(255,255,255,0.2)",
+              background: i === activeIndex ? GOLD : "var(--kt-text-muted, rgba(255,255,255,0.2))",
               border: "none",
               padding: 0,
               cursor: "pointer",

@@ -106,8 +106,8 @@ function LoadoutControl({ thing, saved, flash, onSavedChange }: {
         style={{
           display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG,
           fontSize: "13.5px", fontWeight: 600, color: current ? GOLD : TEXT.body,
-          background: current ? GOLD_SOFT : "rgba(255,255,255,0.05)",
-          border: `1px solid ${current ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`,
+          background: current ? GOLD_SOFT : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
+          border: `1px solid ${current ? GOLD_BORDER : "var(--kt-hairline, rgba(255,255,255,0.08))"}`,
           borderRadius: "100px", padding: "9px 15px", cursor: "pointer",
         }}
       >
@@ -121,7 +121,7 @@ function LoadoutControl({ thing, saved, flash, onSavedChange }: {
           {loadouts.map((l) => {
             const active = l.id === currentId;
             return (
-              <button key={l.id} onClick={() => fileInto(l)} style={{ ...chipBase, color: active ? GOLD : TEXT.body, background: active ? GOLD_SOFT : "rgba(255,255,255,0.05)", borderColor: active ? GOLD_BORDER : "rgba(255,255,255,0.08)" }}>
+              <button key={l.id} onClick={() => fileInto(l)} style={{ ...chipBase, color: active ? GOLD : TEXT.body, background: active ? GOLD_SOFT : "var(--kt-read-surface-2, rgba(255,255,255,0.05))", borderColor: active ? GOLD_BORDER : "var(--kt-hairline, rgba(255,255,255,0.08))" }}>
                 {active && <Check size={13} strokeWidth={2.6} />}{l.name}
               </button>
             );
@@ -136,14 +136,14 @@ function LoadoutControl({ thing, saved, flash, onSavedChange }: {
                 placeholder="Loadout name (e.g. Hackathon)"
                 maxLength={40}
                 autoFocus
-                style={{ flex: 1, minWidth: 0, background: "#111111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "100px", padding: "9px 14px", color: "#ededed", fontSize: "13.5px", outline: "none" }}
+                style={{ flex: 1, minWidth: 0, background: "var(--kt-surface, #111111)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "100px", padding: "9px 14px", color: "var(--kt-text-primary, #ededed)", fontSize: "13.5px", outline: "none" }}
               />
-              <button onClick={create} disabled={!newName.trim()} style={{ ...chipBase, color: newName.trim() ? "#ffffff" : "#666", background: newName.trim() ? GOLD : "rgba(255,255,255,0.05)", border: "none", cursor: newName.trim() ? "pointer" : "default" }}>
+              <button onClick={create} disabled={!newName.trim()} style={{ ...chipBase, color: newName.trim() ? "#ffffff" : "#666", background: newName.trim() ? GOLD : "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: "none", cursor: newName.trim() ? "pointer" : "default" }}>
                 Create
               </button>
             </div>
           ) : (
-            <button onClick={() => setCreating(true)} style={{ ...chipBase, color: TEXT.body, background: "rgba(255,255,255,0.05)" }}>
+            <button onClick={() => setCreating(true)} style={{ ...chipBase, color: TEXT.body, background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))" }}>
               <Plus size={14} strokeWidth={2.4} /> New loadout
             </button>
           )}
@@ -226,7 +226,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
           position: "relative",
           width: isDesktop ? "min(600px, 100%)" : undefined,
           alignSelf: isDesktop ? "center" : undefined,
-          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
+          background: "var(--kt-surface, #111111)", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
         }}
       >
         {/* Drag handle */}
@@ -240,14 +240,14 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
               <h2 style={{ fontFamily: SG, fontSize: "19px", fontWeight: 600, color: "#f3efe9", margin: 0, letterSpacing: "-0.01em" }}>{thing.name}</h2>
-              {thing.typeLabel && <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "#737373", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "2px 8px" }}>{thing.typeLabel}</span>}
+              {thing.typeLabel && <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--kt-text-muted, #737373)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "2px 8px" }}>{thing.typeLabel}</span>}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "7px" }}>
               {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
-              {thing.recency && <span style={{ fontSize: "12px", color: "#8a8a8a" }}>{thing.recency}</span>}
+              {thing.recency && <span style={{ fontSize: "12px", color: "var(--kt-text-muted, #8a8a8a)" }}>{thing.recency}</span>}
             </div>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.08)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--kt-hairline, rgba(255,255,255,0.08))", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
             <X size={16} color="#888" strokeWidth={2} />
           </button>
         </div>
@@ -263,7 +263,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
             <div style={{ marginTop: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", overflow: "hidden" }}>
               {contextRows.map((r, i) => (
                 <div key={r.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "10px 14px", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
-                  <span style={{ fontSize: "12.5px", color: "#8a8a8a", fontWeight: 500 }}>{r.label}</span>
+                  <span style={{ fontSize: "12.5px", color: "var(--kt-text-muted, #8a8a8a)", fontWeight: 500 }}>{r.label}</span>
                   <span style={{ fontSize: "13.5px", color: TEXT.body, fontWeight: 500, textAlign: "right" }}>{r.value}</span>
                 </div>
               ))}
@@ -296,11 +296,11 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
           <button onClick={onSave} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: saved ? GOLD : "#ffffff", background: saved ? GOLD_SOFT : GOLD, border: saved ? `1px solid ${GOLD_BORDER}` : "none", borderRadius: "13px", padding: "13px", cursor: "pointer" }}>
             {saved ? <><Check size={17} strokeWidth={2.5} /> Saved</> : <><Bookmark size={17} strokeWidth={2} /> Save</>}
           </button>
-          <button onClick={onCopy} aria-label="Copy" style={{ width: "50px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "13px", cursor: "pointer" }}>
+          <button onClick={onCopy} aria-label="Copy" style={{ width: "50px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "13px", cursor: "pointer" }}>
             <Copy size={18} color="#c9c5bf" strokeWidth={2} />
           </button>
           {thing.url && (
-            <a href={thing.url} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture("radar_tool_opened_site", { id: thing.id })} aria-label="Open site" style={{ width: "50px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "13px" }}>
+            <a href={thing.url} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture("radar_tool_opened_site", { id: thing.id })} aria-label="Open site" style={{ width: "50px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "13px" }}>
               <ArrowUpRight size={18} color="#c9c5bf" strokeWidth={2} />
             </a>
           )}
@@ -310,7 +310,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
 
         <AnimatePresence>
           {toast && (
-            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: "absolute", left: "50%", bottom: "82px", transform: "translateX(-50%)", background: "rgba(255,255,255,0.10)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "#ededed", fontSize: "12.5px", fontWeight: 500, padding: "7px 16px", borderRadius: "100px", border: "1px solid rgba(255,255,255,0.10)", whiteSpace: "nowrap", pointerEvents: "none" }}>
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ position: "absolute", left: "50%", bottom: "82px", transform: "translateX(-50%)", background: "rgba(255,255,255,0.10)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "var(--kt-text-primary, #ededed)", fontSize: "12.5px", fontWeight: 500, padding: "7px 16px", borderRadius: "100px", border: "1px solid rgba(255,255,255,0.10)", whiteSpace: "nowrap", pointerEvents: "none" }}>
               {toast}
             </motion.div>
           )}

@@ -164,7 +164,7 @@ function SkillCard({ skill, onOpen }: { skill: AiSkill; onOpen: (t: RadarThing) 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
         <FaceMark face="essential" category={SKILL_CATEGORY_SLUG[skill.category]} logoUrl={logoFor(skill.url)} size={26} />
         <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{skill.name}</span>
-        <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{skill.platform}</span>
+        <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{skill.platform}</span>
       </div>
       <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{skill.tagline}</span>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
@@ -190,7 +190,7 @@ function Chips({ items, active, onPick }: { items: { key: string; emoji: string 
               flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
               fontFamily: SG, fontSize: "13px", fontWeight: on ? 700 : 500,
               color: on ? "#ffffff" : TEXT.body,
-              background: on ? GOLD : "rgba(255,255,255,0.05)",
+              background: on ? GOLD : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
               border: `1px solid ${on ? GOLD : HAIRLINE}`,
               borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
             }}
@@ -211,7 +211,7 @@ function SortBar({ items, active, onPick }: { items: { id: string; label: string
         {items.map((s) => {
           const on = s.id === active;
           return (
-            <button key={s.id} onClick={() => onPick(s.id)} style={{ flexShrink: 0, fontFamily: SG, fontSize: "12.5px", fontWeight: on ? 700 : 500, color: on ? TEXT.primary : TEXT.muted, background: on ? "rgba(255,255,255,0.07)" : "transparent", border: `1px solid ${on ? HAIRLINE : "transparent"}`, borderRadius: "100px", padding: "5px 11px", cursor: "pointer", whiteSpace: "nowrap" }}>
+            <button key={s.id} onClick={() => onPick(s.id)} style={{ flexShrink: 0, fontFamily: SG, fontSize: "12.5px", fontWeight: on ? 700 : 500, color: on ? TEXT.primary : TEXT.muted, background: on ? "var(--kt-read-surface-2, rgba(255,255,255,0.07))" : "transparent", border: `1px solid ${on ? HAIRLINE : "transparent"}`, borderRadius: "100px", padding: "5px 11px", cursor: "pointer", whiteSpace: "nowrap" }}>
               {s.label}
             </button>
           );
@@ -296,7 +296,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_
 
       {/* View toggle */}
       <div style={{ padding: "0 24px 12px" }}>
-        <div style={{ display: "inline-flex", background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "3px" }}>
+        <div style={{ display: "inline-flex", background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "3px" }}>
           {([["mcp", "MCP servers"], ["skills", "Skills"]] as const).map(([v, label]) => {
             const on = view === v;
             return (

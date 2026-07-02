@@ -71,7 +71,7 @@ function Sheet({
           position: "relative",
           width: isDesktop ? "min(600px, 100%)" : undefined,
           alignSelf: isDesktop ? "center" : undefined,
-          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 8px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
+          background: "var(--kt-surface, #111111)", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 8px)", pointerEvents: "all", minHeight: "62dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column"
         }}
       >
         {/* Drag handle */}
@@ -88,7 +88,7 @@ function Sheet({
             <p style={{ fontSize: "13px", color: TEXT.muted, margin: "5px 0 0", lineHeight: 1.4 }}>{sub}</p>
             <span style={{ display: "inline-block", marginTop: "7px", fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: TEXT.muted }}>{things.length} tool{things.length === 1 ? "" : "s"}</span>
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.08)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--kt-hairline, rgba(255,255,255,0.08))", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
             <X size={16} color="#888" strokeWidth={2} />
           </button>
         </div>

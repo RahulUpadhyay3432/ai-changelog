@@ -140,9 +140,9 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
-        <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: "#ededed", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+        <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: "var(--kt-text-primary, #ededed)", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
         {thing.typeLabel && (
-          <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "rgba(255,255,255,0.05)", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
+          <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
         )}
       </div>
       {meta && (
@@ -245,13 +245,13 @@ export function BrowseClient(data: BrowseData) {
 
         {/* Search — secondary ghost pill */}
         <div style={{ padding: "0 24px 14px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "rgba(255,255,255,0.04)", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "9px 13px" }}>
-            <Search size={15} color="#5c5c5c" strokeWidth={2} />
+          <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "var(--kt-read-surface, rgba(255,255,255,0.04))", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "9px 13px" }}>
+            <Search size={15} color="var(--kt-text-muted, #5c5c5c)" strokeWidth={2} />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the radar"
-              style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#ededed", fontSize: "14px" }}
+              style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--kt-text-primary, #ededed)", fontSize: "14px" }}
             />
           </div>
         </div>
@@ -306,7 +306,7 @@ export function BrowseClient(data: BrowseData) {
                         display: "inline-flex", alignItems: "center", gap: "6px",
                         fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
                         color: active ? "#ffffff" : TEXT.body,
-                        background: active ? GOLD : "rgba(255,255,255,0.05)",
+                        background: active ? GOLD : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
                         border: `1px solid ${active ? GOLD : HAIRLINE}`,
                         borderRadius: "100px", padding: "7px 14px", cursor: "pointer", whiteSpace: "nowrap",
                       }}
@@ -323,8 +323,8 @@ export function BrowseClient(data: BrowseData) {
             {/* Card grid */}
             {visible.length === 0 ? (
               <div style={{ padding: "40px 32px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <Compass size={28} color="#3a3a3a" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
-                <p style={{ fontSize: "14px", color: "#737373", lineHeight: 1.5, margin: 0, maxWidth: "240px" }}>
+                <Compass size={28} color="var(--kt-text-muted, #3a3a3a)" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
+                <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #737373)", lineHeight: 1.5, margin: 0, maxWidth: "240px" }}>
                   {query ? <>No matches for &ldquo;{query}&rdquo;.</> : <>Nothing on the radar yet. Check back after the next refresh.</>}
                 </p>
                 {!query && (

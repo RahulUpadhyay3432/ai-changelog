@@ -51,7 +51,7 @@ function Sheet({ hackathon: h, onClose }: { hackathon: Hackathon; onClose: () =>
           position: "relative",
           width: isDesktop ? "min(600px, 100%)" : undefined,
           alignSelf: isDesktop ? "center" : undefined,
-          background: "#111111", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "58dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column", overflow: "hidden"
+          background: "var(--kt-surface, #111111)", borderRadius: "20px 20px 0 0", padding: "0 0 calc(env(safe-area-inset-bottom, 0px) + 18px)", pointerEvents: "all", minHeight: "58dvh", maxHeight: "94dvh", display: "flex", flexDirection: "column", overflow: "hidden"
         }}
       >
         {/* Drag handle */}

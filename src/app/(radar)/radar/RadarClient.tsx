@@ -114,9 +114,9 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       style={{
         flexShrink: 0, fontFamily: SG, fontSize: "13px", fontWeight: active ? 700 : 500,
-        color: active ? "#ffffff" : "#a3a3a3",
-        background: active ? GOLD : "rgba(255,255,255,0.04)",
-        border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
+        color: active ? "#ffffff" : "var(--kt-text-muted, #a3a3a3)",
+        background: active ? GOLD : "var(--kt-read-surface, rgba(255,255,255,0.04))",
+        border: `1px solid ${active ? GOLD : "var(--kt-hairline, rgba(255,255,255,0.08))"}`,
         borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
       }}
     >
@@ -467,19 +467,19 @@ function LensChooser({ onChoose }: { onChoose: (l: RadarLens) => void }) {
   return (
     <div className="scrollbar-none" style={{ height: "100%", overflowY: "auto", background: CANVAS, display: "flex", flexDirection: "column", justifyContent: "center", padding: "32px 24px" }}>
       <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 600, letterSpacing: "0.16em", color: GOLD, textTransform: "uppercase" }}>Tune your radar</span>
-      <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "#f5f5f5", margin: "8px 0 0", letterSpacing: "-0.02em", lineHeight: 1.15 }}>How do you move through AI?</h1>
-      <p style={{ fontSize: "14px", color: "#737373", margin: "8px 0 26px", lineHeight: 1.5 }}>Your lens shapes what Kapyn surfaces first. You can change it anytime.</p>
+      <h1 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 600, color: "var(--kt-text-primary, #f5f5f5)", margin: "8px 0 0", letterSpacing: "-0.02em", lineHeight: 1.15 }}>How do you move through AI?</h1>
+      <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #737373)", margin: "8px 0 26px", lineHeight: 1.5 }}>Your lens shapes what Kapyn surfaces first. You can change it anytime.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {HEADLINE.map(({ id, label, tagline, Icon }) => {
           const active = sel === id;
           return (
-            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(59,130,246,0.06)" : "#111111", border: `1px solid ${active ? GOLD_BORDER : "rgba(255,255,255,0.08)"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
+            <button key={id} onClick={() => setSel(id)} className="lens-option" style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: active ? "rgba(59,130,246,0.06)" : "var(--kt-surface, #111111)", border: `1px solid ${active ? GOLD_BORDER : "var(--kt-hairline, rgba(255,255,255,0.08))"}`, borderRadius: "16px", padding: "16px 18px", cursor: "pointer" }}>
               <span style={{ flexShrink: 0, width: "42px", height: "42px", borderRadius: "11px", background: GOLD_SOFT, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={20} color={GOLD} strokeWidth={1.8} />
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ededed" }}>{label}</span>
-                <span style={{ display: "block", fontSize: "13px", color: "#8a8a8a", marginTop: "2px", lineHeight: 1.4 }}>{tagline}</span>
+                <span style={{ display: "block", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "var(--kt-text-primary, #ededed)" }}>{label}</span>
+                <span style={{ display: "block", fontSize: "13px", color: "var(--kt-text-muted, #8a8a8a)", marginTop: "2px", lineHeight: 1.4 }}>{tagline}</span>
               </span>
               <span style={{ flexShrink: 0, width: "20px", height: "20px", borderRadius: "100px", border: `1.5px solid ${active ? GOLD : "rgba(255,255,255,0.18)"}`, background: active ? GOLD : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {active && <Check size={12} color="#ffffff" strokeWidth={3} />}
@@ -536,19 +536,19 @@ function LensRail({ lens, choose }: { lens: RadarLens; choose: (l: RadarLens) =>
         {PILLS.map(({ id, label, Icon }) => {
           const active = id === lens;
           return (
-            <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#ffffff" : "#a3a3a3", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
+            <button key={id} onClick={() => choose(id)} style={{ position: "relative", flexShrink: 0, fontFamily: SG, fontSize: "15px", fontWeight: active ? 600 : 500, color: active ? "#ffffff" : "var(--kt-text-muted, #a3a3a3)", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "9px 18px", cursor: "pointer", whiteSpace: "nowrap" }}>
               {active && <motion.span layoutId="lensPill" transition={lensIndicatorSpring} style={{ position: "absolute", inset: 0, background: GOLD, borderRadius: "100px", zIndex: 0 }} />}
               <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon size={15} strokeWidth={2.2} />{label}</span>
             </button>
           );
         })}
-        <span aria-hidden style={{ flexShrink: 0, width: "1px", height: "22px", background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
+        <span aria-hidden style={{ flexShrink: 0, width: "1px", height: "22px", background: "var(--kt-hairline, rgba(255,255,255,0.12))", margin: "0 2px" }} />
         <Link href="/radar/hackathons" onClick={() => posthog.capture("radar_hackathon_pill_tapped")} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: GOLD, background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "9px 18px", whiteSpace: "nowrap", textDecoration: "none" }}>
           <Trophy size={15} strokeWidth={2.2} /> Hackathons
         </Link>
       </div>
       {overflow && (
-        <div aria-hidden style={{ width: `${TRACK}px`, height: "3px", margin: "10px 0 0", borderRadius: "2px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+        <div aria-hidden style={{ width: `${TRACK}px`, height: "3px", margin: "10px 0 0", borderRadius: "2px", background: "var(--kt-hairline, rgba(255,255,255,0.08))", overflow: "hidden" }}>
           <div style={{ width: `${thumb}px`, height: "100%", borderRadius: "2px", background: GOLD, opacity: 0.7, transform: `translateX(${progress * (TRACK - thumb)}px)`, transition: "transform 0.08s linear" }} />
         </div>
       )}

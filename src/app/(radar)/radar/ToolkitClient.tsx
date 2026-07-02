@@ -9,6 +9,7 @@ import {
   getLoadouts, createLoadout, deleteLoadout,
   type SavedRadarTool, type Loadout,
 } from "@/lib/storage";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { FaceMark, GOLD, GOLD_SOFT, GOLD_BORDER, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT, type Face, type RadarThing } from "./radar-shared";
 import { logoFor } from "./radar-map";
 import { RadarDetailSheet } from "./RadarDetailSheet";
@@ -36,8 +37,8 @@ function LoadoutChip({ active, label, count, onClick }: { active: boolean; label
         flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px",
         fontFamily: SG, fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap",
         color: active ? "#ffffff" : TEXT.body,
-        background: active ? GOLD : "rgba(255,255,255,0.05)",
-        border: `1px solid ${active ? GOLD : "rgba(255,255,255,0.08)"}`,
+        background: active ? GOLD : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
+        border: `1px solid ${active ? GOLD : "var(--kt-hairline, rgba(255,255,255,0.08))"}`,
         borderRadius: "100px", padding: "8px 14px", cursor: "pointer",
       }}
     >
@@ -142,9 +143,12 @@ export function ToolkitClient() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Loadout</h1>
           {!empty && (
-            <button onClick={shareAll} aria-label="Share toolkit" style={{ flexShrink: 0, width: "40px", height: "40px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <Share2 size={18} color="#a3a3a3" strokeWidth={1.8} />
-            </button>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+              <ThemeToggle />
+              <button onClick={shareAll} aria-label="Share toolkit" style={{ flexShrink: 0, width: "40px", height: "40px", borderRadius: "100px", background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.07))", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <Share2 size={18} color="var(--kt-text-muted, #a3a3a3)" strokeWidth={1.8} />
+              </button>
+            </span>
           )}
         </div>
         <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45 }}>
@@ -161,11 +165,11 @@ export function ToolkitClient() {
           rows={4}
           style={{
             width: "100%",
-            background: "#111111",
+            background: "var(--kt-surface, #111111)",
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: "12px",
             padding: "12px 14px",
-            color: "#ededed",
+            color: "var(--kt-text-primary, #ededed)",
             fontSize: "14px",
             lineHeight: 1.6,
             resize: "vertical",
@@ -182,7 +186,7 @@ export function ToolkitClient() {
             <Bookmark size={24} color={GOLD} strokeWidth={1.8} />
           </span>
           <p style={{ fontSize: "15px", color: "#c9c5bf", lineHeight: 1.5, margin: "0 0 6px", maxWidth: "260px" }}>Build your toolkit</p>
-          <p style={{ fontSize: "13.5px", color: "#737373", lineHeight: 1.5, margin: "0 0 20px", maxWidth: "280px" }}>Tap any tool on Today and hit Save. It files itself by category — so you never lose the one that mattered.</p>
+          <p style={{ fontSize: "13.5px", color: "var(--kt-text-muted, #737373)", lineHeight: 1.5, margin: "0 0 20px", maxWidth: "280px" }}>Tap any tool on Today and hit Save. It files itself by category — so you never lose the one that mattered.</p>
           <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
             Browse Today <ArrowRight size={16} strokeWidth={2.3} />
           </Link>
@@ -205,10 +209,10 @@ export function ToolkitClient() {
                 placeholder="Name…"
                 maxLength={40}
                 autoFocus
-                style={{ flexShrink: 0, width: "130px", background: "#111111", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "8px 14px", color: "#ededed", fontSize: "13px", outline: "none" }}
+                style={{ flexShrink: 0, width: "130px", background: "var(--kt-surface, #111111)", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "8px 14px", color: "var(--kt-text-primary, #ededed)", fontSize: "13px", outline: "none" }}
               />
             ) : (
-              <button onClick={() => setCreating(true)} aria-label="New loadout" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "8px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              <button onClick={() => setCreating(true)} aria-label="New loadout" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.body, background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.08))", borderRadius: "100px", padding: "8px 13px", cursor: "pointer", whiteSpace: "nowrap" }}>
                 <Plus size={14} strokeWidth={2.4} /> New
               </button>
             )}
@@ -216,9 +220,9 @@ export function ToolkitClient() {
 
           {/* Search */}
           <div style={{ padding: "0 24px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", padding: "10px 13px" }}>
-              <Search size={16} color="#5c5c5c" strokeWidth={2} />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter your toolkit" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#ededed", fontSize: "14px" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "var(--kt-surface, #111111)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", padding: "10px 13px" }}>
+              <Search size={16} color="var(--kt-text-muted, #5c5c5c)" strokeWidth={2} />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter your toolkit" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--kt-text-primary, #ededed)", fontSize: "14px" }} />
             </div>
           </div>
 
@@ -232,7 +236,7 @@ export function ToolkitClient() {
           )}
 
           {groups.length === 0 && (
-            <p style={{ padding: "0 24px", color: "#5c5c5c", fontSize: "14px" }}>
+            <p style={{ padding: "0 24px", color: "var(--kt-text-muted, #5c5c5c)", fontSize: "14px" }}>
               {query
                 ? <>No matches for &ldquo;{query}&rdquo;.</>
                 : activeLoadout
@@ -247,11 +251,11 @@ export function ToolkitClient() {
               <section key={cat} style={{ marginBottom: "22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", marginBottom: "10px" }}>
                   <button onClick={() => setCollapsed((c) => ({ ...c, [cat]: !c[cat] }))} style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                    <ChevronDown size={15} color="#737373" strokeWidth={2.2} style={{ transform: isCollapsed ? "rotate(-90deg)" : "none", transition: "transform 0.15s ease" }} />
+                    <ChevronDown size={15} color="var(--kt-text-muted, #737373)" strokeWidth={2.2} style={{ transform: isCollapsed ? "rotate(-90deg)" : "none", transition: "transform 0.15s ease" }} />
                     <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 600, letterSpacing: "0.03em", color: GOLD }}>{cat}</span>
                     <span style={{ fontSize: "12px", color: "#525252", fontVariantNumeric: "tabular-nums" }}>{items.length}</span>
                   </button>
-                  <button onClick={() => copyGroup(cat, items)} aria-label={`Copy all ${cat}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: "#737373", fontSize: "12px", fontWeight: 500, padding: "2px 4px" }}>
+                  <button onClick={() => copyGroup(cat, items)} aria-label={`Copy all ${cat}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: "var(--kt-text-muted, #737373)", fontSize: "12px", fontWeight: 500, padding: "2px 4px" }}>
                     <Copy size={13} strokeWidth={2} /> Copy all
                   </button>
                 </div>
@@ -275,7 +279,7 @@ export function ToolkitClient() {
       <RadarDetailSheet thing={detail} onClose={() => { setDetail(null); refresh(); }} />
 
       {toast && (
-        <div style={{ position: "fixed", left: "50%", bottom: "70px", transform: "translateX(-50%)", background: "rgba(255,255,255,0.10)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "#ededed", fontSize: "12.5px", fontWeight: 500, padding: "7px 16px", borderRadius: "100px", border: "1px solid rgba(255,255,255,0.10)", whiteSpace: "nowrap", pointerEvents: "none", zIndex: 60 }}>
+        <div style={{ position: "fixed", left: "50%", bottom: "70px", transform: "translateX(-50%)", background: "var(--kt-hairline, rgba(255,255,255,0.10))", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "var(--kt-text-primary, #ededed)", fontSize: "12.5px", fontWeight: 500, padding: "7px 16px", borderRadius: "100px", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.10))", whiteSpace: "nowrap", pointerEvents: "none", zIndex: 60 }}>
           {toast}
         </div>
       )}

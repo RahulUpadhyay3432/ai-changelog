@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -87,7 +88,7 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
         flexShrink: 0, fontFamily: SG, fontSize: "13px",
         fontWeight: active ? 700 : 500,
         color: active ? "#ffffff" : TEXT.body,
-        background: active ? GOLD : "rgba(255,255,255,0.05)",
+        background: active ? GOLD : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
         border: `1px solid ${active ? GOLD : HAIRLINE}`,
         borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
       }}
@@ -105,7 +106,7 @@ function TogglePill({ active, onClick, children }: { active: boolean; onClick: (
         flexShrink: 0, fontFamily: SG, fontSize: "13px",
         fontWeight: active ? 700 : 500,
         color: active ? GOLD : TEXT.body,
-        background: active ? `${GOLD}18` : "rgba(255,255,255,0.05)",
+        background: active ? `${GOLD}18` : "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
         border: `1px solid ${active ? GOLD : HAIRLINE}`,
         borderRadius: "100px", padding: "6px 13px", cursor: "pointer", whiteSpace: "nowrap",
         display: "inline-flex", alignItems: "center", gap: "5px",
@@ -131,7 +132,7 @@ function SortBar({ active, onPick }: { active: HackathonSort; onPick: (k: Hackat
                 flexShrink: 0, fontFamily: SG, fontSize: "12.5px",
                 fontWeight: on ? 700 : 500,
                 color: on ? TEXT.primary : TEXT.muted,
-                background: on ? "rgba(255,255,255,0.07)" : "transparent",
+                background: on ? "var(--kt-hairline, rgba(255,255,255,0.07))" : "transparent",
                 border: `1px solid ${on ? HAIRLINE : "transparent"}`,
                 borderRadius: "100px", padding: "5px 11px", cursor: "pointer", whiteSpace: "nowrap",
               }}
@@ -282,22 +283,23 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
             <h1 style={{ fontFamily: SG, fontSize: "27px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.03em", lineHeight: 1.05 }}>Hackathons</h1>
             <p style={{ fontSize: "13.5px", color: TEXT.muted, margin: "3px 0 0" }}>AI &amp; tech hackathons to go build in</p>
           </div>
+          <span style={{ marginLeft: "auto", flexShrink: 0 }}><ThemeToggle /></span>
         </div>
       </div>
 
       {/* Search */}
       <div style={{ padding: "0 24px 10px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "rgba(255,255,255,0.04)", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "9px 13px" }}>
-          <Search size={15} color="#5c5c5c" strokeWidth={2} />
+        <div style={{ display: "flex", alignItems: "center", gap: "9px", background: "var(--kt-read-surface, rgba(255,255,255,0.04))", border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "9px 13px" }}>
+          <Search size={15} color="var(--kt-text-muted, #5c5c5c)" strokeWidth={2} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search hackathons"
-            style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#ededed", fontSize: "14px" }}
+            style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--kt-text-primary, #ededed)", fontSize: "14px" }}
           />
           {search && (
             <button onClick={() => setSearch("")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center" }}>
-              <X size={14} color="#5c5c5c" strokeWidth={2} />
+              <X size={14} color="var(--kt-text-muted, #5c5c5c)" strokeWidth={2} />
             </button>
           )}
         </div>
@@ -370,7 +372,7 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
       {/* List */}
       {visible.length === 0 ? (
         <div style={{ padding: "40px 32px", textAlign: "center" }}>
-          <Trophy size={26} color="#3a3a3a" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
+          <Trophy size={26} color="var(--kt-text-muted, #3a3a3a)" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
           <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.5, margin: 0, maxWidth: "260px", marginInline: "auto" }}>
             {hackathons.length === 0 ? "No hackathons loaded yet — check back after the next refresh." : "Nothing matches these filters."}
           </p>

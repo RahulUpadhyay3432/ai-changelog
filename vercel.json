@@ -21,6 +21,10 @@
       "schedule": "0 6 * * *"
     },
     {
+      "path": "/api/radar/mcp",
+      "schedule": "30 6 * * *"
+    },
+    {
       "path": "/api/radar/hackathons",
       "schedule": "0 5 * * *"
     }

@@ -6,6 +6,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { isGenericEntityName, type EntityType } from "./entities";
 import { CURATED_ESSENTIALS } from "./radar-essentials";
+import { MCP_CATEGORY_ORDER, type McpServer, type McpCategory } from "./radar-mcp";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -404,6 +405,53 @@ export async function getRadarTools(limit = 30): Promise<RadarTool[]> {
   const first = await run(RADAR_TOOL_COLS_DESC);
   const { data } = columnMissing(first.error?.message) ? await run(RADAR_TOOL_COLS) : first;
   return (data ?? []).map(toRadarTool);
+}
+
+// ── MCP servers (curated featured + registry-discovered) ─────────────────────
+export interface RadarMcp {
+  servers: McpServer[];
+  meta: Record<string, { stars: number; createdAt: string }>;
+}
+
+interface RadarMcpRow {
+  name: string;
+  tagline: string;
+  description: string | null;
+  category: string;
+  url: string;
+  by: string;
+  score: number;
+  gh_created_at: string | null;
+}
+
+const VALID_MCP_CATEGORIES = new Set<string>(MCP_CATEGORY_ORDER);
+
+// Reads radar_mcp (populated by /api/radar/mcp). Returns empty when the table is
+// missing/empty so the page falls back to the static curated list (never blank).
+export async function getRadarMcpServers(): Promise<RadarMcp> {
+  const { data, error } = await supabase
+    .from("radar_mcp")
+    .select("name, tagline, description, category, url, by, score, gh_created_at, kind, sort_rank")
+    .order("kind", { ascending: false }) // 'featured' before 'discovered'
+    .order("sort_rank", { ascending: true })
+    .order("score", { ascending: false });
+  if (error || !data) return { servers: [], meta: {} };
+
+  const servers: McpServer[] = [];
+  const meta: Record<string, { stars: number; createdAt: string }> = {};
+  for (const r of data as RadarMcpRow[]) {
+    const category = (VALID_MCP_CATEGORIES.has(r.category) ? r.category : "Dev tools") as McpCategory;
+    servers.push({
+      name: r.name,
+      tagline: r.tagline,
+      description: r.description ?? "",
+      category,
+      url: r.url,
+      by: r.by === "official" ? "official" : "community",
+    });
+    meta[r.url] = { stars: r.score ?? 0, createdAt: r.gh_created_at ?? "" };
+  }
+  return { servers, meta };
 }
 
 // "Essentials" — the evergreen canon (curated closed tools + most-starred OSS),

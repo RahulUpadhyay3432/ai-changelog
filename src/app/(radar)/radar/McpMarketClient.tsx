@@ -232,7 +232,7 @@ function SectionHead({ emoji, title, count }: { emoji: string; title: string; co
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
-export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Record<string, McpMeta>; initialView?: View }) {
+export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_SERVERS }: { meta?: Record<string, McpMeta>; initialView?: View; servers?: McpServer[] }) {
   const isDesktop = useIsDesktop();
   const [view, setView] = useState<View>(initialView);
   const [activeCat, setActiveCat] = useState<string>(ALL);
@@ -243,9 +243,9 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
   // MCP grouping
   const mcpByCat = useMemo(() => {
     const m = new Map<McpCategory, McpServer[]>();
-    for (const s of MCP_SERVERS) { if (!m.has(s.category)) m.set(s.category, []); m.get(s.category)!.push(s); }
+    for (const s of servers) { if (!m.has(s.category)) m.set(s.category, []); m.get(s.category)!.push(s); }
     return m;
-  }, []);
+  }, [servers]);
   const mcpCats = useMemo(() => MCP_CATEGORY_ORDER.filter((c) => mcpByCat.has(c)), [mcpByCat]);
 
   // Skills grouping
@@ -269,7 +269,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp" }: { meta?: Rec
 
   // Same items, with counts, for the desktop category sidebar.
   const sidebarItems = view === "mcp"
-    ? [{ key: ALL, emoji: "🔌", count: MCP_SERVERS.length }, ...mcpCats.map((c) => ({ key: c, emoji: MCP_CATEGORY_EMOJI[c], count: mcpByCat.get(c)?.length ?? 0 }))]
+    ? [{ key: ALL, emoji: "🔌", count: servers.length }, ...mcpCats.map((c) => ({ key: c, emoji: MCP_CATEGORY_EMOJI[c], count: mcpByCat.get(c)?.length ?? 0 }))]
     : [{ key: ALL, emoji: "✨", count: AI_SKILLS.length }, ...skillCats.map((c) => ({ key: c, emoji: SKILL_CATEGORY_EMOJI[c], count: skillsByCat.get(c)?.length ?? 0 }))];
   const pickCat = (k: string) => { setActiveCat(k); posthog.capture(view === "mcp" ? "radar_mcp_category" : "radar_skills_category", { category: k }); };
 

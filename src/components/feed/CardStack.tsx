@@ -2,9 +2,11 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
+import { NotificationCard } from "./NotificationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
+import { shouldShowNotifCard } from "@/lib/notifications";
 import { updateStreak } from "@/lib/storage";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
@@ -43,6 +45,10 @@ export function CardStack({
   const [showToast, setShowToast] = useState(false);
   const [caughtUpToast, setCaughtUpToast] = useState(false);
   const [ptrPull, setPtrPull] = useState(0);
+  // Push opt-in interstitial (end-of-feed). Gated client-side to avoid a
+  // hydration mismatch — shouldShowNotifCard() reads localStorage + permission.
+  const [showNotif, setShowNotif] = useState(false);
+  useEffect(() => { setShowNotif(shouldShowNotifCard()); }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
@@ -290,6 +296,11 @@ export function CardStack({
             <NewsCard item={entry.item} onSave={onSave} />
           </div>
         ))}
+        {showNotif && (
+          <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
+            <NotificationCard onDone={() => setShowNotif(false)} />
+          </div>
+        )}
         <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
           <CompletionCard
             readCount={items.length}

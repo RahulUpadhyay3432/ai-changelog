@@ -94,6 +94,12 @@ export const MCP_SERVERS: McpServer[] = [
     description: "The Sentry MCP server lets an assistant fetch issues, stack traces, and performance data from your projects, so it can debug with real production context.",
     url: "https://github.com/getsentry/sentry-mcp",
   },
+  {
+    name: "JetBrains", by: "official", category: "Dev tools",
+    tagline: "Give the assistant context from your JetBrains IDE.",
+    description: "The JetBrains MCP server connects an assistant to IntelliJ, PyCharm, and WebStorm, so it can read the open project, navigate code, and suggest refactors with real IDE context.",
+    url: "https://github.com/JetBrains/mcp-jetbrains",
+  },
 
   // ── Databases ──
   {
@@ -113,6 +119,18 @@ export const MCP_SERVERS: McpServer[] = [
     tagline: "Read and write a Redis store from the assistant.",
     description: "Connects an assistant to Redis for key-value and cache operations, so it can inspect or update state during a task.",
     url: "https://github.com/redis/mcp-redis",
+  },
+  {
+    name: "Chroma", by: "official", category: "Databases",
+    tagline: "Store and semantically search embeddings.",
+    description: "The Chroma MCP server gives an assistant a vector store for retrieval — adding documents, running semantic search, and grounding answers in your own data.",
+    url: "https://github.com/chroma-core/chroma-mcp",
+  },
+  {
+    name: "MindsDB", by: "official", category: "Databases",
+    tagline: "Query many databases as one, in natural language.",
+    description: "MindsDB exposes a single MCP endpoint that federates queries across your databases, warehouses, and vector stores, so an assistant can ask questions across all of them at once.",
+    url: "https://github.com/mindsdb/mindsdb",
   },
 
   // ── Search & web ──
@@ -179,6 +197,12 @@ export const MCP_SERVERS: McpServer[] = [
     tagline: "Read and post messages in Slack.",
     description: "Connects an assistant to Slack to read channels and send messages, so it can summarize discussions or post updates.",
     url: "https://github.com/modelcontextprotocol/servers/tree/main/src/slack",
+  },
+  {
+    name: "Pipedream", by: "official", category: "Productivity",
+    tagline: "Reach 2,500+ apps through one connector.",
+    description: "Pipedream's MCP server exposes thousands of prebuilt actions across 2,500+ APIs, so an assistant can act across your whole SaaS stack — with auth handled — from a single connection.",
+    url: "https://github.com/PipedreamHQ/pipedream",
   },
   {
     name: "Google Drive", by: "community", category: "Productivity",

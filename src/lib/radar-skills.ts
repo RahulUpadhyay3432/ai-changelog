@@ -111,6 +111,20 @@ export const AI_SKILLS: AiSkill[] = [
     category: "Coding & dev", platform: "GPT",
     url: "https://chatgpt.com/g/g-n7Rs0IK86-grimoire",
   },
+  {
+    name: "Superpowers",
+    tagline: "A full brainstorm-to-merge agentic dev workflow.",
+    description: "A composable Claude Skills framework that guides the agent through brainstorm, design spec, plan, subagent-driven build, review and merge. One of the most-starred skill projects on GitHub.",
+    category: "Coding & dev", platform: "Claude",
+    url: "https://github.com/obra/superpowers",
+  },
+  {
+    name: "Google Workspace CLI",
+    tagline: "Drive all of Google Workspace from the assistant.",
+    description: "A skill wrapping the gws CLI, which discovers every Google Workspace API and exposes them through one interface plus a built-in MCP server — Gmail, Docs, Sheets and Drive from natural language.",
+    category: "Coding & dev", platform: "Claude",
+    url: "https://github.com/anthropics/skills",
+  },
 
   // ── Research & analysis ────────────────────────────────────────────────────
   {
@@ -150,6 +164,13 @@ export const AI_SKILLS: AiSkill[] = [
   },
 
   // ── Design & images ────────────────────────────────────────────────────────
+  {
+    name: "Frontend design",
+    tagline: "Give the assistant a real design system and taste.",
+    description: "The official Anthropic Claude Skill that hands the model a design philosophy — distinctive typography, purposeful colour, intentional motion — so generated UIs look designed rather than default.",
+    category: "Design & images", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/artifacts-builder",
+  },
   {
     name: "Image generator",
     tagline: "Generate and refine images from a description.",

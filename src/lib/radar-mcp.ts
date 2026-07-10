@@ -100,6 +100,12 @@ export const MCP_SERVERS: McpServer[] = [
     description: "The JetBrains MCP server connects an assistant to IntelliJ, PyCharm, and WebStorm, so it can read the open project, navigate code, and suggest refactors with real IDE context.",
     url: "https://github.com/JetBrains/mcp-jetbrains",
   },
+  {
+    name: "Cypress", by: "official", category: "Dev tools",
+    tagline: "Run and inspect end-to-end tests from the assistant.",
+    description: "Cypress's MCP server lets an assistant run your end-to-end suite, read failures, and inspect the DOM at each step — one of the production testing platforms wiring directly into agents in 2026.",
+    url: "https://github.com/cypress-io/cypress-mcp",
+  },
 
   // ── Databases ──
   {
@@ -177,6 +183,12 @@ export const MCP_SERVERS: McpServer[] = [
     tagline: "Run cloud browsers for agents at scale.",
     description: "The Browserbase MCP server gives an assistant managed cloud browsers to navigate and automate the web reliably, without running browsers yourself.",
     url: "https://github.com/browserbase/mcp-server-browserbase",
+  },
+  {
+    name: "Vibium", by: "community", category: "Browser & automation",
+    tagline: "\"Selenium for AI\" — plain-English, self-healing browser tests.",
+    description: "From Selenium's creator Jason Huggins, Vibium ships an MCP server with a full set of browser tools built on WebDriver BiDi — plain-English, self-healing tests an assistant can drive in Cursor or Claude.",
+    url: "https://github.com/vibiumhq/vibium",
   },
 
   // ── Productivity ──

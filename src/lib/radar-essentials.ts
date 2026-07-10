@@ -34,6 +34,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   // ── AI coding ──
   { name: "Cursor", valueLine: "AI-native editor that edits across your whole repo.", url: "https://cursor.com", category: "AI coding" },
   { name: "GitHub Copilot", valueLine: "Inline code completion and chat, inside your editor.", url: "https://github.com/features/copilot", category: "AI coding" },
+  { name: "Gemini CLI", valueLine: "Google's open-source agentic coding assistant, in your terminal.", url: "https://github.com/google-gemini/gemini-cli", category: "AI coding" },
   { name: "Claude Code", valueLine: "Agentic coding in your terminal — plans and edits across files.", url: "https://claude.com/claude-code", category: "AI coding" },
   { name: "Lovable", valueLine: "Build and ship full web apps from a prompt.", url: "https://lovable.dev", category: "AI coding" },
   { name: "Windsurf", valueLine: "Agentic IDE that builds features end-to-end.", url: "https://windsurf.com", category: "AI coding" },
@@ -152,6 +153,8 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
     description: "Pika turns text and images into short, shareable videos, with playful effects for restyling and animating clips you already have." },
 
   // ── Voice & audio (speech, music, sound) ──
+  { name: "Wispr Flow", valueLine: "Speak naturally and it writes, in your style, anywhere.", url: "https://wisprflow.ai", category: "Voice & audio",
+    description: "Wispr Flow is a dictation app that turns natural speech into polished writing across every app, with auto-edits when you change your mind and a command mode to reshape selected text. Supports 100+ languages." },
   { name: "ElevenLabs", valueLine: "Generate realistic AI voices and speech via API.", url: "https://elevenlabs.io", category: "Voice & audio",
     description: "ElevenLabs produces natural text-to-speech, voice cloning, dubbing, and sound effects through a simple API, widely used for narration and product voiceovers." },
   { name: "Suno", valueLine: "Create full songs, with vocals, from a prompt.", url: "https://suno.com", category: "Voice & audio",

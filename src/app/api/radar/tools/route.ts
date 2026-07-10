@@ -203,9 +203,22 @@ export async function GET(request: NextRequest) {
   let upserted = 0;
   if (rows.length > 0) {
     // first_seen_at omitted → kept on conflict; the rest refresh.
-    const { error } = await getAdmin()
-      .from("radar_tools")
-      .upsert(rows, { onConflict: "source,external_id" });
+    const write = (payload: object[]) =>
+      getAdmin().from("radar_tools").upsert(payload, { onConflict: "source,external_id" });
+    let { error } = await write(rows);
+    // The read path (getRadarTools/getRadarEssentials) already degrades when the
+    // `description`/`image_url` columns aren't in the live table yet. Mirror that
+    // on write: strip the two optional columns and retry so trending + essentials
+    // still persist instead of the whole batch failing.
+    if (error && /(description|image_url)/i.test(error.message)) {
+      const lean = rows.map((r) => {
+        const copy: Record<string, unknown> = { ...r };
+        delete copy.description;
+        delete copy.image_url;
+        return copy;
+      });
+      ({ error } = await write(lean));
+    }
     if (error) errors.push(`upsert: ${error.message}`);
     else upserted = rows.length;
   }

@@ -42,7 +42,7 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",       sourceName: "Google AI Blog" },
   { url: "https://deepmind.google/blog/rss.xml",                          defaultCategory: "research",       sourceName: "Google DeepMind" },
   { url: "https://blogs.microsoft.com/feed/",                             defaultCategory: "big-tech",       sourceName: "Microsoft Blog" },
-  { url: "https://blogs.microsoft.com/ai/feed/",                          defaultCategory: "big-tech",       sourceName: "Microsoft AI" },
+  { url: "https://syncedreview.com/feed/",                                defaultCategory: "research",       sourceName: "Synced" },
   { url: "https://www.microsoft.com/en-us/research/feed/",                defaultCategory: "research",       sourceName: "Microsoft Research" },
   // Azure service updates feed removed — it's an ops feed for Azure teams, not a news feed.
   // Major Azure AI announcements (OpenAI GA, Foundry, etc.) are covered by Microsoft AI Blog.
@@ -74,7 +74,7 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://hnrss.org/frontpage?q=AI+LLM+GPT+machine+learning+Claude+Anthropic+OpenAI+agent&points=50", defaultCategory: "dev-tools", sourceName: "Hacker News" },
 
   // ── Additional coverage ───────────────────────────────────────────────────
-  { url: "https://www.theregister.com/headlines/ai.atom",                  defaultCategory: "ai-models",      sourceName: "The Register" },
+  { url: "https://www.artificialintelligence-news.com/feed/",             defaultCategory: "ai-models",      sourceName: "AI News" },
   { url: "https://changelog.com/news/feed",                                defaultCategory: "open-source",    sourceName: "Changelog" },
 
   // ── India ─────────────────────────────────────────────────────────────────

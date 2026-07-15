@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { NewsItem } from "./types";
 import { getFeedPrefs } from "./storage";
 import { CATEGORIES } from "./categories";
+import { feedCutoffISO } from "./feed-window";
 
 const ALL_SLUGS = CATEGORIES.map((c) => c.slug);
 
@@ -97,8 +98,8 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
 
   if (data) return dbToNewsItem(data as DbNewsItem);
 
-  // Fallback to the durable archive: news_items rotates after 48h, but
-  // /story/[id] links from concept pages must keep resolving forever.
+  // Fallback to the durable archive: news_items rotates after the feed window
+  // (feed-window.ts), but /story/[id] links must keep resolving forever.
   const { data: archived } = await supabase
     .from("story_archive")
     .select("id, title, summary, source_url, source_name, category_slug, image_url, published_at")
@@ -110,7 +111,7 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
 }
 
 export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {
-  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const cutoff = feedCutoffISO();
 
   let query = supabase
     .from("news_items")

@@ -16,6 +16,7 @@ import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { fetchPageMeta } from "@/lib/page-meta";
+import { feedCutoffISO } from "@/lib/feed-window";
 import {
   canonicalize,
   parseExtractedEntities,
@@ -633,6 +634,35 @@ export async function GET(request: NextRequest) {
     return Response.json({ archived, scanned: (items ?? []).length });
   }
 
+  // ── Restore window — one-off: repopulate news_items from story_archive so a
+  // widened feed window (feed-window.ts) has immediate history instead of only
+  // filling going forward. Idempotent (insert-or-ignore on source_url).
+  if (mode === "restore-window") {
+    const restoreCutoff = feedCutoffISO();
+    const { data: archived } = await supabase
+      .from("story_archive")
+      .select("id, title, summary, source_url, source_name, category_slug, image_url, published_at")
+      .gte("published_at", restoreCutoff);
+    let restored = 0;
+    for (const row of archived ?? []) {
+      const { error } = await supabase.from("news_items").upsert(
+        {
+          id: row.id,
+          title: row.title,
+          summary: row.summary,
+          source_url: row.source_url,
+          source_name: row.source_name,
+          category_slug: row.category_slug,
+          image_url: row.image_url,
+          published_at: row.published_at,
+        },
+        { onConflict: "source_url", ignoreDuplicates: true }
+      );
+      if (!error) restored++;
+    }
+    return Response.json({ restored, scanned: (archived ?? []).length });
+  }
+
   // ── Normal fetch ───────────────────────────────────────────────────────────
 
   // Clean up leaked prompt strings and off-topic summaries already in DB
@@ -645,8 +675,8 @@ export async function GET(request: NextRequest) {
   await supabase.from("news_items").delete().ilike("summary", "%not related to AI%");
   await supabase.from("news_items").delete().ilike("summary", "%not related to tech%");
 
-  // Remove stale items older than 48h
-  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  // Remove stale items older than the feed window (see feed-window.ts)
+  const cutoff = feedCutoffISO();
   await supabase.from("news_items").delete().lt("published_at", cutoff);
 
   // Idempotent slug migrations (runs harmlessly after first pass)

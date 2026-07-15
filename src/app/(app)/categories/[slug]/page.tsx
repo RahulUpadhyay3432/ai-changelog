@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { CATEGORIES, getCategoryBySlug } from "@/lib/categories";
 import { fetchNewsItems } from "@/lib/supabase";
+import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import type { CategorySlug } from "@/lib/types";
 
 const APP_URL = "https://kapyn.app";
@@ -118,7 +119,7 @@ export default async function CategoryPage({ params }: Props) {
             fontWeight: 500,
           }}
         >
-          {stories.length} {stories.length === 1 ? "story" : "stories"} in the last 48h
+          {stories.length} {stories.length === 1 ? "story" : "stories"} in the last {FEED_WINDOW_LABEL}
         </p>
 
         <div
@@ -144,7 +145,7 @@ export default async function CategoryPage({ params }: Props) {
             textAlign: "center",
           }}
         >
-          No stories in the last 48 hours.
+          No stories in the last {FEED_WINDOW_LABEL}.
         </div>
       ) : (
         <div style={{ flex: 1, paddingBottom: "80px" }}>

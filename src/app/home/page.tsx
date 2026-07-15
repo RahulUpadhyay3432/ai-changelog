@@ -5,6 +5,7 @@ import {
   ArrowRight, ArrowUpRight, Compass, Bookmark, Search,
 } from "lucide-react";
 import { fetchNewsItems } from "@/lib/supabase";
+import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import { getRadarTools } from "@/lib/knowledge";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
@@ -240,14 +241,14 @@ export default async function LandingPage() {
               { n: toolCount, l: "tools" },
               { n: mcpCount, l: "MCP servers" },
               { n: skillCount, l: "AI skills" },
-              { n: storyCount, l: "stories / 48h" },
+              { n: storyCount, l: `stories / ${FEED_WINDOW_LABEL}` },
             ].map((s) => (
               <span key={s.l} style={{ display: "inline-flex", alignItems: "baseline", gap: "7px" }}>
                 <span style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, fontVariantNumeric: "tabular-nums" }}>{s.n}</span>
                 <span style={{ fontSize: "13.5px", color: TEXT.muted }}>{s.l}</span>
               </span>
             ))}
-            <span style={{ marginLeft: "auto", fontSize: "13px", color: TEXT.muted, alignSelf: "center" }}>kept current · last 48h</span>
+            <span style={{ marginLeft: "auto", fontSize: "13px", color: TEXT.muted, alignSelf: "center" }}>kept current · last {FEED_WINDOW_LABEL}</span>
           </div>
         </div>
       </header>

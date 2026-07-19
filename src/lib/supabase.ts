@@ -3,6 +3,7 @@ import type { NewsItem } from "./types";
 import { getFeedPrefs } from "./storage";
 import { CATEGORIES } from "./categories";
 import { feedCutoffISO } from "./feed-window";
+import { scoreStoriesByCoverage, type CoverageScore } from "./coverage";
 
 const ALL_SLUGS = CATEGORIES.map((c) => c.slug);
 
@@ -43,6 +44,16 @@ function dbToNewsItem(row: DbNewsItem): NewsItem {
 // follows publish time exactly.
 const MAX_CONSECUTIVE = 2;  // no more than N same-category cards in a row
 const MAX_PER_SOURCE = 3;   // no source dominates the feed
+
+// ── Opener tuning ────────────────────────────────────────────────────────────
+// Lead the "all" feed with the most important recent stories, then revert to
+// chronological. Importance = lead-subject coverage × recency (see coverage.ts).
+// The freshness gate is load-bearing: mention_count is a GLOBAL prominence
+// counter, so without it an old-but-prominent story could lead.
+const OPENER_SIZE = 5;              // K cards before the feed reverts to recency
+const OPENER_FRESHNESS_HOURS = 72;  // max age eligible to lead (stale-story guard)
+const OPENER_MAX_PER_SOURCE = 1;    // no single outlet dominates the lead
+const RECENCY_TAU_HOURS = 24;       // decay constant (matches trending's default)
 
 function rankScore(item: NewsItem): number {
   // Newest first — strictly by publish time.
@@ -87,6 +98,53 @@ function deClusterByCategory(sorted: NewsItem[]): NewsItem[] {
   }
 
   return result;
+}
+
+// The "all" feed leads with the most important recent stories (coverage × recency,
+// see coverage.ts), then reverts to strict recency. Fixes the "weak opener" leak:
+// a first-time user's first cards are the stories that matter, not just the newest.
+// Degrades to the plain recency feed when the entity graph is sparse or a read fails.
+async function composeAllFeed(items: NewsItem[]): Promise<NewsItem[]> {
+  const recencySorted = [...items].sort((a, b) => rankScore(b) - rankScore(a));
+
+  let scores: Map<string, CoverageScore>;
+  try {
+    scores = await scoreStoriesByCoverage(
+      supabase,
+      recencySorted.map((it) => ({ id: it.id, source_url: it.sourceUrl, published_at: it.publishedAt })),
+      { recencyTauHours: RECENCY_TAU_HOURS }
+    );
+  } catch {
+    scores = new Map();
+  }
+
+  // Opener: fresh + genuinely covered stories, ranked by heat, one per topic and
+  // capped per source. Empty when there's no signal ⇒ feed == today's recency feed.
+  const now = Date.now();
+  const opener: NewsItem[] = [];
+  const openerIds = new Set<string>();
+  const seenTopic = new Set<string>();
+  const perSource: Record<string, number> = {};
+  const candidates = recencySorted
+    .filter((it) => now - new Date(it.publishedAt).getTime() <= OPENER_FRESHNESS_HOURS * 3_600_000)
+    .filter((it) => (scores.get(it.id)?.sources ?? 0) > 0)
+    .sort((a, b) => (scores.get(b.id)?.heat ?? 0) - (scores.get(a.id)?.heat ?? 0));
+  for (const it of candidates) {
+    if (opener.length >= OPENER_SIZE) break;
+    const topic = (scores.get(it.id)?.topEntity ?? it.id).toLowerCase();
+    if (seenTopic.has(topic)) continue;
+    if ((perSource[it.sourceName] ?? 0) >= OPENER_MAX_PER_SOURCE) continue;
+    seenTopic.add(topic);
+    perSource[it.sourceName] = (perSource[it.sourceName] ?? 0) + 1;
+    opener.push(it);
+    openerIds.add(it.id);
+  }
+
+  // Body: everything else, strict recency, then the existing source cap + category
+  // de-cluster so no outlet/topic walls up. Breaking news (no coverage yet) lands
+  // at the top of the body, directly under the opener.
+  const body = deClusterByCategory(capBySource(recencySorted.filter((it) => !openerIds.has(it.id))));
+  return [...opener, ...body];
 }
 
 export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
@@ -137,8 +195,7 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
   const items = (data as DbNewsItem[]).map(dbToNewsItem);
 
   if (!categorySlug || categorySlug === "all") {
-    items.sort((a, b) => rankScore(b) - rankScore(a));
-    return deClusterByCategory(capBySource(items));
+    return composeAllFeed(items);
   }
 
   return items;

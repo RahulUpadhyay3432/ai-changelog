@@ -11,6 +11,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { NewsItem } from "./types";
+import { scoreStoriesByCoverage } from "./coverage";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -73,64 +74,13 @@ export async function getTrending(
   const live = (items ?? []) as LiveRow[];
   if (live.length === 0) return { top: [], rest: [] };
 
-  // story_archive is a durable mirror with its OWN id (keyed/deduped on
-  // source_url); entity mentions are linked to that archive id. So join live
-  // stories → archive by source_url, then archive id → entity_mentions.
-  const urls = live.map((r) => r.source_url);
-  const { data: archRows } = await supabase
-    .from("story_archive")
-    .select("id, source_url")
-    .in("source_url", urls);
-
-  const archIdByUrl = new Map<string, string>();
-  for (const a of (archRows ?? []) as { id: string; source_url: string }[]) {
-    archIdByUrl.set(a.source_url, a.id);
-  }
-  // archive id for a live row (its own id is a safe, unique fallback so unmatched
-  // stories simply carry no entities rather than colliding).
-  const archIdForLive = (r: LiveRow): string => archIdByUrl.get(r.source_url) ?? r.id;
-
-  const archIds = [...new Set([...archIdByUrl.values()])];
-  if (archIds.length === 0) archIds.push("00000000-0000-0000-0000-000000000000");
-
-  const { data: mentionRows } = await supabase
-    .from("entity_mentions")
-    .select("entity_id, story_id")
-    .in("story_id", archIds);
-
-  const mentions = (mentionRows ?? []) as { entity_id: string; story_id: string }[];
-  const entityIds = [...new Set(mentions.map((m) => m.entity_id))];
-
-  const entById = new Map<string, { name: string; count: number }>();
-  if (entityIds.length > 0) {
-    const { data: entRows } = await supabase
-      .from("entities")
-      .select("id, canonical_name, mention_count")
-      .in("id", entityIds)
-      .eq("status", "active");
-    for (const e of (entRows ?? []) as { id: string; canonical_name: string; mention_count: number }[]) {
-      entById.set(e.id, { name: e.canonical_name, count: e.mention_count });
-    }
-  }
-
-  // Lead entity (highest coverage) per archive story.
-  const leadByStory = new Map<string, { name: string; count: number }>();
-  for (const m of mentions) {
-    const e = entById.get(m.entity_id);
-    if (!e) continue;
-    const cur = leadByStory.get(m.story_id);
-    if (!cur || e.count > cur.count) leadByStory.set(m.story_id, e);
-  }
-
-  const now = Date.now();
+  // Coverage score (subject prominence × recency) per story — the join now lives
+  // in coverage.ts, shared with the home-feed opener so there's one copy of it.
+  const scores = await scoreStoriesByCoverage(supabase, live);
   const scored: TrendingStory[] = live
     .map((r) => {
-      const lead = leadByStory.get(archIdForLive(r));
-      const ageHours = (now - new Date(r.published_at).getTime()) / (60 * 60 * 1000);
-      const recency = Math.exp(-ageHours / 24); // ~1-day half-life
-      const sources = lead?.count ?? 0;
-      const heat = (1 + sources) * recency;
-      return { ...toNewsItem(r), heat, topEntity: lead?.name ?? null, sources };
+      const s = scores.get(r.id) ?? { heat: 0, topEntity: null, sources: 0 };
+      return { ...toNewsItem(r), heat: s.heat, topEntity: s.topEntity, sources: s.sources };
     })
     .sort((a, b) => b.heat - a.heat);
 

@@ -1,32 +1,42 @@
-// TEMPORARY debug endpoint — verifies the composeAllFeed opener/body split on
-// real data. Returns the ACTUAL fetchNewsItems() order annotated with each
-// card's heat/sources/age so we can confirm the opener is heat-ranked and the
-// body is recency-ordered. DELETE this file after verification.
+// TEMPORARY debug endpoint — diagnoses why composeAllFeed's opener is empty.
+// Hypothesis: scoring 100 items at once overflows the .in("source_url", …) URL
+// limit → null → empty scores. Counts sources>0 at increasing batch sizes.
+// DELETE after verification.
 
-import { fetchNewsItems, supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { scoreStoriesByCoverage } from "@/lib/coverage";
+import { feedCutoffISO } from "@/lib/feed-window";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+type Row = { id: string; source_url: string; published_at: string };
+
+async function countSourced(rows: Row[]): Promise<number> {
+  const scores = await scoreStoriesByCoverage(supabase, rows, { recencyTauHours: 24 });
+  let n = 0;
+  for (const v of scores.values()) if (v.sources > 0) n++;
+  return n;
+}
+
 export async function GET() {
-  const feed = await fetchNewsItems(); // real "all" order → composeAllFeed
-  const scores = await scoreStoriesByCoverage(
-    supabase,
-    feed.map((it) => ({ id: it.id, source_url: it.sourceUrl, published_at: it.publishedAt })),
-    { recencyTauHours: 24 }
-  );
-  const now = Date.now();
-  const rows = feed.slice(0, 15).map((it, i) => {
-    const s = scores.get(it.id);
-    return {
-      pos: i + 1,
-      ageH: +((now - new Date(it.publishedAt).getTime()) / 3.6e6).toFixed(1),
-      sources: s?.sources ?? 0,
-      heat: +(s?.heat ?? 0).toFixed(3),
-      source: it.sourceName,
-      title: it.title.slice(0, 64),
-    };
+  const { data } = await supabase
+    .from("news_items")
+    .select("id, source_url, published_at")
+    .gte("published_at", feedCutoffISO())
+    .order("published_at", { ascending: false })
+    .limit(100);
+  const rows = (data ?? []).map((r) => ({
+    id: r.id as string,
+    source_url: r.source_url as string,
+    published_at: r.published_at as string,
+  }));
+
+  return Response.json({
+    total: rows.length,
+    sourced_first25: await countSourced(rows.slice(0, 25)),
+    sourced_first50: await countSourced(rows.slice(0, 50)),
+    sourced_first75: await countSourced(rows.slice(0, 75)),
+    sourced_all: await countSourced(rows),
   });
-  return Response.json({ count: feed.length, rows });
 }

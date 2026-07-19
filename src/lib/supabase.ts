@@ -104,8 +104,12 @@ function deClusterByCategory(sorted: NewsItem[]): NewsItem[] {
 // see coverage.ts), then reverts to strict recency. Fixes the "weak opener" leak:
 // a first-time user's first cards are the stories that matter, not just the newest.
 // Degrades to the plain recency feed when the entity graph is sparse or a read fails.
-async function composeAllFeed(items: NewsItem[]): Promise<NewsItem[]> {
+async function composeAllFeed(items: NewsItem[], rankOpener: boolean): Promise<NewsItem[]> {
   const recencySorted = [...items].sort((a, b) => rankScore(b) - rankScore(a));
+
+  // A/B control arm: the pre-opener behaviour (pure recency + source cap +
+  // de-cluster), so a PostHog flag can measure the opener's effect on activation.
+  if (!rankOpener) return deClusterByCategory(capBySource(recencySorted));
 
   let scores: Map<string, CoverageScore>;
   try {
@@ -168,7 +172,10 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
   return dbToNewsItem({ ...(archived as Omit<DbNewsItem, "created_at">), created_at: "" } as DbNewsItem);
 }
 
-export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]> {
+export async function fetchNewsItems(
+  categorySlug?: string,
+  opts?: { rankOpener?: boolean }
+): Promise<NewsItem[]> {
   const cutoff = feedCutoffISO();
 
   let query = supabase
@@ -195,7 +202,7 @@ export async function fetchNewsItems(categorySlug?: string): Promise<NewsItem[]>
   const items = (data as DbNewsItem[]).map(dbToNewsItem);
 
   if (!categorySlug || categorySlug === "all") {
-    return composeAllFeed(items);
+    return composeAllFeed(items, opts?.rankOpener ?? true);
   }
 
   return items;

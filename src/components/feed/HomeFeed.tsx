@@ -17,6 +17,13 @@ import type { CategorySlug, NewsItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 
+// A/B: default to the importance-ranked opener; the "feed-opener-ranking" PostHog
+// flag serves the pure-recency control (disabled). Undefined (flag not created, or
+// not loaded yet) = opener on, i.e. no regression before the experiment exists.
+function openerRankingEnabled(): boolean {
+  return posthog.isFeatureEnabled("feed-opener-ranking") ?? true;
+}
+
 // Minimum drag distance (px) or velocity (px/s) to commit a swipe
 const SWIPE_DISTANCE = 72;
 const SWIPE_VELOCITY = 400;
@@ -91,7 +98,7 @@ export function HomeFeed() {
   const resolveFeed = useCallback(async (slug: CategorySlug): Promise<NewsItem[]> => {
     const cached = feedCache.current.get(slug);
     if (cached) return cached;
-    const items = await fetchNewsItems(slug); // may throw → handled by the caller
+    const items = await fetchNewsItems(slug, { rankOpener: openerRankingEnabled() }); // may throw → handled by the caller
     if (items.length > 0) {
       feedCache.current.set(slug, items);
       return items;
@@ -138,6 +145,15 @@ export function HomeFeed() {
         setStories(base);
       }
 
+      // Activation denominator: a reliable "saw the feed" event. (Autocaptured
+      // $pageview mixes the news feed with the /radar surface, so it's a noisy
+      // funnel entry.) opener_ranked carries the A/B arm for segmenting.
+      posthog.capture("feed_viewed", {
+        category: activeCategory,
+        story_count: base.length,
+        opener_ranked: openerRankingEnabled(),
+      });
+
       warmImages(base);
       prefetchAdjacent(activeCategory);
     };
@@ -182,7 +198,7 @@ export function HomeFeed() {
   }, [activeCategory]);
 
   const handleRefresh = useCallback(async (): Promise<number> => {
-    const items = await fetchNewsItems(activeCategory).catch(() => [] as NewsItem[]);
+    const items = await fetchNewsItems(activeCategory, { rankOpener: openerRankingEnabled() }).catch(() => [] as NewsItem[]);
     if (items.length > 0) {
       feedCache.current.set(activeCategory, items);
       setStories(items);

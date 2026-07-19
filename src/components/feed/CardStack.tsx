@@ -25,17 +25,6 @@ const DIRECTION_LOCK_THRESHOLD = 8;
 
 type FeedEntry = { type: "news"; item: NewsItem; newsIdx: number };
 
-function deferIdle(fn: () => void) {
-  if (typeof window === "undefined") return;
-  const ric = (
-    window as typeof window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void;
-    }
-  ).requestIdleCallback;
-  if (ric) ric(fn, { timeout: 500 });
-  else setTimeout(fn, 0);
-}
-
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
   onHorizontalDrag, onHorizontalDragEnd,
@@ -196,16 +185,18 @@ export function CardStack({
       onIndexChange?.(entry.newsIdx, items.length);
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
       const prevItem = feedEntries[prev]?.item ?? items[0];
-      deferIdle(() => {
-        updateStreak();
-        posthog.capture("story_swiped", {
-          direction: index > prev ? "next" : "previous",
-          story_id: prevItem?.id,
-          story_title: prevItem?.title,
-          category: prevItem?.categorySlug,
-          position: prev,
-          total: items.length,
-        });
+      // Fire synchronously. Previously deferred via requestIdleCallback, which
+      // silently dropped the first swipe on a fast bounce — exactly the users
+      // whose swipe-depth we most need to measure. posthog.capture batches, so
+      // this is cheap on the settled index-change handler.
+      updateStreak();
+      posthog.capture("story_swiped", {
+        direction: index > prev ? "next" : "previous",
+        story_id: prevItem?.id,
+        story_title: prevItem?.title,
+        category: prevItem?.categorySlug,
+        position: prev,
+        total: items.length,
       });
     }
   }, [feedEntries, items, onIndexChange]);

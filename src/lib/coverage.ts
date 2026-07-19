@@ -22,6 +22,22 @@ export interface CoverageScore {
 
 type ScoreRow = { id: string; source_url: string; published_at: string };
 
+// PostgREST serializes .in() values into the GET URL, which overflows (→ 414,
+// then a SILENT null) once you pass ~75+ long values like source_urls — which
+// zeroed out the score for the whole feed. Chunk the values (small, since some
+// source_urls are long) and run the chunks in parallel so there's no latency hit.
+const IN_CHUNK = 20;
+async function inChunks<Row>(
+  values: string[],
+  run: (chunk: string[]) => PromiseLike<{ data: Row[] | null }>
+): Promise<Row[]> {
+  if (values.length === 0) return [];
+  const chunks: string[][] = [];
+  for (let i = 0; i < values.length; i += IN_CHUNK) chunks.push(values.slice(i, i + IN_CHUNK));
+  const results = await Promise.all(chunks.map((c) => run(c)));
+  return results.flatMap((r) => r.data ?? []);
+}
+
 // Returns a CoverageScore for EVERY input row. Rows with no linked entity (or a
 // sparse/empty graph) get { heat: recency, topEntity: null, sources: 0 } — so an
 // empty graph degrades the caller to pure recency automatically.
@@ -39,41 +55,29 @@ export async function scoreStoriesByCoverage(
   // source_url); entity mentions link to that archive id. So map live rows →
   // archive id by source_url, then archive id → entity_mentions.
   const urls = rows.map((r) => r.source_url);
-  const { data: archRows } = await client
-    .from("story_archive")
-    .select("id, source_url")
-    .in("source_url", urls);
+  const archRows = await inChunks<{ id: string; source_url: string }>(urls, (chunk) =>
+    client.from("story_archive").select("id, source_url").in("source_url", chunk)
+  );
 
   const archIdByUrl = new Map<string, string>();
-  for (const a of (archRows ?? []) as { id: string; source_url: string }[]) {
-    archIdByUrl.set(a.source_url, a.id);
-  }
+  for (const a of archRows) archIdByUrl.set(a.source_url, a.id);
   // A live row's own id is a safe, unique fallback so unmatched stories simply
   // carry no entities rather than colliding on the mention join.
   const archIdForRow = (r: ScoreRow): string => archIdByUrl.get(r.source_url) ?? r.id;
 
   const archIds = [...new Set([...archIdByUrl.values()])];
-  if (archIds.length === 0) archIds.push("00000000-0000-0000-0000-000000000000");
+  const mentions = await inChunks<{ entity_id: string; story_id: string }>(archIds, (chunk) =>
+    client.from("entity_mentions").select("entity_id, story_id").in("story_id", chunk)
+  );
 
-  const { data: mentionRows } = await client
-    .from("entity_mentions")
-    .select("entity_id, story_id")
-    .in("story_id", archIds);
-
-  const mentions = (mentionRows ?? []) as { entity_id: string; story_id: string }[];
   const entityIds = [...new Set(mentions.map((m) => m.entity_id))];
-
+  const entRows = await inChunks<{ id: string; canonical_name: string; mention_count: number }>(
+    entityIds,
+    (chunk) =>
+      client.from("entities").select("id, canonical_name, mention_count").in("id", chunk).eq("status", "active")
+  );
   const entById = new Map<string, { name: string; count: number }>();
-  if (entityIds.length > 0) {
-    const { data: entRows } = await client
-      .from("entities")
-      .select("id, canonical_name, mention_count")
-      .in("id", entityIds)
-      .eq("status", "active");
-    for (const e of (entRows ?? []) as { id: string; canonical_name: string; mention_count: number }[]) {
-      entById.set(e.id, { name: e.canonical_name, count: e.mention_count });
-    }
-  }
+  for (const e of entRows) entById.set(e.id, { name: e.canonical_name, count: e.mention_count });
 
   // Lead entity (highest coverage) per archive story.
   const leadByStory = new Map<string, { name: string; count: number }>();

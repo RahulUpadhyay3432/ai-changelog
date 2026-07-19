@@ -12,7 +12,7 @@ import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
-import { getFeedHintShown, setFeedHintShown } from "@/lib/storage";
+import { getFeedHintShown, setFeedHintShown, getStreak } from "@/lib/storage";
 import type { CategorySlug, NewsItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
@@ -148,10 +148,14 @@ export function HomeFeed() {
       // Activation denominator: a reliable "saw the feed" event. (Autocaptured
       // $pageview mixes the news feed with the /radar surface, so it's a noisy
       // funnel entry.) opener_ranked carries the A/B arm for segmenting.
+      const streak = getStreak();
       posthog.capture("feed_viewed", {
         category: activeCategory,
         story_count: base.length,
         opener_ranked: openerRankingEnabled(),
+        streak_days: streak,
+        // Promote streak to a person property so returning power users are a segment.
+        $set: { streak_days: streak },
       });
 
       warmImages(base);

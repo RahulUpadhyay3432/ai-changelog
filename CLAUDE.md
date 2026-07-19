@@ -221,8 +221,8 @@ Calm, minimal, intelligent. Never hyped.
 | `SUPABASE_SERVICE_ROLE_KEY` | Ingestion pipeline | JWT format. Falls back to anon key if missing |
 | `GEMINI_API_KEY` | Ingestion + breakdown | Primary LLM |
 | `OPENROUTER_API_KEY` | Ingestion fallback | Free tier Gemini 2.0 Flash Lite |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Client analytics | |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Client analytics | Routes through /ingest proxy |
+| `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` | Client + server analytics | PostHog project token used by both `instrumentation-client.ts` and `posthog-server.ts` |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Server analytics | `posthog-node` host; client hardcodes the `/ingest` rewrite (next.config.ts) instead |
 | `CRON_SECRET` | Cron auth | Protects /api/news/fetch |
 | `NEXT_PUBLIC_APP_URL` | Trigger route | Defaults to https://kapyn.vercel.app |
 | `PRODUCTHUNT_API_TOKEN` | PH GraphQL feed | |

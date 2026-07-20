@@ -516,4 +516,46 @@ export const MCP_SERVERS: McpServer[] = [
     description: "Datadog's MCP server lets an assistant search metrics, logs, traces, and alerts — so observability data is reachable in the chat for incident investigation and debugging.",
     url: "https://github.com/DataDog/datadog-mcp-server",
   },
+  // ── Refreshed July 2026 (GitHub trending + market scan) ──
+  {
+    name: "XcodeBuildMCP",
+    tagline: "Let agents build, run, and debug iOS and macOS apps.",
+    description: "An MCP server wrapping Apple's toolchain \u2014 xcodebuild, simctl, and devicectl \u2014 so an agent can build projects, boot simulators, run tests, UI-automate, and read back errors without a human relaying Xcode output. Around 80 tools cover the full build-and-verify loop. Maintained by Sentry after it acquired the original open-source project.",
+    category: "Dev tools",
+    url: "https://github.com/getsentry/XcodeBuildMCP",
+    by: "community",
+  },
+  {
+    name: "OfficeCLI",
+    tagline: "Read and edit Word, Excel, and PowerPoint files without Office installed.",
+    description: "A single self-contained binary that runs as both a CLI and an MCP server, giving agents deterministic read/write access to .docx, .xlsx, and .pptx files. It evaluates 350+ Excel functions, builds pivot tables, merges templates, and addresses elements by path. Works with Claude Code, Cursor, and VS Code.",
+    category: "Productivity",
+    url: "https://github.com/iOfficeAI/OfficeCLI",
+    by: "community",
+  },
+  {
+    name: "Task Master",
+    tagline: "Turn a spec into an ordered, dependency-aware task list agents can work through.",
+    description: "An MCP server that parses a PRD into structured, sequenced tasks and drives them from inside your editor, breaking large work into tracked steps. It exposes around 36 tools across Cursor, Windsurf, and Claude Code, and can use separate models for planning, research, and fallback. Widely adopted in agentic coding workflows.",
+    category: "Dev tools",
+    url: "https://github.com/eyaltoledano/claude-task-master",
+    by: "community",
+  },
+  {
+    name: "Shopify Storefront MCP",
+    tagline: "Give agents access to a store's catalog, cart, and checkout.",
+    description: "Shopify's official server lets any MCP client search a merchant's catalog, read pricing and policies, and manage a cart through to checkout. It ships built into Hydrogen and is live by default on eligible stores, following the agentic-commerce spec. A first-party entry point for shopping tasks.",
+    category: "Productivity",
+    url: "https://shopify.dev/docs/apps/build/storefront-mcp",
+    by: "official",
+  },
+  {
+    name: "X MCP",
+    tagline: "Search posts, users, and trends on X from an agent.",
+    description: "X's official hosted MCP server exposes read-only access to the platform \u2014 full-archive and user search, profile lookups, timelines, bookmarks, and trends \u2014 scoped to the caller's own account. It is hosted at api.x.com/mcp, so there is nothing to self-host, and it inherits X API pricing. Read-only; it cannot post.",
+    category: "Search & web",
+    url: "https://docs.x.com/tools/mcp",
+    by: "official",
+  },
+
 ];

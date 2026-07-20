@@ -187,4 +187,55 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
     description: "OpusClip finds the most engaging moments in a long video and reframes them into captioned short clips ready for TikTok, Reels, and Shorts." },
   { name: "Gamma", valueLine: "Generate decks, docs, and sites from a prompt.", url: "https://gamma.app", category: "Marketing & content",
     description: "Gamma generates polished presentations, documents, and web pages from a prompt, with on-brand styling and one-click publishing." },
+  // ── Refreshed July 2026 (GitHub trending + market scan) ──
+  {
+    name: "Wren AI",
+    valueLine: "Turn natural-language questions into governed SQL and dashboards over your warehouse.",
+    url: "https://github.com/Canner/WrenAI",
+    category: "Data & RAG",
+    description: "An open-source GenBI engine that answers business questions in plain language, generating SQL, charts, and dashboards across 20+ warehouses like BigQuery, Snowflake, and Postgres. A semantic layer keeps definitions consistent, and it plugs into agents. Apache-2.0.",
+  },
+  {
+    name: "BrowserOS",
+    valueLine: "An open-source Chromium fork with a built-in AI agent that runs locally.",
+    url: "https://github.com/browseros-ai/BrowserOS",
+    category: "Agents & automation",
+    description: "A privacy-first agentic browser with 50+ built-in automation tools, support for 11+ model providers, and local models via Ollama. It is the open-source counterpart to hosted agentic browsers like Comet and Atlas, keeping data on your machine. AGPL-3.0, active San Francisco team.",
+  },
+  {
+    name: "Orca",
+    valueLine: "Run several coding agents in parallel, each in its own git worktree, and merge the best.",
+    url: "https://github.com/stablyai/orca",
+    category: "AI coding",
+    description: "A desktop environment for orchestrating a fleet of coding agents \u2014 Codex, Claude Code, OpenCode, or Pi \u2014 side by side in isolated worktrees, then comparing and merging results. It adds terminal splits, GitHub and Linear integration, and a mobile companion. Uses your own agent subscriptions.",
+  },
+  {
+    name: "Strix",
+    valueLine: "An autonomous agent that finds and validates vulnerabilities like a pentester.",
+    url: "https://github.com/usestrix/strix",
+    category: "Security",
+    description: "Runs reconnaissance, writes and executes real exploits, and confirms findings with proofs-of-concept against a codebase, repo, or live app. Unlike the static scanners it sits alongside, it is an offensive security agent rather than a linter. Apache-2.0, with a free CLI and a hosted platform.",
+  },
+  {
+    name: "cognee",
+    valueLine: "Give agents persistent memory backed by a knowledge graph and vector store.",
+    url: "https://github.com/topoteretes/cognee",
+    category: "Data & RAG",
+    description: "An open-source memory platform that ingests mixed data, builds a knowledge graph plus embeddings, and lets agents recall facts and relationships across sessions. Its graph-first design sets it apart in the agent-memory space. Ships as a Python package, Docker service, and MCP server.",
+  },
+  {
+    name: "Cactus",
+    valueLine: "Run text, speech, and vision models on-device on phones and wearables.",
+    url: "https://github.com/cactus-compute/cactus",
+    category: "Inference",
+    description: "A hybrid edge-cloud inference engine with OpenAI-compatible APIs, custom ARM kernels, and 1-4-bit quantization, so models can run locally on mobile hardware. Native bindings cover Swift, Kotlin, Flutter, React Native, Python, and Rust. Fills the on-device slot in an otherwise cloud-only inference field.",
+  },
+  {
+    name: "Cartesia",
+    valueLine: "Low-latency text-to-speech built for real-time voice agents.",
+    url: "https://cartesia.ai",
+    category: "Voice & audio",
+    description: "Voice infrastructure whose Sonic model streams first audio in around 90ms across 40+ languages, with expressive delivery and on-prem or on-device deployment. It ranked first on Artificial Analysis's speech leaderboards and powers production voice agents. A latency-first way to build voice into apps.",
+  },
+
 ];

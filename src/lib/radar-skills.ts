@@ -369,4 +369,38 @@ export const AI_SKILLS: AiSkill[] = [
     category: "Learning", platform: "GPT",
     url: "https://chatgpt.com/g/g-pdWLoE6XT-mr-ranedeer",
   },
+  // ── Refreshed July 2026 (GitHub trending + market scan) ──
+  {
+    name: "Hallmark",
+    tagline: "Generate web UI that doesn't read as AI-generated.",
+    description: "A design skill for Claude Code, Cursor, and Codex that picks a layout, applies a theme, and runs around 57 anti-pattern checks before emitting a frontend. It can build new UI, audit or redesign existing code, or extract design DNA from a screenshot. Built by Nutlope at Together AI; installs via npx skills add nutlope/hallmark.",
+    category: "Design & images",
+    platform: "Multi",
+    url: "https://github.com/Nutlope/hallmark",
+  },
+  {
+    name: "skill-creator",
+    tagline: "Scaffold and package a new Claude Agent Skill to the current spec.",
+    description: "Anthropic's official meta-skill that walks you through authoring a skill \u2014 writing the SKILL.md, adding reference files and scripts, and packaging it correctly. It is the standard entry point for building on the Agent Skills ecosystem, and the skill counterpart to the MCP builder.",
+    category: "Coding & dev",
+    platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/skill-creator",
+  },
+  {
+    name: "Trail of Bits Security Skills",
+    tagline: "Run professional security audits and static analysis from a coding agent.",
+    description: "A Claude Code plugin marketplace from security firm Trail of Bits covering code auditing, static analysis with CodeQL and Semgrep, variant analysis, fix verification, and reverse engineering. It brings audit-grade security workflows into an agent. Maintained by the team behind Slither and Echidna.",
+    category: "Coding & dev",
+    platform: "Claude",
+    url: "https://github.com/trailofbits/skills",
+  },
+  {
+    name: "video-use",
+    tagline: "Edit a folder of raw footage into a finished cut by chatting with an agent.",
+    description: "A skill for Claude Code and Codex that cuts filler words and dead space, color-grades, adds subtitles, and overlays animation, returning a final.mp4. The model works from a timestamped transcript rather than raw frames. Built by the Browser Use team.",
+    category: "Design & images",
+    platform: "Multi",
+    url: "https://github.com/browser-use/video-use",
+  },
+
 ];

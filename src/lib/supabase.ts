@@ -50,7 +50,7 @@ const MAX_PER_SOURCE = 3;   // no source dominates the feed
 // chronological. Importance = lead-subject coverage × recency (see coverage.ts).
 // The freshness gate is load-bearing: mention_count is a GLOBAL prominence
 // counter, so without it an old-but-prominent story could lead.
-const OPENER_SIZE = 5;              // K cards before the feed reverts to recency
+const OPENER_SIZE = 1;              // pin only the single most-relevant recent story on top, then pure recency (keeps the feed feeling chronological)
 const OPENER_FRESHNESS_HOURS = 72;  // max age eligible to lead (stale-story guard)
 const OPENER_MAX_PER_SOURCE = 1;    // no single outlet dominates the lead
 const RECENCY_TAU_HOURS = 24;       // decay constant (matches trending's default)

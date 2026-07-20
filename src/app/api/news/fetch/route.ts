@@ -87,6 +87,17 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
   { url: "https://news.google.com/rss/search?q=(%22artificial%20intelligence%22%20OR%20AI%20OR%20LLM%20OR%20%22generative%20AI%22)%20(India%20OR%20Indian)%20when:3d&hl=en-IN&gl=IN&ceid=IN:en", defaultCategory: "startups", sourceName: "India AI", maxItems: 12 },
   { url: "https://cio.economictimes.indiatimes.com/rss/artificial-intelligence", defaultCategory: "big-tech",  sourceName: "ET CIO" },
   { url: "https://inc42.com/feed/",                                        defaultCategory: "startups",       sourceName: "Inc42", maxItems: 8 },
+
+  // ── Coverage-gap additions (July 2026 audit) — policy, hardware, robotics, EU, open-weight ──
+  // All RSS URLs were live-fetched and confirmed valid before adding.
+  { url: "https://www.transformernews.ai/feed",                            defaultCategory: "policy",         sourceName: "Transformer" },
+  { url: "https://importai.substack.com/feed",                             defaultCategory: "policy",         sourceName: "Import AI" },
+  { url: "https://www.interconnects.ai/feed",                              defaultCategory: "ai-models",      sourceName: "Interconnects" },
+  { url: "https://www.nextplatform.com/feed/",                             defaultCategory: "infrastructure", sourceName: "The Next Platform", maxItems: 8 },
+  { url: "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss", defaultCategory: "research",    sourceName: "IEEE Spectrum" },
+  { url: "https://www.therobotreport.com/feed/",                           defaultCategory: "research",       sourceName: "The Robot Report", maxItems: 6 },
+  { url: "https://www.latent.space/feed",                                  defaultCategory: "dev-tools",      sourceName: "Latent Space", maxItems: 6 },
+  { url: "https://tech.eu/feed/",                                          defaultCategory: "startups",       sourceName: "Tech.eu", maxItems: 8 },
 ];
 
 type ParserItem = {

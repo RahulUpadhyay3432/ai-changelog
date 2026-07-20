@@ -247,6 +247,27 @@ function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyRe
 
 // isBadSummary now lives in @/lib/quality (shared with the knowledge generator).
 
+// Retry transient LLM failures (rate limits / 5xx / network blips). Most "LLM
+// failed — skipped" drops were a single 429 with no retry; a short exponential
+// backoff clears them and stops silently shrinking the feed.
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  let lastErr: unknown;
+  for (let a = 0; a < attempts; a++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const m = String(err);
+      const transient =
+        /\b(429|500|502|503|504)\b/.test(m) ||
+        /fetch failed|timeout|ETIMEDOUT|ECONNRESET|overloaded|network/i.test(m);
+      if (!transient || a === attempts - 1) break;
+      await new Promise((r) => setTimeout(r, 500 * 2 ** a + Math.floor(Math.random() * 400)));
+    }
+  }
+  throw lastErr;
+}
+
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -296,16 +317,17 @@ async function classifyAndSummarize(
   defaultCategory: CategorySlug
 ): Promise<ClassifyResult | null> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
-  // Primary: OpenRouter (Nemotron). Fallback: Gemini.
+  // Primary: OpenRouter (free model). Fallback: Gemini. Each retried on transient
+  // rate-limit/5xx errors so a single 429 no longer silently drops the story.
   try {
-    const raw = await callOpenRouter(prompt);
+    const raw = await withRetry(() => callOpenRouter(prompt));
     return parseClassifyResponse(raw, defaultCategory);
   } catch {
     try {
-      const raw = await callGemini(prompt);
+      const raw = await withRetry(() => callGemini(prompt));
       return parseClassifyResponse(raw, defaultCategory);
     } catch {
-      return null; // Both failed — skip item, never show raw content
+      return null; // Both failed after retries — skip item, never show raw content
     }
   }
 }
@@ -396,7 +418,7 @@ function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
 
 // ─── Insert pipeline ──────────────────────────────────────────────────────────
 
-const INSERT_CONCURRENCY = 4; // parallel LLM calls — stays within Gemini free quota
+const INSERT_CONCURRENCY = 3; // parallel LLM calls — lower + retry keeps us under provider rate limits
 
 type IngestResults = {
   inserted: number;

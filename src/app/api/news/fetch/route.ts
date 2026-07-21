@@ -282,34 +282,9 @@ async function callGemini(prompt: string): Promise<string> {
   return text;
 }
 
-const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
-
-async function callOpenRouter(prompt: string): Promise<string> {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: OPENROUTER_MODEL,
-      // Nemotron is a reasoning model — headroom for hidden reasoning tokens
-      // plus the answer, or `content` comes back empty.
-      max_tokens: 800,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  if (!text) throw new Error("OpenRouter returned empty response");
-  return text;
-}
-
 /**
- * Single LLM call that returns both the correct category and a clean summary.
- * Falls back to OpenRouter if Gemini fails.
- * Returns null if both fail — callers must skip the item.
+ * Single LLM call (Gemini only) that returns both the correct category and a
+ * clean summary. Returns null if Gemini fails after retries — callers must skip.
  */
 async function classifyAndSummarize(
   title: string,
@@ -317,18 +292,13 @@ async function classifyAndSummarize(
   defaultCategory: CategorySlug
 ): Promise<ClassifyResult | null> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
-  // Primary: OpenRouter (free model). Fallback: Gemini. Each retried on transient
-  // rate-limit/5xx errors so a single 429 no longer silently drops the story.
+  // Gemini only (the main key), retried on transient rate-limit / 5xx errors so a
+  // single 429 no longer silently drops the story.
   try {
-    const raw = await withRetry(() => callOpenRouter(prompt));
+    const raw = await withRetry(() => callGemini(prompt));
     return parseClassifyResponse(raw, defaultCategory);
   } catch {
-    try {
-      const raw = await withRetry(() => callGemini(prompt));
-      return parseClassifyResponse(raw, defaultCategory);
-    } catch {
-      return null; // Both failed after retries — skip item, never show raw content
-    }
+    return null; // Gemini failed after retries — skip item, never show raw content
   }
 }
 

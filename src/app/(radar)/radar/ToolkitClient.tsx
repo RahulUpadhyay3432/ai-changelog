@@ -154,6 +154,9 @@ export function ToolkitClient() {
         <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45 }}>
           {empty ? "Your saved AI tools, filed by category." : `${saved.length} saved · filed by category.`}
         </p>
+        <a href="/radar/packs" style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "12px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: "var(--kt-accent, #3b82f6)", textDecoration: "none" }}>
+          Browse starter packs →
+        </a>
       </div>
 
       {/* Notes workspace — always visible */}

@@ -10,7 +10,7 @@ import { getRadarLens, setRadarLens, type RadarLens } from "@/lib/storage";
 import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { Hackathon } from "@/lib/hackathons";
 import { radarVariants, lensIndicatorSpring } from "@/lib/radar-motion";
-import { FaceMark, MetricChip, CoverImage, usePressTap, accentFor, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, VerdictBadge, CoverImage, usePressTap, accentFor, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, type RadarThing } from "./radar-shared";
 import { toolThing, essThing, canonThing, entThing, categorizeTool, logoFor, WHATS_NEW_CATEGORY_ORDER } from "./radar-map";
 import { slugForUrl } from "@/lib/tools-registry";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -349,7 +349,10 @@ function Row({ thing, onOpen }: { thing: RadarThing; onOpen: (t: RadarThing) => 
     <motion.button {...tap} whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 440, damping: 28 }} className="radar-row" style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", textAlign: "left", padding: "13px 24px", background: "transparent", border: "none", borderBottom: `1px solid ${HAIRLINE}`, cursor: "pointer", color: "inherit" }}>
       <FaceMark face={thing.face} category={thing.categorySlug} logoUrl={thing.logoUrl} label={thing.name} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em" }}>{thing.name}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "7px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em" }}>{thing.name}</span>
+          {thing.verdict && <VerdictBadge verdict={thing.verdict} />}
+        </span>
         <p style={{ fontSize: "14px", fontWeight: 450, color: TEXT.body, lineHeight: 1.4, margin: "2px 0 0" }}>{thing.valueLine}</p>
       </div>
       {thing.metric && <MetricChip>{thing.metric}</MetricChip>}

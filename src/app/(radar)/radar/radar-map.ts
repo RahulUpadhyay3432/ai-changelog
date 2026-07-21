@@ -6,6 +6,7 @@ import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
 import { formatTimeAgo } from "@/lib/mock-data";
 import type { Face, RadarThing } from "./radar-shared";
+import { getVerdict } from "@/lib/radar-tool-depth";
 
 // github.com first-path segments that are product/marketing pages, NOT user or
 // org logins — so we don't ask for a (non-existent) "features" / "marketplace"
@@ -210,6 +211,7 @@ export function essThing(t: RadarTool): RadarThing {
     description: t.description ?? null, topics: t.topics,
     imageUrl: ogProxy(t.url),
     logoUrl: logoFor(t.url),
+    verdict: getVerdict(t.url),
   };
 }
 

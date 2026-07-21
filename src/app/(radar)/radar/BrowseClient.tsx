@@ -10,7 +10,7 @@ import type { RadarTool, RadarItem } from "@/lib/knowledge";
 import type { CategorySlug } from "@/lib/types";
 import { slugForUrl } from "@/lib/tools-registry";
 import {
-  FaceMark, MetricChip, CoverImage, accentFor,
+  FaceMark, MetricChip, VerdictBadge, CoverImage, accentFor,
   GOLD, GOLD_SOFT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT, SG, TEXT,
   type RadarThing,
 } from "./radar-shared";
@@ -142,6 +142,7 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
         <span style={{ flex: 1, minWidth: 0, fontSize: "14.5px", fontWeight: 600, color: "var(--kt-text-primary, #ededed)", letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+        {thing.verdict && <VerdictBadge verdict={thing.verdict} />}
         {thing.typeLabel && (
           <span style={{ flexShrink: 0, fontSize: "10px", fontWeight: 600, letterSpacing: "0.03em", color: TEXT.muted, background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "2px 8px", whiteSpace: "nowrap" }}>{thing.typeLabel}</span>
         )}

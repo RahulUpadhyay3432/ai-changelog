@@ -24,6 +24,7 @@ export function CompletionCard({
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFeedHint, setShowFeedHint] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
+  const [showWeekly, setShowWeekly] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -191,6 +192,30 @@ export function CompletionCard({
           </button>
 
           <button
+            onClick={() => {
+              posthog.capture("weekly_recap_tapped");
+              setShowWeekly(true);
+            }}
+            style={{
+              background: "rgba(74,222,128,0.10)",
+              border: "1px solid rgba(74,222,128,0.24)",
+              borderRadius: "20px",
+              color: "#4ade80",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              padding: "10px 22px",
+              letterSpacing: "0.01em",
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+            }}
+          >
+            <Check size={14} strokeWidth={2.5} />
+            This week: you&apos;re all caught up
+          </button>
+
+          <button
             onClick={() => setShowFeedback(true)}
             style={{
               background: "var(--kt-read-surface-2, rgba(255,255,255,0.05))",
@@ -262,6 +287,7 @@ export function CompletionCard({
 
       <FeedbackSheet open={showFeedback} onClose={() => setShowFeedback(false)} />
       <ShareCardSheet open={showShareCard} onClose={() => setShowShareCard(false)} />
+      <ShareCardSheet open={showWeekly} onClose={() => setShowWeekly(false)} variant="weekly" />
 
       {/* "Still all caught up" toast */}
       <AnimatePresence>

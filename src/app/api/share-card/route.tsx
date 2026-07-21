@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
 import { getCategoryBySlug } from "@/lib/categories";
+import { getTrending } from "@/lib/trending";
 import type { CategorySlug } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -8,26 +9,33 @@ export const dynamic = "force-dynamic";
 const W = 1080;
 const H = 1920;
 
-export async function GET() {
+export async function GET(req: Request) {
+  const weekly = new URL(req.url).searchParams.get("kind") === "weekly";
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-  const { data } = await supabase
-    .from("news_items")
-    .select("id, title, category_slug")
-    .gte("published_at", cutoff)
-    .order("published_at", { ascending: false })
-    .limit(3);
+  let stories: { id: string; title: string; category_slug: string }[];
+  if (weekly) {
+    // The stories that actually mattered this week — ranked by coverage x recency
+    // over a 7-day window, not raw recency. Anti-FOMO: "you're caught up."
+    const { top } = await getTrending(24 * 7, 3, 0);
+    stories = top.map((s) => ({ id: s.id, title: s.title, category_slug: s.categorySlug }));
+  } else {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const { data } = await supabase
+      .from("news_items")
+      .select("id, title, category_slug")
+      .gte("published_at", cutoff)
+      .order("published_at", { ascending: false })
+      .limit(3);
+    stories = (data ?? []).slice(0, 3);
+  }
 
-  const stories = (data ?? []).slice(0, 3);
-
-  const today = new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+  const dateLabel = weekly
+    ? "This week"
+    : new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   const categories = stories.map((s) =>
     getCategoryBySlug(s.category_slug as CategorySlug)
@@ -154,7 +162,7 @@ export async function GET() {
                   display: "flex",
                 }}
               >
-                {today}
+                {dateLabel}
               </span>
             </div>
           </div>
@@ -171,7 +179,7 @@ export async function GET() {
                 display: "flex",
               }}
             >
-              Today in AI
+              {weekly ? "This week in AI" : "Today in AI"}
             </span>
             <p
               style={{
@@ -185,7 +193,7 @@ export async function GET() {
                 flexWrap: "wrap",
               }}
             >
-              3 stories worth knowing
+              {weekly ? "The stories that mattered" : "3 stories worth knowing"}
             </p>
           </div>
 

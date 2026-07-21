@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Bookmark, Copy, ArrowUpRight, Check, Layers, Plus, ChevronDown } from "lucide-react";
 import posthog from "posthog-js";
-import { FaceMark, MetricChip, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
+import { FaceMark, MetricChip, VerdictBadge, verdictStyle, GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT, type RadarThing } from "./radar-shared";
 import { categoryEmoji } from "./radar-map";
 import {
   toggleRadarTool, isRadarToolSaved, getLoadouts, createLoadout,
@@ -241,6 +241,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
               <h2 style={{ fontFamily: SG, fontSize: "19px", fontWeight: 600, color: "#f3efe9", margin: 0, letterSpacing: "-0.01em" }}>{thing.name}</h2>
               {thing.typeLabel && <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--kt-text-muted, #737373)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "2px 8px" }}>{thing.typeLabel}</span>}
+              {depth?.verdict && <VerdictBadge verdict={depth.verdict} size="md" />}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "7px" }}>
               {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
@@ -257,6 +258,21 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
         {/* Content */}
         <div style={{ padding: "18px 20px 0", overflowY: "auto", flex: 1 }}>
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#cfcbc4", margin: 0 }}>{thing.valueLine}</p>
+
+          {/* Kapyn's take — the honest verdict; the reason to read us over a newsletter. */}
+          {depth?.take && (
+            <div style={{
+              marginTop: "16px", padding: "13px 15px", borderRadius: "13px",
+              background: depth.verdict ? verdictStyle(depth.verdict).bg : "rgba(255,255,255,0.04)",
+              border: `1px solid ${depth.verdict ? verdictStyle(depth.verdict).ring : "rgba(255,255,255,0.1)"}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "7px" }}>
+                <span style={{ fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: depth.verdict ? verdictStyle(depth.verdict).fg : GOLD }}>Kapyn&apos;s take</span>
+                {depth.verdict && <VerdictBadge verdict={depth.verdict} />}
+              </div>
+              <p style={{ fontSize: "14.5px", lineHeight: 1.6, color: TEXT.primary, margin: 0 }}>{depth.take}</p>
+            </div>
+          )}
 
           {/* Context facts — always present so the card never reads as one line. */}
           {contextRows.length > 0 && (

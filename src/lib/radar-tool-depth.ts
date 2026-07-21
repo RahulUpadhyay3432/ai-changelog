@@ -7,11 +7,20 @@
 // brand voice: present tense, verb-first, factual, no hype, no emoji. Edit
 // freely — this is editorial, not generated.
 
+// Kapyn's stance on a tool — the "editor with a point of view" layer.
+//   worth-it = genuinely reach for it   watch = promising, not yet
+//   skip = overrated / better options    sunset = losing relevance
+export type Verdict = "worth-it" | "watch" | "skip" | "sunset";
+
 export interface ToolDepth {
   whatItIs: string;
   howItWorks: string;
   whoItsFor: string;
   whereUsed: string;
+  // Optional honest verdict; a missing one just hides the badge. `take` names the
+  // real tradeoff — the "but…" the tool-announcement newsletters never print.
+  verdict?: Verdict;
+  take?: string;
 }
 
 // Normalize so "https://pinecone.io" and "https://pinecone.io/" match.
@@ -499,12 +508,104 @@ const RAW: Record<string, ToolDepth> = {
   },
 };
 
-// Build a normalized lookup once at module load.
+// ── Verdicts ──────────────────────────────────────────────────────────────────
+// Kapyn taking a stance where the tool-announcement newsletters won't. Kept
+// separate from the neutral depth copy so the POV is easy to audit and edit.
+// Keyed by the same canonical URL; merged into getToolDepth(). Calm voice, but
+// every take names the real tradeoff.
+const VERDICTS: Record<string, { verdict: Verdict; take: string }> = {
+  // Models & chat
+  "https://chatgpt.com":     { verdict: "worth-it", take: "The safe default everyone starts with. Broadest tool support — but no longer the sharpest at any one thing: Claude codes better, Gemini reads longer." },
+  "https://claude.ai":       { verdict: "worth-it", take: "The one to reach for on real code and long documents. Slower to add consumer features, and rate limits bite on the cheaper plans." },
+  "https://gemini.google.com": { verdict: "worth-it", take: "Unmatched context length and the pick if you live in Google's tools. The quality gap to Claude on hard reasoning is real, but closing." },
+  "https://perplexity.ai":   { verdict: "worth-it", take: "The one research tool actually worth paying for — it cites, unlike raw ChatGPT. But it's a thin layer; the day Google ships good citations, the moat thins." },
+  "https://grok.com":        { verdict: "watch",    take: "Fast and plugged into live X chatter. Opinionated in ways you may not want near production — great for a pulse-check, not a system prompt." },
+  "https://mistral.ai":      { verdict: "worth-it", take: "Europe's open-weight champion — capable, EU-resident, self-hostable. A notch behind the frontier on the hardest tasks." },
+  "https://deepseek.com":    { verdict: "worth-it", take: "Frontier-grade reasoning at a fraction of the price — the value pick. If your data-governance team is comfortable with the origin." },
+
+  // AI coding
+  "https://cursor.com":                  { verdict: "worth-it", take: "The best AI editor today, full stop. The catch: it's a paid VS Code fork, so you're betting your daily driver on a startup's roadmap and pricing." },
+  "https://github.com/features/copilot": { verdict: "worth-it", take: "Cheap, safe, everywhere. But it's autocomplete — Cursor and Claude Code have lapped it on real multi-file work." },
+  "https://claude.com/claude-code":      { verdict: "worth-it", take: "The strongest terminal agent right now — if you live in the CLI. GUI-first devs will bounce; it assumes you trust it with your shell." },
+  "https://lovable.dev":  { verdict: "watch", take: "Magic for a demo, brittle past it. Perfect for a v0 or a pitch; painful to maintain once real users arrive. Prototype, don't ship." },
+  "https://bolt.new":     { verdict: "watch", take: "Idea to running app in a browser tab — genuinely fun. The generated code is a sketch, not a foundation; expect to rebuild what you keep." },
+  "https://windsurf.com": { verdict: "watch", take: "A capable agentic IDE chasing Cursor. Real, but you're picking the challenger — the momentum is on Cursor's side." },
+  "https://replit.com":   { verdict: "watch", take: "The friendliest way to ship from a browser, and great for learning. You're all-in on their cloud, which gets pricey as you grow." },
+  "https://aider.chat":   { verdict: "worth-it", take: "The open, git-native terminal agent — free, honest, every change committed. Less polished than Cursor, and that's the trade." },
+  "https://cline.bot":    { verdict: "worth-it", take: "An open, transparent agent inside VS Code — you approve every step. Slower than a closed tool, by design." },
+  "https://zed.dev":      { verdict: "watch", take: "Blazing fast and a joy to type in. The AI is still catching Cursor's — you're buying the speed today and betting on the AI later." },
+  "https://devin.ai":     { verdict: "skip",  take: "Over-promised at launch and still finding its feet. Impressive demos, uneven in the wild — watch it, don't staff a sprint on it yet." },
+
+  // UI & design
+  "https://v0.dev":         { verdict: "worth-it", take: "The fastest path to a real React first draft. It won't know your design system — expect to re-skin most of what it hands you." },
+  "https://figma.com":      { verdict: "worth-it", take: "Non-negotiable for product design. The AI features are catch-up, not the reason you're here — you're here for the canvas." },
+  "https://framer.com":     { verdict: "worth-it", take: "Design and ship a marketing site in one place, no dev handoff. You trade pixel-anything for speed — fine for sites, not apps." },
+  "https://ui.shadcn.com":  { verdict: "worth-it", take: "You own the component code, which is the entire point — zero library lock-in. The flip side: no upgrades land in your lap." },
+  "https://tailwindcss.com": { verdict: "worth-it", take: "The default styling layer for a reason, and what most AI tools emit. Purists still hate the class soup; you'll stop caring by week two." },
+  "https://webflow.com":    { verdict: "worth-it", take: "Pixel control without writing front-end. Powerful, with a real learning curve and a subscription that scales with your ambitions." },
+
+  // Model access & inference
+  "https://openrouter.ai":  { verdict: "worth-it", take: "One key for every model — the smart default for multi-model apps. You pay a small margin to never integrate a provider again." },
+  "https://groq.com":       { verdict: "worth-it", take: "Absurdly fast — but open models only. No frontier models here, so it's a speed play, not a quality one." },
+  "https://together.ai":    { verdict: "worth-it", take: "Solid hosting and fine-tuning for open models. Nothing it does is unique — you pick it for breadth and price." },
+  "https://replicate.com":  { verdict: "worth-it", take: "The easiest way to run image/video/audio models behind an API. Cold starts and per-second billing add up at volume." },
+  "https://huggingface.co": { verdict: "worth-it", take: "The GitHub of ML — indispensable for open models, sprawling for everything else. You'll bookmark five pages and ignore the rest." },
+  "https://modal.com":      { verdict: "worth-it", take: "Run Python/GPU jobs without touching infra — a genuine time-saver. You're renting compute at a premium for the convenience." },
+  "https://cerebras.ai":    { verdict: "watch",    take: "Record-fast inference on exotic hardware. Impressive numbers; a thinner model selection and a bet on one vendor's chips." },
+
+  // Data & RAG
+  "https://pinecone.io":    { verdict: "watch",    take: "A solid managed vector DB — but pgvector (Supabase/Neon) is now good enough for most, and cheaper. Reach for Pinecone at real scale, not before." },
+  "https://supabase.com":   { verdict: "worth-it", take: "One backend for your app data and your embeddings — the pragmatic default. You'll hit the free-tier ceiling faster than you expect." },
+  "https://neon.tech":      { verdict: "worth-it", take: "Serverless Postgres that branches like git, with vectors built in. Lovely DX; scale-to-zero cold starts are the tax." },
+  "https://qdrant.tech":    { verdict: "worth-it", take: "Fast, self-hostable vector search in Rust. The open pick if you'd rather own it than rent Pinecone." },
+  "https://trychroma.com":  { verdict: "watch",    take: "The quickest path to RAG in a prototype. Great to start; you'll likely graduate to Qdrant or pgvector for production." },
+  "https://llamaindex.ai":  { verdict: "watch",    take: "Great for wiring data into LLMs fast. Like LangChain, it can over-abstract — reach for it when plain retrieval stops scaling." },
+
+  // Agents, automation & orchestration
+  "https://n8n.io":        { verdict: "worth-it", take: "The self-host answer to Zapier — own your data and your AI nodes. You also own the maintenance, so budget for it." },
+  "https://zapier.com":    { verdict: "worth-it", take: "Still the fastest glue for non-engineers. AI steps make the bill climb quietly — watch the task meter." },
+  "https://make.com":      { verdict: "worth-it", take: "More power than Zapier for branching flows, at a steeper learning curve. Worth it once your automations get real." },
+  "https://crewai.com":    { verdict: "watch",    take: "A clean way to model role-playing agents. Multi-agent is still more demo than dependable — start with one agent that actually works." },
+  "https://dify.ai":       { verdict: "worth-it", take: "An open, visual way to ship LLM apps without wiring every piece. You trade some control for the speed." },
+  "https://langchain.com/langgraph": { verdict: "watch", take: "Powerful and everywhere in tutorials — also famously over-abstracted. Reach for LangGraph only when a plain loop stops scaling." },
+  "https://temporal.io":   { verdict: "worth-it", take: "Overkill for a side project, essential at scale — durable workflows done right. The learning curve is the price of never losing state." },
+  "https://trigger.dev":   { verdict: "worth-it", take: "Background jobs as normal code, open-source, no timeout fights. Younger than Temporal, and far easier to start." },
+  "https://mastra.ai":     { verdict: "watch",    take: "A tidy TypeScript home for agents and RAG. Young, but the right shape if your stack is JS — an early bet." },
+
+  // Security & observability
+  "https://socket.dev":    { verdict: "worth-it", take: "Catches malicious packages the old scanners miss — the supply-chain layer worth adding. Narrow by design; pair it with a broader scanner." },
+  "https://snyk.io":       { verdict: "worth-it", take: "The incumbent for dependency and code scanning — thorough. Priced like an enterprise tool the moment you're past the free tier." },
+  "https://semgrep.dev":   { verdict: "worth-it", take: "Fast, writable static analysis that fits CI. Generous free tier; the real value is in writing your own rules." },
+  "https://helicone.ai":   { verdict: "worth-it", take: "One-line LLM observability — the easiest place to start watching cost and latency. Choose Langfuse instead if you'd rather self-host." },
+  "https://langfuse.com":  { verdict: "worth-it", take: "Open-source tracing and evals — self-host and own the data. More setup than Helicone, more control." },
+  "https://braintrust.dev": { verdict: "worth-it", take: "Actually measure whether a prompt or model change helped before you ship it. The discipline it forces is the real product." },
+
+  // Media
+  "https://elevenlabs.io": { verdict: "worth-it", take: "The voice-quality benchmark. Pricey at scale, and everyone's demos are starting to sound the same." },
+  "https://midjourney.com": { verdict: "worth-it", take: "Still the best-looking image model. Discord-first with a weak API — gorgeous output, awkward to build on." },
+  "https://suno.com":      { verdict: "watch",    take: "Genuinely fun, legally murky. Great for a demo track; think hard before anything commercial." },
+  "https://runwayml.com":  { verdict: "worth-it", take: "A real video suite for creators, not a toy. Credits vanish fast — it rewards knowing exactly what you want." },
+};
+
+// Build normalized lookups once at module load.
 const TOOL_DEPTH: Record<string, ToolDepth> = Object.fromEntries(
   Object.entries(RAW).map(([url, depth]) => [normalizeUrl(url), depth])
+);
+const VERDICT_MAP: Record<string, { verdict: Verdict; take: string }> = Object.fromEntries(
+  Object.entries(VERDICTS).map(([url, v]) => [normalizeUrl(url), v])
 );
 
 export function getToolDepth(url: string | null | undefined): ToolDepth | null {
   if (!url) return null;
-  return TOOL_DEPTH[normalizeUrl(url)] ?? null;
+  const key = normalizeUrl(url);
+  const depth = TOOL_DEPTH[key];
+  if (!depth) return null;
+  const v = VERDICT_MAP[key];
+  return v ? { ...depth, ...v } : depth;
+}
+
+// Verdict-only lookup for the row/card badges (no depth needed).
+export function getVerdict(url: string | null | undefined): Verdict | null {
+  if (!url) return null;
+  return VERDICT_MAP[normalizeUrl(url)]?.verdict ?? null;
 }

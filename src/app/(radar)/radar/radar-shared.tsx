@@ -8,6 +8,7 @@ import {
   GOLD, GOLD_SOFT, GOLD_BORDER, SG,
   CANVAS, SURFACE, SURFACE_RAISED, HAIRLINE, INNER_HIGHLIGHT, TEXT,
 } from "@/lib/design-tokens";
+import type { Verdict } from "@/lib/radar-tool-depth";
 
 // ─── Tap-vs-scroll guard ─────────────────────────────────────────────────────
 // Cards inside a scroll container must open ONLY on a deliberate tap — not when
@@ -237,6 +238,31 @@ export function MetricChip({ children, color = TEXT.body }: { children: React.Re
   );
 }
 
+// ─── Verdict badge — Kapyn's stance on a tool (the "editor with a POV" pill) ──
+const VERDICT_STYLE: Record<Verdict, { label: string; fg: string; bg: string; ring: string }> = {
+  "worth-it": { label: "Worth it", fg: "#4ade80", bg: "rgba(74,222,128,0.12)", ring: "rgba(74,222,128,0.26)" },
+  "watch":    { label: "Watch",    fg: "#fbbf24", bg: "rgba(251,191,36,0.12)", ring: "rgba(251,191,36,0.26)" },
+  "skip":     { label: "Skip",     fg: "#f87171", bg: "rgba(248,113,113,0.12)", ring: "rgba(248,113,113,0.28)" },
+  "sunset":   { label: "Fading",   fg: "#a3a3a3", bg: "rgba(255,255,255,0.06)", ring: "rgba(255,255,255,0.14)" },
+};
+
+export function verdictStyle(v: Verdict) { return VERDICT_STYLE[v]; }
+
+export function VerdictBadge({ verdict, size = "sm" }: { verdict: Verdict; size?: "sm" | "md" }) {
+  const s = VERDICT_STYLE[verdict];
+  const dim = size === "md" ? { fontSize: "10px", padding: "2.5px 9px" } : { fontSize: "9px", padding: "1.5px 7px" };
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center",
+      fontFamily: SG, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase",
+      color: s.fg, background: s.bg, border: `1px solid ${s.ring}`, borderRadius: "100px",
+      whiteSpace: "nowrap", ...dim,
+    }}>
+      {s.label}
+    </span>
+  );
+}
+
 // ─── The normalized unit the radar + detail sheet share ──────────────────────
 export interface RadarThing {
   id: string; // unique: tool url, or `entity:<id>`
@@ -260,4 +286,5 @@ export interface RadarThing {
   subtype?: string | null; // "70B · open weights" / "stdio" / "arXiv"
   description?: string | null; // longer body for the detail sheet (e.g. PH description)
   topics?: string[]; // source topics → chips in the detail sheet
+  verdict?: Verdict | null; // Kapyn's stance — drives the row/card badge
 }

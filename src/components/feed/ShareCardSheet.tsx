@@ -9,27 +9,30 @@ import posthog from "posthog-js";
 interface ShareCardSheetProps {
   open: boolean;
   onClose: () => void;
+  variant?: "today" | "weekly";
 }
 
-function SheetContent({ onClose }: { onClose: () => void }) {
+function SheetContent({ onClose, variant }: { onClose: () => void; variant: "today" | "weekly" }) {
   const [sharing, setSharing] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const weekly = variant === "weekly";
+  const cardSrc = weekly ? "/api/share-card?kind=weekly" : "/api/share-card";
 
   const handleShare = async () => {
     setSharing(true);
     try {
-      const res = await fetch("/api/share-card");
+      const res = await fetch(cardSrc);
       const blob = await res.blob();
-      const file = new File([blob], "kapyn-today.png", { type: "image/png" });
+      const file = new File([blob], weekly ? "kapyn-week.png" : "kapyn-today.png", { type: "image/png" });
 
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Today in AI — Kapyn" });
-        posthog.capture("share_card_shared");
+        await navigator.share({ files: [file], title: weekly ? "This week in AI — Kapyn" : "Today in AI — Kapyn" });
+        posthog.capture("share_card_shared", { variant });
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "kapyn-today.png";
+        a.download = weekly ? "kapyn-week.png" : "kapyn-today.png";
         a.click();
         URL.revokeObjectURL(url);
         posthog.capture("share_card_downloaded");
@@ -134,10 +137,10 @@ function SheetContent({ onClose }: { onClose: () => void }) {
                 letterSpacing: "-0.01em",
               }}
             >
-              Today&apos;s top 3
+              {weekly ? "This week — you're caught up" : "Today's top 3"}
             </p>
             <p style={{ fontSize: "12px", color: "var(--kt-text-muted, #525252)", margin: 0 }}>
-              Share to Instagram, Twitter, or WhatsApp
+              {weekly ? "The stories that mattered — share the recap" : "Share to Instagram, Twitter, or WhatsApp"}
             </p>
           </div>
           <button
@@ -197,8 +200,8 @@ function SheetContent({ onClose }: { onClose: () => void }) {
           )}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/api/share-card"
-            alt="Today's top 3 AI stories"
+            src={cardSrc}
+            alt={weekly ? "This week's biggest AI stories" : "Today's top 3 AI stories"}
             onLoad={() => setImageLoaded(true)}
             style={{
               width: "100%",
@@ -256,7 +259,7 @@ function SheetContent({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function ShareCardSheet({ open, onClose }: ShareCardSheetProps) {
+export function ShareCardSheet({ open, onClose, variant = "today" }: ShareCardSheetProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -270,7 +273,7 @@ export function ShareCardSheet({ open, onClose }: ShareCardSheetProps) {
 
   return createPortal(
     <AnimatePresence>
-      {open && <SheetContent onClose={onClose} />}
+      {open && <SheetContent onClose={onClose} variant={variant} />}
     </AnimatePresence>,
     container
   );

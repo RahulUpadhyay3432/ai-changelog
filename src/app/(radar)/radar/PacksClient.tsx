@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Layers, Plus, Check } from "lucide-react";
 import posthog from "posthog-js";
 import { STARTER_PACKS, type StarterPack } from "@/lib/radar-packs";
-import { getToolDepth } from "@/lib/radar-tool-depth";
+import { getToolDepth, getVerdict } from "@/lib/radar-tool-depth";
 import { createLoadout, assignToolToLoadout } from "@/lib/storage";
-import { FaceMark, GOLD, SG, TEXT, SURFACE, HAIRLINE, CANVAS } from "./radar-shared";
+import { FaceMark, VerdictBadge, GOLD, SG, TEXT, SURFACE, HAIRLINE, CANVAS } from "./radar-shared";
 import { logoFor } from "./radar-map";
 
 // Save every tool in a pack into a fresh named Loadout (on-device). Returns the
@@ -69,18 +69,22 @@ export function PacksClient() {
               <p style={{ fontSize: "13.5px", color: TEXT.muted, lineHeight: 1.5, margin: "6px 0 12px" }}>{pack.blurb}</p>
 
               <div style={{ display: "flex", flexDirection: "column", marginBottom: "13px" }}>
-                {pack.tools.map((t) => (
-                  <a
-                    key={t.url}
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 0", textDecoration: "none", color: "inherit" }}
-                  >
-                    <FaceMark face="essential" logoUrl={logoFor(t.url)} label={t.name} size={26} />
-                    <span style={{ flex: 1, minWidth: 0, fontSize: "14px", fontWeight: 600, color: TEXT.body, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</span>
-                  </a>
-                ))}
+                {pack.tools.map((t) => {
+                  const v = getVerdict(t.url);
+                  return (
+                    <a
+                      key={t.url}
+                      href={t.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 0", textDecoration: "none", color: "inherit" }}
+                    >
+                      <FaceMark face="essential" logoUrl={logoFor(t.url)} label={t.name} size={26} />
+                      <span style={{ flex: 1, minWidth: 0, fontSize: "14px", fontWeight: 600, color: TEXT.body, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</span>
+                      {v && <VerdictBadge verdict={v} />}
+                    </a>
+                  );
+                })}
               </div>
 
               <button

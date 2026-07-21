@@ -25,8 +25,14 @@ interface CardStackProps {
 
 const PTR_THRESHOLD = 64;
 const DIRECTION_LOCK_THRESHOLD = 8;
+// Show the push opt-in after this many stories — engaged, but far before the
+// end-of-stack. The old end-only placement sat after ~100 cards, so virtually
+// nobody reached it → virtually no subscribers → push reached no one.
+const NOTIF_SLOT = 5;
 
-type FeedEntry = { type: "news"; item: NewsItem; newsIdx: number };
+type FeedEntry =
+  | { type: "news"; item: NewsItem; newsIdx: number }
+  | { type: "notif" };
 
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
@@ -63,11 +69,16 @@ export function CardStack({
   useEffect(() => { onRefreshRef.current = onRefresh; }, [onRefresh]);
   useEffect(() => { itemsLenRef.current = items.length; }, [items.length]);
 
-  // ─── Build feed (news only) ──────────────────────────────────────────────
-  const feedEntries = useMemo<FeedEntry[]>(
-    () => items.map((item, i) => ({ type: "news", item, newsIdx: i })),
-    [items]
-  );
+  // ─── Build feed (news + an early push opt-in interstitial) ───────────────
+  const feedEntries = useMemo<FeedEntry[]>(() => {
+    const entries: FeedEntry[] = items.map((item, i) => ({ type: "news", item, newsIdx: i }));
+    // Splice the opt-in in early so engaged readers actually see it — only when
+    // there are enough stories after it that it isn't crowding the end.
+    if (showNotif && entries.length > NOTIF_SLOT) {
+      entries.splice(NOTIF_SLOT, 0, { type: "notif" });
+    }
+    return entries;
+  }, [items, showNotif]);
 
   useEffect(() => {
     updateStreak();
@@ -184,10 +195,11 @@ export function CardStack({
     setCurrentIndex(index);
 
     const entry = feedEntries[index];
-    if (entry) {
+    if (entry && entry.type === "news") {
       onIndexChange?.(entry.newsIdx, items.length);
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
-      const prevItem = feedEntries[prev]?.item ?? items[0];
+      const prevEntry = feedEntries[prev];
+      const prevItem = prevEntry?.type === "news" ? prevEntry.item : items[0];
       // Fire synchronously. Previously deferred via requestIdleCallback, which
       // silently dropped the first swipe on a fast bounce — exactly the users
       // whose swipe-depth we most need to measure. posthog.capture batches, so
@@ -217,7 +229,7 @@ export function CardStack({
   useEffect(() => {
     for (let i = currentIndex + 1; i <= currentIndex + PRELOAD_AHEAD; i++) {
       const entry = feedEntries[i];
-      const url = entry?.item.imageUrl;
+      const url = entry?.type === "news" ? entry.item.imageUrl : null;
       if (!url) continue;
       const img = new window.Image();
       img.decoding = "async";
@@ -230,7 +242,7 @@ export function CardStack({
   useEffect(() => {
     for (let i = currentIndex; i <= currentIndex + BREAKDOWN_PREFETCH_AHEAD; i++) {
       const entry = feedEntries[i];
-      if (!entry) continue;
+      if (!entry || entry.type !== "news") continue;
       prefetchBreakdown(entry.item);
     }
   }, [currentIndex, feedEntries]);
@@ -284,21 +296,20 @@ export function CardStack({
       >
         {feedEntries.map((entry) => (
           <div
-            key={entry.item.id}
+            key={entry.type === "news" ? entry.item.id : "push-optin"}
             style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
           >
-            <NewsCard
-              item={entry.item}
-              onSave={onSave}
-              isNew={lastVisit != null && new Date(entry.item.publishedAt).getTime() > lastVisit}
-            />
+            {entry.type === "news" ? (
+              <NewsCard
+                item={entry.item}
+                onSave={onSave}
+                isNew={lastVisit != null && new Date(entry.item.publishedAt).getTime() > lastVisit}
+              />
+            ) : (
+              <NotificationCard onDone={() => setShowNotif(false)} />
+            )}
           </div>
         ))}
-        {showNotif && (
-          <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
-            <NotificationCard onDone={() => setShowNotif(false)} />
-          </div>
-        )}
         <div style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
           <CompletionCard
             readCount={items.length}

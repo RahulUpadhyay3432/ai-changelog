@@ -66,20 +66,24 @@ const CARD_STYLE: React.CSSProperties = {
 };
 
 // One feature, rendered as a full self-contained, info-rich card.
+// `variant: "peek"` is the depth shell behind the front card — it keeps the
+// full card box (height + transition coverage) but hides the top header so the
+// "What the Radar does" label doesn't visibly repeat in the deck's top sliver.
 function CapabilityCard({
-  cap, toolCount, mcpCount, skillCount,
-}: { cap: Capability; toolCount: number; mcpCount: number; skillCount: number }) {
+  cap, toolCount, mcpCount, skillCount, variant = "front",
+}: { cap: Capability; toolCount: number; mcpCount: number; skillCount: number; variant?: "front" | "peek" }) {
   const { Icon, title, line, points } = cap;
+  const peek = variant === "peek";
   return (
     <div style={CARD_STYLE}>
-      {/* header */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+      {/* header — hidden (space preserved) on peek shells so it doesn't repeat */}
+      <div style={{ display: "flex", alignItems: "center", marginBottom: "5px", visibility: peek ? "hidden" : undefined }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: TEXT.muted }}>
           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, boxShadow: "0 0 0 4px rgba(59,130,246,0.18)" }} />
           What the Radar does
         </span>
       </div>
-      <p style={{ margin: "0 0 12px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4 }}>
+      <p style={{ margin: "0 0 12px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, visibility: peek ? "hidden" : undefined }}>
         The calm map of the AI worth using.
       </p>
       <div style={{ height: "1px", background: HAIRLINE }} />
@@ -209,7 +213,7 @@ export function HeroRadarPanel({
             aria-hidden
             style={{ position: "absolute", top: PEEK_TOP, left: 0, right: 0, transformOrigin: "top center", transform: `translateY(${p.y}px) scale(${p.scale})`, opacity: p.opacity, zIndex: p.z, pointerEvents: "none" }}
           >
-            <CapabilityCard cap={CAPABILITIES[0]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} />
+            <CapabilityCard cap={CAPABILITIES[0]} toolCount={toolCount} mcpCount={mcpCount} skillCount={skillCount} variant="peek" />
           </div>
         ))}
 

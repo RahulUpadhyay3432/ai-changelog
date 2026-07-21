@@ -204,7 +204,7 @@ SUMMARY RULES:
 - NEVER start with "This article", "This release", or "This post"
 - If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
 - If it is a retirement/deprecation notice for a niche cloud service most AI developers wouldn't know (e.g. "Azure Form Recognizer v2 retiring"): write LOW_SIGNAL. But if it affects a widely-used API or platform (e.g. "OpenAI deprecates GPT-3 API"): cover it normally
-- If the content is NOT about AI, ML, software, developer tools, tech startups, or the tech industry: write OFF_TOPIC
+- RELEVANCE GATE (strict — Kapyn is an AI feed): write OFF_TOPIC unless the story is genuinely about AI or machine learning, or the models, developer tools, infrastructure, research, funding, or policy that AI builders actually care about. A company merely being a startup or "in tech" is NOT enough — there must be a real AI/ML angle. Reject as OFF_TOPIC: consumer/D2C brands, general retail, fintech or SaaS with no AI angle, exam or education results (e.g. NEET/board results), sports, entertainment, crypto price moves, and generic business news.
 
 ENTITY EXTRACTION:
 - After the summary, list up to 6 specific named entities this story is actually ABOUT — models, tools, companies, techniques, or concepts (e.g. GPT-5, vLLM, Anthropic, RAG, mixture of experts).

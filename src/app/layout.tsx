@@ -44,6 +44,23 @@ const SITE_JSONLD = {
         "query-input": "required name=search_term_string",
       },
     },
+    {
+      // Establishes "Kapyn" as an app entity so "kapyn app" resolves to a known
+      // product (not Google's "kyn" autocorrect). alternateName carries the exact
+      // query users type.
+      "@type": "WebApplication",
+      "@id": `${APP_URL}/#webapp`,
+      name: "Kapyn",
+      alternateName: "Kapyn App",
+      url: APP_URL,
+      applicationCategory: "NewsApplication",
+      operatingSystem: "Web, iOS, Android",
+      description:
+        "A mobile-first app delivering AI news as swipeable 30-second dispatches, plus a curated Radar of the AI tools, models, MCP servers and skills worth using.",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      isAccessibleForFree: true,
+      publisher: { "@id": `${APP_URL}/#organization` },
+    },
   ],
 };
 

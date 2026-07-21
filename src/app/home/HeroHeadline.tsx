@@ -2,11 +2,15 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { GOLD, TEXT, SG } from "@/lib/design-tokens";
-import { Typewriter } from "./Typewriter";
 
-// The five pillars Kapyn covers — the rotating word cycles through these.
-const PILLARS = ["coding agent", "AI model", "MCP server", "dev tool", "AI skill"];
-const PREFIX = ["Find", "the", "best"];
+// Stable hero headline — commits to Kapyn's core promise from first paint (no
+// rotating word). "worth using" carries the accent; curation is the whole point.
+const LINE1 = ["The", "calm", "map", "of", "the"];
+const LINE2: { word: string; accent: boolean }[] = [
+  { word: "AI", accent: false },
+  { word: "worth", accent: true },
+  { word: "using.", accent: true },
+];
 
 const EASE: [number, number, number, number] = [0.2, 0, 0, 1];
 
@@ -22,39 +26,38 @@ const H1_STYLE: React.CSSProperties = {
 
 export function HeroHeadline() {
   const reduce = useReducedMotion();
-  const rotating = <Typewriter words={PILLARS} color={GOLD} />;
 
   if (reduce) {
     return (
       <h1 style={H1_STYLE}>
-        Find the best
+        The calm map of the
         <br />
-        {rotating}
+        AI <span style={{ color: GOLD }}>worth using.</span>
       </h1>
     );
   }
 
-  const nodes: React.ReactNode[] = [];
-  PREFIX.forEach((w, i) => {
-    nodes.push(
-      <motion.span
-        key={w}
-        initial={{ opacity: 0, filter: "blur(6px)", y: 10 }}
-        animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-        transition={{ duration: 0.5, delay: 0.12 + i * 0.09, ease: EASE }}
-        style={{ display: "inline-block" }}
-      >
-        {w}
-      </motion.span>
-    );
-    if (i < PREFIX.length - 1) nodes.push(" ");
-  });
+  const word = (w: string, i: number, accent: boolean) => (
+    <motion.span
+      key={`${w}-${i}`}
+      initial={{ opacity: 0, filter: "blur(6px)", y: 10 }}
+      animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+      transition={{ duration: 0.5, delay: 0.12 + i * 0.075, ease: EASE }}
+      style={{ display: "inline-block", color: accent ? GOLD : undefined }}
+    >
+      {w}
+    </motion.span>
+  );
 
   return (
     <h1 style={H1_STYLE}>
-      {nodes}
+      {LINE1.map((w, i) => (
+        <span key={`l1-${i}`}>{word(w, i, false)} </span>
+      ))}
       <br />
-      {rotating}
+      {LINE2.map((w, i) => (
+        <span key={`l2-${i}`}>{word(w.word, LINE1.length + i, w.accent)} </span>
+      ))}
     </h1>
   );
 }

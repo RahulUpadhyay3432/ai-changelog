@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "lucide-react";
@@ -12,7 +12,7 @@ import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
-import { getFeedHintShown, setFeedHintShown, getStreak } from "@/lib/storage";
+import { getFeedHintShown, setFeedHintShown, getStreak, getLastVisitTimestamp, setLastVisitTimestamp } from "@/lib/storage";
 import type { CategorySlug, NewsItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
@@ -49,10 +49,25 @@ function warmImages(items: NewsItem[], count = 3) {
   }
 }
 
+// Session-stable "new since last visit" baseline. Module-scoped so it survives
+// feed remounts (in-app navigation) — captured once per page session in the
+// HomeFeed initializer below, not re-read on every mount.
+let sessionBaseline: number | null | undefined;
+
 export function HomeFeed() {
   const searchParams = useSearchParams();
   const initialCategory = (searchParams.get("category") ?? "all") as CategorySlug;
   const [storyId] = useState(() => searchParams.get("story"));
+
+  // "New since last visit" baseline: read the previous visit's timestamp ONCE per
+  // page session (cached in module scope so it doesn't reset on remount), then
+  // stamp "now" for next time. null for first-timers → no "new" hook (they've
+  // missed nothing yet). Measured against publishedAt in CardStack/NewsCard.
+  const [lastVisit] = useState<number | null>(() => {
+    if (sessionBaseline === undefined) sessionBaseline = getLastVisitTimestamp();
+    return sessionBaseline;
+  });
+  useEffect(() => { setLastVisitTimestamp(); }, []);
 
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
   const [stories, setStories] = useState<NewsItem[]>([]);
@@ -149,11 +164,18 @@ export function HomeFeed() {
       // $pageview mixes the news feed with the /radar surface, so it's a noisy
       // funnel entry.) opener_ranked carries the A/B arm for segmenting.
       const streak = getStreak();
+      const newSince = lastVisit == null
+        ? 0
+        : base.filter((s) => new Date(s.publishedAt).getTime() > lastVisit).length;
       posthog.capture("feed_viewed", {
         category: activeCategory,
         story_count: base.length,
         opener_ranked: openerRankingEnabled(),
         streak_days: streak,
+        // Returning-user retention signal: did they actually have unseen stories
+        // waiting? is_returning separates first-timers (no baseline) from the rest.
+        new_since_last_visit: newSince,
+        is_returning: lastVisit != null,
         // Promote streak to a person property so returning power users are a segment.
         $set: { streak_days: streak },
       });
@@ -186,7 +208,7 @@ export function HomeFeed() {
       });
 
     return () => { cancelled = true; };
-  }, [activeCategory, storyId, resolveFeed, prefetchAdjacent, reloadNonce]);
+  }, [activeCategory, storyId, resolveFeed, prefetchAdjacent, reloadNonce, lastVisit]);
 
   const handleCategoryChange = useCallback((slug: CategorySlug) => {
     posthog.capture("category_changed", { category: slug, previous_category: activeCategory });
@@ -265,6 +287,13 @@ export function HomeFeed() {
   const tabs = CATEGORY_TABS;
   const tabIdx = tabs.findIndex((t) => t.slug === activeCategory);
 
+  // "You missed N" — stories in the current feed newer than the user's last
+  // visit. The top-bar signal that pairs with the per-card "New" badges.
+  const newCount = useMemo(
+    () => (lastVisit == null ? 0 : stories.filter((s) => new Date(s.publishedAt).getTime() > lastVisit).length),
+    [stories, lastVisit]
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "var(--kt-canvas, #0a0a0a)" }}>
       {/* Top bar */}
@@ -275,13 +304,30 @@ export function HomeFeed() {
         alignItems: "center",
         justifyContent: "space-between",
       }}>
-        <h1 style={{
-          fontSize: "26px", fontWeight: 500, color: "var(--kt-text-primary, #E8E4DE)",
-          margin: 0, letterSpacing: "-0.02em",
-          fontFamily: "var(--font-space-grotesk), sans-serif",
-        }}>
-          kapyn
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+          <h1 style={{
+            fontSize: "26px", fontWeight: 500, color: "var(--kt-text-primary, #E8E4DE)",
+            margin: 0, letterSpacing: "-0.02em",
+            fontFamily: "var(--font-space-grotesk), sans-serif",
+          }}>
+            kapyn
+          </h1>
+          {newCount > 0 && (
+            <span
+              aria-label={`${newCount} new since your last visit`}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "5px",
+                fontSize: "11px", fontWeight: 600, letterSpacing: "0.02em",
+                color: "#4ade80", background: "rgba(74,222,128,0.12)",
+                border: "1px solid rgba(74,222,128,0.24)",
+                padding: "3px 9px", borderRadius: "100px", whiteSpace: "nowrap",
+              }}
+            >
+              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4ade80" }} />
+              {newCount} new
+            </span>
+          )}
+        </div>
         <HomeScreenPill />
       </div>
 
@@ -360,6 +406,7 @@ export function HomeFeed() {
                 onRefresh={handleRefresh}
                 onHorizontalDrag={handleHorizontalDrag}
                 onHorizontalDragEnd={handleHorizontalDragEnd}
+                lastVisit={lastVisit}
               />
             </motion.div>
 

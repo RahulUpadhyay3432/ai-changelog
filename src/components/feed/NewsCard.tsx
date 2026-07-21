@@ -17,6 +17,9 @@ interface NewsCardProps {
   item: NewsItem;
   onSave?: (id: string) => void;
   isSaved?: boolean;
+  // True when this story was published after the user's last visit — drives the
+  // "New" badge that gives a returning user a reason to keep swiping.
+  isNew?: boolean;
 }
 
 // The card summary is generated at ingestion by this model (api/news/fetch).
@@ -97,7 +100,7 @@ function cleanText(text: string): string {
     .trim();
 }
 
-function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
+function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCardProps) {
   const [saved, setSaved] = useState(isSaved);
   const [copied, setCopied] = useState(false);
   const [sharePressed, setSharePressed] = useState(false);
@@ -338,6 +341,28 @@ function NewsCardInner({ item, onSave, isSaved = false }: NewsCardProps) {
           >
             {category?.name ?? item.categorySlug}
           </span>
+          {isNew && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#4ade80",
+                background: "rgba(74,222,128,0.14)",
+                border: "1px solid rgba(74,222,128,0.30)",
+                padding: "2px 7px",
+                borderRadius: "100px",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4ade80", flexShrink: 0 }} />
+              New
+            </span>
+          )}
           <span
             style={{ fontSize: "10px", color: "var(--kt-text-muted, #8f8a82)", fontWeight: 500 }}
             suppressHydrationWarning

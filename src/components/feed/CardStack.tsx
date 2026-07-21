@@ -18,6 +18,9 @@ interface CardStackProps {
   onSave?: (id: string) => void;
   onHorizontalDrag?: (dx: number) => void;
   onHorizontalDragEnd?: (dx: number) => void;
+  // Unix ms of the user's previous visit (null for first-timers). Stories
+  // published after it get a "New" badge — the returning-user hook.
+  lastVisit?: number | null;
 }
 
 const PTR_THRESHOLD = 64;
@@ -27,7 +30,7 @@ type FeedEntry = { type: "news"; item: NewsItem; newsIdx: number };
 
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
-  onHorizontalDrag, onHorizontalDragEnd,
+  onHorizontalDrag, onHorizontalDragEnd, lastVisit,
 }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -284,7 +287,11 @@ export function CardStack({
             key={entry.item.id}
             style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
           >
-            <NewsCard item={entry.item} onSave={onSave} />
+            <NewsCard
+              item={entry.item}
+              onSave={onSave}
+              isNew={lastVisit != null && new Date(entry.item.publishedAt).getTime() > lastVisit}
+            />
           </div>
         ))}
         {showNotif && (

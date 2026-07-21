@@ -126,7 +126,7 @@ export default async function LandingPage() {
     AI_SKILLS.slice(0, 5).map((s) => ({ name: s.name, typeLabel: "skill", faviconHref: faviconFor(s.url), href: "/radar/mcp?tab=skills" })),
   );
 
-  const modelsCount = CURATED_ESSENTIALS.filter((e) => e.category === "Foundation models & chat").length;
+  const modelsCount = CURATED_ESSENTIALS.filter((e) => e.category === "Models & chat").length;
 
   const mapCards = [
     { Icon: Cpu, title: "Agents & Tools", line: "Coding agents, frameworks, automation", count: toolCount, chips: ["Cursor", "LangGraph", "n8n"], href: "/radar/browse" },

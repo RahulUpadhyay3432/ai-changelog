@@ -1,5 +1,5 @@
 // Shared LLM provider cascade for server-side generation: OpenRouter (free
-// GLM-4.5-Air, fast + predictable) primary, Gemini 2.5 Flash Lite fallback.
+// GLM-4.5-Air, fast + predictable) primary, Gemini Flash Lite (latest) fallback.
 // Mirrors the pattern in api/breakdown; centralised here for the knowledge
 // generator. Both tiers are free, so marginal cost stays ~$0.
 
@@ -40,7 +40,7 @@ export async function callOpenRouter(prompt: string, maxTokens = 800): Promise<s
 export async function callGemini(prompt: string): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY missing");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${key}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -65,6 +65,6 @@ export async function callLLM(prompt: string, maxTokens = 800): Promise<LLMResul
   try {
     return { text: await callOpenRouter(prompt, maxTokens), model: "glm-4.5-air" };
   } catch {
-    return { text: await callGemini(prompt), model: "gemini-2.5-flash-lite" };
+    return { text: await callGemini(prompt), model: "gemini-flash-lite-latest" };
   }
 }

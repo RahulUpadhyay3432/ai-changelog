@@ -21,7 +21,7 @@ interface NewsCardProps {
 
 // The card summary is generated at ingestion by this model (api/news/fetch).
 // Hardcoded for the attribution label (true for the vast majority of stories).
-const SUMMARY_MODEL = "Gemini 2.5 Flash Lite";
+const SUMMARY_MODEL = "Gemini Flash Lite";
 
 // One representative mark per category — turns an image-less story into an
 // intentional, consistent "cover" instead of an empty gradient.

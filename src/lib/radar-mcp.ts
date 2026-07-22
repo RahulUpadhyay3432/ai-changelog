@@ -17,6 +17,9 @@ export interface McpServer {
   by: "official" | "community";
 }
 
+// Expanded taxonomy to match a full MCP directory (MCP Market / PulseMCP breadth).
+// The first 8 are kept verbatim so the curated MCP_SERVERS entries stay valid; the
+// rest give the registry classifier real buckets to sort thousands of servers into.
 export type McpCategory =
   | "Dev tools"
   | "Databases"
@@ -25,12 +28,34 @@ export type McpCategory =
   | "Productivity"
   | "Cloud & infra"
   | "Memory & reasoning"
-  | "Payments";
+  | "Payments"
+  | "Version control"
+  | "DevOps & CI/CD"
+  | "Communication"
+  | "Web scraping"
+  | "Data & analytics"
+  | "AI & ML"
+  | "File & storage"
+  | "Docs & content"
+  | "Monitoring & observability"
+  | "Security"
+  | "CRM & sales"
+  | "Marketing"
+  | "Design"
+  | "Media"
+  | "Maps & location"
+  | "E-commerce";
 
-// Display order + emoji for the market's category sections / chips.
+// Display order for the market's category sections / chips (dev → data → business → media).
 export const MCP_CATEGORY_ORDER: McpCategory[] = [
-  "Dev tools", "Databases", "Search & web", "Browser & automation",
-  "Productivity", "Cloud & infra", "Memory & reasoning", "Payments",
+  "Dev tools", "Version control", "DevOps & CI/CD", "Cloud & infra",
+  "Databases", "Data & analytics", "File & storage",
+  "Search & web", "Web scraping", "Browser & automation",
+  "AI & ML", "Memory & reasoning",
+  "Productivity", "Communication", "Docs & content",
+  "Monitoring & observability", "Security",
+  "CRM & sales", "Marketing", "Design", "E-commerce", "Payments",
+  "Maps & location", "Media",
 ];
 
 export const MCP_CATEGORY_EMOJI: Record<McpCategory, string> = {
@@ -42,6 +67,22 @@ export const MCP_CATEGORY_EMOJI: Record<McpCategory, string> = {
   "Cloud & infra": "☁️",
   "Memory & reasoning": "🧠",
   "Payments": "💳",
+  "Version control": "🔀",
+  "DevOps & CI/CD": "⚙️",
+  "Communication": "💬",
+  "Web scraping": "🕸️",
+  "Data & analytics": "📊",
+  "AI & ML": "🧬",
+  "File & storage": "📁",
+  "Docs & content": "📝",
+  "Monitoring & observability": "📈",
+  "Security": "🔒",
+  "CRM & sales": "🤝",
+  "Marketing": "📣",
+  "Design": "🎨",
+  "Media": "🎬",
+  "Maps & location": "🗺️",
+  "E-commerce": "🛒",
 };
 
 // Extract "owner/repo" from a github.com URL (for stars/date enrichment).
@@ -66,6 +107,22 @@ export const MCP_CATEGORY_SLUG: Record<McpCategory, CategorySlug> = {
   "Cloud & infra": "infrastructure",
   "Memory & reasoning": "research",
   "Payments": "funding-ma",
+  "Version control": "dev-tools",
+  "DevOps & CI/CD": "infrastructure",
+  "Communication": "startups",
+  "Web scraping": "research",
+  "Data & analytics": "research",
+  "AI & ML": "ai-models",
+  "File & storage": "infrastructure",
+  "Docs & content": "open-source",
+  "Monitoring & observability": "infrastructure",
+  "Security": "policy",
+  "CRM & sales": "funding-ma",
+  "Marketing": "startups",
+  "Design": "open-source",
+  "Media": "ai-models",
+  "Maps & location": "research",
+  "E-commerce": "funding-ma",
 };
 
 export const MCP_SERVERS: McpServer[] = [

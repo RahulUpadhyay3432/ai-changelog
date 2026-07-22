@@ -105,17 +105,39 @@ export async function fetchMcpRegistryServers(maxPages = 6): Promise<RegistrySer
   return out;
 }
 
-// Coarse keyword → McpCategory mapping for discovered servers (curated ones carry
-// their own category). Defaults to "Dev tools" — the safest generic bucket.
+// Keyword → McpCategory mapping for discovered servers (curated ones carry their
+// own category). Ordered most-specific → most-generic; FIRST match wins, so put
+// narrow buckets (Payments, CRM) above broad ones (Cloud, Dev tools). Defaults to
+// "Dev tools" — the safest generic bucket. Edit freely; this is the taxonomy that
+// turns a flat registry into a categorized directory.
 export function categorizeMcp(name: string, description: string): McpCategory {
   const t = `${name} ${description}`.toLowerCase();
   const has = (...words: string[]) => words.some((w) => t.includes(w));
-  if (has("postgres", "mysql", "sqlite", "database", "sql ", "mongodb", "redis", "supabase", "vector", "warehouse")) return "Databases";
-  if (has("search", "web search", "scrape", "crawl", "serp", "google search")) return "Search & web";
-  if (has("browser", "playwright", "puppeteer", "automation", "selenium", "headless")) return "Browser & automation";
-  if (has("notion", "slack", "linear", "jira", "calendar", "email", "gmail", "docs", "productivity", "todo")) return "Productivity";
-  if (has("aws", "gcp", "azure", "cloud", "kubernetes", "docker", "terraform", "infra", "deploy", "server")) return "Cloud & infra";
-  if (has("memory", "reasoning", "knowledge graph", "recall", "embedding")) return "Memory & reasoning";
-  if (has("stripe", "payment", "billing", "invoice", "paypal", "checkout")) return "Payments";
+
+  if (has("stripe", "payment", "billing", "invoice", "paypal", "checkout", "subscription")) return "Payments";
+  if (has("shopify", "woocommerce", "ecommerce", "e-commerce", "storefront", "product catalog", "cart")) return "E-commerce";
+  if (has("salesforce", "hubspot", " crm", "pipedrive", "lead ", "sales")) return "CRM & sales";
+  if (has("marketing", "campaign", "seo", "ads", "mailchimp", "newsletter", "outreach")) return "Marketing";
+  if (has("figma", "canva", "sketch", "design", "prototype", "ui kit", "wireframe")) return "Design";
+  if (has("map", "geocod", "places", "geospatial", "directions", "location", "weather")) return "Maps & location";
+  if (has("video", "audio", "image gen", "youtube", "podcast", "transcri", "speech", "text-to-speech", "media")) return "Media";
+  if (has("security", "vulnerab", "secret", "oauth", "auth ", "compliance", "pentest", "scanner", "cve")) return "Security";
+  if (has("monitor", "observability", "tracing", "logging", "grafana", "datadog", "sentry", "metrics", " logs")) return "Monitoring & observability";
+  if (has("scrape", "crawl", "scraper", "firecrawl", "html to markdown", "web extract")) return "Web scraping";
+  if (has("web search", "serp", "google search", "brave search", "exa", "perplexity", "tavily")) return "Search & web";
+  if (has("browser", "playwright", "puppeteer", "selenium", "headless", "computer use", "web automation")) return "Browser & automation";
+  if (has("git ", "github", "gitlab", "bitbucket", "version control", "pull request", "commit", "repo")) return "Version control";
+  if (has("docker", "kubernetes", "terraform", "ci/cd", "pipeline", "jenkins", "ansible", "helm", "deploy")) return "DevOps & CI/CD";
+  if (has("postgres", "mysql", "sqlite", "database", "mongodb", "redis", "supabase", "warehouse", "clickhouse", "duckdb", "neon", "sql ")) return "Databases";
+  if (has("vector", "embedding", "pinecone", "qdrant", "weaviate", "chroma", "rag")) return "Data & analytics";
+  if (has("analytics", "dashboard", "tableau", "metabase", "etl", "data pipeline", "bigquery", "snowflake")) return "Data & analytics";
+  if (has("memory", "knowledge graph", "recall", "reasoning", "long-term memory")) return "Memory & reasoning";
+  if (has("filesystem", "file system", "storage", " s3", "google drive", "dropbox", "blob", "file access")) return "File & storage";
+  if (has("aws", "gcp", "azure", "cloud", "cloudflare", "vercel", "serverless", "infra")) return "Cloud & infra";
+  if (has("slack", "discord", "telegram", "email", "gmail", "whatsapp", "teams", "twilio", "sms", "chat")) return "Communication";
+  if (has("notion", "confluence", "wiki", "markdown", "document", "docs", "content")) return "Docs & content";
+  if (has("machine learning", "huggingface", "openai", "anthropic", " llm", "inference", "fine-tun", "model ")) return "AI & ML";
+  if (has("linear", "jira", "calendar", "todo", "task", "productivity", "asana", "trello", "airtable")) return "Productivity";
+
   return "Dev tools";
 }

@@ -15,8 +15,13 @@ import { isAuthorizedCron } from "@/lib/cron-auth";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const MIN_STARS = 30; // quality gate for discovered servers — keep out the long tail
-const MAX_DISCOVERED = 40;
+// Quality gate + breadth for the self-updating registry layer. Widened to make
+// the directory genuinely deep (MCP-Market scale) while a star floor still keeps
+// the dead long tail out. The set fills toward MAX over successive daily runs as
+// GitHub star lookups warm their day-cache (set GITHUB_TOKEN in Vercel to fill
+// faster — it raises the GitHub rate limit from 60/hr to 5000/hr).
+const MIN_STARS = 10;
+const MAX_DISCOVERED = 300;
 
 function getAdmin(): SupabaseClient {
   return createClient(
@@ -56,7 +61,7 @@ export async function GET(request: NextRequest) {
   // Discover from the registry (best-effort).
   let discovered: Awaited<ReturnType<typeof fetchMcpRegistryServers>> = [];
   try {
-    discovered = await fetchMcpRegistryServers(6);
+    discovered = await fetchMcpRegistryServers(20);
   } catch (e) {
     errors.push(`registry: ${String(e).slice(0, 120)}`);
   }

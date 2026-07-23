@@ -309,14 +309,14 @@ function CategoryTile({ s, onJump }: { s: SectionData; onJump: (key: string) => 
       {...tap}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 440, damping: 28 }}
-      style={{ scrollSnapAlign: "start", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 58%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "9px 11px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+      style={{ scrollSnapAlign: "start", display: "flex", alignItems: "center", gap: "10px", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 62%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "13px", padding: "10px 12px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "5px" }}>
-        <span style={{ flexShrink: 0, width: "24px", height: "24px", borderRadius: "7px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px" }}>{s.emoji ?? "✨"}</span>
-        <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
+      <span style={{ flexShrink: 0, width: "30px", height: "30px", borderRadius: "8px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{s.emoji ?? "✨"}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
+        <span style={{ display: "block", fontSize: "11px", color: TEXT.muted, lineHeight: 1.25, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
       </div>
-      <span style={{ display: "block", width: "100%", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
-      <span style={{ display: "block", width: "100%", fontSize: "11px", color: TEXT.muted, lineHeight: 1.3, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
+      <span style={{ flexShrink: 0, fontFamily: SG, fontSize: "12.5px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
     </motion.button>
   );
 }

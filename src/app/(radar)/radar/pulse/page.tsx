@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getRadarTools, getRadarCards, getRadarMcpDiscovered } from "@/lib/knowledge";
+import { getTrending } from "@/lib/trending";
 import { PulseClient } from "./PulseClient";
 
 const APP_URL = "https://kapyn.app";
@@ -34,11 +35,13 @@ function weekOfLabel(): string {
 }
 
 export default async function PulsePage() {
-  const [tools, mcp, entities] = await Promise.all([
+  const [tools, mcp, entities, trending] = await Promise.all([
     getRadarTools(24),
     getRadarMcpDiscovered(8),
     getRadarCards(7, 2, 14),
+    getTrending(24 * 7, 5, 0).catch(() => ({ top: [], rest: [] })),
   ]);
+  const stories = trending.top;
 
   const launches = tools.filter((t) => t.source === "producthunt").length;
   const stats = [
@@ -66,7 +69,7 @@ export default async function PulsePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <PulseClient tools={tools} mcp={mcp} entities={entities} stats={stats} weekOf={weekOfLabel()} />
+      <PulseClient tools={tools} mcp={mcp} entities={entities} stories={stories} stats={stats} weekOf={weekOfLabel()} />
     </>
   );
 }

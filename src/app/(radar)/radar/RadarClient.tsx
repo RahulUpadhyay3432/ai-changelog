@@ -309,14 +309,14 @@ function CategoryTile({ s, onJump }: { s: SectionData; onJump: (key: string) => 
       {...tap}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 440, damping: 28 }}
-      style={{ scrollSnapAlign: "start", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 58%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "12px 13px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+      style={{ scrollSnapAlign: "start", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 58%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "9px 11px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "9px" }}>
-        <span style={{ flexShrink: 0, width: "30px", height: "30px", borderRadius: "9px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{s.emoji ?? "✨"}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "5px" }}>
+        <span style={{ flexShrink: 0, width: "24px", height: "24px", borderRadius: "7px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px" }}>{s.emoji ?? "✨"}</span>
         <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
       </div>
-      <span style={{ display: "block", width: "100%", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
-      <span style={{ display: "block", width: "100%", fontSize: "11.5px", color: TEXT.muted, lineHeight: 1.3, marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
+      <span style={{ display: "block", width: "100%", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
+      <span style={{ display: "block", width: "100%", fontSize: "11px", color: TEXT.muted, lineHeight: 1.3, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
     </motion.button>
   );
 }
@@ -333,7 +333,7 @@ function CategoryTiles({ sections }: { sections: SectionData[] }) {
     <div
       className="scrollbar-none"
       style={isDesktop
-        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px", padding: "0 24px", margin: "0 0 24px" }
+        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: "9px", padding: "0 24px", margin: "0 0 22px" }
         : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
     >
       {items.map((s) => <CategoryTile key={s.key} s={s} onJump={jump} />)}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Flame } from "lucide-react";
 import type { RadarTool, RadarItem, DiscoveredMcp } from "@/lib/knowledge";
 import { entityHref, type EntityType } from "@/lib/entities";
+import type { TrendingStory } from "@/lib/trending";
 import {
   FaceMark, MetricChip, CoverImage, accentFor, accentForFace,
   GOLD, GOLD_SOFT, SG, TEXT, CANVAS, SURFACE, HAIRLINE, INNER_HIGHLIGHT,
@@ -88,19 +89,17 @@ function HeroCard({ thing }: { thing: RadarThing }) {
   );
 }
 
-// ── Leaderboard row (#2…) ──
-function LeaderRow({ rank, thing }: { rank: number; thing: RadarThing }) {
+// ── Trending tool card (#2…) — grid item ──
+function ToolCard({ rank, thing }: { rank: number; thing: RadarThing }) {
   return (
-    <a href={thing.url ?? "#"} target="_blank" rel="noopener noreferrer" className="radar-row" style={{ display: "flex", alignItems: "center", gap: "13px", width: "100%", textDecoration: "none", color: "inherit", borderBottom: `1px solid ${HAIRLINE}`, padding: "13px 6px" }}>
-      <span style={{ flexShrink: 0, width: "24px", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: GOLD, fontVariantNumeric: "tabular-nums", textAlign: "center" }}>
-        {String(rank).padStart(2, "0")}
-      </span>
-      <FaceMark logoUrl={thing.logoUrl} label={thing.name} size={30} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ display: "block", fontFamily: SG, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
-        <span style={{ display: "block", fontSize: "12.5px", color: TEXT.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.valueLine}</span>
+    <a href={thing.url ?? "#"} target="_blank" rel="noopener noreferrer" className="radar-railcard" style={{ display: "flex", flexDirection: "column", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "14px", textDecoration: "none", color: "inherit", boxShadow: INNER_HIGHLIGHT }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+        <FaceMark logoUrl={thing.logoUrl} label={thing.name} size={30} />
+        <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, color: GOLD, fontVariantNumeric: "tabular-nums" }}>{String(rank).padStart(2, "0")}</span>
       </div>
-      {thing.metric && <MetricChip>{thing.metric}</MetricChip>}
+      <span style={{ fontFamily: SG, fontSize: "14.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{thing.name}</span>
+      <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.45, margin: "5px 0 12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
+      {thing.metric && <div style={{ marginTop: "auto" }}><MetricChip>{thing.metric}</MetricChip></div>}
     </a>
   );
 }
@@ -140,11 +139,12 @@ function EntCard({ e }: { e: RadarItem }) {
 }
 
 export function PulseClient({
-  tools, mcp, entities, stats, weekOf,
+  tools, mcp, entities, stories, stats, weekOf,
 }: {
   tools: RadarTool[];
   mcp: DiscoveredMcp[];
   entities: RadarItem[];
+  stories: TrendingStory[];
   stats: { n: number; label: string }[];
   weekOf: string;
 }) {
@@ -184,16 +184,34 @@ export function PulseClient({
           </div>
         )}
 
+        {/* The stories that mattered this week — the weekly recap, surfaced on a
+            reachable page (was only findable at the end of the mobile feed). */}
+        {stories.length > 0 && (
+          <section style={{ marginBottom: "34px" }}>
+            <Kicker count={stories.length}>The stories that mattered</Kicker>
+            <div style={{ borderTop: `1px solid ${HAIRLINE}` }}>
+              {stories.map((s, i) => (
+                <Link key={s.id} href={`/story/${s.id}`} className="radar-row" style={{ display: "flex", alignItems: "flex-start", gap: "13px", width: "100%", textDecoration: "none", color: "inherit", borderBottom: `1px solid ${HAIRLINE}`, padding: "13px 6px" }}>
+                  <span style={{ flexShrink: 0, width: "24px", fontFamily: SG, fontSize: "15px", fontWeight: 700, color: GOLD, fontVariantNumeric: "tabular-nums", textAlign: "center", paddingTop: "1px" }}>{String(i + 1).padStart(2, "0")}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: "-webkit-box", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.3, WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{s.title}</span>
+                    <span style={{ display: "block", fontSize: "12px", color: TEXT.muted, marginTop: "3px" }}>{s.sourceName}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <p style={{ fontSize: "12.5px", color: TEXT.muted, margin: "12px 0 0" }}>That&apos;s the week. You&apos;re caught up.</p>
+          </section>
+        )}
+
         {/* #1 hero */}
         {hero && <HeroCard thing={hero} />}
 
-        {/* Trending leaderboard */}
+        {/* Trending tools — grid of cards */}
         {rest.length > 0 && (
           <section style={{ marginBottom: "34px" }}>
             <Kicker>Trending tools</Kicker>
-            <div style={{ borderTop: `1px solid ${HAIRLINE}` }}>
-              {rest.map((t, i) => <LeaderRow key={t.id} rank={i + 2} thing={t} />)}
-            </div>
+            <div className={styles.grid}>{rest.map((t, i) => <ToolCard key={t.id} rank={i + 2} thing={t} />)}</div>
           </section>
         )}
 

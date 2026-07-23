@@ -309,14 +309,14 @@ function CategoryTile({ s, onJump }: { s: SectionData; onJump: (key: string) => 
       {...tap}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 440, damping: 28 }}
-      style={{ scrollSnapAlign: "start", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 58%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "9px 11px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
+      style={{ scrollSnapAlign: "start", display: "flex", alignItems: "center", gap: "10px", textAlign: "left", minWidth: 0, overflow: "hidden", background: `linear-gradient(135deg, ${accent}1f 0%, ${SURFACE} 62%)`, border: `1px solid ${HAIRLINE}`, borderRadius: "13px", padding: "10px 12px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "5px" }}>
-        <span style={{ flexShrink: 0, width: "24px", height: "24px", borderRadius: "7px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px" }}>{s.emoji ?? "✨"}</span>
-        <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
+      <span style={{ flexShrink: 0, width: "30px", height: "30px", borderRadius: "8px", background: `${accent}24`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px" }}>{s.emoji ?? "✨"}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.short ?? s.eyebrow}</span>
+        <span style={{ display: "block", fontSize: "11px", color: TEXT.muted, lineHeight: 1.25, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
       </div>
-      <span style={{ display: "block", width: "100%", fontFamily: SG, fontSize: "13.5px", fontWeight: 600, color: TEXT.primary, letterSpacing: "-0.01em", lineHeight: 1.15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.eyebrow}</span>
-      <span style={{ display: "block", width: "100%", fontSize: "11px", color: TEXT.muted, lineHeight: 1.3, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.sub}</span>
+      <span style={{ flexShrink: 0, fontFamily: SG, fontSize: "12.5px", fontWeight: 700, color: accent, fontVariantNumeric: "tabular-nums" }}>{s.things.length}</span>
     </motion.button>
   );
 }
@@ -333,8 +333,8 @@ function CategoryTiles({ sections }: { sections: SectionData[] }) {
     <div
       className="scrollbar-none"
       style={isDesktop
-        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: "9px", padding: "0 24px", margin: "0 0 22px" }
-        : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
+        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "9px", padding: "0 24px", margin: "0 0 22px" }
+        : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "204px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
     >
       {items.map((s) => <CategoryTile key={s.key} s={s} onJump={jump} />)}
     </div>
@@ -375,7 +375,9 @@ function RailCard({ thing, wide, fill, onOpen }: { thing: RadarThing; wide: bool
   );
 }
 
-interface SectionData { key: string; emoji?: string; eyebrow: string; sub: string; variant: "list" | "rail"; things: RadarThing[] }
+// `short` is the tile-sized label — the one-line category tiles use it so titles
+// never ellipsize; the full `eyebrow` still heads the section itself.
+interface SectionData { key: string; emoji?: string; eyebrow: string; short?: string; sub: string; variant: "list" | "rail"; things: RadarThing[] }
 
 function Section({ emoji, eyebrow, sub, variant, things, onOpen, onSeeAll }: SectionData & { onOpen: (t: RadarThing) => void; onSeeAll?: () => void }) {
   const isDesktop = useContext(DesktopCtx);
@@ -433,15 +435,15 @@ function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
     // ship it safely → see what's new / moving / canonical.
     raw = [
       { key: "coding", emoji: "⌨️", eyebrow: "Build with AI", sub: "AI coding tools & agentic editors", variant: "rail", things: byCat("AI coding").map(essThing) },
-      { key: "ui", emoji: "🎨", eyebrow: "Ship the interface", sub: "UI, design & front-end generation", variant: "rail", things: byCat("UI & design").map(essThing) },
-      { key: "agents", emoji: "🤖", eyebrow: "Agents & orchestration", sub: "Wire AI into workflows that run themselves", variant: "rail", things: [...byCat("Agents & automation"), ...byCat("Orchestration")].map(essThing) },
-      { key: "models", emoji: "🧠", eyebrow: "Models & inference", sub: "Where to run the models you build on", variant: "rail", things: [...byCat("Models & chat"), ...byCat("Inference")].map(essThing) },
+      { key: "ui", emoji: "🎨", eyebrow: "Ship the interface", short: "Ship the UI", sub: "UI, design & front-end generation", variant: "rail", things: byCat("UI & design").map(essThing) },
+      { key: "agents", emoji: "🤖", eyebrow: "Agents & orchestration", short: "Agents", sub: "Wire AI into workflows that run themselves", variant: "rail", things: [...byCat("Agents & automation"), ...byCat("Orchestration")].map(essThing) },
+      { key: "models", emoji: "🧠", eyebrow: "Models & inference", short: "Run models", sub: "Where to run the models you build on", variant: "rail", things: [...byCat("Models & chat"), ...byCat("Inference")].map(essThing) },
       { key: "data", emoji: "🗄️", eyebrow: "Data & RAG", sub: "Give your app memory and retrieval", variant: "rail", things: byCat("Data & RAG").map(essThing) },
       { key: "safe", emoji: "🔒", eyebrow: "Ship it safely", sub: "Security, evals & observability", variant: "rail", things: [...byCat("Security"), ...byCat("Eval & observability")].map(essThing) },
       { key: "media", emoji: "🎬", eyebrow: "Generate media", sub: "Voice, image, and video models", variant: "rail", things: [...byCat("Video"), ...byCat("Voice & audio"), ...byCat("Image")].map(essThing) },
-      { key: "moving", emoji: "📈", eyebrow: "Models & tools moving", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
-      { key: "ghtrending", emoji: "🐙", eyebrow: "Trending on GitHub", sub: "Repos gaining stars fast right now", variant: "rail", things: data.tools.filter((t) => t.source === "github").sort((a, b) => b.score - a.score).map(toolThing) },
-      { key: "oss", emoji: "📦", eyebrow: "Popular open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
+      { key: "moving", emoji: "📈", eyebrow: "Models & tools moving", short: "On the rise", sub: "Gaining traction in AI now", variant: "list", things: modelsTools.slice(0, 10).map(entThing) },
+      { key: "ghtrending", emoji: "🐙", eyebrow: "Trending on GitHub", short: "GitHub", sub: "Repos gaining stars fast right now", variant: "rail", things: data.tools.filter((t) => t.source === "github").sort((a, b) => b.score - a.score).map(toolThing) },
+      { key: "oss", emoji: "📦", eyebrow: "Popular open source", short: "Open source", sub: "Most-starred, still maintained", variant: "list", things: canon.slice(0, 8).map(canonThing) },
     ];
   } else if (lens === "creator") {
     // For makers & marketers: generate, then distribute. Video → voice → image
@@ -449,16 +451,16 @@ function buildSections(lens: RadarLens, data: RadarData): SectionData[] {
     raw = [
       { key: "video", emoji: "🎥", eyebrow: "Generate video", sub: "Text-to-video & motion models", variant: "rail", things: byCat("Video").map(essThing) },
       { key: "voice", emoji: "🎙️", eyebrow: "Voice & audio", sub: "Speech, music & sound generation", variant: "rail", things: byCat("Voice & audio").map(essThing) },
-      { key: "image", emoji: "🖼️", eyebrow: "Generate images", sub: "Image & design generation", variant: "rail", things: byCat("Image").map(essThing) },
-      { key: "marketing", emoji: "📣", eyebrow: "Marketing & content", sub: "Avatars, clips & decks that sell", variant: "rail", things: byCat("Marketing & content").map(essThing) },
-      { key: "cbig", emoji: "🔥", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
+      { key: "image", emoji: "🖼️", eyebrow: "Generate images", short: "Images", sub: "Image & design generation", variant: "rail", things: byCat("Image").map(essThing) },
+      { key: "marketing", emoji: "📣", eyebrow: "Marketing & content", short: "Marketing", sub: "Avatars, clips & decks that sell", variant: "rail", things: byCat("Marketing & content").map(essThing) },
+      { key: "cbig", emoji: "🔥", eyebrow: "What's big right now", short: "Big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
       { key: "cnotable", emoji: "✨", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
     ];
   } else {
     raw = [
       { key: "start", emoji: "🚀", eyebrow: "Start here", sub: "The AI tools everyone's using", variant: "rail", things: byCat("Models & chat").map(essThing) },
-      { key: "big", emoji: "🔥", eyebrow: "What's big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
-      { key: "toolkit", emoji: "🧰", eyebrow: "Build your toolkit", sub: "When you're ready to go deeper", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference")].map(essThing) },
+      { key: "big", emoji: "🔥", eyebrow: "What's big right now", short: "Big right now", sub: "Most talked-about in AI", variant: "list", things: byTraction.slice(0, 6).map(entThing) },
+      { key: "toolkit", emoji: "🧰", eyebrow: "Build your toolkit", short: "Your toolkit", sub: "When you're ready to go deeper", variant: "rail", things: [...byCat("AI coding"), ...byCat("Inference")].map(essThing) },
       { key: "notable", emoji: "✨", eyebrow: "New & notable", sub: "Fresh launches", variant: "rail", things: data.tools.slice(0, 6).map(toolThing) },
     ];
   }

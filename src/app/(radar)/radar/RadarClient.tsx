@@ -333,8 +333,8 @@ function CategoryTiles({ sections }: { sections: SectionData[] }) {
     <div
       className="scrollbar-none"
       style={isDesktop
-        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: "9px", padding: "0 24px", margin: "0 0 22px" }
-        : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "168px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
+        ? { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "9px", padding: "0 24px", margin: "0 0 22px" }
+        : { display: "grid", gridAutoFlow: "column", gridTemplateRows: "1fr 1fr", gridAutoColumns: "204px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "0 24px", margin: "0 0 24px" }}
     >
       {items.map((s) => <CategoryTile key={s.key} s={s} onJump={jump} />)}
     </div>

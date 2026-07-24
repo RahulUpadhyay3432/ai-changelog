@@ -50,6 +50,14 @@ export function CardStack({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
+  // Activation instrumentation: the deepest news card reached this session and
+  // whether the end was hit — summarised in one event on session end so a
+  // card-1 bouncer (who never fires story_swiped) is still counted at depth 0.
+  const maxDepthRef = useRef(0);
+  const reachedCompletionRef = useRef(false);
+  const sessionEndedRef = useRef(false);
+  const lastVisitRef = useRef(lastVisit);
+  useEffect(() => { lastVisitRef.current = lastVisit; }, [lastVisit]);
   const isRefreshingRef = useRef(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const caughtUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -85,6 +93,36 @@ export function CardStack({
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       if (caughtUpTimerRef.current) clearTimeout(caughtUpTimerRef.current);
+    };
+  }, []);
+
+  // ─── Activation summary — one event per feed session ──────────────────────
+  // Fires once on session end (pagehide, tab hidden, or SPA unmount). This is
+  // the event that answers "activation vs return-trigger": paired with
+  // feed_viewed as the denominator, max_depth reveals whether first-timers ever
+  // get past the opening cards. Card-1 bouncers land here at depth 0 — otherwise
+  // invisible, since story_swiped never fires without a swipe.
+  useEffect(() => {
+    const endSession = () => {
+      if (sessionEndedRef.current || itemsLenRef.current === 0) return;
+      sessionEndedRef.current = true;
+      posthog.capture("feed_session_ended", {
+        max_depth: maxDepthRef.current,
+        total: itemsLenRef.current,
+        reached_completion: reachedCompletionRef.current,
+        is_returning: lastVisitRef.current != null,
+        // First-ever session proxy (no prior-visit marker) — the population whose
+        // activation we most need to isolate against retention.
+        is_first_session: lastVisitRef.current == null,
+      });
+    };
+    const onVisibility = () => { if (document.visibilityState === "hidden") endSession(); };
+    window.addEventListener("pagehide", endSession);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", endSession);
+      document.removeEventListener("visibilitychange", onVisibility);
+      endSession();
     };
   }, []);
 
@@ -194,8 +232,12 @@ export function CardStack({
     currentIndexRef.current = index;
     setCurrentIndex(index);
 
+    // Reaching the trailing completion card (index === feedEntries.length).
+    if (index >= feedEntries.length) reachedCompletionRef.current = true;
+
     const entry = feedEntries[index];
     if (entry && entry.type === "news") {
+      if (entry.newsIdx > maxDepthRef.current) maxDepthRef.current = entry.newsIdx;
       onIndexChange?.(entry.newsIdx, items.length);
       if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(10);
       const prevEntry = feedEntries[prev];

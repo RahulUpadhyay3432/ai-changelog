@@ -8,10 +8,13 @@ on:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Trigger news fetch
         run: |
           curl -f -s -L -X GET \
+            --retry 3 --retry-delay 10 --retry-all-errors \
+            --max-time 540 \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             "https://kapyn.app/api/news/fetch" \
             | jq .

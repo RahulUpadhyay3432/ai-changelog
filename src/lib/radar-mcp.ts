@@ -175,7 +175,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Supabase", by: "official", category: "Databases",
     tagline: "Manage your Supabase project from the assistant.",
     description: "The Supabase MCP server lets an assistant query your database, manage tables, and run tasks against your project, turning natural language into Supabase operations.",
-    url: "https://github.com/supabase-community/supabase-mcp",
+    url: "https://github.com/supabase/mcp",
   },
   {
     name: "Redis", by: "community", category: "Databases",
@@ -385,7 +385,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Firecrawl", by: "community", category: "Search & web",
     tagline: "Scrape and crawl websites into clean data.",
     description: "Firecrawl's MCP server lets an assistant scrape pages and crawl sites, returning clean markdown or structured data for research and extraction.",
-    url: "https://github.com/mendableai/firecrawl-mcp-server",
+    url: "https://github.com/firecrawl/firecrawl-mcp-server",
   },
   {
     name: "Perplexity", by: "official", category: "Search & web",

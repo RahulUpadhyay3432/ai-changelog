@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
         destination: "https://kapyn.app/:path*",
         permanent: true,
       },
+      // The Claude-vs-GPT post was renamed when GPT-4o stopped being current
+      // (Aug 2026). Keep the old URL alive so existing links and any accrued
+      // ranking transfer to the rewritten piece.
+      {
+        source: "/blog/claude-vs-gpt4o-which-to-use-2026",
+        destination: "/blog/claude-vs-gpt5-which-to-use-2026",
+        permanent: true,
+      },
     ];
   },
 

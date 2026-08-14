@@ -158,10 +158,10 @@ export const MCP_SERVERS: McpServer[] = [
     url: "https://github.com/JetBrains/mcp-jetbrains",
   },
   {
-    name: "Cypress", by: "official", category: "Dev tools",
+    name: "Cypress", by: "community", category: "Dev tools",
     tagline: "Run and inspect end-to-end tests from the assistant.",
     description: "Cypress's MCP server lets an assistant run your end-to-end suite, read failures, and inspect the DOM at each step — one of the production testing platforms wiring directly into agents in 2026.",
-    url: "https://github.com/cypress-io/cypress-mcp",
+    url: "https://github.com/jams4code/cypress-mcp",
   },
 
   // ── Databases ──
@@ -169,7 +169,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "PostgreSQL", by: "official", category: "Databases",
     tagline: "Query a Postgres database in natural language.",
     description: "A reference server that connects an assistant to Postgres, letting it inspect schemas and run read queries. Useful for letting a model answer questions about your data.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/postgres",
   },
   {
     name: "Supabase", by: "official", category: "Databases",
@@ -213,7 +213,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Brave Search", by: "official", category: "Search & web",
     tagline: "Search the web via the Brave API.",
     description: "A reference server that adds web and local search through Brave's independent index, with no tracking.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/brave-search",
   },
   {
     name: "Tavily", by: "official", category: "Search & web",
@@ -233,7 +233,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Puppeteer", by: "official", category: "Browser & automation",
     tagline: "Automate a headless Chrome browser.",
     description: "A reference server for browser automation via Puppeteer, letting an assistant navigate pages, fill forms, and capture content.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/puppeteer",
   },
   {
     name: "Browserbase", by: "official", category: "Browser & automation",
@@ -245,7 +245,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Vibium", by: "community", category: "Browser & automation",
     tagline: "\"Selenium for AI\" — plain-English, self-healing browser tests.",
     description: "From Selenium's creator Jason Huggins, Vibium ships an MCP server with a full set of browser tools built on WebDriver BiDi — plain-English, self-healing tests an assistant can drive in Cursor or Claude.",
-    url: "https://github.com/vibiumhq/vibium",
+    url: "https://github.com/VibiumDev/vibium",
   },
 
   // ── Productivity ──
@@ -265,7 +265,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Slack", by: "community", category: "Productivity",
     tagline: "Read and post messages in Slack.",
     description: "Connects an assistant to Slack to read channels and send messages, so it can summarize discussions or post updates.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/slack",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/slack",
   },
   {
     name: "Pipedream", by: "official", category: "Productivity",
@@ -277,7 +277,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Google Drive", by: "community", category: "Productivity",
     tagline: "Search and read files in Google Drive.",
     description: "Gives an assistant access to search and read documents in Drive, so it can answer questions grounded in your files.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/gdrive",
   },
 
   // ── Cloud & infra ──
@@ -297,7 +297,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Docker", by: "community", category: "Cloud & infra",
     tagline: "Inspect and run containers from the assistant.",
     description: "Connects an assistant to Docker to list, run, and manage containers, useful for local development and ops tasks.",
-    url: "https://github.com/docker/mcp-servers",
+    url: "https://github.com/docker/mcp-gateway",
   },
 
   // ── Memory & reasoning ──
@@ -453,7 +453,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Zep", by: "official", category: "Memory & reasoning",
     tagline: "Long-term user memory with semantic search across sessions.",
     description: "Zep gives an assistant persistent memory with user profiling and semantic recall — facts, preferences and prior context survive across sessions, built for production agent systems.",
-    url: "https://github.com/getzep/mcp-zep",
+    url: "https://github.com/getzep/zep",
   },
 
   // ── More: Dev tools ──
@@ -461,7 +461,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Vercel", by: "official", category: "Dev tools",
     tagline: "Deploy projects and query logs from the assistant.",
     description: "Vercel's official MCP server lets an assistant trigger deployments, read build logs, manage environment variables, and inspect project state — all from natural language.",
-    url: "https://vercel.com/changelog/vercel-mcp-server",
+    url: "https://vercel.com/docs/mcp/vercel-mcp",
   },
   {
     name: "E2B", by: "official", category: "Dev tools",
@@ -479,7 +479,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "n8n", by: "official", category: "Productivity",
     tagline: "Trigger and manage workflow automations from the chat.",
     description: "n8n's MCP server lets an assistant execute workflows, inspect run history, and manage automation pipelines without leaving the conversation — useful for no-code automation at scale.",
-    url: "https://github.com/n8n-io/n8n-mcp",
+    url: "https://github.com/czlonkowski/n8n-mcp",
   },
 
   // ── More: Databases ──
@@ -487,7 +487,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "SQLite", by: "official", category: "Databases",
     tagline: "Query and write a local SQLite database.",
     description: "A reference server for SQLite that lets an assistant read and write a local database file with full SQL support — the simplest way to give a model structured local data.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
   },
   {
     name: "Qdrant", by: "official", category: "Databases",
@@ -519,7 +519,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Google Maps", by: "official", category: "Search & web",
     tagline: "Search places and get directions.",
     description: "A reference server that adds Google Maps to an assistant — place search, geocoding, directions, and distance calculations for location-aware tasks.",
-    url: "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps",
+    url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/google-maps",
   },
   {
     name: "YouTube Transcripts", by: "community", category: "Search & web",
@@ -551,7 +551,7 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Google Calendar", by: "community", category: "Productivity",
     tagline: "Read and create calendar events.",
     description: "Connects an assistant to Google Calendar to list upcoming events, check availability, and create or update appointments across your calendars.",
-    url: "https://github.com/nspilman/google-calendar-mcp",
+    url: "https://github.com/nspady/google-calendar-mcp",
   },
   {
     name: "Twilio", by: "community", category: "Productivity",
@@ -565,13 +565,13 @@ export const MCP_SERVERS: McpServer[] = [
     name: "Firebase", by: "official", category: "Cloud & infra",
     tagline: "Manage Firestore, auth and storage.",
     description: "Google's official Firebase MCP server lets an assistant interact with Firestore collections, Authentication, and Storage — turning Firebase into a first-class assistant target.",
-    url: "https://firebase.google.com/docs/studio/mcp-server",
+    url: "https://firebase.google.com/docs/cli/mcp-server",
   },
   {
     name: "Datadog", by: "official", category: "Cloud & infra",
     tagline: "Query metrics, logs and monitors.",
     description: "Datadog's MCP server lets an assistant search metrics, logs, traces, and alerts — so observability data is reachable in the chat for incident investigation and debugging.",
-    url: "https://github.com/DataDog/datadog-mcp-server",
+    url: "https://docs.datadoghq.com/bits_ai/mcp_server/",
   },
   // ── Refreshed July 2026 (GitHub trending + market scan) ──
   {

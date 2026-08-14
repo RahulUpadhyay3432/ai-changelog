@@ -4,6 +4,7 @@ import { CATEGORIES } from "@/lib/categories";
 import { BLOG_POSTS } from "@/lib/blog-content";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
+import { MODEL_PAIRS, pairSlug } from "@/lib/model-pairs";
 import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";
@@ -100,6 +101,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${APP_URL}/explore`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/compare`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    ...MODEL_PAIRS.map((pr) => ({
+      url: `${APP_URL}/compare/${pairSlug(pr)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     { url: `${APP_URL}/trending`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.5 },
     { url: `${APP_URL}/categories`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.4 },
     { url: `${APP_URL}/okf`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.6 },

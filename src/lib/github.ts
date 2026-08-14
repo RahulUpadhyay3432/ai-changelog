@@ -37,6 +37,9 @@ const TOPIC_QUERIES = [
   { q: "topic:voice-agent",          minStars: 10 },
   { q: "topic:deep-research",        minStars: 10 },
   { q: "topic:mcp",                  minStars: 10 }, // Model Context Protocol
+  { q: "topic:claude-skills",        minStars: 10 }, // Agent Skills ecosystem
+  { q: "topic:agent-skills",         minStars: 10 },
+  { q: "topic:claude-code",          minStars: 10 },
   { q: "topic:openai-api",           minStars: 15 },
   { q: "topic:huggingface",          minStars: 15 },
 ] as const;
@@ -49,7 +52,10 @@ export interface GitHubRepo {
   fullName: string;
   description: string | null;
   htmlUrl: string;
+  /** Total stars on the repo. Always the real cumulative count, never a delta. */
   stars: number;
+  /** Stars gained in the trending window, when the source reports velocity. */
+  starsGained?: number;
   language: string | null;
   topics: string[];
   createdAt: string;
@@ -283,40 +289,72 @@ async function fetchOssPeriod(period: string): Promise<OssRow[]> {
   return json.data?.rows ?? [];
 }
 
+// Star floors are on stars *gained in the window*, not totals — see the OssRow
+// note above. A 24h window produces far smaller deltas than a 7d one (a busy day
+// tops out around 15-20), so a single shared floor silently emptied the 24h set.
+const OSS_PERIODS = [
+  { period: "past_24_hours", minGained: 3 },
+  { period: "past_week", minGained: 15 },
+] as const;
+
+// Cap before resolving real totals — each resolve is one API call (day-cached).
+const OSS_MAX_RESOLVE = 30;
+
 /**
  * Repos trending by recent star velocity (not just newly-created), AI-filtered.
- * Pulls the 24h and 7d windows, dedupes, requires a description + a small star
- * floor, and returns the GitHubRepo shape so it merges with the Search results.
+ *
+ * OSSInsight reports stars GAINED in the window; the rest of the pipeline ranks
+ * and displays *total* stars (the Search source supplies totals). Mixing the two
+ * made trending repos render as "231 stars" when they had 15,731, and sort below
+ * everything else. So we filter on the delta, then resolve true totals via
+ * `fetchReposMeta` before returning, and keep the delta on `starsGained`.
  */
-export async function fetchOssInsightTrending(minStars = 25): Promise<GitHubRepo[]> {
-  const settled = await Promise.allSettled([fetchOssPeriod("past_24_hours"), fetchOssPeriod("past_week")]);
+export async function fetchOssInsightTrending(): Promise<GitHubRepo[]> {
+  const settled = await Promise.allSettled(OSS_PERIODS.map((p) => fetchOssPeriod(p.period)));
+
   const seen = new Set<string>();
-  const out: GitHubRepo[] = [];
-  for (const r of settled) {
-    if (r.status !== "fulfilled") continue;
-    for (const row of r.value) {
+  const candidates: GitHubRepo[] = [];
+  settled.forEach((result, i) => {
+    if (result.status !== "fulfilled") return;
+    const { minGained } = OSS_PERIODS[i];
+    for (const row of result.value) {
       if (!row.repo_name || seen.has(row.repo_name)) continue;
       const desc = (row.description ?? "").trim();
       if (!desc) continue; // no self-description → no trustworthy value-line
-      const stars = parseInt(row.stars, 10) || 0;
-      if (stars < minStars) continue;
+      const gained = parseInt(row.stars, 10) || 0;
+      if (gained < minGained) continue;
       if (!ossIsAi(row)) continue;
       seen.add(row.repo_name);
       const [owner, ...rest] = row.repo_name.split("/");
-      out.push({
+      candidates.push({
         name: rest.join("/") || row.repo_name,
         fullName: row.repo_name,
         description: desc,
         htmlUrl: `https://github.com/${row.repo_name}`,
-        stars,
+        stars: 0, // filled in below from the real repo record
+        starsGained: gained,
         language: row.primary_language ?? null,
         topics: (row.collection_names ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 8),
         createdAt: "", // OSSInsight doesn't return creation date for trending rows
         owner: owner ?? row.repo_name,
       });
     }
-  }
-  return out.sort((a, b) => b.stars - a.stars);
+  });
+
+  const top = candidates
+    .sort((a, b) => (b.starsGained ?? 0) - (a.starsGained ?? 0))
+    .slice(0, OSS_MAX_RESOLVE);
+
+  const meta = await fetchReposMeta(top.map((r) => r.fullName));
+
+  // Drop anything we could not resolve — same reasoning as the missing-description
+  // skip above: better absent than displayed with a number we do not trust.
+  return top
+    .flatMap((r) => {
+      const real = meta[r.fullName];
+      return real ? [{ ...r, stars: real.stars, createdAt: real.createdAt }] : [];
+    })
+    .sort((a, b) => b.stars - a.stars);
 }
 
 /**

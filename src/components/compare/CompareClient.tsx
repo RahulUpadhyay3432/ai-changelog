@@ -94,7 +94,7 @@ export function CompareClient({ embed = false }: { embed?: boolean }) {
                     {m.name}
                     <ArrowUpRight size={12} strokeWidth={2.2} style={{ flexShrink: 0, opacity: 0.6 }} />
                   </a>
-                  <span className={styles.provider}>{m.provider}</span>
+                  <span className={styles.provider}>{m.currentVersion ? `${m.provider} · ${m.currentVersion}` : m.provider}</span>
                 </td>
                 <td><CategoryTag category={m.category} /></td>
                 <td style={{ fontFamily: SG, color: TEXT.body, whiteSpace: "nowrap" }}>{formatContext(m.contextK)}</td>
@@ -123,6 +123,7 @@ export function CompareClient({ embed = false }: { embed?: boolean }) {
               </a>
               <CategoryTag category={m.category} />
             </div>
+            <span className={styles.provider}>{m.currentVersion ? `${m.provider} · ${m.currentVersion}` : m.provider}</span>
             <p style={{ color: TEXT.muted, fontSize: "13px", lineHeight: 1.5, margin: "8px 0 12px" }}>{m.bestFor}</p>
             <div className={styles.specRow}>
               <span style={{ background: SURFACE_RAISED }} className={styles.spec}>Context {formatContext(m.contextK)}</span>

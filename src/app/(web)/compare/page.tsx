@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareClient } from "@/components/compare/CompareClient";
 import { MODELS, LAST_UPDATED, CATEGORY_LABELS } from "@/lib/models";
+import { MODEL_PAIRS, modelById, pairSlug } from "@/lib/model-pairs";
 import { GOLD, SG, TEXT } from "@/lib/design-tokens";
 
 const APP_URL = "https://kapyn.app";
@@ -9,7 +10,7 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const DESC =
-  "Compare the major AI models side by side — Claude, GPT, Gemini, Llama, and more — by context window, cost, modalities, and what each is genuinely best for. Calm, sourced, and free.";
+  "Compare the major AI models side by side — Claude Opus 5, GPT-5.6, Gemini 3.1 Pro, Grok, Kimi K3 and more — by context window, cost, modalities, and what each is genuinely best for. Calm, sourced, and free.";
 
 export const metadata: Metadata = {
   title: "AI Model Comparison — Claude vs GPT vs Gemini and more",
@@ -72,12 +73,48 @@ export default function ComparePage() {
 
       <CompareClient />
 
+      {/* Head-to-head index — the pages people actually search for */}
+      <section style={{ margin: "40px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
+        <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Head to head</h2>
+        <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 16px", maxWidth: "620px" }}>
+          The matrix answers &ldquo;what exists&rdquo;. These answer &ldquo;which one for me&rdquo; — each with the honest tradeoff, not a
+          leaderboard.
+        </p>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {MODEL_PAIRS.map((pr) => {
+            const ma = modelById(pr.a);
+            const mb = modelById(pr.b);
+            if (!ma || !mb) return null;
+            return (
+              <li key={pairSlug(pr)}>
+                <Link
+                  href={`/compare/${pairSlug(pr)}`}
+                  style={{
+                    display: "inline-block",
+                    fontFamily: SG,
+                    fontSize: "13.5px",
+                    fontWeight: 600,
+                    color: TEXT.body,
+                    textDecoration: "none",
+                    border: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))",
+                    borderRadius: "100px",
+                    padding: "7px 14px",
+                  }}
+                >
+                  {ma.name} vs {mb.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
       {/* Deeper reads */}
       <section style={{ margin: "40px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Go deeper</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 0", maxWidth: "620px" }}>
           The matrix is the quick answer. For the reasoning behind a pick, read{" "}
-          <Link href="/blog/claude-vs-gpt4o-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs GPT-4o</Link>,{" "}
+          <Link href="/blog/claude-vs-gpt5-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs GPT-5.6</Link>,{" "}
           <Link href="/blog/claude-vs-gemini-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs Gemini</Link>, or{" "}
           <Link href="/blog/run-llms-locally-2026" style={{ color: GOLD, textDecoration: "none" }}>running open models locally</Link>. Every category above —{" "}
           {Object.values(CATEGORY_LABELS).join(", ")} — maps to a use case, not a leaderboard rank.

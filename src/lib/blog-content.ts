@@ -31,8 +31,14 @@ export interface BlogPost {
   slug: string;
   title: string;
   deck: string;
-  /** ISO date */
+  /** ISO date the post was first published. */
   date: string;
+  /**
+   * ISO date of the last substantive refresh. Evergreen hubs ("best X in 2026")
+   * live or die on this: it drives `dateModified` in the JSON-LD, which is the
+   * freshness signal search engines actually read. Omit for one-off pieces.
+   */
+  updated?: string;
   readingMin: number;
   tag: string;
   hero: { src: string; alt: string; credit?: string };
@@ -83,7 +89,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "For most indie work, **Claude Sonnet** is the right call. It reads code like a senior engineer, follows multi-step instructions without losing the thread, and rarely invents APIs you then have to go and verify. When you're optimizing for cost at volume — classification, extraction, the boring high-throughput stuff — **GPT-4o mini** is fast and cheap and good enough. And when the bill needs to be zero, **Gemini 2.5 Flash** has a free tier that is genuinely usable for prototyping.",
+        text: "For most indie work, **Claude Sonnet** is the right call. It reads code like a senior engineer, follows multi-step instructions without losing the thread, and rarely invents APIs you then have to go and verify. When you're optimizing for cost at volume — classification, extraction, the boring high-throughput stuff — **GPT-5.6 Luna** is fast and cheap and good enough. And when the bill needs to be zero, **Gemini 3.7 Flash** has a free tier that is genuinely usable for prototyping.",
       },
       {
         type: "quote",
@@ -93,8 +99,8 @@ export const BLOG_POSTS: BlogPost[] = [
         type: "tools",
         items: [
           { name: "Anthropic API", valueLine: "Claude Sonnet — the model that reads code like a senior engineer.", url: "https://www.anthropic.com/api" },
-          { name: "OpenAI API", valueLine: "GPT-4o mini — fast, cheap, right for high-volume extraction and classification.", url: "https://platform.openai.com" },
-          { name: "Google AI Studio", valueLine: "Gemini 2.5 Flash — capable, free tier, good for prototyping before you have a budget.", url: "https://aistudio.google.com" },
+          { name: "OpenAI API", valueLine: "GPT-5.6 Luna — fast, cheap, right for high-volume extraction and classification.", url: "https://platform.openai.com" },
+          { name: "Google AI Studio", valueLine: "Gemini 3.7 Flash — capable, free tier, good for prototyping before you have a budget.", url: "https://aistudio.google.com" },
         ],
       },
 
@@ -734,7 +740,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "The model underneath is your choice: Claude Sonnet, GPT-4o, or Cursor's own fine-tuned model. In practice, Claude Sonnet gives the most coherent multi-file edits; the fine-tuned model is faster for quick completions. Pricing is $20/month for Pro, which includes unlimited slow requests and 500 fast ones — most developers hit the fast limit mid-month and barely notice.",
+        text: "The model underneath is your choice: Claude Sonnet, GPT-5.6, or Cursor's own fine-tuned model. In practice, Claude Sonnet gives the most coherent multi-file edits; the fine-tuned model is faster for quick completions. Pricing is $20/month for Pro, which includes unlimited slow requests and 500 fast ones — most developers hit the fast limit mid-month and barely notice.",
       },
       {
         type: "paragraph",
@@ -760,7 +766,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "The suggestion quality has improved significantly with Copilot's upgrade to Claude and GPT-4o as underlying models. It's no longer the quality-laggard it was in 2023. For an organization that needs single-vendor, audited, SLA-backed AI tooling, it's the clear answer.",
+        text: "The suggestion quality has improved significantly with Copilot's upgrade to the Claude and GPT-5.6 families as underlying models. It's no longer the quality-laggard it was in 2023. For an organization that needs single-vendor, audited, SLA-backed AI tooling, it's the clear answer.",
       },
       { type: "heading", level: 2, text: "Windsurf — best Cursor alternative" },
       {
@@ -1090,12 +1096,12 @@ limit 8;`,
     ],
   },
 
-  // ─── SEO: Claude vs GPT-4o ───────────────────────────────────────────────────
+  // ─── SEO: Claude vs GPT ─────────────────────────────────────────────────────
   {
-    slug: "claude-vs-gpt4o-which-to-use-2026",
-    title: "Claude vs GPT-4o: Which AI model should you use in 2026?",
-    deck: "The honest comparison. Not a benchmark table, a breakdown of which tasks each model handles better, and when the difference actually matters.",
-    date: "2026-06-21",
+    slug: "claude-vs-gpt5-which-to-use-2026",
+    title: "Claude vs GPT-5.6: Which AI model should you use in 2026?",
+    deck: "The honest comparison. Not a benchmark table — a breakdown of which tasks each family handles better, and when the difference actually matters.",
+    date: "2026-08-14",
     readingMin: 8,
     tag: "Comparison",
     hero: {
@@ -1107,77 +1113,90 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "For most developers in 2026: use **Claude Sonnet** for coding, reasoning, and anything that requires following long, nuanced instructions; use **GPT-4o** for multimodal tasks (image analysis, voice), for workflows deeply integrated with the OpenAI ecosystem, and for high-volume low-cost work via GPT-4o mini. The two models are closer in quality than they've ever been — the choice is increasingly about workflow fit, not raw capability.",
+        text: "For most developers in August 2026: use **Claude Opus 5** for agentic coding and long autonomous runs, **Claude Sonnet 5** as the everyday default, and **GPT-5.6 Sol** when you want the strongest all-round generalist or need text, vision and audio in one model. The two families are close enough on raw capability that the deciding factor is usually workflow fit and price, not quality.",
       },
       {
         type: "paragraph",
-        text: "Benchmark tables are useful for headline numbers but misleading for actual decisions. A model that scores 3% better on MMLU might produce worse output on your specific task — because prompting style, instruction format, and task type all interact with model strengths in ways benchmarks don't capture. This comparison focuses on the differences that practitioners actually notice.",
+        text: "Benchmark tables are useful for headline numbers but misleading for actual decisions. A model that scores three points higher on an aggregate index might produce worse output on your specific task — prompting style, instruction format, and task type all interact with model strengths in ways benchmarks don't capture. This comparison focuses on the differences practitioners actually notice.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "What changed in 2026",
+        text: "If you last compared these families in 2025, most of what you remember is out of date. The context-window gap has closed — Sonnet, Opus and Fable all carry a million tokens, and so does every tier of GPT-5.6. Reasoning is now an effort setting on a frontier model rather than a separate product line. And OpenAI split GPT-5.6 into three tiers (Sol, Terra, Luna) rather than shipping one model.",
+      },
+      { type: "heading", level: 2, text: "The lineups, briefly" },
+      {
+        type: "list",
+        items: [
+          "**Anthropic**: Fable 5 (the ceiling) · Opus 5 (near-Fable capability at half the price, released July 2026) · Sonnet 5 (the workhorse) · Haiku 4.5 (small and fast, 200K context)",
+          "**OpenAI**: GPT-5.6 Sol (flagship) · Terra (production tier) · Luna (high-volume, cut 80% in price in July 2026) — all three share the same ~1M-token window",
+        ],
       },
       { type: "heading", level: 2, text: "Where Claude is better" },
       {
         type: "paragraph",
-        text: "**Code quality and architecture**: Claude reliably writes code that follows the conventions of an existing codebase. Ask it to add a feature to a Next.js app and it will match the file structure, import style, naming conventions, and error handling patterns already present — without being told to. GPT-4o produces correct code more often than not, but is more likely to introduce new patterns or miss contextual norms.",
+        text: "**Agentic and long-horizon work**: Opus 5 leads the agentic indices, and it shows up in practice as a model that holds a task together over many tool calls without drifting. If you are running an agent unsupervised for an hour, this is the difference that matters most.",
       },
       {
         type: "paragraph",
-        text: "**Long document processing**: Claude's 200K context window handles a full codebase or a 300-page PDF without losing coherence. GPT-4o's 128K context is usually enough, but Claude edges ahead on tasks that require holding many inter-related facts simultaneously — financial document analysis, codebase-wide refactors, legal contract review.",
+        text: "**Code that fits an existing codebase**: Claude reliably matches the file structure, import style, naming conventions and error handling already present in a repo — without being told to. GPT-5.6 produces correct code at least as often, but is more likely to introduce new patterns or miss contextual norms.",
       },
       {
         type: "paragraph",
-        text: "**Instruction following**: Multi-step, conditional instructions (\"if the user is a new account, do X; if returning, do Y; and in both cases, never do Z\") are handled more consistently by Claude. The failure mode for GPT-4o is selectively ignoring constraints mid-response, especially in long outputs. Claude's refusal to override its instructions can feel frustrating in creative tasks, but makes it more reliable in production.",
+        text: "**Instruction following**: Multi-step conditional instructions (\"if the user is a new account do X; if returning do Y; and in both cases never do Z\") are handled more consistently by Claude. The failure mode on the other side is selectively dropping constraints mid-response, especially in long outputs.",
       },
       {
         type: "quote",
-        text: "Claude writes code that fits your codebase. GPT-4o writes code that works. The difference shows up at scale.",
+        text: "Claude writes code that fits your codebase. GPT writes code that works. The difference shows up at scale.",
       },
-      { type: "heading", level: 2, text: "Where GPT-4o is better" },
+      { type: "heading", level: 2, text: "Where GPT-5.6 is better" },
       {
         type: "paragraph",
-        text: "**Multimodal tasks**: GPT-4o's vision capability is more polished for complex image analysis — reading dense charts, interpreting screenshots, describing UI for accessibility. Claude's vision is capable but the gap narrows significantly on straightforward image tasks. If you're building a pipeline that processes images at scale, test both and measure.",
-      },
-      {
-        type: "paragraph",
-        text: "**Ecosystem integration**: The OpenAI ecosystem is larger. More third-party tools, libraries, and hosted solutions default to the OpenAI API. LangChain, LlamaIndex, and most RAG frameworks have better first-party support for OpenAI. If you're integrating into an existing stack, the path of least resistance often runs through GPT-4o.",
+        text: "**Breadth across modalities**: Sol handles text, vision and audio natively in one model. Claude covers text and vision but not audio, so a voice pipeline means bolting on a second provider.",
       },
       {
         type: "paragraph",
-        text: "**Cost at volume**: GPT-4o mini is the most cost-effective capable model in the category. For high-volume pipelines — content classification, extraction, summarization at scale — mini is hard to beat on the $/token/quality ratio. Claude Haiku is the equivalent offer from Anthropic, but GPT-4o mini has a larger track record in production.",
+        text: "**Ecosystem integration**: The OpenAI ecosystem is still larger. More third-party tools, libraries and hosted services default to its API, and most RAG frameworks have better first-party support. If you are integrating into an existing stack, the path of least resistance often runs through OpenAI.",
+      },
+      {
+        type: "paragraph",
+        text: "**A cheaper floor**: Luna dropped 80% in price in July 2026, which makes it very hard to beat for classification, routing and extraction at volume — and unlike Haiku it keeps the full million-token context. Haiku 4.5 is the Anthropic equivalent, but caps at 200K.",
       },
       { type: "heading", level: 2, text: "The verdict by use case" },
       {
         type: "list",
         items: [
-          "**Coding assistant / agent**: Claude Sonnet — better instruction following and context retention",
-          "**High-volume extraction / classification**: GPT-4o mini — cheaper and fast enough",
-          "**Long document analysis**: Claude — 200K context, coherent over long spans",
-          "**Image analysis**: GPT-4o — better multimodal pipeline support",
-          "**Creative writing**: Similar quality; Claude has more consistent voice",
-          "**Existing OpenAI stack**: GPT-4o — less migration friction",
-          "**MCP / agentic workflows**: Claude — native MCP origin, better tool use on complex chains",
+          "**Agentic coding / long autonomous runs**: Claude Opus 5 — leads the agentic benchmarks",
+          "**Everyday coding assistant**: Claude Sonnet 5 — most of Opus's judgment at a fraction of the cost",
+          "**Strongest single generalist**: GPT-5.6 Sol — top overall scores, widest ecosystem",
+          "**High-volume extraction / classification**: GPT-5.6 Luna — cheapest capable option with a large window",
+          "**Voice or audio pipelines**: GPT-5.6 — Claude has no native audio",
+          "**Existing OpenAI stack**: GPT-5.6 Terra — least migration friction",
+          "**MCP / complex tool chains**: Claude — native MCP origin, better tool use on long chains",
         ],
       },
       {
         type: "callout",
         variant: "tip",
         title: "Test on your actual task",
-        text: "The single best way to choose is to run 50 examples from your real use case through both models, score the outputs, and pick the winner. Benchmarks tell you nothing about performance on your specific data and task.",
+        text: "The single best way to choose is to run 50 examples from your real use case through both, score the outputs, and pick the winner. Benchmarks tell you nothing about performance on your specific data. Prices and rankings in this piece are current as of August 2026 and move often — confirm on the provider's page before you commit.",
       },
       {
         type: "tools",
         items: [
-          { name: "Anthropic API", valueLine: "Claude Sonnet and Haiku — best for coding, long-context reasoning, and agentic chains.", url: "https://www.anthropic.com/api" },
-          { name: "OpenAI API", valueLine: "GPT-4o and mini — best multimodal support, widest ecosystem, cheapest at volume.", url: "https://platform.openai.com" },
-          { name: "OpenRouter", valueLine: "Single API for 200+ models — test Claude and GPT-4o side by side with one integration.", url: "https://openrouter.ai" },
+          { name: "Anthropic API", valueLine: "Opus 5, Sonnet 5 and Haiku 4.5 — best for agentic coding, long-context reasoning, and tool chains.", url: "https://www.anthropic.com/api" },
+          { name: "OpenAI API", valueLine: "GPT-5.6 Sol, Terra and Luna — widest ecosystem, native audio, cheapest high-volume tier.", url: "https://platform.openai.com" },
+          { name: "OpenRouter", valueLine: "Single API for 200+ models — test both families side by side with one integration.", url: "https://openrouter.ai" },
         ],
       },
       { type: "divider" },
       {
         type: "paragraph",
-        text: "The \"which model?\" question will be irrelevant within a year as quality converges further. What won't converge is the ecosystem and the workflow fit. Build integrations with the API abstraction layer (Vercel AI SDK, OpenRouter) rather than the provider directly, and switching when the quality picture shifts will cost you an afternoon, not a sprint.",
+        text: "The \"which model?\" question keeps getting less interesting as quality converges — the top models now sit within a few points of each other, and open weights are close behind. What does not converge is ecosystem and workflow fit. Build against an abstraction layer (the Vercel AI SDK, OpenRouter) rather than a provider directly, and switching when the picture shifts costs you an afternoon rather than a sprint.",
       },
     ],
   },
-
   // ─── SEO: Best AI tools for startups ────────────────────────────────────────
   {
     slug: "best-ai-tools-for-startups-2026",
@@ -1222,7 +1241,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "Research and competitive intelligence" },
       {
         type: "paragraph",
-        text: "**Perplexity** is the best research tool available because it combines web search with synthesis — you get an answer with cited sources, not a list of links to open. For market research, competitor tracking, technical deep dives, and anything that needs current information, it beats a Google search + GPT-4o workflow for speed.",
+        text: "**Perplexity** is the best research tool available because it combines web search with synthesis — you get an answer with cited sources, not a list of links to open. For market research, competitor tracking, technical deep dives, and anything that needs current information, it beats a Google search + chatbot workflow for speed.",
       },
       {
         type: "paragraph",
@@ -1489,7 +1508,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "The best free AI tools in 2026 — tools with genuinely useful free tiers, not crippled demos: **Claude.ai** (free tier covers most personal use), **Gemini 2.5 Flash** via Google AI Studio (free with a Google account), **Perplexity** (free tier good enough for most research), **Windsurf** (generous free coding tier), and **Canva AI** (free image generation in a full design tool). Every tool on this list is usable without a credit card for real work.",
+        text: "The best free AI tools in 2026 — tools with genuinely useful free tiers, not crippled demos: **Claude.ai** (free tier covers most personal use), **Gemini 3.7 Flash** via Google AI Studio (free with a Google account), **Perplexity** (free tier good enough for most research), **Windsurf** (generous free coding tier), and **Canva AI** (free image generation in a full design tool). Every tool on this list is usable without a credit card for real work.",
       },
       {
         type: "paragraph",
@@ -1498,7 +1517,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "AI assistants and chat" },
       {
         type: "paragraph",
-        text: "**Claude.ai** free tier gives you access to Claude Sonnet with a daily usage limit — enough for most personal tasks: writing, research, coding questions, document analysis. The context window on the free tier (32K) is smaller than Pro (200K), which matters for long documents but not for typical Q&A use. **ChatGPT** (GPT-4o) has a similar free structure. **Google Gemini** via the Gemini web interface is fully free with a Google account and uses the Gemini 1.5 Flash model.",
+        text: "**Claude.ai** free tier gives you access to Claude Sonnet with a daily usage limit — enough for most personal tasks: writing, research, coding questions, document analysis. The context window on the free tier is smaller than Pro, which matters for long documents but not for typical Q&A use. **ChatGPT** has a similar free structure on GPT-5.6. **Google Gemini** via the web interface is fully free with a Google account and runs a Flash-tier model.",
       },
       { type: "heading", level: 2, text: "AI coding tools" },
       {
@@ -1507,7 +1526,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "**Google AI Studio** lets you use Gemini 2.5 Flash and Pro via the API for free up to the quota limit — and Gemini 2.5 Flash is a legitimately capable model, not a stripped-down freeware version. For developers who want to experiment with AI features in their own apps without a billing commitment, this is the lowest-friction starting point.",
+        text: "**Google AI Studio** lets you use Gemini Flash and Pro via the API for free up to the quota limit — and Gemini 3.7 Flash is a legitimately capable model, not a stripped-down freeware version. For developers who want to experiment with AI features in their own apps without a billing commitment, this is the lowest-friction starting point.",
       },
       { type: "heading", level: 2, text: "Image generation" },
       {
@@ -1530,7 +1549,7 @@ limit 8;`,
         title: "Free AI tools worth bookmarking",
         items: [
           { name: "Claude", valueLine: "Free tier covers most personal use — Sonnet model, daily limit, 32K context.", url: "https://claude.ai" },
-          { name: "Google AI Studio", valueLine: "Gemini 2.5 Flash free via API — best free starting point for developers building AI features.", url: "https://aistudio.google.com" },
+          { name: "Google AI Studio", valueLine: "Gemini 3.7 Flash free via API — best free starting point for developers building AI features.", url: "https://aistudio.google.com" },
           { name: "Windsurf", valueLine: "Free AI code editor with unlimited autocomplete — the best free Cursor alternative.", url: "https://codeium.com/windsurf" },
           { name: "Perplexity", valueLine: "Free AI research with citations — 5 Pro searches/day, unlimited standard.", url: "https://perplexity.ai" },
           { name: "Canva AI", valueLine: "Free AI image generation inside a full design tool — better than a standalone generator.", url: "https://canva.com" },
@@ -1561,7 +1580,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "The essential AI tools for developers in 2026: **Cursor** or **Windsurf** for daily editing, **Claude Code** for agentic tasks, **GitHub Copilot** for team environments, **Vercel AI SDK** for building AI features into products, and the **Anthropic API** (Claude) or **OpenAI API** (GPT-4o) as the model layer. Beyond these, the right additions depend on your stack — here's what to add and when.",
+        text: "The essential AI tools for developers in 2026: **Cursor** or **Windsurf** for daily editing, **Claude Code** for agentic tasks, **GitHub Copilot** for team environments, **Vercel AI SDK** for building AI features into products, and the **Anthropic API** (Claude) or **OpenAI API** (GPT-5.6) as the model layer. Beyond these, the right additions depend on your stack — here's what to add and when.",
       },
       {
         type: "paragraph",
@@ -1592,7 +1611,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "The integration layer: building AI into your product" },
       {
         type: "paragraph",
-        text: "The **Vercel AI SDK** is the right abstraction for any Next.js or Node.js project. It provides streaming, tool calling, multi-step agent loops, and RAG primitives behind a clean API — and it's maintained by the same team as Vercel, so it tracks Next.js improvements closely. Call it with Claude, GPT-4o, or Gemini with the same interface.",
+        text: "The **Vercel AI SDK** is the right abstraction for any Next.js or Node.js project. It provides streaming, tool calling, multi-step agent loops, and RAG primitives behind a clean API — and it's maintained by the same team as Vercel, so it tracks Next.js improvements closely. Call it with Claude, GPT-5.6, or Gemini with the same interface.",
       },
       {
         type: "paragraph",
@@ -1850,17 +1869,17 @@ limit 8;`,
       { type: "heading", level: 2, text: "Claude — best for writing and reasoning" },
       {
         type: "paragraph",
-        text: "**Claude** (Anthropic) is the model most knowledge workers reach for when quality matters. The writing is cleaner and more nuanced than GPT-4o's — Claude doesn't pad, doesn't add unnecessary caveats, and calibrates formality to the context without being told. For coding, Claude Code is the best agentic implementation of any frontier model. The extended thinking mode (Claude Sonnet with `thinking: extended`) produces noticeably better results on hard reasoning problems. The main limitation: no image generation, and the free tier is limited.",
+        text: "**Claude** (Anthropic) is the model most knowledge workers reach for when quality matters. The writing is cleaner and more nuanced than GPT-5.6's — Claude doesn't pad, doesn't add unnecessary caveats, and calibrates formality to the context without being told. For coding, Claude Code is the best agentic implementation of any frontier model. Turning the reasoning effort up produces noticeably better results on hard problems, at the cost of latency. The main limitation: no image generation, and the free tier is limited.",
       },
       { type: "heading", level: 2, text: "ChatGPT — best for breadth and ecosystem" },
       {
         type: "paragraph",
-        text: "**ChatGPT** (OpenAI) has the widest ecosystem: DALL-E 3 for image generation, Code Interpreter for data analysis, a plugin store with hundreds of integrations, and GPT-4o's voice mode for natural conversation. If you need one tool that does everything, ChatGPT Plus is the right choice. The quality ceiling is slightly lower than Claude on writing tasks, but the breadth is genuinely unmatched.",
+        text: "**ChatGPT** (OpenAI) has the widest ecosystem: DALL-E 3 for image generation, Code Interpreter for data analysis, a plugin store with hundreds of integrations, and GPT-5.6's voice mode for natural conversation. If you need one tool that does everything, ChatGPT Plus is the right choice. The quality ceiling is slightly lower than Claude on writing tasks, but the breadth is genuinely unmatched.",
       },
       { type: "heading", level: 2, text: "Gemini — best for Google Workspace users" },
       {
         type: "paragraph",
-        text: "**Gemini** (Google) is the right choice if your workflow is built around Google products. The integration with Gmail, Docs, Drive, and Sheets is seamless — Gemini can draft emails, summarize documents, and query your Drive without copy-paste. Gemini 2.0 Pro is a genuinely strong model for reasoning, and the 1 million token context window (Gemini 1.5 Pro) is larger than any competitor. For non-Google users, the integrations are less compelling.",
+        text: "**Gemini** (Google) is the right choice if your workflow is built around Google products. The integration with Gmail, Docs, Drive, and Sheets is seamless — Gemini can draft emails, summarize documents, and query your Drive without copy-paste. Gemini 3.1 Pro leads the reasoning benchmarks, and carries a million-token context window — though Claude and GPT-5.6 have since matched that, so it is no longer the differentiator it was. For non-Google users, the integrations are less compelling.",
       },
       { type: "heading", level: 2, text: "Perplexity — best for research" },
       {
@@ -2083,7 +2102,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "**Claude** wins for writing quality, coding, and nuanced reasoning. **Gemini** wins for Google Workspace integration, real-time web search, and the largest context window (1M tokens in Gemini 1.5 Pro). If you live in Google Docs and Gmail and care most about web access, use Gemini. If you care most about the quality of what you produce — prose, code, analysis — use Claude. Both are genuinely good; the choice is about your workflow, not about one being broken.",
+        text: "**Claude** wins for writing quality, coding, and nuanced reasoning. **Gemini** wins for Google Workspace integration, real-time web search, and price at the frontier tier — the context advantage has gone, since Claude and GPT-5.6 also carry a million tokens now. If you live in Google Docs and Gmail and care most about web access, use Gemini. If you care most about the quality of what you produce — prose, code, analysis — use Claude. Both are genuinely good; the choice is about your workflow, not about one being broken.",
       },
       {
         type: "paragraph",
@@ -2097,7 +2116,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "Coding" },
       {
         type: "paragraph",
-        text: "Claude Sonnet is the preferred model among developers for coding tasks — the instruction following on complex multi-file changes is more reliable, and the error messages when something goes wrong are more specific and actionable. Gemini 2.0 Pro is a strong coder, but independent benchmarks and developer feedback consistently put Claude ahead on real-world coding tasks (as opposed to benchmark tests). Claude Code (the agentic CLI) is a significant capability that Gemini has no equivalent for.",
+        text: "Claude Sonnet is the preferred model among developers for coding tasks — the instruction following on complex multi-file changes is more reliable, and the error messages when something goes wrong are more specific and actionable. Gemini 3.1 Pro is a strong coder and leads the reasoning benchmarks, but developer feedback consistently puts Claude ahead on real-world coding tasks (as opposed to benchmark tests). Both now ship an agentic CLI — Claude Code and Gemini CLI — so that is no longer a one-sided advantage.",
       },
       { type: "heading", level: 2, text: "Research and web access" },
       {
@@ -2333,7 +2352,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "Finding information" },
       {
         type: "paragraph",
-        text: "**Perplexity** is the most useful everyday research tool because it answers questions with real-time web sources and cites them. The citations make it far more trustworthy than asking a chatbot that might confabulate facts — you can verify every claim immediately. Perplexity Pro adds deeper search modes, Claude and GPT-4o as optional models, and file upload for document-based queries.",
+        text: "**Perplexity** is the most useful everyday research tool because it answers questions with real-time web sources and cites them. The citations make it far more trustworthy than asking a chatbot that might confabulate facts — you can verify every claim immediately. Perplexity Pro adds deeper search modes, Claude and GPT-5.6 as optional models, and file upload for document-based queries.",
       },
       {
         type: "paragraph",
@@ -2389,7 +2408,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "Project management AI has mostly followed the pattern of adding AI drafting and summarization to existing PM tools — which is genuinely useful, but represents incremental improvement rather than a category shift. The larger opportunity is using general-purpose AI (Claude, GPT-4o) for the high-cognitive-overhead parts of PM: structuring ambiguity, communicating to stakeholders, and writing up what happened and why.",
+        text: "Project management AI has mostly followed the pattern of adding AI drafting and summarization to existing PM tools — which is genuinely useful, but represents incremental improvement rather than a category shift. The larger opportunity is using general-purpose AI (Claude, GPT-5.6) for the high-cognitive-overhead parts of PM: structuring ambiguity, communicating to stakeholders, and writing up what happened and why.",
       },
       { type: "heading", level: 2, text: "For software teams: Linear" },
       {
@@ -3840,6 +3859,384 @@ limit 8;`,
       {
         type: "paragraph",
         text: "The takeaway: healthcare AI's real, proven value today is giving clinicians their time back — ambient notes, record summaries, administrative relief — while the clinical frontier advances carefully behind regulation and human accountability. Start administrative, keep humans in charge, and protect patient data by design. Track healthcare and vertical AI on the [Kapyn Radar](/radar/browse).",
+      },
+    ],
+  },
+
+  // ─── Hub: best AI skills (evergreen, refreshed monthly) ─────────────────────
+  {
+    slug: "best-ai-skills-2026",
+    title: "Best AI skills in 2026: the Claude Skills and agent skills worth installing",
+    deck: "Skills are the fastest-moving layer in AI tooling right now. Here are the ones that change how an agent works, not just what it knows.",
+    date: "2026-08-14",
+    updated: "2026-08-14",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1526379095098-d400fd0bf935"),
+      alt: "Modular components arranged on a workbench",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "A skill is a set of instructions an agent loads when it needs them — a way of encoding *how* to do something rather than hoping the model remembers. In 2026 this became the highest-leverage thing you can add to a coding agent, and the ecosystem now runs to tens of thousands of published skills. Most are noise. These are the ones worth your time.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "Skill, MCP server, or plugin?",
+        text: "They solve different problems and people conflate them constantly. A skill teaches the model a method — how to review code, how to structure a diagram. An MCP server gives the model a capability it lacks — read this database, drive this browser. A plugin usually bundles both. If your agent knows what to do but does it badly, you want a skill. If it cannot reach something at all, you want an MCP server.",
+      },
+      { type: "heading", level: 2, text: "Where skills actually come from" },
+      {
+        type: "paragraph",
+        text: "There is no single official store, which is why finding good ones is hard. Three sources cover almost everything worth having: Anthropic's own `anthropics/skills` repository, the plugin marketplace built into Claude Code, and a handful of community collections that have earned real adoption. Everything below comes from one of those.",
+      },
+      { type: "heading", level: 2, text: "The engineering skills" },
+      {
+        type: "paragraph",
+        text: "**Superpowers** is the most ambitious of them — a full brainstorm-to-merge methodology that walks an agent through design spec, plan, subagent-driven build, review and merge. It is opinionated in a way that either fits how you work or does not, but it is the closest thing to a complete development process expressed as a skill.",
+      },
+      {
+        type: "paragraph",
+        text: "**Agent Skills** (Addy Osmani's collection) is the pragmatic counterpart: testing discipline, performance work, review standards, refactoring patterns. Where Superpowers restructures your whole workflow, this raises the floor on the work an agent already does.",
+      },
+      {
+        type: "paragraph",
+        text: "**Andrej Karpathy behavioural skills** encodes four rules distilled from Karpathy's observations about where LLMs go wrong writing software: think before coding, keep implementations simple, make surgical changes, verify the success criteria. It is the shortest thing on this list and probably the highest ratio of benefit to effort.",
+      },
+      {
+        type: "quote",
+        text: "The best skills do not make the model smarter. They stop it doing the specific stupid thing it keeps doing.",
+      },
+      { type: "heading", level: 2, text: "The official Anthropic set" },
+      {
+        type: "paragraph",
+        text: "**skill-creator** is where to start if you plan to write your own — it scaffolds the structure and teaches the format by doing. **mcp-builder** turns a description of the tools you want into a runnable MCP server. **webapp-testing** and **frontend-design** are the two that most visibly change output quality: the first makes an agent actually verify a UI works, the second hands it a design philosophy so generated interfaces look considered rather than default.",
+      },
+      {
+        type: "paragraph",
+        text: "The document skills — **docx**, **pdf**, **pptx**, **xlsx** — are unglamorous and quietly essential if you generate real deliverables. **claude-api** is worth adding to any project that calls Claude programmatically, because it keeps parameter shapes current instead of remembered.",
+      },
+      { type: "heading", level: 2, text: "Design and communication" },
+      {
+        type: "paragraph",
+        text: "**Design engineering skills** covers animation, interaction detail and interface craft — the judgment that separates a working UI from a considered one. **Diagram design** ships 29 editorial diagram types as self-contained HTML and SVG, which matters because the default failure mode is every explanation becoming the same flowchart. **Theme factory** generates coherent colour, type and spacing systems so generated interfaces share one visual language.",
+      },
+      { type: "heading", level: 2, text: "Security, research and the specialists" },
+      {
+        type: "paragraph",
+        text: "**Trail of Bits Security Skills** brings audit-grade workflows — CodeQL and Semgrep static analysis, variant analysis, fix verification — from the firm behind Slither and Echidna. **Reverse skill** routes an agent through reverse engineering and penetration testing methodology; for authorised work only, and worth saying so plainly. **Book to skill** converts a technical book PDF into a skill, which turns the book you meant to read into something the agent references while working.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Skills are instructions you are trusting",
+        text: "A skill is prompt text and sometimes executable tooling, usually written by a stranger. Read one before you install it, the same way you would read a shell script from a blog post. Popularity is a signal about usefulness, not about safety.",
+      },
+      { type: "heading", level: 2, text: "How to choose" },
+      {
+        type: "list",
+        items: [
+          "**Does it solve a problem you actually hit?** Installing skills speculatively is how you end up with a bloated context and slower runs.",
+          "**Does it reduce token overhead or add it?** Every loaded skill costs input tokens on every turn. A skill has to earn that.",
+          "**Is it maintained?** Check the last commit. A skill written against last year's agent behaviour can actively mislead.",
+          "**Start with three.** Add one at a time and notice whether the output changed. If you cannot tell, remove it.",
+        ],
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "Anthropic Skills", valueLine: "The official set — skill-creator, mcp-builder, webapp-testing, frontend-design and the document skills.", url: "https://github.com/anthropics/skills" },
+          { name: "Superpowers", valueLine: "A full brainstorm-to-merge agentic development methodology.", url: "https://github.com/obra/superpowers" },
+          { name: "Agent Skills", valueLine: "Production engineering practice encoded as rules an agent follows.", url: "https://github.com/addyosmani/agent-skills" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The skills layer is moving faster than any other part of AI tooling, and most of what is published this month will be irrelevant by the next. We keep the [full skills directory](/skills) current rather than letting a list rot — it is the same catalog this piece is drawn from.",
+      },
+    ],
+  },
+
+  // ─── Hub: best MCP servers (evergreen, refreshed monthly) ───────────────────
+  {
+    slug: "best-mcp-servers-2026",
+    title: "Best MCP servers in 2026: the ones worth actually installing",
+    deck: "The MCP ecosystem passed 17,000 public servers. You need about eight. Here is which eight, and why the rest are noise.",
+    date: "2026-08-14",
+    updated: "2026-08-14",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1558494949-ef010cbdcc31"),
+      alt: "Network cables patched into a switch",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "The Model Context Protocol won. It was donated to the Linux Foundation's Agentic AI Foundation in December 2025, OpenAI and Google DeepMind both adopted it, and the public registry now lists more than 17,000 servers. That abundance is the problem: every one you install costs context on every turn, so the useful question is not which servers exist but which few earn their place.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "The 2026 default is remote, not local",
+        text: "GitHub, Vercel, Linear, Notion, Supabase, Stripe and Figma all publish OAuth-secured hosted endpoints now, so you skip the local install entirely. Zuplo's State of MCP survey found 59% of builders on Streamable HTTP against 34% still on stdio. If a setup guide tells you to clone a repo and run a Node process, check whether the vendor has since shipped a hosted endpoint.",
+      },
+      { type: "heading", level: 2, text: "The ones almost everyone should have" },
+      {
+        type: "paragraph",
+        text: "**Context7** is the most recommended server in developer communities right now, and deservedly. It pulls live documentation so the model stops hallucinating API signatures that were deprecated two versions ago. If you install exactly one thing from this list, install this.",
+      },
+      {
+        type: "paragraph",
+        text: "**GitHub** gives an agent issues, pull requests and code search — the connective tissue between what you ask for and where the work lives. **Filesystem** and **Git** are the local pair that make an agent useful on a real repository rather than a chat transcript.",
+      },
+      {
+        type: "paragraph",
+        text: "**Sentry** closes the loop that most setups leave open: the agent that wrote the code can see the error the code produced in production.",
+      },
+      { type: "heading", level: 2, text: "Browser automation: pick the right one" },
+      {
+        type: "paragraph",
+        text: "This is where people install three servers that do overlapping jobs. The distinction is real and worth learning once.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Playwright MCP** — repeatable end-to-end assertions across browsers. Microsoft-maintained, the broadest support, the default for testing.",
+          "**Chrome DevTools MCP** — interactive debugging of one live Chrome instance: performance traces, network inspection. Official Google server. Use it when you need evidence, not a test.",
+          "**Puppeteer MCP** — quick local Chromium screenshots and DOM extraction. Now archived upstream; reach for Playwright instead unless you have a reason.",
+          "**Browserbase** — managed sessions with replay and persistence, for when browser automation goes to production.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "Chrome DevTools MCP is for debugging one browser. Playwright MCP is for asserting across many. Installing both because they sound similar just costs you context.",
+      },
+      { type: "heading", level: 2, text: "Data and backend" },
+      {
+        type: "paragraph",
+        text: "**Supabase** gives an agent visibility into a Postgres backend — schema, auth, storage, edge functions — which is why it became the default for people building on it. **Neon**, **ClickHouse** and **MongoDB** cover the same job for their own stacks. **Cloudflare** exposes DNS, Workers, Pages deployments, caching and firewall rules, which is more useful than it sounds the first time an agent diagnoses a caching problem for you.",
+      },
+      { type: "heading", level: 2, text: "Search and retrieval" },
+      {
+        type: "paragraph",
+        text: "**Exa**, **Tavily** and **Firecrawl** all fetch the web, with different emphases: Exa for semantic search over quality sources, Tavily for agent-shaped search results, Firecrawl for turning arbitrary pages into clean markdown. Most people need one. **Perplexity** is worth adding if you want cited answers rather than raw pages.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Every server you add is attack surface",
+        text: "An MCP server runs with whatever credentials you hand it and can be prompted through the model. Prefer official servers over community forks with similar names, scope tokens to the minimum, and be deliberate about anything with write access to production. The convenience of an agent that can deploy is also the risk of an agent that can deploy.",
+      },
+      { type: "heading", level: 2, text: "A reasonable starting set" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Context7** — stops the hallucinated APIs",
+          "**GitHub** — issues, PRs, code search",
+          "**Filesystem** — local file access",
+          "**Playwright** — browser testing",
+          "**Your database** — Supabase, Neon, Postgres, whichever you run",
+          "**Sentry** — production errors",
+          "**One search server** — Exa, Tavily or Firecrawl, not all three",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "That is seven. Add the eighth when you feel an actual gap, not because a listicle recommended it.",
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "Context7", valueLine: "Live documentation retrieval — the single highest-value server for coding agents.", url: "https://github.com/upstash/context7" },
+          { name: "Playwright MCP", valueLine: "Cross-browser automation and end-to-end assertions, maintained by Microsoft.", url: "https://github.com/microsoft/playwright-mcp" },
+          { name: "GitHub MCP", valueLine: "Issues, pull requests and code search, wired into the agent.", url: "https://github.com/github/github-mcp-server" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "If you use Claude specifically, the setup details differ slightly — see [best MCP servers for Claude](/blog/best-mcp-servers-for-claude-2026), and [what MCP actually is](/blog/what-is-mcp-model-context-protocol) if the protocol itself is new to you. The [full MCP directory](/mcp) stays current.",
+      },
+    ],
+  },
+
+  // ─── Hub: best AI tools (evergreen index over the category guides) ──────────
+  {
+    slug: "best-ai-tools-2026",
+    title: "Best AI tools in 2026: the honest shortlist",
+    deck: "Most AI tool lists are affiliate pages with 60 entries. This one is short, opinionated, and points you at the deeper guide for whatever you actually do.",
+    date: "2026-08-14",
+    updated: "2026-08-14",
+    readingMin: 8,
+    tag: "Guide",
+    hero: {
+      src: U("1518770660439-4636190af475"),
+      alt: "Neatly arranged hand tools on a pegboard",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "There are more AI tools than anyone can evaluate, and the lists that claim to rank them mostly rank whoever pays best. What follows is the short version — the tools that survive contact with real work — plus a route into the specific guide for your job. No affiliate links, no paywall.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How to read this",
+        text: "Categories, not a leaderboard. \"Best\" depends entirely on what you are doing, and a tool that wins for a solo founder often loses for a team of forty. Where a choice is genuinely close, we say so instead of inventing a winner.",
+      },
+      { type: "heading", level: 2, text: "The model you talk to" },
+      {
+        type: "paragraph",
+        text: "**Claude** for reasoning, coding and anything requiring long nuanced instructions. **ChatGPT** for breadth, native voice, and the widest ecosystem. **Gemini** if you live in Google Workspace, and for very long documents. **Perplexity** when you want cited sources rather than a confident paragraph. The quality gap between the frontier models is now small enough that workflow fit decides it — the [model comparison matrix](/compare) lays out the specifics side by side.",
+      },
+      { type: "heading", level: 2, text: "Writing code" },
+      {
+        type: "paragraph",
+        text: "**Cursor** is still the broadest default for editor-based work. **Claude Code** is the strongest agentic option for tasks you hand over whole. **GitHub Copilot** wins in organisations that need single-vendor, audited, SLA-backed tooling. **Windsurf**, **Cline**, **Codex** and **Zed** all have real constituencies. Full breakdown in [best AI coding assistants](/blog/best-ai-coding-assistants-2026).",
+      },
+      { type: "heading", level: 2, text: "Everything else, by job" },
+      {
+        type: "paragraph",
+        text: "Rather than pad this page with sixty entries, here is the map. Each of these is a real guide, not a paragraph:",
+      },
+      {
+        type: "list",
+        items: [
+          "**Building a product** — [AI tools for startups](/blog/best-ai-tools-for-startups-2026) and [the AI tech stack for any product](/blog/best-ai-tech-stack-for-any-product-2026)",
+          "**Design** — [AI tools for designers](/blog/best-ai-tools-for-designers-2026) and the [vibe-coding design checklist](/blog/vibe-coding-design-checklist)",
+          "**Writing** — [AI writing tools](/blog/best-ai-writing-tools-2026)",
+          "**Images and video** — [image generators](/blog/best-ai-image-generators-2026), [video generators](/blog/best-ai-video-generators-2026)",
+          "**Agents** — [best AI agents](/blog/best-ai-agents-2026) and [what agentic AI actually means](/blog/what-is-agentic-ai-2026)",
+          "**Marketing and SEO** — [marketing](/blog/best-ai-tools-for-marketing-2026), [SEO](/blog/best-ai-tools-for-seo-2026), [social](/blog/best-ai-tools-for-social-media-2026)",
+          "**Research and analysis** — [research](/blog/best-ai-tools-for-research-2026), [data analysis](/blog/best-ai-tools-for-data-analysis-2026)",
+          "**Running on a budget** — [best free AI tools](/blog/best-free-ai-tools-2026) and [controlling AI credit burn](/blog/control-ai-credit-burn-2026)",
+        ],
+      },
+      { type: "heading", level: 2, text: "The two layers most lists skip" },
+      {
+        type: "paragraph",
+        text: "**Skills** changed what a coding agent is capable of more than any model release this year — they encode *how* to do something rather than what to know. **MCP servers** give an agent capabilities it structurally lacks: your database, a real browser, live documentation. If your setup is a chat window and nothing else, these two are where the leverage is. See [best AI skills](/blog/best-ai-skills-2026) and [best MCP servers](/blog/best-mcp-servers-2026).",
+      },
+      {
+        type: "quote",
+        text: "The gap between people getting a lot out of AI and people getting a little is rarely the model. It is whether they wired it to anything.",
+      },
+      { type: "heading", level: 2, text: "What we deliberately leave out" },
+      {
+        type: "paragraph",
+        text: "Tools that exist mainly to be listed. Wrappers with no durable advantage — [we wrote about whether an AI wrapper can be defensible](/blog/is-your-ai-wrapper-defensible-2026). And anything that shut down, which happens more than the lists admit; the [AI tool graveyard](/blog/ai-tool-graveyard-2026) tracks the ones that did.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Pick three, not thirty",
+        text: "The cost of AI tooling is rarely the subscription. It is the attention spent evaluating alternatives instead of shipping. Choose a model, a coding tool and one automation layer, use them until you can name a specific thing they cannot do, and only then look further.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "The [full tool catalog](/tools) is kept current — curated, not scraped, and about 140 entries rather than 12,000. Why that distinction matters: [most AI tool directories are useless](/blog/why-ai-tool-directories-are-useless).",
+      },
+    ],
+  },
+
+  // ─── Monthly roundup — genuinely new each month, not a keyword page ─────────
+  {
+    slug: "ai-tooling-august-2026",
+    title: "AI tooling in August 2026: what shipped, what changed, what to install",
+    deck: "A month of frontier releases, a price war at the cheap end, and the skills ecosystem eating GitHub trending. The changes that affect what you build with.",
+    date: "2026-08-14",
+    readingMin: 7,
+    tag: "Roundup",
+    hero: {
+      src: U("1504384308090-c894fdcc538d"),
+      alt: "A wall calendar and notes on a desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "August was unusually dense at the top of the market: four frontier releases inside six weeks, an 80% price cut at the cheap end, and an open-weight model close enough to the leaders that self-hosting became a real conversation again. Here is what actually changed for people building things.",
+      },
+      { type: "heading", level: 2, text: "The frontier reshuffled" },
+      {
+        type: "paragraph",
+        text: "**Claude Opus 5** landed on 24 July delivering near-Fable capability at half the price, which quietly demoted Fable 5 from default to specialist. **Grok 4.6** arrived on 12 August with a 500K context window and strong agentic tool use, taking roughly third place on Artificial Analysis. **Gemini 3.7 Flash** shipped on 13 August at the cheap end. **GPT-5.6** — Sol, Terra and Luna — continues to lead the overall benchmark snapshot with Sol.",
+      },
+      {
+        type: "paragraph",
+        text: "The practical read: the top models now sit within a few points of each other, and every one of them carries a context window measured in millions of tokens. Context size has stopped being a differentiator. Price and agentic reliability are the live battlegrounds.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "If you only change one thing",
+        text: "Check what your code defaults to. A lot of production stacks are still pinned to a model two generations old because nobody revisited the constant. The cheap tiers in particular got dramatically better this year — GPT-5.6 Luna dropped 80% in price in July while keeping the full context window.",
+      },
+      { type: "heading", level: 2, text: "Open weights got genuinely close" },
+      {
+        type: "paragraph",
+        text: "**Kimi K3** from Moonshot AI — roughly 2.8 trillion parameters, a million-token context, open weights — is the story here. It is close enough to the closed frontier that the decision between them is now about deployment, data residency and lock-in rather than capability. That is a different conversation from the one we were having a year ago.",
+      },
+      { type: "heading", level: 2, text: "Agents moved onto the desktop" },
+      {
+        type: "paragraph",
+        text: "**Claude Cowork** went generally available across macOS and Windows, with web and mobile access — you hand it a folder and a plain-language task, no coding required. **Gemini Spark** launched as a standing agent across Gmail, Calendar, Docs and Sheets, initially Ultra-only and since opened to the cheaper AI Pro tier. **Grok Build**, xAI's terminal coding agent, was open-sourced under Apache 2.0 — harness, TUI and tool layer.",
+      },
+      {
+        type: "paragraph",
+        text: "The pattern across all three: agents are leaving the chat window. The interesting products this month were about giving a model somewhere to *act*, not something to say.",
+      },
+      { type: "heading", level: 2, text: "Skills took over GitHub trending" },
+      {
+        type: "paragraph",
+        text: "The single clearest signal of the month. Look at what is trending on GitHub and it is skills repositories: production engineering skills, design engineering skills, security research routers, tools that convert a technical book into a skill an agent can study. Anthropic's own skills repository and the largest community framework both sit in the six figures of stars.",
+      },
+      {
+        type: "quote",
+        text: "The models got a bit better this month. The instructions we give them got a lot better.",
+      },
+      {
+        type: "paragraph",
+        text: "If you have not touched this layer, it is the highest-leverage thing available right now — see [best AI skills in 2026](/blog/best-ai-skills-2026) for the shortlist.",
+      },
+      { type: "heading", level: 2, text: "Infrastructure worth noticing" },
+      {
+        type: "list",
+        items: [
+          "**Cloudflare Computer** — hands an agent a real machine at the edge: filesystem, browser, shell",
+          "**OmniRoute** — an MIT-licensed gateway fronting 330+ providers, so switching models is config rather than code",
+          "**Agent memory** became a category, with team-level memory hubs treating what agents learn as a reusable asset instead of session litter",
+          "**Document ingestion** quietly improved — anydoc and pdf-inspector both target the layer where RAG pipelines lose fidelity",
+        ],
+      },
+      { type: "heading", level: 2, text: "What to do about it" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "Audit the model constant in your codebase — the cheap tiers changed most",
+          "Install two or three skills and see whether output quality moves",
+          "If you run browser automation, check you are on Playwright rather than the now-archived Puppeteer server",
+          "Ignore the rest until something you are building actually needs it",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "We publish this monthly. The [tool catalog](/tools), [skills directory](/skills), [MCP directory](/mcp) and [model comparison](/compare) are kept current between roundups.",
       },
     ],
   },

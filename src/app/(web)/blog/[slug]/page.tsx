@@ -37,6 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: "Kapyn",
       type: "article",
       publishedTime: post.date,
+      modifiedTime: post.updated ?? post.date,
       images: post.hero?.src ? [{ url: post.hero.src }] : undefined,
     },
     twitter: {
@@ -71,7 +72,7 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.deck,
     image: post.hero?.src ? [{ "@type": "ImageObject", url: post.hero.src }] : undefined,
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updated ?? post.date,
     author: { "@type": "Organization", name: "Kapyn", url: APP_URL },
     publisher: {
       "@type": "Organization",
@@ -132,6 +133,7 @@ export default async function BlogPostPage({ params }: Props) {
             <span style={{ display: "block", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: READING.heading }}>Kapyn</span>
             <span style={{ display: "block", fontSize: "12.5px", color: READING.muted }}>
               {fmtDate(post.date)} · {post.readingMin} min read
+              {post.updated && <> · Updated {fmtDate(post.updated)}</>}
             </span>
           </div>
           <div className={styles.tabletShare}>

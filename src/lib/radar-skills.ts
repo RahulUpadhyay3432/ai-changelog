@@ -79,7 +79,7 @@ export const AI_SKILLS: AiSkill[] = [
     tagline: "Generate and edit .docx with real formatting.",
     description: "A Claude Skill that produces proper Word files — headings, styles, tables and tracked structure — instead of plain text you have to reformat.",
     category: "Writing & content", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/document-skills/docx",
+    url: "https://github.com/anthropics/skills/tree/main/skills/docx",
   },
 
   // ── Coding & dev ───────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ export const AI_SKILLS: AiSkill[] = [
     tagline: "Scaffold a working MCP server from a spec.",
     description: "A Claude Skill that turns a description of the tools you want into a runnable Model Context Protocol server, wiring and boilerplate included.",
     category: "Coding & dev", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/mcp-builder",
+    url: "https://github.com/anthropics/skills/tree/main/skills/mcp-builder",
   },
   {
     name: "Grimoire",
@@ -121,16 +121,16 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "Karpathy Behavioural",
     tagline: "Teach the agent to avoid the classic LLM coding pitfalls.",
-    description: "The fastest-growing Claude Code skill of 2026 — it encodes Andrej Karpathy's viral observations about where LLMs go wrong when coding, so the agent sidesteps them. Reached 144k GitHub stars within weeks of release.",
+    description: "Encodes Andrej Karpathy's observations about where LLMs go wrong writing software — think before coding, keep it simple, make surgical changes, verify the result — as rules the agent follows. One of the most-starred skill repos on GitHub.",
     category: "Coding & dev", platform: "Claude",
-    url: "https://github.com/obra/karpathy-behavioural-skill",
+    url: "https://github.com/multica-ai/andrej-karpathy-skills",
   },
   {
     name: "Caveman",
     tagline: "Cut agent output tokens by writing terse, high-signal replies.",
     description: "A widely-starred Claude skill that reshapes the model's verbosity — 65% average output-token reduction across benchmarks — so long agent sessions stay cheaper and faster without losing the substance.",
     category: "Coding & dev", platform: "Claude",
-    url: "https://github.com/blader/caveman",
+    url: "https://github.com/JuliusBrussee/caveman",
   },
   {
     name: "Code reviewer",
@@ -154,6 +154,13 @@ export const AI_SKILLS: AiSkill[] = [
     url: "https://github.com/anthropics/skills",
   },
 
+  {
+    name: "Claude API",
+    tagline: "Build against the Claude API without reading the whole docs site.",
+    description: "The official Anthropic skill for writing code that calls Claude — model selection, streaming, tool use and prompt caching, with the current parameter shapes rather than remembered ones.",
+    category: "Coding & dev", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/claude-api",
+  },
   // ── Research & analysis ────────────────────────────────────────────────────
   {
     name: "Consensus",
@@ -170,25 +177,11 @@ export const AI_SKILLS: AiSkill[] = [
     url: "https://chatgpt.com/g/g-kZ0eYXlJe-scholar-gpt",
   },
   {
-    name: "Wolfram",
-    tagline: "Compute exact answers with Wolfram|Alpha.",
-    description: "Hands hard math, unit conversions and data lookups to the Wolfram engine, so the numbers are computed rather than guessed.",
-    category: "Research & analysis", platform: "GPT",
-    url: "https://chatgpt.com/g/g-0S5FXLyFN-wolfram",
-  },
-  {
     name: "Deep Research",
     tagline: "Plan, browse and compile a cited report.",
     description: "A Gemini capability that runs a multi-step web investigation on your behalf and returns a structured, sourced brief on the question.",
     category: "Research & analysis", platform: "Gemini",
     url: "https://gemini.google.com/app#deep-research",
-  },
-  {
-    name: "AskYourPDF",
-    tagline: "Chat with and cite any PDF or document.",
-    description: "Upload a file and ask questions against it — the GPT pulls answers from the source and points back to the exact passages.",
-    category: "Research & analysis", platform: "GPT",
-    url: "https://chatgpt.com/g/g-q3Kbb4hr9-askyourpdf-research-assistant",
   },
 
   // ── Design & images ────────────────────────────────────────────────────────
@@ -197,7 +190,7 @@ export const AI_SKILLS: AiSkill[] = [
     tagline: "Give the assistant a real design system and taste.",
     description: "The official Anthropic Claude Skill that hands the model a design philosophy — distinctive typography, purposeful colour, intentional motion — so generated UIs look designed rather than default.",
     category: "Design & images", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/artifacts-builder",
+    url: "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
   },
   {
     name: "Image generator",
@@ -213,35 +206,42 @@ export const AI_SKILLS: AiSkill[] = [
     category: "Design & images", platform: "GPT",
     url: "https://chatgpt.com/g/g-gFt1ghYJl-logo-creator",
   },
-  {
-    name: "Diagrams: Show Me",
-    tagline: "Render flowcharts and diagrams from text.",
-    description: "Describe a system or process and get an editable diagram back — architecture, sequences and mind maps without a drawing tool.",
-    category: "Design & images", platform: "GPT",
-    url: "https://chatgpt.com/g/g-RsLpzPjMJ-show-me-diagrams",
-  },
 
+  {
+    name: "Web artifacts builder",
+    tagline: "Generate self-contained interactive web artifacts.",
+    description: "The official Anthropic skill for building single-file HTML artifacts that run standalone — the successor to the older artifacts-builder path.",
+    category: "Design & images", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/web-artifacts-builder",
+  },
+  {
+    name: "Canvas design",
+    tagline: "Lay out visual compositions the model can reason about.",
+    description: "An official Anthropic skill for canvas-based design work, giving the assistant structure for composition and layout rather than one-shot image prompts.",
+    category: "Design & images", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/canvas-design",
+  },
+  {
+    name: "Theme factory",
+    tagline: "Produce a coherent visual theme instead of ad-hoc colours.",
+    description: "An official Anthropic skill that generates consistent colour, type and spacing systems, so generated interfaces share one visual language.",
+    category: "Design & images", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/theme-factory",
+  },
   // ── Productivity & docs ────────────────────────────────────────────────────
   {
     name: "PowerPoint decks",
     tagline: "Build polished slide decks, no template wrangling.",
     description: "A Claude Skill that generates real .pptx presentations — layouts, speaker notes and consistent styling — from an outline or brief.",
     category: "Productivity & docs", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/document-skills/pptx",
+    url: "https://github.com/anthropics/skills/tree/main/skills/pptx",
   },
   {
     name: "PDF tools",
     tagline: "Fill, merge and extract data from PDFs.",
     description: "A Claude Skill that reads and writes PDFs — pulling fields out of forms, filling them in, and combining files programmatically.",
     category: "Productivity & docs", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/document-skills/pdf",
-  },
-  {
-    name: "ChatPRD",
-    tagline: "Draft PRDs and product specs like a senior PM.",
-    description: "A popular GPT that turns a rough idea into a structured product requirements doc — goals, user stories, scope and success metrics.",
-    category: "Productivity & docs", platform: "GPT",
-    url: "https://chatgpt.com/g/g-G5diVh62r-chatprd",
+    url: "https://github.com/anthropics/skills/tree/main/skills/pdf",
   },
   {
     name: "Gemini in Workspace",
@@ -251,13 +251,20 @@ export const AI_SKILLS: AiSkill[] = [
     url: "https://gemini.google.com/app#workspace",
   },
 
+  {
+    name: "Doc co-authoring",
+    tagline: "Draft and revise long documents alongside the model.",
+    description: "An official Anthropic skill for collaborative writing — the assistant edits in place, tracks what changed and keeps a consistent voice across a long document.",
+    category: "Productivity & docs", platform: "Claude",
+    url: "https://github.com/anthropics/skills/tree/main/skills/doc-coauthoring",
+  },
   // ── Data & sheets ──────────────────────────────────────────────────────────
   {
     name: "Excel spreadsheets",
     tagline: "Create .xlsx with formulas and charts.",
     description: "A Claude Skill that builds working spreadsheets — formulas, pivot-style summaries and charts — not just a table of numbers.",
     category: "Data & sheets", platform: "Claude",
-    url: "https://github.com/anthropics/skills/tree/main/document-skills/xlsx",
+    url: "https://github.com/anthropics/skills/tree/main/skills/xlsx",
   },
   {
     name: "Data Analyst",
@@ -319,13 +326,6 @@ export const AI_SKILLS: AiSkill[] = [
     category: "Marketing & social", platform: "Gemini",
     url: "https://gemini.google.com/app#brainstormer",
   },
-  {
-    name: "Video GPT by VEED",
-    tagline: "Generate short videos with script and voice.",
-    description: "A popular GPT that writes a script, adds voiceover and captions, and renders a shareable short — useful for ads and social clips.",
-    category: "Marketing & social", platform: "GPT",
-    url: "https://chatgpt.com/g/g-Hkqnd7mFV-video-gpt-by-veed",
-  },
 
   // ── Additional: Research & analysis ───────────────────────────────────────
   {
@@ -343,31 +343,6 @@ export const AI_SKILLS: AiSkill[] = [
     description: "One of the most popular design GPTs — describe a system or idea and get an editable diagram rendered in Whimsical: flowcharts, mind maps, org charts and sequence diagrams.",
     category: "Design & images", platform: "GPT",
     url: "https://chatgpt.com/g/g-vI2kaiM9N-whimsical-diagrams",
-  },
-
-  // ── Additional: Productivity & docs ───────────────────────────────────────
-  {
-    name: "Zapier",
-    tagline: "Trigger 7,000+ app automations from the chat.",
-    description: "Zapier's official GPT lets you run and manage Zaps in natural language — connect your tools, automate repetitive work, and check automation status without leaving the conversation.",
-    category: "Productivity & docs", platform: "GPT",
-    url: "https://chatgpt.com/g/g-zdG3jFbLN-zapier",
-  },
-
-  // ── Additional: Learning ───────────────────────────────────────────────────
-  {
-    name: "Speak",
-    tagline: "Practice a foreign language with a real tutor dynamic.",
-    description: "A popular language-learning GPT that runs realistic conversation practice, corrects errors in context, and adapts the lesson to your level and target language.",
-    category: "Learning", platform: "GPT",
-    url: "https://chatgpt.com/g/g-pe1WRgEi8-speak",
-  },
-  {
-    name: "Mr. Ranedeer",
-    tagline: "Adaptive tutor — builds a curriculum to your level.",
-    description: "One of the most used learning GPTs: generates a structured lesson plan on any topic, explains concepts at the right depth, quizzes you, and adjusts as you improve.",
-    category: "Learning", platform: "GPT",
-    url: "https://chatgpt.com/g/g-pdWLoE6XT-mr-ranedeer",
   },
   // ── Refreshed July 2026 (GitHub trending + market scan) ──
   {
@@ -403,4 +378,53 @@ export const AI_SKILLS: AiSkill[] = [
     url: "https://github.com/browser-use/video-use",
   },
 
+  // ── Refreshed August 2026 (GitHub trending — the skills ecosystem itself) ──
+  {
+    name: "Agent Skills",
+    tagline: "Production engineering practice, encoded as skills a coding agent follows.",
+    description: "Addy Osmani's collection of engineering skills for AI coding agents — testing discipline, performance work, review standards and refactoring patterns, written as rules an agent applies rather than advice a human reads. The most-starred community skills collection.",
+    category: "Coding & dev",
+    platform: "Claude",
+    url: "https://github.com/addyosmani/agent-skills",
+  },
+  {
+    name: "Reverse skill",
+    tagline: "Route an agent through reverse engineering and authorised security testing.",
+    description: "A skill router for reverse engineering, authorised penetration testing and security research, aimed at coding clients. It selects the right analysis path for a target rather than exposing one flat prompt. For authorised work only.",
+    category: "Coding & dev",
+    platform: "Claude",
+    url: "https://github.com/zhaoxuya520/reverse-skill",
+  },
+  {
+    name: "Google skills",
+    tagline: "Work with Google products and technologies from an agent.",
+    description: "Google's own Agent Skills collection covering its products and platforms, so an assistant handles Google-specific APIs and conventions from current documentation rather than recalled details.",
+    category: "Coding & dev",
+    platform: "Gemini",
+    url: "https://github.com/google/skills",
+  },
+  {
+    name: "Design engineering skills",
+    tagline: "Give an agent a designer's eye for interface work.",
+    description: "Emil Kowalski's skills for designers and engineers, covering animation, interaction detail and interface craft — the judgment that separates a working UI from a considered one.",
+    category: "Design & images",
+    platform: "Claude",
+    url: "https://github.com/emilkowalski/skills",
+  },
+  {
+    name: "Diagram design",
+    tagline: "Draw 29 editorial diagram types instead of one default flowchart.",
+    description: "A Claude Code skill with 29 editorial diagram types rendered as self-contained HTML and SVG — comparison matrices, timelines, system maps and more, each with a defined structure so the model picks a form that fits the argument.",
+    category: "Design & images",
+    platform: "Claude",
+    url: "https://github.com/cathrynlavery/diagram-design",
+  },
+  {
+    name: "Book to skill",
+    tagline: "Turn a technical book into a skill the agent can study and apply.",
+    description: "Converts a technical book PDF into a Claude Code skill, so the material becomes something an agent references while working rather than a file you meant to read.",
+    category: "Learning",
+    platform: "Claude",
+    url: "https://github.com/virgiliojr94/book-to-skill",
+  },
 ];

@@ -50,6 +50,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "OpenCode", valueLine: "An open-source coding agent that runs in your terminal.", url: "https://opencode.ai", category: "AI coding" },
   { name: "Continue", valueLine: "Open-source IDE autopilot you point at your own models.", url: "https://continue.dev", category: "AI coding" },
   { name: "Roo Code", valueLine: "An open-source autonomous coding agent inside VS Code.", url: "https://roocode.com", category: "AI coding" },
+  { name: "Grok Build", valueLine: "xAI's terminal coding agent — open-source harness, TUI, and tool layer.", url: "https://github.com/xai-org/grok-build", category: "AI coding" },
 
   // ── UI & design ──
   { name: "v0", valueLine: "Generate production React UIs from a prompt.", url: "https://v0.dev", category: "UI & design" },
@@ -102,6 +103,8 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "LanceDB", valueLine: "An open-source vector database that runs on your own storage.", url: "https://lancedb.com", category: "Data & RAG" },
 
   // ── Agents & automation ──
+  { name: "Claude Cowork", valueLine: "Hand Claude a folder and a plain-language task — desktop, web, and mobile.", url: "https://claude.com/cowork", category: "Agents & automation" },
+  { name: "Gemini Spark", valueLine: "A standing agent that works across Gmail, Calendar, Docs, and Sheets.", url: "https://gemini.google.com/spark", category: "Agents & automation" },
   { name: "n8n", valueLine: "Wire AI into automated workflows, self-hostable.", url: "https://n8n.io", category: "Agents & automation" },
   { name: "Zapier", valueLine: "Connect AI to thousands of apps without code.", url: "https://zapier.com", category: "Agents & automation" },
   { name: "Make", valueLine: "Visually automate work across apps and AI.", url: "https://make.com", category: "Agents & automation" },
@@ -238,4 +241,97 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
     description: "Voice infrastructure whose Sonic model streams first audio in around 90ms across 40+ languages, with expressive delivery and on-prem or on-device deployment. It ranked first on Artificial Analysis's speech leaderboards and powers production voice agents. A latency-first way to build voice into apps.",
   },
 
+  // ── Refreshed August 2026 (GitHub trending, AI/agent only) ──
+  {
+    name: "ComfyUI",
+    valueLine: "Build image and video generation pipelines as a visual node graph.",
+    url: "https://github.com/Comfy-Org/ComfyUI",
+    category: "Image",
+    description: "A modular interface for diffusion models where each step \u2014 loading a checkpoint, conditioning, sampling, upscaling \u2014 is a node you wire together. The graph is the artefact: it saves, shares and reruns exactly, which is why it became the standard for reproducible generation work.",
+  },
+  {
+    name: "OmniRoute",
+    valueLine: "One endpoint in front of 330+ model providers, MIT-licensed.",
+    url: "https://github.com/diegosouzapw/OmniRoute",
+    category: "Inference",
+    description: "A free AI gateway that puts a single API in front of hundreds of providers, so switching or falling back between models is configuration rather than a code change. The open alternative to a hosted router.",
+  },
+  {
+    name: "CLI-Anything",
+    valueLine: "Give any piece of software a command line an agent can drive.",
+    url: "https://github.com/HKUDS/CLI-Anything",
+    category: "Agents & automation",
+    description: "A project aimed at making all software agent-native by generating a command-line surface for tools that lack one. Agents are far more reliable driving a CLI than a GUI, so this widens what they can actually operate.",
+  },
+  {
+    name: "DeepSeek-Reasonix",
+    valueLine: "A terminal coding agent built specifically around DeepSeek models.",
+    url: "https://github.com/esengine/DeepSeek-Reasonix",
+    category: "AI coding",
+    description: "A coding agent engineered for DeepSeek rather than adapted to it, with prefix-cache stability so long sessions stay cheap. The option worth knowing if you want capable agentic coding on open reasoning models.",
+  },
+  {
+    name: "herdr",
+    valueLine: "A runtime for coding agents to live in, rather than run loose on your machine.",
+    url: "https://github.com/herdrdev/herdr",
+    category: "Orchestration",
+    description: "Infrastructure that gives coding agents a defined place to execute \u2014 isolation, lifecycle and state \u2014 instead of each agent improvising against your local filesystem. Aimed at teams running several agents at once.",
+  },
+  {
+    name: "TencentDB Agent Memory",
+    valueLine: "Share memory across a team's agents instead of siloing it per session.",
+    url: "https://github.com/TencentCloud/TencentDB-Agent-Memory",
+    category: "Data & RAG",
+    description: "A team-level memory hub that treats what agents learn as a reusable asset rather than something discarded at the end of a conversation. Addresses the gap where every agent starts from zero on shared context.",
+  },
+  {
+    name: "anydoc",
+    valueLine: "Convert Word, PowerPoint, Excel, EPUB and more into text a model can read.",
+    url: "https://github.com/firecrawl/anydoc",
+    category: "Data & RAG",
+    description: "A converter covering the document formats that break most ingestion pipelines, from Firecrawl. The unglamorous layer that decides whether a RAG system sees your documents at all.",
+  },
+  {
+    name: "prime-agent",
+    valueLine: "A coding agent that improves its own approach over long-running tasks.",
+    url: "https://github.com/PrimeIntellect-ai/prime-agent",
+    category: "Agents & automation",
+    description: "A self-improving agent from Prime Intellect built for coding workflows and tasks that run for hours, adjusting its strategy as it goes rather than repeating a fixed loop.",
+  },
+  {
+    name: "pdf-inspector",
+    valueLine: "Pull clean text out of PDFs quickly, including the awkward ones.",
+    url: "https://github.com/firecrawl/pdf-inspector",
+    category: "Data & RAG",
+    description: "A Rust library for PDF inspection, classification and text extraction, built for speed at ingestion scale. PDFs are where most document pipelines quietly lose fidelity; this is the layer that decides how much survives.",
+  },
+  {
+    name: "Cloudflare Computer",
+    valueLine: "Give an agent a real computer to work on, running at the edge.",
+    url: "https://github.com/cloudflare/computer",
+    category: "Agents & automation",
+    description: "Cloudflare's environment for handing an agent an actual machine \u2014 filesystem, browser and shell \u2014 rather than a chat window. The infrastructure answer to computer-use agents that need somewhere to act.",
+  },
+  {
+    name: "semantica",
+    valueLine: "Store agent context as a graph so decisions can be traced.",
+    url: "https://github.com/semantica-agi/semantica",
+    category: "Data & RAG",
+    description: "Graph-native infrastructure for context and accountable AI systems, where relationships between facts are first-class instead of flattened into embeddings. Aimed at systems that must explain why they concluded something.",
+  },
+  {
+    name: "loopx",
+    valueLine: "Keep long-running agent teams from losing the thread.",
+    url: "https://github.com/huangruiteng/loopx",
+    category: "Orchestration",
+    description: "A lightweight state kernel for loop engineering \u2014 managing what a team of agents knows and has done across a long task, which is where most multi-agent setups drift or repeat themselves.",
+  },
+  {
+    name: "code-graph-rag",
+    valueLine: "Query and edit a monorepo through a knowledge graph of the code.",
+    url: "https://github.com/vitali87/code-graph-rag",
+    category: "Data & RAG",
+    description: "RAG built for monorepos, indexing structure and relationships rather than chunking files, so an agent can answer questions that span packages. Aimed at codebases too large to fit in any context window.",
+  },
 ];
+

@@ -1,151 +1,124 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-06-19 — *Radar redesign **shipped to production** (PR #10 merged → main, merge commit `7105ceb`, Vercel prod green): bento browse, spotlight trending, colour foundation, real logos, MCP-and-skills catalog with a Skills tab, logo-less marks dropped. The entity-radar probe has graduated into the live radar surface.*
+> **Last updated:** 2026-08-14 — *content freshness pass: `/compare` rebuilt around the August 2026 frontier, head-to-head comparison pages added, 24 dead links fixed across the MCP/skills catalogs.*
 >
-> **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` + `docs/market-research.md` before any product/UI work.
+> **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` before any product/UI work.
 
 ---
 
-## 👉 RIGHT NOW — the ONE open decision (everything hinges on this)
+## 👉 RIGHT NOW — the one problem that matters
 
-**Decide Kapyn's strategic direction**, because it gates almost everything below:
+**Retention. Not features.**
 
-- **Option A — stay the calm AI-news app** (current live product: swipeable 30s news + the `/learn` knowledge base).
-- **Option B — pivot to "the trusted companion for people building with AI" (vibe coders / AI builders).** Sharper, higher-pain, more differentiated. See `docs/market-research.md` for the full landscape.
+PostHog (2026-07-23) puts week-1 retention at **~1–2%** on the large recent cohorts (May 31–Jun 6, n=219 → 1.4%; Jul 12–18, n=171 → 1.2%; Jul 5–11, n=122 → 0%). The "Mean" row in the dashboard reads ~10% only because tiny early cohorts inflate it. Acquisition is no longer the binding constraint — **Reddit works** (≈75 referrals, the #1 real channel) — but nobody comes back.
 
-**Where we landed (not yet committed):** the *problem* in Option B is real and huge (quantified in market research). The naive "build a vibe-coding security scanner SaaS" is a **trap** (lane filling fast + the "Ignorance-Risk Paradox" = people won't pay to prevent risks they don't perceive). The **viable** version for Kapyn is the **content/trust/no-paywall companion** that proactively surfaces *"what you didn't know to ask"* (security, cost, orchestration, what-changed) — sitting on Kapyn's existing DNA. **But validate with ~5 real builders before committing** (do they return to a destination, or just ask AI / run a $9 scanner?).
+**Do not default to building new surface.** The product is broad and polished; the leak is downstream of that.
 
-**Recommended next action:** run that validation (5 builder conversations), then commit to A or B. *Don't build more product surface until this is decided* — the design, the right-swipe space, and the big feedback items all change shape based on it.
+### The diagnosis fork (measure before fixing)
+Is it **activation** (first-timers bounce on the opening cards) or a **return trigger** problem (they engage but have no reason to come back)? Different fixes, and we now have the instrumentation to tell them apart.
 
-### 📍 Movement (2026-06-17 session) — 4/5 builders → B; radar vision expanded + de-risked
-- **4 of ~5 builder validations now in, all converging on the same axis: actionability** ("does this news let me *do* something / is it useful," not "what happened"). The 4th builder (Instagram) explicitly named story *curation/actionability* as the biggest differentiation opportunity — same point the other three made in different words. **One more conversation to formally commit, but the signal is now strong.**
-- **Radar vision expanded from "entity radar" → a full *space* that packs all valuable things for an AI builder.** Derived from first principles: a builder lives with a *gap* between "best way to build with AI" and "how I build now"; the radar surfaces every event that changes that gap — the **7 triggers** (new / better-way / risk / cheaper / consensus / **deprecation** / **decision**). Two were missing from the old brief (deprecation + decision support) and are now added. Organized as verbs: **Discover · Protect · Decide · Learn · Cheaper.** The distinctive bet is **Protect** (vibe-coding security + deprecation alerts — the layer no AI news app has). **`docs/radar-feature.md` fully rewritten around this.** Sharpest v1 = **Discover + Protect.**
-- **Radar gate run** (`/api/radar-gate`, headless, ₹0): 40 entities, names mostly sharp, good volume/mix → **conditional pass.** Three ₹0 data fixes identified before UI: suppress the broken `isNew` badge (first_seen_at = ingestion date, not launch), headline-match the value-line story (~20% currently describe the wrong entity), denylist junk + merge version fragments. **Next concrete step.**
-- **Shipped this session:** breakdown ("why it matters") **cost fix** (missing `news_items.breakdown` column added → DB cache now works, near-zero LLM cost after warmup; prefetch trimmed 3→2) + **builder UI feedback** (tappable "Why it matters" w/ Sparkles icon, all Unicode arrows → Lucide SVG, iOS `100dvh` viewport fix). All on `main`, build green.
+`feed_session_ended` shipped in **PR #45** ([CardStack.tsx](../src/components/feed/CardStack.tsx)) — carries `max_depth`, `reached_completion`, `is_returning`, `is_first_session`. It pairs with the pre-existing `feed_viewed`, `story_swiped`, `story_breakdown_opened`, `feed_completed`.
 
-### 📍 Movement (2026-06-16 session) — leaning B, now with evidence + a live probe
-- **2 of ~5 builder validations are in, both pointing at B** (unsolicited Instagram feedback — see Strategic context). One asked, unprompted, to *"follow OpenAI, Anthropic, Agents, Open Source"* + personalization + weekly recap. The other validated the concept and will share Kapyn to a dev broadcast channel. **Still need ~3 more conversations** before formally committing — and these are enthusiasm + idea-lists, *soft* signal, not proven willingness-to-return.
-- **We shipped a deliberate, low-cost probe of B: the entity radar** (see Built this session). It rides Kapyn's *existing* entity-extraction rails, needs no auth, and is the cheapest way to test whether builders return to a destination. **This is the test, not a commitment.**
-- **The compounding/retention thesis sharpened:** the durable "why come back" is **follow topics/players** ("what's new in *my* world that I'd miss"), not the read-history "reflection" idea — see Retention plan.
-- **Immediate open call: the radar data-quality go/no-go** (below). Judge the live preview's entity names / one-liners / traction / volume → then either build follow + tap-through + design pass, or do an extraction/taxonomy sharpening pass first.
+**Pending — dashboard work only, no code:**
+1. Filter internal + bot traffic (the "1000 users" figure is inflated by datacenter hits and our own testing — Bengaluru showed 382 visitors → 2905 views).
+2. Funnel: `feed_viewed` → `feed_session_ended max_depth≥2` → `reached_completion`, broken down by `is_first_session`.
+3. Depth histogram, and retention cohortised by `max_depth≥2` vs `<2`.
 
----
-
-## Active workstreams (branches & PRs)
-
-| Branch | PR | What | Status |
-|---|---|---|---|
-| `main` | — | Production → www.kapyn.app | Live |
-| `feat/knowledge-base-m1` | [#3](https://github.com/RahulUpadhyay3432/ai-changelog/pull/3) | KB M1 + craft pass | ✅ Merged |
-| `fix/api-rate-limiting` | [#4](https://github.com/RahulUpadhyay3432/ai-changelog/pull/4) | Rate limiting (Upstash) + input cap | ✅ Merged |
-| `feat/seo-llms-rss` | [#5](https://github.com/RahulUpadhyay3432/ai-changelog/pull/5) | `/llms.txt` + `/feed.xml` | ✅ Merged |
-| `fix/remove-feed-cards` | [#7](https://github.com/RahulUpadhyay3432/ai-changelog/pull/7) | Removed notification + Elon/insight cards from feed | ✅ Merged |
-| `fix/feedback-quickwins` | [#8](https://github.com/RahulUpadhyay3432/ai-changelog/pull/8) | Tap-summary→source + model attribution | ✅ Merged |
-| `feat/desktop-layout` | [#6](https://github.com/RahulUpadhyay3432/ai-changelog/pull/6) | Desktop 3-col `/learn` + `/explore` + AppCta + **editorial-serif redesign** | ⚠️ **OPEN, NOT merged — design rejected by founder, needs reference-driven redo (see Design status)** |
-| `feat/radar-screen` | [#10](https://github.com/RahulUpadhyay3432/ai-changelog/pull/10) | **Radar redesign** — bento browse, spotlight trending, colour foundation, real logos, **MCP-and-skills catalog** (curated MCP servers + AI skills, segmented view), logo-less marks dropped | ✅ **Merged to main 2026-06-19** (merge commit `7105ceb`, Vercel prod green). The radar surface is now live. |
-| `feat/entity-radar` | — (no PR) | **"On the radar"** entity-discovery surface — original Radar tab listing models/tools/companies by traction (`getRadarEntities()` mirrors `getLearnEntities()`) | ⤴️ **Superseded** — graduated into `feat/radar-screen` (the shipped redesign). Branch can be retired. |
-| `feat/your-ai-read-history` | — (no PR yet) | localStorage read-history logging (`recordRead` on swipe) + "Your AI" Profile block (top areas, count, quietest-area nudge) | 🟠 **Pushed (`0dfb0c2`), no PR.** Logging is a fine cheap foundation; the *displayed reflection block* was reconsidered (founder: low value) — **superseded by the radar's "follow" as the retention mechanic.** Keep logging, reconsider the UI. |
-| `feat/india-sources` | [#9](https://github.com/RahulUpadhyay3432/ai-changelog/pull/9) | Added Indian AI sources to ingestion: **India AI** (Google News AI+India query — the "miss nothing" net, catches AIM/NDTV/Forbes India), **ET CIO** (AI-scoped enterprise), **Inc42** (startups/funding, capped 8) | ✅ **Merged to main 2026-06-16.** Root cause of "no Indian AI news": feed had 20+ sources, zero Indian. Takes effect after production deploy + ingestion run. |
+### Fix sequence (ICE-ordered, only after the data lands)
+1. **Feed opener** — lead with the best stories, not the newest. Partly shipped (`composeAllFeed` in [supabase.ts](../src/lib/supabase.ts), A/B-gated on the PostHog flag `feed-opener-ranking`). Build further only if the data shows shallow first-session bounce.
+2. **"What you missed since last visit"** — cheap return reward, uses `kapyn_last_visit`, no auth. The "New" badge (PR #34) is the first half of this.
+3. **Web Push** — the real return trigger, but opt-in friction is high on a no-auth PWA and it cannot fix a weak opener. Needs VAPID keys.
 
 ---
 
-## ✅ Shipped & live (production = www.kapyn.app)
-- **Radar redesign** (PR #10, merged 2026-06-19): the radar is now a full discovery surface — **bento browse** grid, **spotlight trending**, a calm colour/gold foundation, **real brand logos** (via same-origin `/api/favicon` proxy), per-category accents, and the **"MCP and skills"** catalog at `/radar/mcp` (curated MCP servers enriched with live GitHub stars + a curated AI-skills catalog grouped by use-case, behind a `[MCP servers] [Skills]` segmented toggle). Logo-less marks render nothing (no first-letter boxes). Static curated `.ts` catalogs — no new DB/ingestion.
-- **Knowledge base M1**: `/learn/[slug]` + `/explore`, 5 durable Supabase tables, auto-generation cron with self-critique gating, sitemap + JSON-LD. All 15 seed concepts published. Migration run.
-- **SEO/LLM discovery**: `/llms.txt` + `/feed.xml` live; sitemap confirmed in Google Search Console (Success, 208 pages).
-- **API hardening**: Upstash rate limiting + input cap on `/api/breakdown` + `/api/news/trigger` (`src/lib/ratelimit.ts`).
-- **Feed cleanup**: removed the notification-prompt card + the Elon/insight card; feed is now news-only.
-- **Feedback quick wins**: tap summary → opens source article; card footer shows "AI summary · Gemini 2.5 Flash Lite" + source.
+## 🔴 Blocked on the founder (not code)
+
+- [ ] **Gemini credits** — prepaid credits depleted → 429 `RESOURCE_EXHAUSTED` → summarisation fails → the feed cannot ingest. Top up at ai.studio and confirm the *same* key is in Vercel prod.
+- [ ] **PostHog** — create the `feed-opener-ranking` boolean flag at 50% so the opener A/B actually records; enable session replay.
+- [ ] **VAPID keys** — required before web push can be switched on.
+- [ ] **Rotate `CRON_SECRET`** — still the weak `kapyntest123`, in *both* Vercel env and the GitHub repo secret.
+- [ ] **Gemini billing cap** — ingestion now runs 12×/day; set a denial-of-wallet backstop.
+- [ ] **`sameAs: []` in layout.tsx** — fill with real X/IG/LinkedIn URLs; strongest signal against the "kapyn → kyn" Google autocorrect.
 
 ---
 
-## 🆕 Built this session (2026-06-16, on branches — NOT yet merged/live)
+## ✅ Shipped & live (production = kapyn.app)
 
-### `feat/entity-radar` — "On the radar" (the lead build)
-- **What:** a new **Radar** bottom-nav tab (server-rendered `src/app/(app)/radar/page.tsx`) that surfaces the named **models / tools / companies** moving in AI now, grouped by type and ranked by recency + `mention_count` (how many sources cover it = traction).
-- **Key insight that made it cheap:** ingestion *already* extracts these entities daily into the Supabase `entities` table (`/api/news/fetch` → up to 6 named entities per story); **nothing rendered the model/tool/company types.** Added `getRadarEntities()` to `src/lib/knowledge.ts` — a direct mirror of the existing `getLearnEntities()` (which serves the concept/technique glossary). No new pipeline, no auth, no migration.
-- **👉 OPEN — data-quality go/no-go (the immediate decision):** look at the live preview on phone and judge: are entity **names sharp**, **one-liners useful**, **ranking interesting**, **volume enough**?
-  - **Sharp →** add **tap-through to source stories** + **follow** (OpenAI / Anthropic / Agents / Open Source — localStorage like feed prefs; the compounding retention hook), then a news-app-referenced **design pass**.
-  - **Mushy →** **sharpen extraction/taxonomy first** before more UI.
-- **Known gap:** the `entity_type` enum is `model/tool/company/technique/concept` — so **"Agents" and "Open Source" are NOT first-class types; they're buried inside `tool`.** The two lenses builders most want need a sharpening pass (extend taxonomy or derive from source/description).
-- **Provisional choices:** it's a nav **tab** (not the eventual swipe-right panel) and rows aren't tappable yet — both deliberate, to get real data in hand fast.
+**The app.** Swipeable 30-second feed, categories, trending, saved, profile. Desktop visitors to `/` are rewritten to the `/home` landing via [middleware.ts](../src/middleware.ts); phones and the installed PWA get the app.
 
-### `feat/your-ai-read-history` — read-history + "Your AI" block
-- `recordRead()`/`getReadHistory()` in `src/lib/storage.ts` (capped, deduped, SSR-safe — mirrors the streak pattern), fired in `CardStack` on swipe; a "Your AI" section on Profile (top areas + count + quietest-area nudge).
-- **Reconsidered:** founder feels a *reflection* surface ("you read N, here are your topics") doesn't add real value — people know what they know. **Logging stays as a cheap foundation; the displayed block is parked.** The radar's **follow** replaces it as the retention bet.
+**The Radar** — the discovery surface and the real retention bet: Today, Browse, Toolkit, Packs, Pulse, Hackathons, MCP market. Lives in the `(radar)` route group with its own layout.
 
-### Side outputs (not code)
-- Drafted a **LinkedIn post** + DM about Nelson Lee's "Concentric Circles of AI" Substack note (a model-choice framework: be only as close to the frontier as your closest competitor; upgrade on cost-crossover). Nelson is a potential contributor for the eventual "which model / cost-effective stack" comparison layer.
+**SEO/AEO surface** — `/mcp` + `/mcp/[slug]`, `/skills` + `/skills/[slug]`, `/tools` + `/tools/[slug]`, `/compare` + `/compare/[a]-vs-[b]`, `/blog` (41 posts), `/learn`, `/explore`, `/search`, `llms.txt`, `feed.xml`, sitemap.
 
----
+**Ingestion** — GitHub Actions cron every 2h ([fetch-news.yml](../.github/workflows/fetch-news.yml)) plus Vercel crons for the radar/knowledge/email jobs. A retry workflow (PR #46) re-runs the fetch when GitHub fails to allocate a runner.
 
-## 🧭 Strategic context (the thinking behind the open decision)
-
-- **Value > UI.** UI is copyable; value is not. We spent hours polishing chrome on *commodity* content ("what is RAG" = available everywhere). That, not the visuals, is the real "I won't come back" problem.
-- **The "just ask AI" objection (the central risk):** AI chat owns *answers*. So Kapyn's value cannot be "look up answers." It must be **the question you didn't know to ask + trust it's right/current + a curated POV + proactive** — things AI chat structurally can't be (it's reactive, non-committal, ephemeral, sometimes confidently wrong). AI's proliferation is the *tailwind* (more builders shipping with hidden risks).
-- **Market research verdict (`docs/market-research.md`):** "partially taken." Security-scanner lane filling (UNPWNED, Vibe App Scanner, GitGuardian/Codacy). The *trusted content/companion* position is open. Demand is massive (r/vibecoding ~559k weekly; 65% of vibe-coded apps have security defects; $12k surprise bills; CVE-2025-48757). But the **Ignorance-Risk Paradox** kills a paid-prevention SaaS → Kapyn's edge is a **content/brand/no-paywall** play, monetized via audience, not fear-insurance.
-- **Builder validation in progress (2/~5, both → B):** unsolicited Instagram feedback.
-  - **Person 2** (real builder): *"swipeable format + Why it matters make AI news easy to consume."* Asked for **personalized feeds (Builder/Founder/Researcher), follow topics (OpenAI / Anthropic / Agents / Open Source), source-credibility labels, more practical Why-it-matters, weekly recap.** Said **personalization is the next feature**; will **share Kapyn in his dev broadcast channel** (real distribution signal). → 3 of his 5 ideas collapse into the **entity radar**.
-  - **Person 1 (Nelson Lee):** *"like the content"* but **the UX looks generic ("Claude UI")** — suggested **Mobbin + news-app references** to give it identity. (Diagnoses the same problem that got PR #6 rejected; names the *right adjacency* — see Design status.) Also wrote a sharp model-choice framework ("Concentric Circles of AI").
-  - **Discipline note:** treat Person 2's 5 ideas as **2 jobs** (personalized discovery + better breakdowns), not 5 features — avoid Artifact-style feature creep. These are *soft* signals (friendly enthusiasm), still need ~3 more + a willingness-to-return read.
+### Recent merges
+| PR | What |
+|---|---|
+| #46 | Auto-recover from runner-acquisition failures in the news cron |
+| #45 | `feed_session_ended` — the activation-vs-trigger diagnostic |
+| #42–44 | Packs + weekly recap surfaced; grid Pulse; denser Today tiles |
+| #41 | MCP directory made far richer and self-updating |
+| #39–40 | Starter packs + verdict badges |
+| #38 | "Caught up this week" anti-FOMO share card |
+| #37 | Judgment layer — honest verdicts on the tool canon |
+| #36 | Push opt-in moved to slot 5 so people actually see it |
+| #34 | Return hook ("New" badge, "N new" pill) + first-run landing fixes |
 
 ---
 
-## 🎨 Design status (IMPORTANT — read before any UI work)
-- **The `/learn` + `/explore` redesign on PR #6 was rejected** — looked "fine but generic / wouldn't return." Root cause: **I designed from text descriptions, not visual references** (web search was blocked during research, so I worked from specs, not screenshots). Lesson: **never design without real reference images.**
-- **There IS a full design-skill library at `.agents/skills/`** (`high-end-visual-design`, `impeccable` [craft/polish/typography refs], `web-design-guidelines`, `design-taste-frontend`) + `.continue/skills/ui-ux-pro-max` (has a `scripts/search.py --design-system` generator). **USE THESE.** They were missed initially.
-- **Reference screenshots saved to `/home/rahul/kapyn-design-references/`** (7 PNGs: linear, anthropic, every, vercel, stripe-docs, brilliant; stripe-press blank). **Lesson: those were the WRONG adjacency** (SaaS/product/docs sites). The right references are **exploration/understanding destinations** (where people go to learn/explore/solve): AI newsletters, Wikipedia/Investopedia, Perplexity, etc. — NOT product landing pages.
-- **Screenshot capability exists:** `/snap/bin/chromium --headless=new --screenshot=...` works (write to `/home/rahul/...`, NOT `/tmp` — snap has a private `/tmp`). Use `dangerouslyDisableSandbox` for network.
-- **Next design step:** founder sends (or we capture) references from the *right adjacency*, then redesign `/learn`+`/explore` to MATCH a chosen reference — and run it through the `.agents` design skills. Don't guess.
-- **🆕 Builder-named reference source (2026-06-16):** Nelson Lee independently flagged the app as looking like generic **"Claude UI"** and suggested **[Mobbin](https://mobbin.com)** (real-app screenshot library) filtered to **news apps** — i.e. capture *news-app* references and design against them. This is the right adjacency, concretely sourced. **Applies to both the PR #6 redo AND the new radar surface's eventual design pass** (build the radar's value first, polish with references second — do not front-load chrome).
+## 🧭 Strategic position (resolved — do not relitigate)
+
+The old "Option A vs Option B" decision in this doc is **closed**. Kapyn is **the calm map of the AI worth using** — discovery first, news as the live signal. The Radar is the headline; the 30-second feed feeds it.
+
+Two things worth keeping in view:
+
+- **AI news alone is a commodity** — a vitamin, not a painkiller. Value is everywhere (X, Reddit, TLDR, just asking a chatbot). Artifact had beautiful UX, push, and Instagram's founders, and still shut down. **News UX does not produce retention.** The habit-forming version is *"what's new in my world"* — which is what the Radar and follow are for.
+- **The "just ask AI" objection** is the central risk. Kapyn's value cannot be "look up answers" — chat owns that. It has to be *the question you didn't know to ask*, a curated point of view, and trust that it is current.
 
 ---
 
-## 🔁 Retention plan (value-first)
-Honest principle: **retention follows value, not mechanics** (Inshorts/Artifact had push+streaks+great UX and died on commodity value). The 3 direction-independent, cheap moves to do meanwhile:
-1. **Measure** — set up a PostHog retention report (D1/D7/D30, return cadence). Currently flying blind (~2–20 DAU).
-2. **A trigger** — an owned re-engagement channel: daily/weekly **email brief** (durable; works regardless of pivot) or activate the dormant **push** (built; needs VAPID + a new opt-in spot since the in-feed prompt was removed).
-3. **Investment** — ~~start logging **read-history**~~ **DONE this session** (`feat/your-ai-read-history`). But the leading investment/retention bet has shifted from a *literacy map* to **follow topics/players** (the radar's "follow") — "what's new in my world" pulls returns harder than "reflect on what you read." Read-history logging still useful as a cheap signal; the displayed map is parked.
-- **Do NOT** build guilt-gamification (off-brand for "calm intelligence").
+## 📅 Content freshness (new — this is now a recurring job)
+
+Catalogs and model data go stale fast and quietly. The August 2026 audit found `/compare` still presenting **GPT-4o as frontier**, two generations behind, and **24 dead links** across the MCP and skills directories.
+
+**Single source of truth:** [models.ts](../src/lib/models.ts) — `name` is the family, `currentVersion` is the release it points at. Updating a model family should be a one-field edit plus `LAST_UPDATED`. Never put a minor version in `name`; that is exactly how it went stale.
+
+**Recommended cadence — monthly:**
+1. Re-check `LAST_UPDATED` in `models.ts` against the current frontier.
+2. Run a dead-link sweep over `radar-mcp.ts`, `radar-skills.ts`, `radar-essentials.ts` (upstream repos get archived and renamed constantly — `modelcontextprotocol/servers` moved seven reference servers to `servers-archived`).
+3. Grep the blog for retired model names before they embarrass a ranking page.
 
 ---
 
-## 🗺️ Backlog / ideas
-- **Right-swipe space** (gesture currently unused): the **entity radar** (`feat/entity-radar`) is the concrete first instantiation — currently a nav tab, intended to graduate into the swipe-right panel once its content proves out. Eventual surface = radar + follow + explore + saved + (later) Ask Kapyn; optionally contextual (swipe-right-on-story → the entity/concept behind it). **Do NOT copy Inshorts' cluttered tab-soup + word game.**
-- **M2 entity work is now in flight** via the radar (reads the `entities` graph). Remaining M2: `/tools/[slug]` deep pages + in-feed entity chips + radar tap-through + **follow**.
-- **Parked feedback (direction-dependent):** search, more/mute topics, **account sync** (= auth + backend — don't build until strategy decided).
-- **Personal AI-literacy map** — highest-leverage retention mechanic (design-foundations §4).
-- **M2** `/tools/[slug]` + in-feed entity chips · **M3** `/digest/[date]` · **M4** light `/admin` · **Ask Kapyn** (RAG; needs rate-limit + billing cap first).
+## 🗺️ Backlog
+
+- **Ask Kapyn** — RAG over the corpus. Needs rate limiting + a billing cap first.
+- **Blog engine (Phase 2)** — auto-synthesise posts from the corpus with a human-review gate; the hand-authored seed in [blog-content.ts](../src/lib/blog-content.ts) swaps out behind the existing routes.
+- **`radar_tools` schema debt** — the live table has no `description` or `image_url` column; reads and writes both degrade via a lean-retry. Adding the two columns makes that a no-op.
+- **Admin dashboard** at `/admin` for content QA.
+- Parked: search, account sync (needs auth), personal AI-literacy map.
+
+**Stale PR:** [#6](https://github.com/RahulUpadhyay3432/ai-changelog/pull/6) (`feat/desktop-layout`) has been open since 2026-06-15 and was superseded by the desktop front door (#27/#28). Close it.
 
 ---
 
-## ⏳ Pending — founder dashboard actions
-- [ ] Set **`kapyn.app` as PRIMARY domain** in Vercel (apex 307-redirects to www; canonicals use apex).
-- [ ] Set Upstash env vars (`UPSTASH_REDIS_REST_URL` + `_TOKEN`) — else rate limiting uses weak in-memory fallback.
-- [ ] Set a **Gemini billing cap** (Google Cloud) — denial-of-wallet backstop.
-- [ ] Rotate `CRON_SECRET` from `kapyntest123` to a strong value.
+## ⚙️ Working notes
+
+- **Local `next build` OOMs this machine.** Verify with `npx tsc --noEmit` + `eslint`, and rely on the Vercel build gate.
+- **Local `npm run dev` does not load `.env.local`** when started from Claude — DB pages 500. Verify on the Vercel preview instead.
+- **Screenshots work**: `google-chrome --headless=new --disable-gpu --no-sandbox --hide-scrollbars --window-size=430,2400 --virtual-time-budget=17000 --screenshot=<out> <url>`. The `--virtual-time-budget` is load-bearing (client fetch needs ~15s). Chrome is the snap build — it can only write to `/home/rahul/snap/chromium/common/`.
+- **Verify every UI change at 430px and 1280px**, before and after.
+- **Pushing `.github/workflows/*` needs the `workflow` OAuth scope** on the gh token (`gh auth refresh -h github.com -s workflow`).
 
 ---
 
-## ⚙️ Working notes (cost + tooling)
-- **Model tiering** to control cost: **Sonnet** for routine coding/edits; **Opus** (plain, not `[1m]`) only for planning/architecture/review/hard judgment. Drop `[1m]` unless huge context needed.
-- **Offload to GPT/Gemini Deep Research:** market research, content drafts, isolated/well-specified tasks. **Keep in Claude:** repo-aware build, integration, review, taste.
-- Local `next build` **OOMs** this machine (closes the editor) — rely on the Vercel build gate; use `tsc --noEmit` / `eslint <file>` for local checks.
+## 📎 Key files
 
----
-
-## 🔐 Security posture (quick reference)
-- The KB/blog is inherently safe — static (SSG/ISR), CDN-cached, cron-generated. Keep it static.
-- LLM endpoints (`/api/breakdown`) are the denial-of-wallet surface → rate-limited + capped; billing cap pending.
-- Public anon key allows direct reads of public Supabase tables — acceptable (public data).
-
----
-
-## 📎 Key files & references
-- `docs/design-foundations.md` — design/product brief (read before UI).
-- `docs/market-research.md` — vibe-coder/AI-builder competitive landscape + synthesis.
-- `/home/rahul/kapyn-design-references/` — saved reference screenshots (note: wrong adjacency — recapture exploration destinations).
-- `.agents/skills/` + `.continue/skills/ui-ux-pro-max` — design skills (USE THEM).
-- `supabase/migrations/0001_knowledge_base.sql` — KB schema (run).
-- Repo: `RahulUpadhyay3432/ai-changelog`. Deploy: Vercel. **Main working clone: `/home/rahul/projects/ai-changelog`** (persistent). ⚠️ A throwaway `/tmp/ai-changelog` checkout was used earlier this session and got wiped on reboot — **always work in the `/home/rahul/projects` clone**; everything important is pushed to GitHub regardless.
+- [design-foundations.md](design-foundations.md) — design/product brief; read before UI work.
+- [market-research.md](market-research.md) — competitive landscape (June 2026; the "security scanner SaaS is a trap" verdict still holds).
+- [models.ts](../src/lib/models.ts) · [model-pairs.ts](../src/lib/model-pairs.ts) — model data and curated comparisons.
+- [radar-essentials.ts](../src/lib/radar-essentials.ts) · [radar-mcp.ts](../src/lib/radar-mcp.ts) · [radar-skills.ts](../src/lib/radar-skills.ts) — the curated catalogs.
+- [design-tokens.ts](../src/lib/design-tokens.ts) — single brand source. The export is still *named* `GOLD` but holds blue `#3b82f6`; renaming would touch ~110 sites.
+- Repo: `RahulUpadhyay3432/ai-changelog` · Deploy: Vercel · Working clone: `/home/rahul/projects/ai-changelog`.

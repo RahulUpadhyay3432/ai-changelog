@@ -54,7 +54,13 @@ function warmImages(items: NewsItem[], count = 3) {
 // HomeFeed initializer below, not re-read on every mount.
 let sessionBaseline: number | null | undefined;
 
-export function HomeFeed() {
+/**
+ * `initialItems` is the "all" feed rendered on the server. It exists purely so the
+ * first paint has real headlines instead of a skeleton — the client still
+ * re-resolves the feed after hydration to apply the user's topic prefs and the
+ * opener A/B arm, which the server cannot know.
+ */
+export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = {}) {
   const searchParams = useSearchParams();
   const initialCategory = (searchParams.get("category") ?? "all") as CategorySlug;
   const [storyId] = useState(() => searchParams.get("story"));
@@ -70,11 +76,20 @@ export function HomeFeed() {
   useEffect(() => { setLastVisitTimestamp(); }, []);
 
   const [activeCategory, setActiveCategory] = useState<CategorySlug>(initialCategory);
-  const [stories, setStories] = useState<NewsItem[]>([]);
+  const [stories, setStories] = useState<NewsItem[]>(
+    // Only seed when the server payload matches the category we're opening on.
+    initialCategory === "all" ? initialItems : [],
+  );
   // Loading is true whenever the active category's feed isn't ready yet — cold
   // start AND switches to a not-yet-prefetched tab (so the latter shows a
   // skeleton instead of frozen stale content). Cached/prefetched tabs stay instant.
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(
+    !(initialCategory === "all" && initialItems.length > 0),
+  );
+  // True until the first client resolve finishes. While set, the effect below
+  // refreshes in the background rather than flashing a skeleton over the
+  // server-rendered cards.
+  const seededRef = useRef(initialCategory === "all" && initialItems.length > 0);
   const [loadError, setLoadError] = useState(false);
   const [reloadNonce, setReloadNonce] = useState(0); // bump to force a re-fetch (retry)
   const [showFeedHint, setShowFeedHint] = useState(false);
@@ -138,8 +153,10 @@ export function HomeFeed() {
 
   useEffect(() => {
     // Show the skeleton only when this category isn't already resolved — a
-    // prefetched/cached tab swaps in instantly with no flash.
-    if (!feedCache.current.has(activeCategory)) setLoading(true);
+    // prefetched/cached tab swaps in instantly with no flash. The server-seeded
+    // first render counts as resolved, so the background re-resolve is invisible.
+    if (!feedCache.current.has(activeCategory) && !seededRef.current) setLoading(true);
+    seededRef.current = false;
     let cancelled = false;
 
     const loadFeed = async () => {

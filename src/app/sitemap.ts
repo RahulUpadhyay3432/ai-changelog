@@ -5,7 +5,7 @@ import { BLOG_POSTS } from "@/lib/blog-content";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
 import { MODEL_PAIRS, pairSlug } from "@/lib/model-pairs";
-import { getAllTools } from "@/lib/tools-registry";
+import { getAllTools, getPromotedToolPages } from "@/lib/tools-registry";
 import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";
@@ -71,6 +71,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const promotedToolUrls: MetadataRoute.Sitemap = (await getPromotedToolPages()).map((t) => ({
+    url: `${APP_URL}/tools/${t.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((p) => ({
     url: `${APP_URL}/blog/${p.slug}`,
     lastModified: new Date(p.date),
@@ -102,6 +109,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     })),
     { url: `${APP_URL}/explore`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
+    // Discovered tools that cleared the promotion gate. This is the half of the
+    // catalog search engines could not previously see.
+    ...promotedToolUrls,
     { url: `${APP_URL}/compare`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     // Only tools with enough curated peers get an alternatives page — mirrors
     // the MIN_ALTERNATIVES guard on the route so the sitemap never lists a 404.

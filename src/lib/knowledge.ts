@@ -580,3 +580,77 @@ function titleNamesEntity(title: string, name: string): boolean {
   const escaped = name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i").test(title.toLowerCase());
 }
+
+// ── Promotion: discovered tools that have earned an indexable page ───────────
+//
+// The pipeline discovers tools daily (GitHub trending, Product Hunt) and renders
+// them in the Radar, but tools-registry.ts deliberately excludes them, so none
+// of it was ever reachable by search. That is the reason the catalog looks
+// static to Google while actually growing every day.
+//
+// Promotion is gated rather than automatic. Auto-publishing every discovery
+// would generate pages from a 14-word LLM line and a star count, which is the
+// thin doorway-page pattern that gets whole domains demoted. A tool earns a page
+// by clearing three bars:
+//
+//   1. a real description (not an empty or one-word value line)
+//   2. genuine traction — MIN_PROMOTE_SCORE stars/upvotes
+//   3. persistence — first seen at least MIN_PROMOTE_DAYS ago AND still being
+//      seen, which filters the one-day spike that never comes back
+//
+// Bar 3 is the one that matters most. Star counts spike on repos that vanish a
+// week later; a tool the crawler keeps re-finding a fortnight on is real.
+
+export const MIN_PROMOTE_SCORE = 500;
+export const MIN_PROMOTE_DAYS = 3;
+const PROMOTE_STALE_DAYS = 30; // not seen in a month → stop publishing it
+
+export interface PromotedTool {
+  source: string;
+  name: string;
+  valueLine: string;
+  url: string;
+  description: string | null;
+  score: number;
+  topics: string[];
+}
+
+export async function getPromotedTools(limit = 300): Promise<PromotedTool[]> {
+  const now = Date.now();
+  const firstSeenBefore = new Date(now - MIN_PROMOTE_DAYS * 86400000).toISOString();
+  const lastSeenAfter = new Date(now - PROMOTE_STALE_DAYS * 86400000).toISOString();
+
+  const run = (cols: string) =>
+    supabase
+      .from("radar_tools")
+      .select(cols)
+      .gte("score", MIN_PROMOTE_SCORE)
+      .lte("first_seen_at", firstSeenBefore)
+      .gte("last_seen_at", lastSeenAfter)
+      .order("score", { ascending: false })
+      .limit(limit);
+
+  const first = await run(`${RADAR_TOOL_COLS_DESC}, first_seen_at`);
+  const { data, error } = columnMissing(first.error?.message)
+    ? await run(`${RADAR_TOOL_COLS}, first_seen_at`)
+    : first;
+  if (error) return [];
+
+  return (data ?? []).flatMap((row) => {
+    const r = row as unknown as Record<string, unknown>;
+    const valueLine = typeof r.value_line === "string" ? r.value_line.trim() : "";
+    const url = typeof r.url === "string" ? r.url : "";
+    const name = typeof r.name === "string" ? r.name.trim() : "";
+    // Bar 1: a value line that is actually a sentence, not a stub.
+    if (!name || !url || valueLine.split(/\s+/).length < 4) return [];
+    return [{
+      source: String(r.source ?? "github"),
+      name,
+      valueLine,
+      url,
+      description: typeof r.description === "string" && r.description.trim() ? r.description : null,
+      score: typeof r.score === "number" ? r.score : 0,
+      topics: Array.isArray(r.topics) ? (r.topics as string[]) : [],
+    }];
+  });
+}

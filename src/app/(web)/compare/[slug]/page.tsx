@@ -12,6 +12,7 @@ import {
 } from "@/lib/model-pairs";
 import { CATEGORY_LABELS, LAST_UPDATED, PRICE_TIER_LABEL, formatContext, type AIModel } from "@/lib/models";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
@@ -165,8 +166,8 @@ export default async function ComparePair({ params }: Props) {
 
   return (
     <article>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }} />
 
       <Link
         href="/compare"

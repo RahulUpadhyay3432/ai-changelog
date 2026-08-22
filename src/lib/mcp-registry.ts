@@ -24,8 +24,9 @@ interface RawEntry {
     description?: string;
     websiteUrl?: string;
     repository?: { url?: string; source?: string };
+    remotes?: { type?: string; url?: string }[];
   };
-  _meta?: Record<string, { status?: string; isLatest?: boolean }>;
+  _meta?: Record<string, { status?: string; isLatest?: boolean; updatedAt?: string }>;
 }
 
 // "github.com/owner/repo" (any suffix) → "owner/repo"; null if not GitHub.
@@ -140,4 +141,85 @@ export function categorizeMcp(name: string, description: string): McpCategory {
   if (has("linear", "jira", "calendar", "todo", "task", "productivity", "asana", "trello", "airtable")) return "Productivity";
 
   return "Dev tools";
+}
+
+// ── Verification + freshness for the CURATED set ─────────────────────────────
+// Different job from fetchMcpRegistryServers above. That one DISCOVERS new
+// servers; this one asks the registry a targeted question about a server we
+// already list: is the official entry for this exact repo still active, and is
+// the version we point at the current one?
+//
+// Exact-name matching matters. Searching the registry for "context7" also
+// returns `ai.smithery/renCosta2025-context7fork` and
+// `com.clauxel.context7docs/context7docs-mcp`. Presence in the registry is
+// therefore NOT verification on its own — only the entry whose name derives
+// from the repo URL we curate means "this is the official listing for the thing
+// we linked to". That distinction is the entire value of the badge.
+
+export interface RegistryStatus {
+  /** Reverse-DNS id we matched, e.g. "io.github.upstash/context7". */
+  registryName: string;
+  /** Registry lifecycle: "active", "deprecated", "deleted". */
+  status: string;
+  /** False when a newer version exists than the one listed. */
+  isLatest: boolean;
+  /** ISO timestamp of the registry's last update to this entry. */
+  updatedAt: string | null;
+  /** Hosted endpoints, when the maintainer publishes any. */
+  remotes: { type: string; url: string }[];
+}
+
+/** "https://github.com/upstash/context7" → "io.github.upstash/context7" */
+export function registryNameForRepo(url: string): string | null {
+  const full = githubFullNameFromUrl(url);
+  return full ? `io.github.${full}` : null;
+}
+
+/**
+ * Look up one curated server's official registry entry.
+ *
+ * Returns null when the server is not in the registry at all — which is common
+ * and not a fault. Plenty of widely-used servers have never been published
+ * there, so absence must render as "not listed", never as "unverified" or
+ * anything that reads like a warning.
+ */
+export async function lookupRegistryStatus(repoUrl: string): Promise<RegistryStatus | null> {
+  const wanted = registryNameForRepo(repoUrl);
+  if (!wanted) return null;
+
+  try {
+    const res = await fetch(
+      `${REGISTRY_URL}?search=${encodeURIComponent(wanted.split("/").pop() ?? "")}&limit=50`,
+      { next: { revalidate: 86400 } },
+    );
+    if (!res.ok) return null;
+    const json = (await res.json()) as { servers?: RawEntry[] };
+
+    // Case-insensitive exact match on the derived name; forks and lookalikes
+    // carry different namespaces and are correctly ignored.
+    const hits = (json.servers ?? []).filter(
+      (e) => (e.server?.name ?? "").toLowerCase() === wanted.toLowerCase(),
+    );
+    if (!hits.length) return null;
+
+    // Several versions of the same server can be listed; prefer the latest.
+    const best = hits.find((e) => metaOf(e)?.isLatest) ?? hits[hits.length - 1];
+    const meta = metaOf(best);
+    return {
+      registryName: wanted,
+      status: meta?.status ?? "unknown",
+      isLatest: meta?.isLatest !== false,
+      updatedAt: meta?.updatedAt ?? null,
+      remotes: (best.server?.remotes ?? []).flatMap((r) =>
+        r?.type && r?.url ? [{ type: r.type, url: r.url }] : [],
+      ),
+    };
+  } catch {
+    return null; // registry down → render as "not listed", never block the page
+  }
+}
+
+function metaOf(e: RawEntry): { status?: string; isLatest?: boolean; updatedAt?: string } | null {
+  const m = e._meta?.["io.modelcontextprotocol.registry/official"];
+  return m ?? null;
 }

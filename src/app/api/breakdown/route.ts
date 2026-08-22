@@ -53,10 +53,28 @@ export async function POST(req: NextRequest) {
     if (cached) return NextResponse.json({ explanation: cached, cached: true });
   }
 
+  // ⚠️  Anything PERSISTED must be generated from the stored row, never from the
+  // request body. This endpoint is unauthenticated, so a caller could otherwise
+  // POST an arbitrary `title`/`summary` alongside a real story's `id`, and the
+  // resulting text would be written to that row with the service-role key and
+  // then served from cache to every future reader. Body values are still fine
+  // for one-off, uncached responses (mock stories in dev).
+  let promptTitle = title;
+  let promptSummary = summary;
+  let persistable = false;
+  if (cacheable) {
+    const row = await readStoryForPrompt(id);
+    if (row) {
+      promptTitle = row.title;
+      promptSummary = row.summary;
+      persistable = true;
+    }
+  }
+
   const prompt = `You are explaining a tech/AI news story to someone smart but not a specialist. Be concise and direct.
 
-Headline: "${title}"
-Summary: "${summary}"
+Headline: "${promptTitle}"
+Summary: "${promptSummary}"
 
 Respond in exactly this format:
 
@@ -81,7 +99,7 @@ Rules:
     if (!text) throw new Error("Empty response from both providers");
     // Persist so the next view (any user, any session) is instant. Best-effort,
     // awaited so it completes before the serverless function freezes.
-    if (cacheable) await storeBreakdown(id, text);
+    if (persistable && id) await storeBreakdown(id, text);
     return NextResponse.json({ explanation: text });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -98,6 +116,28 @@ function getDbClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return null;
   return createClient(url, key, { auth: { persistSession: false } });
+}
+
+/**
+ * The story's own title/summary, straight from the table. This is the trusted
+ * input for anything we intend to persist.
+ */
+async function readStoryForPrompt(id: string): Promise<{ title: string; summary: string } | null> {
+  try {
+    const db = getDbClient();
+    if (!db) return null;
+    const { data, error } = await db
+      .from("news_items")
+      .select("title, summary")
+      .eq("id", id)
+      .maybeSingle();
+    if (error || !data) return null;
+    const t = typeof data.title === "string" ? data.title.trim() : "";
+    const sm = typeof data.summary === "string" ? data.summary.trim() : "";
+    return t && sm ? { title: t.slice(0, MAX_TITLE), summary: sm.slice(0, MAX_SUMMARY) } : null;
+  } catch {
+    return null;
+  }
 }
 
 async function readCachedBreakdown(id: string): Promise<string | null> {

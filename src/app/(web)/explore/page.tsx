@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { entityHref } from "@/lib/entities";
 import { getLearnEntities } from "@/lib/knowledge";
 import { ExploreClient, type EntityLite } from "./ExploreClient";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -49,7 +50,7 @@ export default async function ExplorePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <ExploreClient entities={items} />
     </>
   );

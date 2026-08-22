@@ -10,6 +10,7 @@ import { BlogReader } from "@/components/blog/BlogReader";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, SG } from "@/lib/design-tokens";
 import { READING } from "../theme";
 import styles from "../blog.module.css";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -101,8 +102,8 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <article>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(listJsonLd) }} />
 
       <BlogReader
         toc={toc}

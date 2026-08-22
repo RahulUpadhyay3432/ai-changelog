@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { MCP_CLIENTS, MCP_FAILURES } from "@/lib/mcp-clients";
 import { GOLD, HAIRLINE, SG, SURFACE, TEXT } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
@@ -71,7 +72,7 @@ export default function McpConfigPage() {
 
   return (
     <article>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqLd) }} />
 
       <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: TEXT.muted, textDecoration: "none", margin: "0 0 18px" }}>
         <ArrowLeft size={14} strokeWidth={2.3} /> MCP servers

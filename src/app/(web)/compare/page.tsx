@@ -4,6 +4,7 @@ import { CompareClient } from "@/components/compare/CompareClient";
 import { MODELS, LAST_UPDATED, CATEGORY_LABELS } from "@/lib/models";
 import { MODEL_PAIRS, modelById, pairSlug } from "@/lib/model-pairs";
 import { GOLD, SG, TEXT } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -53,7 +54,7 @@ export default function ComparePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
       <header style={{ margin: "4px 0 28px" }}>
         <span style={{ fontFamily: SG, fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>

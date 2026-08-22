@@ -18,7 +18,18 @@ export const runtime = "nodejs";
 const WEEK = "public, max-age=604800";
 const PH_GRAPHQL = "https://api.producthunt.com/v2/api/graphql";
 
+/**
+ * 302 to an image URL, but only to one that passes the SSRF guard.
+ *
+ * Every target here is attacker-influenceable: `og:image` comes from a
+ * third-party page, and the PH thumbnail from an API response. Redirecting to
+ * them unchecked turned this route into an open redirect on the kapyn.app
+ * origin (a phishing primitive: the link genuinely is our domain) as well as an
+ * internal-network probe. Validating inside the helper covers all call sites,
+ * including ones added later.
+ */
 function redirect(location: string): Response {
+  if (!isSafePublicUrl(location)) return empty();
   return new Response(null, { status: 302, headers: { Location: location, "Cache-Control": WEEK } });
 }
 

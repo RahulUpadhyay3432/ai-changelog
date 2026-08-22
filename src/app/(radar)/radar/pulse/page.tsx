@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getRadarTools, getRadarCards, getRadarMcpDiscovered } from "@/lib/knowledge";
 import { getTrending } from "@/lib/trending";
 import { PulseClient } from "./PulseClient";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -68,7 +69,7 @@ export default async function PulsePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <PulseClient tools={tools} mcp={mcp} entities={entities} stories={stories} stats={stats} weekOf={weekOfLabel()} />
     </>
   );

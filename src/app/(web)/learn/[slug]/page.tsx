@@ -11,6 +11,7 @@ import {
   getEntitiesBySlugs,
 } from "@/lib/knowledge";
 import styles from "./learn.module.css";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -131,7 +132,7 @@ export default async function LearnPage({ params }: Props) {
     <div className={styles.layout}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <article className={styles.article}>

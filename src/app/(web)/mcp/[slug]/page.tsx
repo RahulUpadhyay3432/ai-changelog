@@ -5,8 +5,10 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { MCP_SERVERS, MCP_CATEGORY_EMOJI, githubFullName, type McpServer } from "@/lib/radar-mcp";
 import { slugify } from "@/lib/entities";
 import { getMcpInstall, claudeCodeCommand } from "@/lib/mcp-install";
+import { lookupRegistryStatus } from "@/lib/mcp-registry";
 import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
@@ -43,6 +45,10 @@ export default async function McpDetail({ params }: Props) {
 
   const repo = githubFullName(s.url);
   const install = getMcpInstall(s.url);
+  // Official-registry check, revalidated daily with the page. Absence is normal
+  // and renders as "not listed" — plenty of good servers were never published
+  // there, so it must never read as a warning.
+  const registry = await lookupRegistryStatus(s.url);
   const related = MCP_SERVERS.filter((x) => x.category === s.category && x.name !== s.name).slice(0, 6);
   const url = `${APP_URL}/mcp/${slug}`;
   const answer = `${s.tagline} ${s.description}`;
@@ -108,10 +114,10 @@ export default async function McpDetail({ params }: Props) {
 
   return (
     <article>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      {howToLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }} />
+      {howToLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(howToLd) }} />}
 
       <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: "#a3a3a3", textDecoration: "none", margin: "0 0 18px" }}>
         <ArrowLeft size={14} strokeWidth={2.3} /> MCP servers
@@ -144,6 +150,31 @@ export default async function McpDetail({ params }: Props) {
           Browse all MCP servers
         </Link>
       </div>
+
+      {registry && (
+        <div
+          style={{
+            display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px 14px",
+            margin: "20px 0 0", padding: "12px 16px",
+            border: `1px solid ${registry.status === "active" ? "rgba(37,99,235,0.28)" : "rgba(217,119,6,0.32)"}`,
+            background: registry.status === "active" ? "rgba(37,99,235,0.07)" : "rgba(217,119,6,0.07)",
+            borderRadius: "12px",
+          }}
+        >
+          <span style={{ fontFamily: SG, fontSize: "13px", fontWeight: 600, color: registry.status === "active" ? "#93b4fd" : "#e0b877" }}>
+            {registry.status === "active" ? "In the official MCP registry" : `Registry status: ${registry.status}`}
+          </span>
+          <span style={{ fontSize: "12.5px", color: "#8a857c" }}>{registry.registryName}</span>
+          {!registry.isLatest && (
+            <span style={{ fontSize: "12.5px", color: "#e0b877" }}>a newer version is published</span>
+          )}
+          {registry.updatedAt && (
+            <span style={{ fontSize: "12.5px", color: "#737373" }}>
+              updated {registry.updatedAt.slice(0, 10)}
+            </span>
+          )}
+        </div>
+      )}
 
       <McpInstallBlock name={s.name} install={install} docsUrl={s.url} />
 

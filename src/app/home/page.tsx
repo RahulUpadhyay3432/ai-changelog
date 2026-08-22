@@ -23,6 +23,7 @@ import { HeroRadarPanel } from "./HeroRadarPanel";
 import { HeroHeadline } from "./HeroHeadline";
 import { HeroPill } from "./HeroPill";
 import styles from "./landing.module.css";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 export const revalidate = 1800;
 
@@ -546,9 +547,9 @@ export default async function LandingPage() {
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(navJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(navJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(catalogJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }} />
     </div>
   );
 }

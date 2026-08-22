@@ -14,7 +14,7 @@ Recent context:
 "${title}"
 ${summary}
 
-Write ONE line, max 14 words, telling a developer what ${name} lets them DO or why it matters for their work — the action/value, not the announcement.
+Write ONE line, max 14 words, telling a developer what ${name} lets them DO or why it matters for their work, the action/value, not the announcement.
 Rules:
 - Verb-first where natural. Concrete and specific.
 - No hype, no exclamation marks, no marketing adjectives.
@@ -22,8 +22,8 @@ Rules:
 - Reply with exactly INSUFFICIENT if the context is too thin, OR if it is merely news ABOUT the entity (funding, partnerships, spending, hiring, valuation) rather than a capability, tool, or release a developer can actually use.
 
 Good examples:
-- Serves 70B models on one consumer GPU — cuts inference cost
-- Edits across files in agent mode — faster refactors
+- Serves 70B models on one consumer GPU , cuts inference cost
+- Edits across files in agent mode , faster refactors
 - Open-source coding model you can self-host
 
 Value line:`;

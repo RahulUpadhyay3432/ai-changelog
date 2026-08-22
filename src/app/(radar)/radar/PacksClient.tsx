@@ -54,7 +54,7 @@ export function PacksClient() {
           The stack to actually use
         </h1>
         <p style={{ fontSize: "15px", lineHeight: 1.5, color: TEXT.body, margin: "0 0 26px", maxWidth: "560px" }}>
-          Hand-picked stacks for a real job — not 12,000 tools. Each is a curated loadout you can save to your Toolkit in one tap.
+          Hand-picked stacks for a real job, not 12,000 tools. Each is a curated loadout you can save to your Toolkit in one tap.
         </p>
 
         {/* Packs — responsive grid that fills the width instead of a lonely column */}

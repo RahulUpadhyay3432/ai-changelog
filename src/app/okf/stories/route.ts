@@ -75,17 +75,17 @@ export async function GET() {
 
   const md = `---
 type: AI News Digest
-title: Kapyn AI & Tech News — ${today}
+title: Kapyn AI & Tech News, ${today}
 description: ${stories.length} stories from the last 48 hours, grouped by category
 resource: ${APP_URL}
 tags: [${allTags.join(", ")}]
 timestamp: ${now}
 ---
 
-# Kapyn News Digest — ${today}
+# Kapyn News Digest , ${today}
 
 ${stories.length} stories from the last 48 hours, grouped by category.
-Published by Kapyn (${APP_URL}) — AI/tech news distilled to 30-second reads.
+Published by Kapyn (${APP_URL}) , AI/tech news distilled to 30-second reads.
 
 [← Back to catalog](/okf)
 ${sections}`;

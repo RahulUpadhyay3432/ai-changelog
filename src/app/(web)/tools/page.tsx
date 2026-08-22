@@ -9,10 +9,10 @@ export const revalidate = 86400;
 
 // The 40-word extractable answer for "what are AI tools".
 const WHAT_ARE_TOOLS =
-  "AI tools are the apps and services that put AI to work — chat assistants, coding copilots, image and video generators, agent frameworks, and the infrastructure to run them — so you can build, create and ship without starting from scratch.";
+  "AI tools are the apps and services that put AI to work, chat assistants, coding copilots, image and video generators, agent frameworks, and the infrastructure to run them , so you can build, create and ship without starting from scratch.";
 
 const DESC =
-  "A curated directory of the essential AI tools worth knowing — models and chat, coding, UI and design, agents, inference, data and more — the must-know names, by category.";
+  "A curated directory of the essential AI tools worth knowing, models and chat, coding, UI and design, agents, inference, data and more , the must-know names, by category.";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "Models & chat": "🧠",
@@ -31,11 +31,11 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 export const metadata: Metadata = {
-  title: "Best AI tools — the essential AI tools worth knowing, by category",
+  title: "Best AI tools, the essential AI tools worth knowing, by category",
   description: DESC,
   alternates: { canonical: `${APP_URL}/tools` },
-  openGraph: { title: "Best AI tools — Kapyn", description: DESC, url: `${APP_URL}/tools`, siteName: "Kapyn", type: "website" },
-  twitter: { card: "summary_large_image", title: "Best AI tools — Kapyn", description: DESC },
+  openGraph: { title: "Best AI tools, Kapyn", description: DESC, url: `${APP_URL}/tools`, siteName: "Kapyn", type: "website" },
+  twitter: { card: "summary_large_image", title: "Best AI tools, Kapyn", description: DESC },
 };
 
 export default function ToolsHub() {

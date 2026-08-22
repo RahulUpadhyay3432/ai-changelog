@@ -64,7 +64,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$$$",
     modalities: ["text", "vision"],
     openWeights: false,
-    bestFor: "The ceiling — problems where being right matters more than the bill",
+    bestFor: "The ceiling, problems where being right matters more than the bill",
     strengths: ["Highest capability in the Claude line", "Long-horizon agentic work", "Deep code reasoning"],
   },
   {
@@ -79,7 +79,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$$",
     modalities: ["text", "vision"],
     openWeights: false,
-    bestFor: "Agentic coding and multi-step engineering work — near the ceiling, at half the price",
+    bestFor: "Agentic coding and multi-step engineering work, near the ceiling, at half the price",
     strengths: ["Leads agentic benchmarks", "Best-in-class coding", "Reasoning-effort control"],
   },
   {
@@ -93,7 +93,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$$$",
     modalities: ["text", "vision", "audio"],
     openWeights: false,
-    bestFor: "The strongest generalist — complex agentic and scientific work across modalities",
+    bestFor: "The strongest generalist, complex agentic and scientific work across modalities",
     strengths: ["Top overall benchmark scores", "Broadest ecosystem", "Native audio and vision"],
   },
   {
@@ -108,7 +108,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$",
     modalities: ["text", "vision", "audio"],
     openWeights: false,
-    bestFor: "Reasoning over very long inputs — whole codebases, long documents, video",
+    bestFor: "Reasoning over very long inputs, whole codebases, long documents, video",
     strengths: ["Leads reasoning benchmarks", "Huge context", "Strong price for the tier"],
   },
   {
@@ -140,7 +140,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$",
     modalities: ["text", "vision"],
     openWeights: false,
-    bestFor: "The default for most work — reads code like a senior engineer at a fair price",
+    bestFor: "The default for most work, reads code like a senior engineer at a fair price",
     strengths: ["Strong coding", "Great price-to-quality", "Reliable tool use"],
   },
   {
@@ -171,7 +171,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$",
     modalities: ["text", "vision", "audio"],
     openWeights: false,
-    bestFor: "High-volume agent loops and prototyping — cheap enough to run constantly",
+    bestFor: "High-volume agent loops and prototyping, cheap enough to run constantly",
     strengths: ["Very cheap for its capability", "Large context", "Fast"],
   },
   {
@@ -233,7 +233,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$",
     modalities: ["text", "vision"],
     openWeights: true,
-    bestFor: "Frontier-adjacent quality you can self-host — the open model closest to the closed leaders",
+    bestFor: "Frontier-adjacent quality you can self-host, the open model closest to the closed leaders",
     strengths: ["Open weights at frontier scale", "1M context", "Cheap to run via providers"],
   },
   {
@@ -261,7 +261,7 @@ export const MODELS: AIModel[] = [
     priceTier: "free",
     modalities: ["text", "vision"],
     openWeights: true,
-    bestFor: "Running locally or self-hosting — private, free to run, no vendor lock-in",
+    bestFor: "Running locally or self-hosting, private, free to run, no vendor lock-in",
     strengths: ["Open weights", "Runs locally", "Largest open ecosystem"],
   },
   {

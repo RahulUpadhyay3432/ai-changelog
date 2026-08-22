@@ -290,7 +290,7 @@ export function McpMarketClient({ meta = {}, initialView = "mcp", servers = MCP_
           </span>
           <div>
             <h1 style={{ fontFamily: SG, fontSize: "27px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.03em", lineHeight: 1.05 }}>MCP and skills</h1>
-            <p style={{ fontSize: "13.5px", color: TEXT.muted, margin: "3px 0 0" }}>Connect and extend your assistant — servers and skills</p>
+            <p style={{ fontSize: "13.5px", color: TEXT.muted, margin: "3px 0 0" }}>Connect and extend your assistant, servers and skills</p>
           </div>
           <span style={{ marginLeft: "auto", flexShrink: 0 }}><ThemeToggle /></span>
         </div>

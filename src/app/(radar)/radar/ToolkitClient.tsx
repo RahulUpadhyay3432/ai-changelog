@@ -26,7 +26,7 @@ function toThing(s: SavedRadarTool): RadarThing {
 }
 
 function copyLine(s: SavedRadarTool): string {
-  return `${s.name} — ${s.valueLine}${s.url ? ` ${s.url}` : ""}`;
+  return `${s.name}, ${s.valueLine}${s.url ? ` ${s.url}` : ""}`;
 }
 
 function LoadoutChip({ active, label, count, onClick }: { active: boolean; label: string; count: number; onClick: () => void }) {
@@ -128,7 +128,7 @@ export function ToolkitClient() {
 
   const copyGroup = async (cat: string, items: SavedRadarTool[]) => {
     try {
-      await navigator.clipboard.writeText(`${cat} — via Kapyn Radar\n\n${items.map(copyLine).join("\n")}`);
+      await navigator.clipboard.writeText(`${cat} , via Kapyn Radar\n\n${items.map(copyLine).join("\n")}`);
       flash(`Copied ${items.length}`);
       posthog.capture("radar_toolkit_copy_group", { category: cat, count: items.length });
     } catch { flash("Couldn't copy"); }
@@ -189,7 +189,7 @@ export function ToolkitClient() {
             <Bookmark size={24} color={GOLD} strokeWidth={1.8} />
           </span>
           <p style={{ fontSize: "15px", color: "#c9c5bf", lineHeight: 1.5, margin: "0 0 6px", maxWidth: "260px" }}>Build your toolkit</p>
-          <p style={{ fontSize: "13.5px", color: "var(--kt-text-muted, #737373)", lineHeight: 1.5, margin: "0 0 20px", maxWidth: "280px" }}>Tap any tool on Today and hit Save. It files itself by category — so you never lose the one that mattered.</p>
+          <p style={{ fontSize: "13.5px", color: "var(--kt-text-muted, #737373)", lineHeight: 1.5, margin: "0 0 20px", maxWidth: "280px" }}>Tap any tool on Today and hit Save. It files itself by category , so you never lose the one that mattered.</p>
           <Link href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
             Browse Today <ArrowRight size={16} strokeWidth={2.3} />
           </Link>

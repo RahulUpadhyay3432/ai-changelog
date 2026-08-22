@@ -31,5 +31,5 @@ export async function GET(request: Request) {
     .eq("unsubscribe_token", token);
 
   if (error) return page("Something went wrong. Email hello@kapyn.app and we'll remove you.");
-  return page("You're unsubscribed from the Kapyn weekly digest. No more emails — thanks for reading.");
+  return page("You're unsubscribed from the Kapyn weekly digest. No more emails, thanks for reading.");
 }

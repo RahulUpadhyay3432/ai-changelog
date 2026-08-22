@@ -37,7 +37,7 @@ function SearchInner() {
         Search Kapyn
       </h1>
       <p style={{ fontSize: "14px", color: TEXT.muted, margin: "0 0 28px" }}>
-        Tools, MCP servers, AI skills, and guides — all in one place.
+        Tools, MCP servers, AI skills, and guides, all in one place.
       </p>
 
       {/* Search input */}

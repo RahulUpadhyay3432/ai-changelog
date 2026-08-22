@@ -47,7 +47,7 @@ export async function GET() {
 
   const md = `---
 type: Knowledge Bundle Index
-title: Kapyn — AI & Tech Intelligence Catalog
+title: Kapyn, AI & Tech Intelligence Catalog
 description: Daily structured digest of AI/tech news and tool tracking, updated hourly
 resource: ${APP_URL}
 tags: [ai, tech, news, radar, tools, daily-digest, open-knowledge-format]
@@ -56,7 +56,7 @@ timestamp: ${now}
 
 # Kapyn Knowledge Catalog
 
-Kapyn tracks what matters in AI and tech — distilled to 30-second reads.
+Kapyn tracks what matters in AI and tech , distilled to 30-second reads.
 This OKF bundle exposes the structured content behind the feed for AI agents,
 search crawlers, and downstream integrations.
 
@@ -64,8 +64,8 @@ Updated hourly. No paywall. No hype.
 
 # Sections
 
-* [Today's Stories](/okf/stories) — ${storyCount} stories in the last 48h
-* [AI Tools Radar](/okf/tools) — ${toolCount} tools, models, and entities tracked
+* [Today's Stories](/okf/stories) , ${storyCount} stories in the last 48h
+* [AI Tools Radar](/okf/tools) , ${toolCount} tools, models, and entities tracked
 
 # Today at a Glance (${today})
 

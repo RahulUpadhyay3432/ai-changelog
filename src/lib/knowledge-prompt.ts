@@ -31,12 +31,12 @@ export function buildExplainerPrompt(
 
   return `You are writing a calm, factual glossary entry for Kapyn, an AI/tech knowledge base for engineers, founders, and operators. Explain the ${entityType} "${name}".
 
-CONTEXT — recent Kapyn news mentioning ${name}. Use it ONLY for the CURRENT section, and cite by [number]:
+CONTEXT, recent Kapyn news mentioning ${name}. Use it ONLY for the CURRENT section, and cite by [number]:
 ${context}
 
 Rules:
 - Plain English, present tense, active voice. No hype, no marketing, no emojis, no exclamation marks.
-- Write from well-established facts. If the CONTEXT is thin or empty, keep CURRENT short or write "none" — never invent.
+- Write from well-established facts. If the CONTEXT is thin or empty, keep CURRENT short or write "none" , never invent.
 - Do not invent product names, numbers, dates, benchmarks, or companies that are not in the CONTEXT or common knowledge.
 - Each section is 2-4 sentences. No markdown headers, no bullet points, no bold.
 
@@ -81,7 +81,7 @@ export function parseExplainer(text: string): ParsedExplainer {
 // ── Self-critique (quality gate) ────────────────────────────────────────────
 
 export function buildCritiquePrompt(name: string, explainer: string): string {
-  return `You are a strict fact-checker. Score this glossary entry about "${name}" from 0 to 100 on: factual accuracy, grounding (no invented specifics), specificity, and absence of filler or hallucination. If it states specific facts — numbers, dates, product claims — that are not common knowledge, score below 50. If it is vague or padded, score below 60.
+  return `You are a strict fact-checker. Score this glossary entry about "${name}" from 0 to 100 on: factual accuracy, grounding (no invented specifics), specificity, and absence of filler or hallucination. If it states specific facts , numbers, dates, product claims , that are not common knowledge, score below 50. If it is vague or padded, score below 60.
 
 ENTRY:
 ${explainer}

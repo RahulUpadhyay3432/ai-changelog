@@ -26,7 +26,7 @@ const SITE_JSONLD = {
       url: APP_URL,
       logo: `${APP_URL}/api/icon/512`,
       description:
-        "The calm map of the AI worth using — agents, models, tools, MCP servers and skills.",
+        "The calm map of the AI worth using, agents, models, tools, MCP servers and skills.",
       sameAs: [] as string[],
     },
     {
@@ -70,11 +70,11 @@ export const metadata: Metadata = {
     google: "vwiJeZYbR-J6Se91wicz3KZlpXtY8_YlWTxuZ7gRfjc",
   },
   title: {
-    default: "Kapyn — The calm signal layer for AI",
+    default: "Kapyn, The calm signal layer for AI",
     template: "%s | Kapyn",
   },
   description:
-    "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+    "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -89,18 +89,18 @@ export const metadata: Metadata = {
     apple: [{ url: "/api/icon/180", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Kapyn — The calm signal layer for AI",
+    title: "Kapyn, The calm signal layer for AI",
     description:
-      "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+      "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
     url: APP_URL,
     siteName: "Kapyn",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kapyn — The calm signal layer for AI",
+    title: "Kapyn, The calm signal layer for AI",
     description:
-      "Find the AI worth using — a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+      "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
   },
 };
 

@@ -45,8 +45,8 @@ interface RadarData {
 
 // ─── Lenses (Builder + Exploring + Creator) ──────────────────────────────────
 const HEADLINE: { id: RadarLens; label: string; tagline: string; Icon: LucideIcon }[] = [
-  { id: "builder", label: "Builder", tagline: "I build with AI — code, agents, UI, infra", Icon: Cpu },
-  { id: "creator", label: "Creator", tagline: "I create with AI — video, voice, image, content", Icon: Clapperboard },
+  { id: "builder", label: "Builder", tagline: "I build with AI, code, agents, UI, infra", Icon: Cpu },
+  { id: "creator", label: "Creator", tagline: "I create with AI, video, voice, image, content", Icon: Clapperboard },
   { id: "curious", label: "Just exploring", tagline: "Keep me current across AI, broadly", Icon: Compass },
 ];
 const PILLS: { id: RadarLens; label: string; Icon: LucideIcon }[] = [
@@ -583,7 +583,7 @@ function RadarStaticIndex({ data }: { data: RadarData }) {
         The AI worth using
       </h1>
       <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.5, margin: "0 0 26px", maxWidth: "560px" }}>
-        A curated radar of AI agents, models, tools, MCP servers and skills — kept current by a daily signal. No paywall, ever.
+        A curated radar of AI agents, models, tools, MCP servers and skills, kept current by a daily signal. No paywall, ever.
       </p>
       {groups.map((g) =>
         g.items.length === 0 ? null : (

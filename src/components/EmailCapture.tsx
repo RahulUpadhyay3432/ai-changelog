@@ -48,7 +48,7 @@ export function EmailCapture({ source = "web" }: { source?: string }) {
         }}
       >
         <Check size={18} strokeWidth={2.5} style={{ color: "var(--kt-accent, #3b82f6)", flexShrink: 0 }} />
-        You&apos;re in — the first weekly digest lands Monday.
+        You&apos;re in, the first weekly digest lands Monday.
       </div>
     );
   }
@@ -100,7 +100,7 @@ export function EmailCapture({ source = "web" }: { source?: string }) {
       </form>
       <p style={{ margin: "10px 0 0", fontSize: "12.5px", color: "var(--kt-text-muted, #9e988c)", lineHeight: 1.5 }}>
         {state === "error"
-          ? "Something went wrong — please try again."
+          ? "Something went wrong, please try again."
           : "One email a week. No spam. Unsubscribe anytime."}
       </p>
     </div>

@@ -200,7 +200,7 @@ function Sheet({ thing, onClose }: { thing: RadarThing; onClose: () => void }) {
   };
 
   const onCopy = async () => {
-    const text = `${thing.name} — ${thing.valueLine}${thing.url ? ` ${thing.url}` : ""} (via Kapyn Radar)`;
+    const text = `${thing.name}, ${thing.valueLine}${thing.url ? ` ${thing.url}` : ""} (via Kapyn Radar)`;
     try {
       await navigator.clipboard.writeText(text);
       flash("Copied");

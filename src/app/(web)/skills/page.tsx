@@ -9,17 +9,17 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const WHAT_ARE_SKILLS =
-  "AI skills are prebuilt capabilities you add to an assistant — custom GPTs, Claude Skills and Gemini Gems — that specialise it for one job, like writing, coding, research or design, so you get expert results without crafting the prompt yourself.";
+  "AI skills are prebuilt capabilities you add to an assistant, custom GPTs, Claude Skills and Gemini Gems , that specialise it for one job, like writing, coding, research or design, so you get expert results without crafting the prompt yourself.";
 
 const DESC =
-  "A curated directory of the best AI skills — custom GPTs, Claude Skills and Gemini Gems — by use case: writing, coding, research, design, data, productivity and more.";
+  "A curated directory of the best AI skills, custom GPTs, Claude Skills and Gemini Gems , by use case: writing, coding, research, design, data, productivity and more.";
 
 export const metadata: Metadata = {
-  title: "Best AI skills — custom GPTs, Claude Skills & Gemini Gems",
+  title: "Best AI skills, custom GPTs, Claude Skills & Gemini Gems",
   description: DESC,
   alternates: { canonical: `${APP_URL}/skills` },
-  openGraph: { title: "Best AI skills — Kapyn", description: DESC, url: `${APP_URL}/skills`, siteName: "Kapyn", type: "website" },
-  twitter: { card: "summary_large_image", title: "Best AI skills — Kapyn", description: DESC },
+  openGraph: { title: "Best AI skills, Kapyn", description: DESC, url: `${APP_URL}/skills`, siteName: "Kapyn", type: "website" },
+  twitter: { card: "summary_large_image", title: "Best AI skills, Kapyn", description: DESC },
 };
 
 export default function SkillsHub() {

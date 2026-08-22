@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!story) {
     return {
-      title: "Kapyn — AI & tech news in 30-second reads",
+      title: "Kapyn, AI & tech news in 30-second reads",
       description: "AI and tech news distilled into 30-second reads.",
     };
   }
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : story.summary;
 
   return {
-    title: `${story.title} — Kapyn`,
+    title: `${story.title}, Kapyn`,
     description,
     alternates: {
       canonical: `${APP_URL}/story/${story.id}`,

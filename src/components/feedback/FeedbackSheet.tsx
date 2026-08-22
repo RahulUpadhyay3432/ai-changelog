@@ -148,7 +148,7 @@ export function FeedbackSheet({ open, onClose }: FeedbackSheetProps) {
               >
                 <span style={{ fontSize: "28px" }}>🙏</span>
                 <p style={{ fontSize: "15px", color: "#E8E4DE", margin: 0, fontWeight: 500 }}>
-                  Thank you — means a lot.
+                  Thank you, means a lot.
                 </p>
               </div>
             ) : (

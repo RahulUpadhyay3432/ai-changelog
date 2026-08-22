@@ -35,7 +35,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Cursor", valueLine: "AI-native editor that edits across your whole repo.", url: "https://cursor.com", category: "AI coding" },
   { name: "GitHub Copilot", valueLine: "Inline code completion and chat, inside your editor.", url: "https://github.com/features/copilot", category: "AI coding" },
   { name: "Gemini CLI", valueLine: "Google's open-source agentic coding assistant, in your terminal.", url: "https://github.com/google-gemini/gemini-cli", category: "AI coding" },
-  { name: "Claude Code", valueLine: "Agentic coding in your terminal — plans and edits across files.", url: "https://claude.com/claude-code", category: "AI coding" },
+  { name: "Claude Code", valueLine: "Agentic coding in your terminal, plans and edits across files.", url: "https://claude.com/claude-code", category: "AI coding" },
   { name: "Lovable", valueLine: "Build and ship full web apps from a prompt.", url: "https://lovable.dev", category: "AI coding" },
   { name: "Windsurf", valueLine: "Agentic IDE that builds features end-to-end.", url: "https://windsurf.com", category: "AI coding" },
   { name: "Bolt.new", valueLine: "Prompt full-stack web apps that run in the browser.", url: "https://bolt.new", category: "AI coding" },
@@ -50,7 +50,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "OpenCode", valueLine: "An open-source coding agent that runs in your terminal.", url: "https://opencode.ai", category: "AI coding" },
   { name: "Continue", valueLine: "Open-source IDE autopilot you point at your own models.", url: "https://continue.dev", category: "AI coding" },
   { name: "Roo Code", valueLine: "An open-source autonomous coding agent inside VS Code.", url: "https://roocode.com", category: "AI coding" },
-  { name: "Grok Build", valueLine: "xAI's terminal coding agent — open-source harness, TUI, and tool layer.", url: "https://github.com/xai-org/grok-build", category: "AI coding" },
+  { name: "Grok Build", valueLine: "xAI's terminal coding agent, open-source harness, TUI, and tool layer.", url: "https://github.com/xai-org/grok-build", category: "AI coding" },
 
   // ── UI & design ──
   { name: "v0", valueLine: "Generate production React UIs from a prompt.", url: "https://v0.dev", category: "UI & design" },
@@ -103,7 +103,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "LanceDB", valueLine: "An open-source vector database that runs on your own storage.", url: "https://lancedb.com", category: "Data & RAG" },
 
   // ── Agents & automation ──
-  { name: "Claude Cowork", valueLine: "Hand Claude a folder and a plain-language task — desktop, web, and mobile.", url: "https://claude.com/cowork", category: "Agents & automation" },
+  { name: "Claude Cowork", valueLine: "Hand Claude a folder and a plain-language task, desktop, web, and mobile.", url: "https://claude.com/cowork", category: "Agents & automation" },
   { name: "Gemini Spark", valueLine: "A standing agent that works across Gmail, Calendar, Docs, and Sheets.", url: "https://gemini.google.com/spark", category: "Agents & automation" },
   { name: "n8n", valueLine: "Wire AI into automated workflows, self-hostable.", url: "https://n8n.io", category: "Agents & automation" },
   { name: "Zapier", valueLine: "Connect AI to thousands of apps without code.", url: "https://zapier.com", category: "Agents & automation" },
@@ -145,7 +145,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Sora", valueLine: "OpenAI's text-to-video model for generating clips.", url: "https://sora.com", category: "Video",
     description: "OpenAI's video model turns a text prompt into short, coherent clips, with control over style, motion, and camera. Available through the Sora app and API." },
   { name: "Runway", valueLine: "Generate and edit video with AI.", url: "https://runwayml.com", category: "Video",
-    description: "A creative suite for generating and editing video — text-to-video, video-to-video, and a deep set of motion and editing tools used in real production work." },
+    description: "A creative suite for generating and editing video, text-to-video, video-to-video, and a deep set of motion and editing tools used in real production work." },
   { name: "Kling", valueLine: "Generate cinematic video from text and images.", url: "https://klingai.com", category: "Video",
     description: "Kuaishou's video model turns text and reference images into cinematic, high-motion clips, popular for stylized and narrative shots." },
   { name: "Luma", valueLine: "Generate cinematic video and 3D from text or images.", url: "https://lumalabs.ai", category: "Video",
@@ -161,7 +161,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "ElevenLabs", valueLine: "Generate realistic AI voices and speech via API.", url: "https://elevenlabs.io", category: "Voice & audio",
     description: "ElevenLabs produces natural text-to-speech, voice cloning, dubbing, and sound effects through a simple API, widely used for narration and product voiceovers." },
   { name: "Suno", valueLine: "Create full songs, with vocals, from a prompt.", url: "https://suno.com", category: "Voice & audio",
-    description: "Suno generates complete songs — melody, instrumentation, and vocals — from a short text prompt, with control over genre and lyrics." },
+    description: "Suno generates complete songs, melody, instrumentation, and vocals , from a short text prompt, with control over genre and lyrics." },
   { name: "Udio", valueLine: "Generate music and vocals from a prompt.", url: "https://udio.com", category: "Voice & audio",
     description: "Udio creates high-fidelity music with vocals from a text description, with fine control over style, structure, and lyrics." },
   { name: "Descript", valueLine: "Edit audio and video by editing the transcript.", url: "https://descript.com", category: "Voice & audio",
@@ -171,7 +171,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Midjourney", valueLine: "Generate striking images from text prompts.", url: "https://midjourney.com", category: "Image",
     description: "Midjourney is known for its distinctive, high-aesthetic image generation, with deep control over style, composition, and consistency across a series." },
   { name: "Ideogram", valueLine: "Generate images with reliable, legible text.", url: "https://ideogram.ai", category: "Image",
-    description: "Ideogram generates images from prompts and is especially strong at rendering accurate, legible text — useful for posters, logos, and typographic art." },
+    description: "Ideogram generates images from prompts and is especially strong at rendering accurate, legible text, useful for posters, logos, and typographic art." },
   { name: "Krea", valueLine: "Generate and enhance images in real time.", url: "https://krea.ai", category: "Image",
     description: "Krea offers real-time image generation, upscaling, and restyling on one canvas, with live previews as you adjust the prompt and reference images." },
   { name: "Recraft", valueLine: "Design-grade image and vector generation.", url: "https://recraft.ai", category: "Image",
@@ -181,11 +181,11 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
 
   // ── Marketing & content (avatars, clips, decks) ──
   { name: "HeyGen", valueLine: "Generate AI avatar and spokesperson videos.", url: "https://heygen.com", category: "Marketing & content",
-    description: "HeyGen creates studio-quality avatar videos from a script, with realistic talking-head presenters and translation into dozens of languages — used for marketing and training." },
+    description: "HeyGen creates studio-quality avatar videos from a script, with realistic talking-head presenters and translation into dozens of languages, used for marketing and training." },
   { name: "Synthesia", valueLine: "Create AI avatar videos from a script.", url: "https://synthesia.io", category: "Marketing & content",
     description: "Synthesia turns plain text into professional videos fronted by AI avatars in 140+ languages, widely used for training, onboarding, and sales content." },
   { name: "Captions", valueLine: "Edit and caption talking videos with AI.", url: "https://captions.ai", category: "Marketing & content",
-    description: "Captions is an AI video studio for creators — auto-captions, eye-contact correction, dubbing, and an AI presenter for short-form social video." },
+    description: "Captions is an AI video studio for creators, auto-captions, eye-contact correction, dubbing, and an AI presenter for short-form social video." },
   { name: "OpusClip", valueLine: "Turn long videos into short, captioned clips.", url: "https://opus.pro", category: "Marketing & content",
     description: "OpusClip finds the most engaging moments in a long video and reframes them into captioned short clips ready for TikTok, Reels, and Shorts." },
   { name: "Gamma", valueLine: "Generate decks, docs, and sites from a prompt.", url: "https://gamma.app", category: "Marketing & content",

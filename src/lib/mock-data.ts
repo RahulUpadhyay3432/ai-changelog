@@ -13,7 +13,7 @@ export const MOCK_STORIES: NewsItem[] = [
   },
   {
     id: "2",
-    title: "Boston Dynamics Spot Gets GPT-5 Brain — Autonomously Navigates Warehouses",
+    title: "Boston Dynamics Spot Gets GPT-5 Brain, Autonomously Navigates Warehouses",
     summary:
       "Boston Dynamics has integrated GPT-5 vision reasoning into Spot, enabling fully autonomous warehouse navigation, anomaly detection, and report generation without human oversight. The system processes 30 camera feeds simultaneously and generates plain-English incident reports.",
     sourceName: "MIT Tech Review",
@@ -85,7 +85,7 @@ export const MOCK_STORIES: NewsItem[] = [
     id: "9",
     title: "OpenAI o3 Achieves 88% on ARC-AGI, Surpassing Human Average of 85%",
     summary:
-      "OpenAI's reasoning model o3 scored 88% on the ARC-AGI benchmark designed to be unsolvable by current AI systems. The result reignites AGI debate. Francois Chollet, ARC creator, notes the model uses significant compute to achieve this — $17 per task on high-compute setting.",
+      "OpenAI's reasoning model o3 scored 88% on the ARC-AGI benchmark designed to be unsolvable by current AI systems. The result reignites AGI debate. Francois Chollet, ARC creator, notes the model uses significant compute to achieve this, $17 per task on high-compute setting.",
     sourceName: "OpenAI Research",
     sourceUrl: "https://openai.com/research",
     categorySlug: "ai-models",

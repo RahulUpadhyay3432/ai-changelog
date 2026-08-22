@@ -8,7 +8,7 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 3600;
 
 const DESC =
-  "Guides and deep dives on the AI and front-end tools worth using — calm, sourced, and free. From the team behind Kapyn Radar.";
+  "Guides and deep dives on the AI and front-end tools worth using, calm, sourced, and free. From the team behind Kapyn Radar.";
 
 export const metadata: Metadata = {
   title: "The Kapyn Blog",

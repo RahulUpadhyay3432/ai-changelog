@@ -32,7 +32,7 @@ export const CATEGORIES: Category[] = [
     colorBg: "#2d1200",
     colorLabel: "#fb923c",
     storyCount: 0,
-    lastUpdated: "—",
+    lastUpdated: ", ",
   },
   {
     slug: "startups",

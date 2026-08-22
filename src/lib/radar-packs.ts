@@ -19,7 +19,7 @@ export const STARTER_PACKS: StarterPack[] = [
   {
     id: "ship-an-agent",
     name: "Ship an AI agent",
-    blurb: "Take an agent from prompt to production — build, route, run, watch.",
+    blurb: "Take an agent from prompt to production, build, route, run, watch.",
     tools: [
       { name: "Cursor", url: "https://cursor.com" },
       { name: "Claude Code", url: "https://claude.com/claude-code" },
@@ -32,7 +32,7 @@ export const STARTER_PACKS: StarterPack[] = [
   {
     id: "vibe-code-a-saas",
     name: "Vibe-code a SaaS",
-    blurb: "Idea to a live product without a team — prototype, style, ship.",
+    blurb: "Idea to a live product without a team, prototype, style, ship.",
     tools: [
       { name: "Lovable", url: "https://lovable.dev" },
       { name: "v0", url: "https://v0.dev" },
@@ -44,7 +44,7 @@ export const STARTER_PACKS: StarterPack[] = [
   {
     id: "rag-in-a-weekend",
     name: "RAG in a weekend",
-    blurb: "Chat over your own docs — index, store, retrieve, trace.",
+    blurb: "Chat over your own docs, index, store, retrieve, trace.",
     tools: [
       { name: "LlamaIndex", url: "https://llamaindex.ai" },
       { name: "Supabase", url: "https://supabase.com" },
@@ -56,7 +56,7 @@ export const STARTER_PACKS: StarterPack[] = [
   {
     id: "ai-content-studio",
     name: "AI content studio",
-    blurb: "A one-person media team — voice, image, video, music.",
+    blurb: "A one-person media team, voice, image, video, music.",
     tools: [
       { name: "ElevenLabs", url: "https://elevenlabs.io" },
       { name: "Midjourney", url: "https://midjourney.com" },
@@ -68,7 +68,7 @@ export const STARTER_PACKS: StarterPack[] = [
   {
     id: "run-open-models",
     name: "Run open models",
-    blurb: "Serve open-weight models yourself — find, host, run fast.",
+    blurb: "Serve open-weight models yourself, find, host, run fast.",
     tools: [
       { name: "Hugging Face", url: "https://huggingface.co" },
       { name: "Groq", url: "https://groq.com" },

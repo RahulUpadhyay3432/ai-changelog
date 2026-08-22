@@ -12,7 +12,7 @@
 //   Context7                 -> `@upstash/context7`  (never published; the real
 //                                                     package is …/context7-mcp)
 // And squatting is real: `mcp-server-redis` on npm self-describes as a
-// "security research canary — not for production use". Shipping a generated
+// "security research canary, not for production use". Shipping a generated
 // command would point users at strangers' packages, which is worse than
 // shipping nothing.
 //
@@ -52,7 +52,7 @@ const RAW: Record<string, McpInstall> = {
     command: "npx",
     args: ["-y", "@upstash/context7-mcp"],
     remoteUrl: "https://mcp.context7.com/mcp",
-    note: "Context7 is now hosted — the endpoint needs an API key sent as an `Authorization: Bearer <key>` header. `npx ctx7 setup` will wire this up for you across supported clients.",
+    note: "Context7 is now hosted, the endpoint needs an API key sent as an `Authorization: Bearer <key>` header. `npx ctx7 setup` will wire this up for you across supported clients.",
   },
   "https://github.com/chromedevtools/chrome-devtools-mcp": {
     command: "npx",
@@ -188,7 +188,7 @@ const RAW: Record<string, McpInstall> = {
   "https://github.com/redis/mcp-redis": {
     command: "npx",
     args: ["-y", "@modelcontextprotocol/server-redis"],
-    note: `${ARCHIVED} Note the npm package \`mcp-server-redis\` is an unrelated squatted name — use the scoped package above.`,
+    note: `${ARCHIVED} Note the npm package \`mcp-server-redis\` is an unrelated squatted name, use the scoped package above.`,
   },
 };
 

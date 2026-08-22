@@ -30,7 +30,7 @@ export const MCP_CLIENTS: McpClient[] = [
       { os: "Local + User scope", path: "~/.claude.json" },
     ],
     notes: [
-      "Local scope is the **default** — `claude mcp add` writes to `~/.claude.json` scoped to the current project, not to `.mcp.json`. Add `--scope project` to share with your team, or `--scope user` for all your projects.",
+      "Local scope is the **default**, `claude mcp add` writes to `~/.claude.json` scoped to the current project, not to `.mcp.json`. Add `--scope project` to share with your team, or `--scope user` for all your projects.",
       "MCP local scope (`~/.claude.json`) is **not** the same file as general local settings (`.claude/settings.local.json`). The docs call this out because people conflate them constantly.",
       "Project servers from `.mcp.json` need approval. They show as `⏸ Pending approval (run claude to approve)` until you run `claude` interactively and accept.",
       "A cloned repo **cannot approve its own servers**. Until you trust the workspace, a committed `enableAllProjectMcpServers` is ignored and the server stays pending.",
@@ -49,7 +49,7 @@ export const MCP_CLIENTS: McpClient[] = [
     ],
     notes: [
       "The in-app **Edit Config** button has been reported to open the wrong file, so people edit something that is never read. If your change has no effect, open the path above directly and confirm you are looking at the same file.",
-      "Restart the app fully after editing. Closing the window is not enough on macOS — quit it.",
+      "Restart the app fully after editing. Closing the window is not enough on macOS, quit it.",
     ],
   },
   {
@@ -62,7 +62,7 @@ export const MCP_CLIENTS: McpClient[] = [
     ],
     notes: [
       "Same JSON shape as Claude Desktop, so an `mcpServers` block copies across unchanged.",
-      "Project config wins where both exist — useful for pinning a server to one repo.",
+      "Project config wins where both exist, useful for pinning a server to one repo.",
     ],
   },
   {
@@ -83,7 +83,7 @@ export const MCP_CLIENTS: McpClient[] = [
       { os: "Windows", path: "%USERPROFILE%\\.codeium\\windsurf\\mcp_config.json" },
     ],
     notes: [
-      "The file is **not created on first launch** — you have to make it yourself, directories included.",
+      "The file is **not created on first launch**. You have to make it yourself, directories included.",
       "Cmd+Shift+P → \"Windsurf: Configure MCP Servers\" opens it without hunting for the path.",
     ],
   },
@@ -94,12 +94,12 @@ export const MCP_FAILURES: { symptom: string; cause: string; fix: string }[] = [
   {
     symptom: "The server does not appear at all",
     cause: "Wrong file, or the wrong root key",
-    fix: "Confirm the exact path for your client above. In VS Code, check you used `servers` and not `mcpServers`. In Claude Code, run `claude mcp get <name>` — if it says pending approval, run `claude` and approve it.",
+    fix: "Confirm the exact path for your client above. In VS Code, check you used `servers` and not `mcpServers`. In Claude Code, run `claude mcp get <name>`, if it says pending approval, run `claude` and approve it.",
   },
   {
     symptom: "It appears but will not connect",
     cause: "The command cannot run",
-    fix: "Run the `command` and `args` yourself in a terminal. `npx -y <package>` should start and wait. If it errors there, it will error in the client — this isolates the problem in seconds.",
+    fix: "Run the `command` and `args` yourself in a terminal. `npx -y <package>` should start and wait. If it errors there, it will error in the client. This isolates the problem in seconds.",
   },
   {
     symptom: "Works locally, fails for teammates",
@@ -109,7 +109,7 @@ export const MCP_FAILURES: { symptom: string; cause: string; fix: string }[] = [
   {
     symptom: "Auth failures against a hosted server",
     cause: "Missing or unexpanded environment variable",
-    fix: "Confirm the variable is exported in the environment the client launches from — a GUI app does not inherit your shell profile. Restart the client fully after changing it.",
+    fix: "Confirm the variable is exported in the environment the client launches from, a GUI app does not inherit your shell profile. Restart the client fully after changing it.",
   },
   {
     symptom: "Everything works but the model picks the wrong tool",
@@ -119,6 +119,6 @@ export const MCP_FAILURES: { symptom: string; cause: string; fix: string }[] = [
   {
     symptom: "Breaks only on native Windows",
     cause: "POSIX path assumptions",
-    fix: "Many servers assume POSIX paths, shell hooks and file watchers. WSL is the supported path in 2026 — if a server misbehaves only on native Windows, try it under WSL before debugging further.",
+    fix: "Many servers assume POSIX paths, shell hooks and file watchers. WSL is the supported path in 2026, if a server misbehaves only on native Windows, try it under WSL before debugging further.",
   },
 ];

@@ -39,7 +39,7 @@ function buildHtml(stories: Story[], tools: Tool[], unsubUrl: string): string {
       (t) => `
       <tr><td style="padding:0 0 12px">
         <a href="${escapeHtml(t.url)}" style="color:#17140f;text-decoration:none;font-size:14.5px;font-weight:600">${escapeHtml(t.name)}</a>
-        <span style="color:#6d675f;font-size:13.5px"> — ${escapeHtml(t.value_line)}</span>
+        <span style="color:#6d675f;font-size:13.5px">, ${escapeHtml(t.value_line)}</span>
       </td></tr>`
     )
     .join("");

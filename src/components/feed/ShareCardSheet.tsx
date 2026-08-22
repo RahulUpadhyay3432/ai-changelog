@@ -26,7 +26,7 @@ function SheetContent({ onClose, variant }: { onClose: () => void; variant: "tod
       const file = new File([blob], weekly ? "kapyn-week.png" : "kapyn-today.png", { type: "image/png" });
 
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: weekly ? "This week in AI — Kapyn" : "Today in AI — Kapyn" });
+        await navigator.share({ files: [file], title: weekly ? "This week in AI, Kapyn" : "Today in AI, Kapyn" });
         posthog.capture("share_card_shared", { variant });
       } else {
         const url = URL.createObjectURL(blob);
@@ -137,10 +137,10 @@ function SheetContent({ onClose, variant }: { onClose: () => void; variant: "tod
                 letterSpacing: "-0.01em",
               }}
             >
-              {weekly ? "This week — you're caught up" : "Today's top 3"}
+              {weekly ? "This week. You're caught up" : "Today's top 3"}
             </p>
             <p style={{ fontSize: "12px", color: "var(--kt-text-muted, #525252)", margin: 0 }}>
-              {weekly ? "The stories that mattered — share the recap" : "Share to Instagram, Twitter, or WhatsApp"}
+              {weekly ? "The stories that mattered, share the recap" : "Share to Instagram, Twitter, or WhatsApp"}
             </p>
           </div>
           <button

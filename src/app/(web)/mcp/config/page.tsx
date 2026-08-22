@@ -8,14 +8,14 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const DESC =
-  "Where the MCP config file lives for Claude Code, Claude Desktop, Cursor, VS Code and Windsurf — with the exact paths, the root key each one expects, and fixes for why a server isn't showing up.";
+  "Where the MCP config file lives for Claude Code, Claude Desktop, Cursor, VS Code and Windsurf, with the exact paths, the root key each one expects, and fixes for why a server isn't showing up.";
 
 export const metadata: Metadata = {
-  title: "MCP config file location — every client, exact paths",
+  title: "MCP config file location, every client, exact paths",
   description: DESC,
   alternates: { canonical: `${APP_URL}/mcp/config` },
   openGraph: {
-    title: "MCP config file location — every client, exact paths",
+    title: "MCP config file location, every client, exact paths",
     description: DESC,
     url: `${APP_URL}/mcp/config`,
     siteName: "Kapyn",
@@ -136,8 +136,7 @@ export default function McpConfigPage() {
 
       <section style={{ margin: "36px 0 0", paddingTop: "26px", borderTop: `1px solid ${HAIRLINE}` }}>
         <p style={{ fontSize: "14.5px", color: TEXT.muted, lineHeight: 1.7, maxWidth: "620px" }}>
-          Once it connects, the question becomes which servers are worth the context they cost —
-          three to five is the working recommendation, not thirty. We keep a{" "}
+          Once it connects, the question becomes which servers are worth the context they cost, three to five is the working recommendation, not thirty. We keep a{" "}
           <Link href="/mcp" style={{ color: GOLD, textDecoration: "none" }}>hand-checked directory</Link>{" "}
           with copy-paste configs, and argued the case for a{" "}
           <Link href="/blog/best-mcp-servers-2026" style={{ color: GOLD, textDecoration: "none" }}>deliberately short list</Link>.

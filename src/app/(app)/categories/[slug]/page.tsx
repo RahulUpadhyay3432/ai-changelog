@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = getCategoryBySlug(slug as CategorySlug);
   if (!category) return {};
 
-  const title = `${category.name} News — Kapyn`;
+  const title = `${category.name} News, Kapyn`;
   const description = `${category.description}. Distilled to 30-second reads, updated daily.`;
 
   return {

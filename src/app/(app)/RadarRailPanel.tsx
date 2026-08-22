@@ -45,7 +45,7 @@ export async function RadarRailPanel() {
       <Kicker>On the Radar today</Kicker>
       <div style={{ margin: "6px 0 0" }}>
         {tools.length === 0 ? (
-          <p style={{ fontSize: "13px", color: TEXT.muted, padding: "10px 4px" }}>Catalog refreshing — check back shortly.</p>
+          <p style={{ fontSize: "13px", color: TEXT.muted, padding: "10px 4px" }}>Catalog refreshing, check back shortly.</p>
         ) : (
           tools.map((t) => {
             const fav = faviconFor(t.url);

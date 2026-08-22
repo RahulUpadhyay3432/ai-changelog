@@ -26,10 +26,20 @@ interface CardStackProps {
 
 const PTR_THRESHOLD = 64;
 const DIRECTION_LOCK_THRESHOLD = 8;
-// Show the push opt-in after this many stories — engaged, but far before the
-// end-of-stack. The old end-only placement sat after ~100 cards, so virtually
-// nobody reached it → virtually no subscribers → push reached no one.
-const NOTIF_SLOT = 5;
+// Push opt-in placement.
+//
+// History: it used to sit at the end of the stack (~100 cards), so nobody saw it.
+// Moving it to slot 5 helped, but measured depth data shows 23 of 42 sessions end
+// on card 0 and the topic picker at slot 2 shifts this one to index 6 — still
+// past most readers.
+//
+// It now sits at slot 4 AND is gated on investment: we only ask people who have
+// actually picked topics. That ordering is deliberate, because a denied
+// Notification permission is PERMANENT — the browser will not let us ask again.
+// Spending that one chance on a disengaged first-timer forecloses it forever,
+// whereas asking straight after someone has invested is when a yes is most
+// likely. See docs/analytics-findings-aug-2026.md.
+const NOTIF_SLOT = 4;
 // The topic picker sits at slot 2, not 5. Measured: over half of all feed
 // sessions end on card 0, so anything deeper reaches almost nobody — and picking
 // a category in the first session is the strongest retention predictor we have
@@ -58,6 +68,10 @@ export function CardStack({
   // returns null until they do, so this never nags a returning user.
   const [showTopics, setShowTopics] = useState(false);
   useEffect(() => { setShowTopics(getFeedPrefs() === null); }, []);
+  // "Has this person invested?" — true once they have picked topics, in this
+  // session or any previous one. Gates the push ask (see NOTIF_SLOT).
+  const [hasInvested, setHasInvested] = useState(false);
+  useEffect(() => { setHasInvested(getFeedPrefs() !== null); }, []);
   useEffect(() => { setShowNotif(shouldShowNotifCard()); }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,7 +108,8 @@ export function CardStack({
     const entries: FeedEntry[] = items.map((item, i) => ({ type: "news", item, newsIdx: i }));
     // Splice the opt-in in early so engaged readers actually see it — only when
     // there are enough stories after it that it isn't crowding the end.
-    if (showNotif && entries.length > NOTIF_SLOT) {
+    // Ask for push only after the reader has invested — see NOTIF_SLOT.
+    if (showNotif && hasInvested && entries.length > NOTIF_SLOT) {
       entries.splice(NOTIF_SLOT, 0, { type: "notif" });
     }
     // Spliced after the notif so its index isn't shifted by this insert.
@@ -102,7 +117,7 @@ export function CardStack({
       entries.splice(TOPIC_SLOT, 0, { type: "topics" });
     }
     return entries;
-  }, [items, showNotif, showTopics]);
+  }, [items, showNotif, showTopics, hasInvested]);
 
   useEffect(() => {
     updateStreak();
@@ -364,7 +379,12 @@ export function CardStack({
                 isNew={lastVisit != null && new Date(entry.item.publishedAt).getTime() > lastVisit}
               />
             ) : entry.type === "topics" ? (
-              <TopicPickerCard onDone={() => setShowTopics(false)} />
+              <TopicPickerCard
+                onDone={() => {
+                  setShowTopics(false);
+                  setHasInvested(getFeedPrefs() !== null);
+                }}
+              />
             ) : (
               <NotificationCard onDone={() => setShowNotif(false)} />
             )}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fetchNewsItemById } from "@/lib/supabase";
 import { getCategoryBySlug } from "@/lib/categories";
 import { ClientRedirect } from "./ClientRedirect";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -115,7 +116,7 @@ export default async function StoryPage({ params }: Props) {
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       )}
 

@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { MCP_SERVERS, MCP_CATEGORY_ORDER, MCP_CATEGORY_EMOJI, type McpCategory } from "@/lib/radar-mcp";
 import { slugify } from "@/lib/entities";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
@@ -50,8 +51,8 @@ export default function McpHub() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemList) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faq) }} />
 
       <header style={{ margin: "4px 0 26px" }}>
         <span style={{ fontFamily: SG, fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GOLD }}>MCP directory</span>

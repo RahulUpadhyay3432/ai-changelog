@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getRadarTools, getRadarCards, getRadarEssentials } from "@/lib/knowledge";
 import { getHackathons } from "@/lib/hackathons";
 import { RadarClient } from "./RadarClient";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 // Server-fetches the cached radar engine, then hands off to the client for
 // lens-aware (Builder / Exploring) arrangement. ISR every 30 min. RadarClient
@@ -52,7 +53,7 @@ export default async function RadarPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <RadarClient tools={tools} entities={entities} essentials={essentials} hackathons={hackathons} />
     </>
   );

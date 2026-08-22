@@ -3,6 +3,7 @@ import "./globals.css";
 import { Space_Grotesk } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -140,7 +141,7 @@ export default function RootLayout({
           <ServiceWorkerRegistrar />
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }}
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(SITE_JSONLD) }}
           />
           {children}
         </body>

@@ -1,22 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 // Per-IP rate limit: 5 signups / 15 min (resets on cold start — blocks spam
 // floods, not a determined actor). Mirrors the feedback endpoint.
-const rlMap = new Map<string, { count: number; resetAt: number }>();
-const RL_MAX = 5;
-const RL_WINDOW = 15 * 60 * 1000;
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const e = rlMap.get(ip);
-  if (!e || e.resetAt < now) {
-    rlMap.set(ip, { count: 1, resetAt: now + RL_WINDOW });
-    return false;
-  }
-  if (e.count >= RL_MAX) return true;
-  e.count++;
-  return false;
-}
 
 // Deliberately simple + permissive — real validation is the confirmation, not a regex.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -29,11 +16,9 @@ function getAdmin() {
 
 export async function POST(request: Request) {
   try {
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-      request.headers.get("x-real-ip") ??
-      "unknown";
-    if (isRateLimited(ip)) {
+    const ip = clientIp(request.headers);
+    const { ok: withinLimit } = await rateLimit({ key: `email-sub:${ip}`, limit: 5, windowSeconds: 900 });
+    if (!withinLimit) {
       return Response.json({ error: "Too many requests" }, { status: 429 });
     }
 

@@ -7,6 +7,7 @@ import { getMcpInstall } from "@/lib/mcp-install";
 import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { CoverImage } from "@/app/(radar)/radar/radar-shared";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SURFACE, SG, TEXT } from "@/lib/design-tokens";
+import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
 
@@ -82,7 +83,7 @@ export default async function ToolDetailPage({ params }: Props) {
 
   return (
     <article>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
       {/* Breadcrumb */}
       <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: TEXT.muted, margin: "0 0 18px" }}>

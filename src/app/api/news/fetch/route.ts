@@ -268,6 +268,29 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   throw lastErr;
 }
 
+// DeepSeek's OpenAI-compatible endpoint. v4-flash is the cheap tier and is more
+// than capable of classify-and-summarise; verified against the real prompt, its
+// output parses with parseClassifyResponse unchanged.
+async function callDeepSeek(prompt: string): Promise<string> {
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) throw new Error("DEEPSEEK_API_KEY missing");
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: "deepseek-v4-flash",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+  });
+  if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("DeepSeek returned empty response");
+  return text;
+}
+
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -282,24 +305,55 @@ async function callGemini(prompt: string): Promise<string> {
   return text;
 }
 
+type ClassifyOutcome =
+  | { ok: true; value: ClassifyResult; provider: string }
+  | { ok: false; reason: string };
+
 /**
- * Single LLM call (Gemini only) that returns both the correct category and a
- * clean summary. Returns null if Gemini fails after retries — callers must skip.
+ * Single LLM call (Gemini only) returning both category and clean summary.
+ *
+ * Returns the provider's reason on failure rather than a bare null. The previous
+ * `catch {}` here cost us 11 days of a frozen feed: every run reported "LLM
+ * failed for <title> — skipped" with no cause, while the actual error was a
+ * plain `429 RESOURCE_EXHAUSTED — prepayment credits are depleted`. Never
+ * swallow this again; the reason is the whole diagnostic.
  */
+// Ordered provider chain. Cheapest first; each is skipped when its key is absent.
+//
+// This is a chain rather than one provider because a single-provider summariser
+// is a single point of failure for the entire feed: when Gemini's prepaid credits
+// ran out on ~2026-08-11, ingestion kept fetching stories and dropping every one
+// of them for eleven days. Any one provider can now go down without freezing the
+// feed. Add keys, not conditionals.
+const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
+  { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
+  { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
+];
+
 async function classifyAndSummarize(
   title: string,
   content: string,
   defaultCategory: CategorySlug
-): Promise<ClassifyResult | null> {
+): Promise<ClassifyOutcome> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
-  // Gemini only (the main key), retried on transient rate-limit / 5xx errors so a
-  // single 429 no longer silently drops the story.
-  try {
-    const raw = await withRetry(() => callGemini(prompt));
-    return parseClassifyResponse(raw, defaultCategory);
-  } catch {
-    return null; // Gemini failed after retries — skip item, never show raw content
+  const reasons: string[] = [];
+
+  for (const provider of LLM_PROVIDERS) {
+    if (!process.env[provider.envKey]) continue;
+    try {
+      // Retry handles transient 429/5xx within a provider; the loop handles a
+      // provider being down or out of credit entirely.
+      const raw = await withRetry(() => provider.call(prompt));
+      return { ok: true, value: parseClassifyResponse(raw, defaultCategory), provider: provider.name };
+    } catch (err) {
+      reasons.push(`${provider.name}: ${String(err).slice(0, 160)}`);
+    }
   }
+
+  return {
+    ok: false,
+    reason: reasons.length ? reasons.join(" | ") : "no LLM provider configured",
+  };
 }
 
 // ─── Feed types ───────────────────────────────────────────────────────────────
@@ -394,6 +448,12 @@ type IngestResults = {
   inserted: number;
   skipped: number;
   lowSignal: number;
+  /** Items dropped because the LLM call failed. Non-zero = ingestion is broken. */
+  llmFailed: number;
+  /** First provider error seen, verbatim — the thing you actually need to debug. */
+  llmError: string | null;
+  /** Which provider(s) produced summaries this run. */
+  llmProviders: Record<string, number>;
   entitiesUpserted: number;
   mentionsLinked: number;
   errors: string[];
@@ -482,12 +542,20 @@ async function insertItems(
 
   // ── Process new items with bounded concurrency ────────────────────────────
   const processOne = async (item: FeedItem) => {
-    const result = await classifyAndSummarize(item.title, item.content, item.defaultCategory);
-    if (result === null) {
+    const outcome = await classifyAndSummarize(item.title, item.content, item.defaultCategory);
+    if (!outcome.ok) {
+      results.llmFailed++;
+      // Keep the first reason verbatim; the per-item lines stay terse so a
+      // provider outage doesn't bury it under a hundred identical errors.
+      if (!results.llmError) {
+        results.llmError = outcome.reason;
+        results.errors.push(`LLM failed — ${outcome.reason}`);
+      }
       results.errors.push(`LLM failed for "${item.title}" — skipped`);
       return;
     }
-    const { category, summary, entities } = result;
+    results.llmProviders[outcome.provider] = (results.llmProviders[outcome.provider] ?? 0) + 1;
+    const { category, summary, entities } = outcome.value;
     if (isBadSummary(summary)) { results.lowSignal++; return; }
 
     const { data: inserted, error } = await supabase
@@ -569,13 +637,17 @@ export async function GET(request: NextRequest) {
           item.title,
           (item.category_slug as CategorySlug) ?? "ai-models"
         );
-        if (r === null || isBadSummary(r.summary)) {
-          results.errors.push(`Bad/failed re-summary skipped for "${item.title}"`);
+        if (!r.ok || isBadSummary(r.value.summary)) {
+          results.errors.push(
+            !r.ok
+              ? `Re-summary failed for "${item.title}" — ${r.reason}`
+              : `Bad re-summary skipped for "${item.title}"`,
+          );
           continue;
         }
         const { error } = await supabase
           .from("news_items")
-          .update({ summary: r.summary, category_slug: r.category })
+          .update({ summary: r.value.summary, category_slug: r.value.category })
           .eq("id", item.id);
         if (error) results.errors.push(`Update ${item.id}: ${error.message}`);
         else results.updated++;
@@ -689,6 +761,7 @@ export async function GET(request: NextRequest) {
 
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
+    llmFailed: 0, llmError: null, llmProviders: {},
     entitiesUpserted: 0, mentionsLinked: 0, errors: [],
   };
 
@@ -733,6 +806,9 @@ export async function GET(request: NextRequest) {
       inserted: results.inserted,
       skipped: results.skipped,
       low_signal: results.lowSignal,
+      llm_failed: results.llmFailed,
+      llm_error: results.llmError,
+      llm_providers: JSON.stringify(results.llmProviders),
       entities_upserted: results.entitiesUpserted,
       mentions_linked: results.mentionsLinked,
       errors: results.errors.length,

@@ -24,7 +24,11 @@ interface NewsCardProps {
 
 // The card summary is generated at ingestion by this model (api/news/fetch).
 // Hardcoded for the attribution label (true for the vast majority of stories).
-const SUMMARY_MODEL = "Gemini Flash Lite";
+// Summaries now come from a provider chain (DeepSeek first, Gemini fallback), so
+// naming one model on the card would be wrong whenever the fallback fires. The
+// item's provider isn't stored per-row yet — until it is, stay accurate and
+// generic rather than confidently wrong.
+const SUMMARY_MODEL = "";
 
 // One representative mark per category — turns an image-less story into an
 // intentional, consistent "cover" instead of an empty gradient.
@@ -499,7 +503,7 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
             {item.sourceName}
           </span>
           <span style={{ fontSize: "9px", color: "var(--kt-text-muted, #8f8a82)", fontWeight: 500 }}>
-            AI summary · {SUMMARY_MODEL}
+            AI summary{SUMMARY_MODEL ? ` · ${SUMMARY_MODEL}` : ""}
           </span>
         </div>
         <button

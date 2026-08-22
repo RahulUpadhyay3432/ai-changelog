@@ -12,9 +12,33 @@ jobs:
     steps:
       - name: Trigger news fetch
         run: |
+          set -euo pipefail
+
           curl -f -s -L -X GET \
             --retry 3 --retry-delay 10 --retry-all-errors \
             --max-time 540 \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             "https://kapyn.app/api/news/fetch" \
-            | jq .
+            -o response.json
+
+          jq . response.json
+
+          # A 200 with `inserted: 0` is not success. Gemini's prepaid credits ran
+          # out on ~2026-08-11 and every run stayed green for eleven days while
+          # the feed froze, because the endpoint returned 200 and nothing checked
+          # the body. `llmFailed` is the real health signal: the fetch worked,
+          # the summariser did not.
+          llm_failed=$(jq -r '.llmFailed // 0' response.json)
+          inserted=$(jq -r '.inserted // 0' response.json)
+          llm_error=$(jq -r '.llmError // "none"' response.json)
+
+          echo "inserted=$inserted  llmFailed=$llm_failed"
+
+          if [ "$llm_failed" -gt 0 ]; then
+            echo "::error title=Summarizer failing::${llm_failed} items dropped. First error: ${llm_error}"
+            # Nothing got through at all — the pipeline is down, not just lossy.
+            if [ "$inserted" -eq 0 ]; then
+              exit 1
+            fi
+            echo "::warning::Partial failure — ${inserted} inserted despite ${llm_failed} drops."
+          fi

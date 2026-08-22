@@ -116,6 +116,20 @@ export default async function BlogPostPage({ params }: Props) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={post.hero.src} alt={post.hero.alt} className={styles.heroImg} />
             <div className={styles.heroOverlay} aria-hidden />
+            {/* CC BY images require visible attribution — this is a licence
+                obligation, not decoration. Do not remove it. */}
+            {post.hero.credit && (
+              <span
+                style={{
+                  position: "absolute", right: "10px", bottom: "8px", zIndex: 2,
+                  fontSize: "10.5px", color: "rgba(255,255,255,0.62)",
+                  background: "rgba(0,0,0,0.38)", borderRadius: "5px",
+                  padding: "2px 7px", pointerEvents: "none",
+                }}
+              >
+                {post.hero.credit}
+              </span>
+            )}
             <div className={styles.heroInner}>
               <span style={{ display: "inline-block", fontFamily: SG, fontSize: "11.5px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "#fff", background: "rgba(59,130,246,0.85)", border: `1px solid ${GOLD_BORDER}`, borderRadius: "100px", padding: "3px 10px" }}>
                 {post.tag}

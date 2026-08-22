@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { claudeCodeCommand, mcpServersJson, type McpInstall } from "@/lib/mcp-install";
 import { HAIRLINE, SG } from "@/lib/design-tokens";
@@ -124,6 +125,11 @@ export function McpInstallBlock({
         <span style={label}>Claude Desktop · Cursor · VS Code · Windsurf</span>
         <pre style={pre}>{json}</pre>
       </div>
+
+      <p style={{ fontSize: "13.5px", color: "#737373", lineHeight: 1.7, margin: "14px 0 0" }}>
+        Not sure where the config file lives, or it isn&apos;t picking the server up?{" "}
+        <Link href="/mcp/config" style={{ color: "#cbc7bf" }}>Config paths for every client</Link>.
+      </p>
 
       {install.env?.length ? (
         <p style={{ fontSize: "13.5px", color: "#a3a3a3", lineHeight: 1.7, margin: "14px 0 0" }}>

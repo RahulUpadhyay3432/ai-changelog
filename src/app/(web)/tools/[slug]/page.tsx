@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ArrowRight } from "lucide-react";
-import { getAllTools, getToolBySlug, similarTools, kindLabel } from "@/lib/tools-registry";
+import { getAllTools, getToolBySlug, getToolBySlugAsync, getPromotedToolPages, similarTools, kindLabel } from "@/lib/tools-registry";
 import { getMcpInstall } from "@/lib/mcp-install";
 import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { CoverImage } from "@/app/(radar)/radar/radar-shared";
@@ -13,8 +13,12 @@ const APP_URL = "https://kapyn.app";
 
 export const revalidate = 86400;
 
-export function generateStaticParams() {
-  return getAllTools().map((t) => ({ slug: t.slug }));
+export async function generateStaticParams() {
+  // Curated catalog plus any discovered tool that has earned a page. Promotion
+  // is gated on traction and persistence (see knowledge.ts) so this grows on its
+  // own without turning into a directory of one-day GitHub spikes.
+  const promoted = await getPromotedToolPages();
+  return [...getAllTools(), ...promoted].map((t) => ({ slug: t.slug }));
 }
 
 type Props = { params: Promise<{ slug: string }> };
@@ -40,7 +44,7 @@ function hostOf(url: string): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getToolBySlugAsync(slug);
   if (!tool) return { title: "Not found", robots: { index: false, follow: true } };
   const url = `${APP_URL}/tools/${tool.slug}`;
   const title = `${tool.name}, ${kindLabel(tool.kind)}`;
@@ -58,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ToolDetailPage({ params }: Props) {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getToolBySlugAsync(slug);
   if (!tool) notFound();
 
   const fav = favicon(tool.url);

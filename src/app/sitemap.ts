@@ -86,6 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/radar`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${APP_URL}/radar/pulse`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/mcp`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${APP_URL}/mcp/config`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     ...MCP_SERVERS.map((s) => ({
       url: `${APP_URL}/mcp/${slugify(s.name)}`,
       lastModified: new Date(),

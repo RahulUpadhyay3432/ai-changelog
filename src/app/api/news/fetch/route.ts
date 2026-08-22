@@ -24,7 +24,12 @@ import {
 } from "@/lib/entities";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+// 800s is the Pro + Fluid compute ceiling (Hobby caps at 300s). Sized off real
+// data: every run under the old 300s limit finished at 301-305s, i.e. the
+// platform was killing ingestion mid-pass every single time. That was invisible
+// while the summarizer failed instantly; once DeepSeek started doing real work
+// the run needed more clock than the function was allowed.
+export const maxDuration = 800;
 
 // Valid category slugs — used for AI classifier validation
 const VALID_SLUGS: CategorySlug[] = [

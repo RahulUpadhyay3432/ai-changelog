@@ -16,6 +16,9 @@ const ALL_SLUGS = CATEGORIES.map((c) => c.slug);
 export default function ProfilePage() {
   const [savedCount, setSavedCount] = useState(0);
   const [streakCount, setStreakCount] = useState(0);
+  // Founder/device traffic was inflating every metric. posthog-js persists the
+  // opt-out itself, so this reflects real state rather than component state.
+  const [analyticsOff, setAnalyticsOff] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
   // enabled slugs — null until loaded (avoids flash)
@@ -25,6 +28,7 @@ export default function ProfilePage() {
   useEffect(() => {
     setSavedCount(getSavedStories().length);
     setStreakCount(getStreak());
+    setAnalyticsOff(posthog.has_opted_out_capturing());
     const raw = getFeedPrefs();
     // Old implementation stored all 9 by default — that's not a real selection.
     // Reset to empty so new additive model starts clean.
@@ -287,6 +291,61 @@ export default function ProfilePage() {
             borderBottom: "1px solid rgba(255,255,255,0.04)",
           }}
         >
+          <button
+            onClick={() => {
+              const next = !analyticsOff;
+              if (next) posthog.opt_out_capturing();
+              else posthog.opt_in_capturing();
+              setAnalyticsOff(next);
+            }}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "16px 24px",
+              background: "none",
+              border: "none",
+              borderBottom: "1px solid rgba(255,255,255,0.04)",
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: "block", fontSize: "15px", color: "var(--kt-text, #f5f5f5)" }}>
+                Exclude me from analytics
+              </span>
+              <span style={{ display: "block", fontSize: "12.5px", color: "var(--kt-text-muted, #737373)", marginTop: "2px" }}>
+                {analyticsOff ? "This device is not being counted" : "Your own visits are counted right now"}
+              </span>
+            </span>
+            <span
+              aria-hidden
+              style={{
+                flexShrink: 0,
+                width: "44px",
+                height: "26px",
+                borderRadius: "100px",
+                background: analyticsOff ? "#3b82f6" : "rgba(255,255,255,0.14)",
+                position: "relative",
+                transition: "background 160ms ease",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: "3px",
+                  left: analyticsOff ? "21px" : "3px",
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "50%",
+                  background: "#fff",
+                  transition: "left 160ms ease",
+                }}
+              />
+            </span>
+          </button>
+
           <button
             onClick={handleEnableNotifs}
             disabled={notifState !== "default"}

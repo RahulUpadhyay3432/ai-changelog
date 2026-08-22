@@ -78,7 +78,7 @@ export function ExploreClient({ entities }: { entities: EntityLite[] }) {
         <span className={styles.eyebrow}>The AI glossary</span>
         <h1 className={styles.title}>Understand the ideas behind the news.</h1>
         <p className={styles.deck}>
-          Plain-English explainers for the concepts and techniques shaping AI — each one tied to the
+          Plain-English explainers for the concepts and techniques shaping AI, each one tied to the
           latest news as it happens.
         </p>
         <p className={styles.count}>

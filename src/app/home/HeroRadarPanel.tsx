@@ -12,7 +12,7 @@ const CAPABILITIES: Capability[] = [
   {
     Icon: Compass,
     title: "Discover by what you're building",
-    line: "The tool worth using, filed by the job — not buried in a feed.",
+    line: "The tool worth using, filed by the job, not buried in a feed.",
     points: [
       "Browse by use-case: agents, RAG, vision, voice",
       "See what each tool is actually for, at a glance",
@@ -26,26 +26,26 @@ const CAPABILITIES: Capability[] = [
     points: [
       "Today's launches and what's gaining traction",
       "30-second briefs on what actually changed",
-      "A calm daily signal — no hype, no doomscroll",
+      "A calm daily signal, no hype, no doomscroll",
     ],
   },
   {
     Icon: Layers,
     title: "The whole stack, one map",
-    line: "Models, tools, MCP servers and skills — curated, not 12,000.",
+    line: "Models, tools, MCP servers and skills, curated, not 12,000.",
     points: [
       "Models · dev tools · MCP servers · skills",
       "Hand-picked and cross-linked, all in one place",
-      "Quality over quantity — every entry earns its spot",
+      "Quality over quantity, every entry earns its spot",
     ],
   },
   {
     Icon: Bookmark,
     title: "Make it your map",
-    line: "Save any tool into a named Loadout — your stack, on device.",
+    line: "Save any tool into a named Loadout. Your stack, on device.",
     points: [
       "Group tools into named Loadouts you control",
-      "Yours, stored on device — no account needed",
+      "Yours, stored on device, no account needed",
       "Free forever, every claim linked to its source",
     ],
   },

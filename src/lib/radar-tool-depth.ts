@@ -33,13 +33,13 @@ const RAW: Record<string, ToolDepth> = {
   "https://chatgpt.com": {
     whatItIs: "OpenAI's chat assistant, the most widely used way to work with frontier models day to day.",
     howItWorks: "You type a prompt and the model responds; it can also browse, run code, generate images, and call tools inside the same conversation.",
-    whoItsFor: "Anyone who wants a general reasoning and writing partner — from first-time users to engineers prototyping with the API behind it.",
+    whoItsFor: "Anyone who wants a general reasoning and writing partner, from first-time users to engineers prototyping with the API behind it.",
     whereUsed: "Drafting, research, code help, and quick prototyping before you commit a workflow to the API.",
   },
   "https://claude.ai": {
     whatItIs: "Anthropic's assistant, known for long-context reasoning and strong coding.",
     howItWorks: "It reads large documents or codebases in a single context window and works through them step by step, with optional tool use and file uploads.",
-    whoItsFor: "Builders and writers who work with long inputs — full repos, contracts, research — and want careful, structured output.",
+    whoItsFor: "Builders and writers who work with long inputs, full repos, contracts, research , and want careful, structured output.",
     whereUsed: "Codebase reasoning, document analysis, and writing that needs to hold a lot of context at once.",
   },
   "https://gemini.google.com": {
@@ -70,7 +70,7 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://claude.com/claude-code": {
     whatItIs: "Anthropic's agentic coding tool that runs in your terminal.",
-    howItWorks: "You describe a task and it plans, reads, and edits across files, runs commands, and iterates — checking in before risky steps.",
+    howItWorks: "You describe a task and it plans, reads, and edits across files, runs commands, and iterates, checking in before risky steps.",
     whoItsFor: "Engineers comfortable in the terminal who want an agent that can carry a whole task, not just complete a line.",
     whereUsed: "Multi-file changes, debugging, migrations, and automating repetitive engineering work.",
   },
@@ -82,7 +82,7 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://windsurf.com": {
     whatItIs: "An agentic IDE that builds features end to end.",
-    howItWorks: "Its agent keeps track of your project state and takes multi-step actions — editing files, running commands — while you stay in the loop.",
+    howItWorks: "Its agent keeps track of your project state and takes multi-step actions, editing files, running commands , while you stay in the loop.",
     whoItsFor: "Developers who want a more autonomous coding agent inside a full editor.",
     whereUsed: "Feature development and larger changes where the agent handles several steps at once.",
   },
@@ -108,7 +108,7 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://framer.com": {
     whatItIs: "A design tool that publishes real, responsive websites.",
-    howItWorks: "You design on a canvas with components and animation, then publish to a live site — increasingly with AI help for layout and copy.",
+    howItWorks: "You design on a canvas with components and animation, then publish to a live site, increasingly with AI help for layout and copy.",
     whoItsFor: "Designers and small teams who want to design and ship a site without a separate build step.",
     whereUsed: "Marketing sites, landing pages, and portfolios.",
   },
@@ -147,13 +147,13 @@ const RAW: Record<string, ToolDepth> = {
   "https://replicate.com": {
     whatItIs: "A service to run and deploy machine-learning models with one API call.",
     howItWorks: "Models are packaged as containers you call over HTTP; you can run community models or push your own.",
-    whoItsFor: "Developers who want to use models — especially image, video, and audio — without managing infrastructure.",
+    whoItsFor: "Developers who want to use models, especially image, video, and audio , without managing infrastructure.",
     whereUsed: "Image and media generation, and shipping custom models behind an API.",
   },
   "https://huggingface.co": {
-    whatItIs: "The hub for open models, datasets, and demos — the GitHub of machine learning.",
+    whatItIs: "The hub for open models, datasets, and demos, the GitHub of machine learning.",
     howItWorks: "It hosts hundreds of thousands of models and datasets with libraries to download, run, and share them, plus hosted demo Spaces.",
-    whoItsFor: "Anyone working with open models — from researchers to app builders.",
+    whoItsFor: "Anyone working with open models, from researchers to app builders.",
     whereUsed: "Finding models, sharing weights, and running quick demos.",
   },
 
@@ -174,7 +174,7 @@ const RAW: Record<string, ToolDepth> = {
   // ── Agents & automation ──
   "https://n8n.io": {
     whatItIs: "A workflow automation tool you can self-host, with first-class AI nodes.",
-    howItWorks: "You connect triggers and actions on a visual canvas — including LLM and agent nodes — and the workflow runs on your own infrastructure.",
+    howItWorks: "You connect triggers and actions on a visual canvas, including LLM and agent nodes , and the workflow runs on your own infrastructure.",
     whoItsFor: "Technical teams who want automation and AI workflows without sending data to a closed SaaS.",
     whereUsed: "Internal automations, data pipelines, and self-hosted AI agents.",
   },
@@ -226,13 +226,13 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://semgrep.dev": {
     whatItIs: "A fast static analysis tool that scans code for security and quality bugs.",
-    howItWorks: "It matches code against rules — pattern-based, so you can write your own — and flags issues in seconds across many languages.",
+    howItWorks: "It matches code against rules, pattern-based, so you can write your own , and flags issues in seconds across many languages.",
     whoItsFor: "Developers and security teams who want quick, customizable scanning in CI.",
     whereUsed: "Catching vulnerabilities and enforcing code standards before merge.",
   },
   "https://socket.dev": {
     whatItIs: "A tool that catches malicious and risky open-source dependencies.",
-    howItWorks: "It inspects what packages actually do — network access, install scripts, shell use — to flag supply-chain attacks traditional scanners miss.",
+    howItWorks: "It inspects what packages actually do, network access, install scripts, shell use , to flag supply-chain attacks traditional scanners miss.",
     whoItsFor: "Teams worried about compromised or sketchy packages entering their codebase.",
     whereUsed: "Reviewing new dependencies and guarding the supply chain in pull requests.",
   },
@@ -252,13 +252,13 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://helicone.ai": {
     whatItIs: "An observability layer that monitors LLM cost, latency, and usage.",
-    howItWorks: "You route model calls through it as a proxy, and it logs every request with metrics and dashboards — often a one-line change.",
+    howItWorks: "You route model calls through it as a proxy, and it logs every request with metrics and dashboards, often a one-line change.",
     whoItsFor: "Teams who want visibility into their LLM spend and performance fast.",
     whereUsed: "Tracking cost per feature, latency, and usage across models.",
   },
   "https://langfuse.com": {
     whatItIs: "Open-source tracing and evaluation for LLM applications.",
-    howItWorks: "It captures traces of model and agent runs and lets you score outputs, run evals, and manage prompts — self-hostable or managed.",
+    howItWorks: "It captures traces of model and agent runs and lets you score outputs, run evals, and manage prompts, self-hostable or managed.",
     whoItsFor: "Engineers who want open, self-hostable observability for their AI stack.",
     whereUsed: "Tracing agents, running evals, and versioning prompts in production.",
   },
@@ -294,7 +294,7 @@ const RAW: Record<string, ToolDepth> = {
   // ── AI coding (added) ──
   "https://replit.com": {
     whatItIs: "A browser IDE that builds, runs, and deploys apps with an AI agent.",
-    howItWorks: "You describe an app and its Agent writes, runs, and hosts it in a full cloud environment — no local setup.",
+    howItWorks: "You describe an app and its Agent writes, runs, and hosts it in a full cloud environment, no local setup.",
     whoItsFor: "Beginners and builders who want to go from idea to deployed app in one place.",
     whereUsed: "Prototypes, learning to code, and small apps shipped from the browser.",
   },
@@ -346,7 +346,7 @@ const RAW: Record<string, ToolDepth> = {
     whatItIs: "A utility-first CSS framework for styling in your markup.",
     howItWorks: "You compose small utility classes directly in HTML or JSX; a build step strips everything you don't use.",
     whoItsFor: "Developers who want consistent, fast styling without writing custom CSS.",
-    whereUsed: "Almost any modern web UI — it's the default for many AI-generated front ends.",
+    whereUsed: "Almost any modern web UI. It's the default for many AI-generated front ends.",
   },
 
   // ── Inference (added) ──
@@ -430,7 +430,7 @@ const RAW: Record<string, ToolDepth> = {
   // ── Orchestration (added) ──
   "https://mastra.ai": {
     whatItIs: "A TypeScript framework for agents, workflows, and RAG.",
-    howItWorks: "It gives you typed building blocks — agents, tools, workflows, memory — to assemble AI features in one codebase.",
+    howItWorks: "It gives you typed building blocks, agents, tools, workflows, memory , to assemble AI features in one codebase.",
     whoItsFor: "TypeScript developers who want structure for production AI apps.",
     whereUsed: "Agents, RAG, and multi-step AI workflows in JavaScript stacks.",
   },
@@ -515,76 +515,76 @@ const RAW: Record<string, ToolDepth> = {
 // every take names the real tradeoff.
 const VERDICTS: Record<string, { verdict: Verdict; take: string }> = {
   // Models & chat
-  "https://chatgpt.com":     { verdict: "worth-it", take: "The safe default everyone starts with. Broadest tool support — but no longer the sharpest at any one thing: Claude codes better, Gemini reads longer." },
+  "https://chatgpt.com":     { verdict: "worth-it", take: "The safe default everyone starts with. Broadest tool support, but no longer the sharpest at any one thing: Claude codes better, Gemini reads longer." },
   "https://claude.ai":       { verdict: "worth-it", take: "The one to reach for on real code and long documents. Slower to add consumer features, and rate limits bite on the cheaper plans." },
   "https://gemini.google.com": { verdict: "worth-it", take: "Unmatched context length and the pick if you live in Google's tools. The quality gap to Claude on hard reasoning is real, but closing." },
-  "https://perplexity.ai":   { verdict: "worth-it", take: "The one research tool actually worth paying for — it cites, unlike raw ChatGPT. But it's a thin layer; the day Google ships good citations, the moat thins." },
-  "https://grok.com":        { verdict: "watch",    take: "Fast and plugged into live X chatter. Opinionated in ways you may not want near production — great for a pulse-check, not a system prompt." },
-  "https://mistral.ai":      { verdict: "worth-it", take: "Europe's open-weight champion — capable, EU-resident, self-hostable. A notch behind the frontier on the hardest tasks." },
-  "https://deepseek.com":    { verdict: "worth-it", take: "Frontier-grade reasoning at a fraction of the price — the value pick. If your data-governance team is comfortable with the origin." },
+  "https://perplexity.ai":   { verdict: "worth-it", take: "The one research tool actually worth paying for, it cites, unlike raw ChatGPT. But it's a thin layer; the day Google ships good citations, the moat thins." },
+  "https://grok.com":        { verdict: "watch",    take: "Fast and plugged into live X chatter. Opinionated in ways you may not want near production, great for a pulse-check, not a system prompt." },
+  "https://mistral.ai":      { verdict: "worth-it", take: "Europe's open-weight champion, capable, EU-resident, self-hostable. A notch behind the frontier on the hardest tasks." },
+  "https://deepseek.com":    { verdict: "worth-it", take: "Frontier-grade reasoning at a fraction of the price, the value pick. If your data-governance team is comfortable with the origin." },
 
   // AI coding
   "https://cursor.com":                  { verdict: "worth-it", take: "The best AI editor today, full stop. The catch: it's a paid VS Code fork, so you're betting your daily driver on a startup's roadmap and pricing." },
-  "https://github.com/features/copilot": { verdict: "worth-it", take: "Cheap, safe, everywhere. But it's autocomplete — Cursor and Claude Code have lapped it on real multi-file work." },
-  "https://claude.com/claude-code":      { verdict: "worth-it", take: "The strongest terminal agent right now — if you live in the CLI. GUI-first devs will bounce; it assumes you trust it with your shell." },
+  "https://github.com/features/copilot": { verdict: "worth-it", take: "Cheap, safe, everywhere. But it's autocomplete, Cursor and Claude Code have lapped it on real multi-file work." },
+  "https://claude.com/claude-code":      { verdict: "worth-it", take: "The strongest terminal agent right now, if you live in the CLI. GUI-first devs will bounce; it assumes you trust it with your shell." },
   "https://lovable.dev":  { verdict: "watch", take: "Magic for a demo, brittle past it. Perfect for a v0 or a pitch; painful to maintain once real users arrive. Prototype, don't ship." },
-  "https://bolt.new":     { verdict: "watch", take: "Idea to running app in a browser tab — genuinely fun. The generated code is a sketch, not a foundation; expect to rebuild what you keep." },
-  "https://windsurf.com": { verdict: "watch", take: "A capable agentic IDE chasing Cursor. Real, but you're picking the challenger — the momentum is on Cursor's side." },
+  "https://bolt.new":     { verdict: "watch", take: "Idea to running app in a browser tab, genuinely fun. The generated code is a sketch, not a foundation; expect to rebuild what you keep." },
+  "https://windsurf.com": { verdict: "watch", take: "A capable agentic IDE chasing Cursor. Real, but you're picking the challenger, the momentum is on Cursor's side." },
   "https://replit.com":   { verdict: "watch", take: "The friendliest way to ship from a browser, and great for learning. You're all-in on their cloud, which gets pricey as you grow." },
-  "https://aider.chat":   { verdict: "worth-it", take: "The open, git-native terminal agent — free, honest, every change committed. Less polished than Cursor, and that's the trade." },
-  "https://cline.bot":    { verdict: "worth-it", take: "An open, transparent agent inside VS Code — you approve every step. Slower than a closed tool, by design." },
-  "https://zed.dev":      { verdict: "watch", take: "Blazing fast and a joy to type in. The AI is still catching Cursor's — you're buying the speed today and betting on the AI later." },
-  "https://devin.ai":     { verdict: "skip",  take: "Over-promised at launch and still finding its feet. Impressive demos, uneven in the wild — watch it, don't staff a sprint on it yet." },
+  "https://aider.chat":   { verdict: "worth-it", take: "The open, git-native terminal agent, free, honest, every change committed. Less polished than Cursor, and that's the trade." },
+  "https://cline.bot":    { verdict: "worth-it", take: "An open, transparent agent inside VS Code. You approve every step. Slower than a closed tool, by design." },
+  "https://zed.dev":      { verdict: "watch", take: "Blazing fast and a joy to type in. The AI is still catching Cursor's. You're buying the speed today and betting on the AI later." },
+  "https://devin.ai":     { verdict: "skip",  take: "Over-promised at launch and still finding its feet. Impressive demos, uneven in the wild, watch it, don't staff a sprint on it yet." },
 
   // UI & design
-  "https://v0.dev":         { verdict: "worth-it", take: "The fastest path to a real React first draft. It won't know your design system — expect to re-skin most of what it hands you." },
-  "https://figma.com":      { verdict: "worth-it", take: "Non-negotiable for product design. The AI features are catch-up, not the reason you're here — you're here for the canvas." },
-  "https://framer.com":     { verdict: "worth-it", take: "Design and ship a marketing site in one place, no dev handoff. You trade pixel-anything for speed — fine for sites, not apps." },
-  "https://ui.shadcn.com":  { verdict: "worth-it", take: "You own the component code, which is the entire point — zero library lock-in. The flip side: no upgrades land in your lap." },
+  "https://v0.dev":         { verdict: "worth-it", take: "The fastest path to a real React first draft. It won't know your design system, expect to re-skin most of what it hands you." },
+  "https://figma.com":      { verdict: "worth-it", take: "Non-negotiable for product design. The AI features are catch-up, not the reason you're here. You're here for the canvas." },
+  "https://framer.com":     { verdict: "worth-it", take: "Design and ship a marketing site in one place, no dev handoff. You trade pixel-anything for speed, fine for sites, not apps." },
+  "https://ui.shadcn.com":  { verdict: "worth-it", take: "You own the component code, which is the entire point, zero library lock-in. The flip side: no upgrades land in your lap." },
   "https://tailwindcss.com": { verdict: "worth-it", take: "The default styling layer for a reason, and what most AI tools emit. Purists still hate the class soup; you'll stop caring by week two." },
   "https://webflow.com":    { verdict: "worth-it", take: "Pixel control without writing front-end. Powerful, with a real learning curve and a subscription that scales with your ambitions." },
 
   // Model access & inference
-  "https://openrouter.ai":  { verdict: "worth-it", take: "One key for every model — the smart default for multi-model apps. You pay a small margin to never integrate a provider again." },
-  "https://groq.com":       { verdict: "worth-it", take: "Absurdly fast — but open models only. No frontier models here, so it's a speed play, not a quality one." },
-  "https://together.ai":    { verdict: "worth-it", take: "Solid hosting and fine-tuning for open models. Nothing it does is unique — you pick it for breadth and price." },
+  "https://openrouter.ai":  { verdict: "worth-it", take: "One key for every model, the smart default for multi-model apps. You pay a small margin to never integrate a provider again." },
+  "https://groq.com":       { verdict: "worth-it", take: "Absurdly fast, but open models only. No frontier models here, so it's a speed play, not a quality one." },
+  "https://together.ai":    { verdict: "worth-it", take: "Solid hosting and fine-tuning for open models. Nothing it does is unique. You pick it for breadth and price." },
   "https://replicate.com":  { verdict: "worth-it", take: "The easiest way to run image/video/audio models behind an API. Cold starts and per-second billing add up at volume." },
-  "https://huggingface.co": { verdict: "worth-it", take: "The GitHub of ML — indispensable for open models, sprawling for everything else. You'll bookmark five pages and ignore the rest." },
-  "https://modal.com":      { verdict: "worth-it", take: "Run Python/GPU jobs without touching infra — a genuine time-saver. You're renting compute at a premium for the convenience." },
+  "https://huggingface.co": { verdict: "worth-it", take: "The GitHub of ML, indispensable for open models, sprawling for everything else. You'll bookmark five pages and ignore the rest." },
+  "https://modal.com":      { verdict: "worth-it", take: "Run Python/GPU jobs without touching infra, a genuine time-saver. You're renting compute at a premium for the convenience." },
   "https://cerebras.ai":    { verdict: "watch",    take: "Record-fast inference on exotic hardware. Impressive numbers; a thinner model selection and a bet on one vendor's chips." },
 
   // Data & RAG
-  "https://pinecone.io":    { verdict: "watch",    take: "A solid managed vector DB — but pgvector (Supabase/Neon) is now good enough for most, and cheaper. Reach for Pinecone at real scale, not before." },
-  "https://supabase.com":   { verdict: "worth-it", take: "One backend for your app data and your embeddings — the pragmatic default. You'll hit the free-tier ceiling faster than you expect." },
+  "https://pinecone.io":    { verdict: "watch",    take: "A solid managed vector DB, but pgvector (Supabase/Neon) is now good enough for most, and cheaper. Reach for Pinecone at real scale, not before." },
+  "https://supabase.com":   { verdict: "worth-it", take: "One backend for your app data and your embeddings, the pragmatic default. You'll hit the free-tier ceiling faster than you expect." },
   "https://neon.tech":      { verdict: "worth-it", take: "Serverless Postgres that branches like git, with vectors built in. Lovely DX; scale-to-zero cold starts are the tax." },
   "https://qdrant.tech":    { verdict: "worth-it", take: "Fast, self-hostable vector search in Rust. The open pick if you'd rather own it than rent Pinecone." },
   "https://trychroma.com":  { verdict: "watch",    take: "The quickest path to RAG in a prototype. Great to start; you'll likely graduate to Qdrant or pgvector for production." },
-  "https://llamaindex.ai":  { verdict: "watch",    take: "Great for wiring data into LLMs fast. Like LangChain, it can over-abstract — reach for it when plain retrieval stops scaling." },
+  "https://llamaindex.ai":  { verdict: "watch",    take: "Great for wiring data into LLMs fast. Like LangChain, it can over-abstract, reach for it when plain retrieval stops scaling." },
 
   // Agents, automation & orchestration
-  "https://n8n.io":        { verdict: "worth-it", take: "The self-host answer to Zapier — own your data and your AI nodes. You also own the maintenance, so budget for it." },
-  "https://zapier.com":    { verdict: "worth-it", take: "Still the fastest glue for non-engineers. AI steps make the bill climb quietly — watch the task meter." },
+  "https://n8n.io":        { verdict: "worth-it", take: "The self-host answer to Zapier, own your data and your AI nodes. You also own the maintenance, so budget for it." },
+  "https://zapier.com":    { verdict: "worth-it", take: "Still the fastest glue for non-engineers. AI steps make the bill climb quietly, watch the task meter." },
   "https://make.com":      { verdict: "worth-it", take: "More power than Zapier for branching flows, at a steeper learning curve. Worth it once your automations get real." },
-  "https://crewai.com":    { verdict: "watch",    take: "A clean way to model role-playing agents. Multi-agent is still more demo than dependable — start with one agent that actually works." },
+  "https://crewai.com":    { verdict: "watch",    take: "A clean way to model role-playing agents. Multi-agent is still more demo than dependable, start with one agent that actually works." },
   "https://dify.ai":       { verdict: "worth-it", take: "An open, visual way to ship LLM apps without wiring every piece. You trade some control for the speed." },
-  "https://langchain.com/langgraph": { verdict: "watch", take: "Powerful and everywhere in tutorials — also famously over-abstracted. Reach for LangGraph only when a plain loop stops scaling." },
-  "https://temporal.io":   { verdict: "worth-it", take: "Overkill for a side project, essential at scale — durable workflows done right. The learning curve is the price of never losing state." },
+  "https://langchain.com/langgraph": { verdict: "watch", take: "Powerful and everywhere in tutorials, also famously over-abstracted. Reach for LangGraph only when a plain loop stops scaling." },
+  "https://temporal.io":   { verdict: "worth-it", take: "Overkill for a side project, essential at scale, durable workflows done right. The learning curve is the price of never losing state." },
   "https://trigger.dev":   { verdict: "worth-it", take: "Background jobs as normal code, open-source, no timeout fights. Younger than Temporal, and far easier to start." },
-  "https://mastra.ai":     { verdict: "watch",    take: "A tidy TypeScript home for agents and RAG. Young, but the right shape if your stack is JS — an early bet." },
+  "https://mastra.ai":     { verdict: "watch",    take: "A tidy TypeScript home for agents and RAG. Young, but the right shape if your stack is JS, an early bet." },
 
   // Security & observability
-  "https://socket.dev":    { verdict: "worth-it", take: "Catches malicious packages the old scanners miss — the supply-chain layer worth adding. Narrow by design; pair it with a broader scanner." },
-  "https://snyk.io":       { verdict: "worth-it", take: "The incumbent for dependency and code scanning — thorough. Priced like an enterprise tool the moment you're past the free tier." },
+  "https://socket.dev":    { verdict: "worth-it", take: "Catches malicious packages the old scanners miss, the supply-chain layer worth adding. Narrow by design; pair it with a broader scanner." },
+  "https://snyk.io":       { verdict: "worth-it", take: "The incumbent for dependency and code scanning, thorough. Priced like an enterprise tool the moment you're past the free tier." },
   "https://semgrep.dev":   { verdict: "worth-it", take: "Fast, writable static analysis that fits CI. Generous free tier; the real value is in writing your own rules." },
-  "https://helicone.ai":   { verdict: "worth-it", take: "One-line LLM observability — the easiest place to start watching cost and latency. Choose Langfuse instead if you'd rather self-host." },
-  "https://langfuse.com":  { verdict: "worth-it", take: "Open-source tracing and evals — self-host and own the data. More setup than Helicone, more control." },
+  "https://helicone.ai":   { verdict: "worth-it", take: "One-line LLM observability, the easiest place to start watching cost and latency. Choose Langfuse instead if you'd rather self-host." },
+  "https://langfuse.com":  { verdict: "worth-it", take: "Open-source tracing and evals, self-host and own the data. More setup than Helicone, more control." },
   "https://braintrust.dev": { verdict: "worth-it", take: "Actually measure whether a prompt or model change helped before you ship it. The discipline it forces is the real product." },
 
   // Media
   "https://elevenlabs.io": { verdict: "worth-it", take: "The voice-quality benchmark. Pricey at scale, and everyone's demos are starting to sound the same." },
-  "https://midjourney.com": { verdict: "worth-it", take: "Still the best-looking image model. Discord-first with a weak API — gorgeous output, awkward to build on." },
+  "https://midjourney.com": { verdict: "worth-it", take: "Still the best-looking image model. Discord-first with a weak API, gorgeous output, awkward to build on." },
   "https://suno.com":      { verdict: "watch",    take: "Genuinely fun, legally murky. Great for a demo track; think hard before anything commercial." },
-  "https://runwayml.com":  { verdict: "worth-it", take: "A real video suite for creators, not a toy. Credits vanish fast — it rewards knowing exactly what you want." },
+  "https://runwayml.com":  { verdict: "worth-it", take: "A real video suite for creators, not a toy. Credits vanish fast, it rewards knowing exactly what you want." },
 };
 
 // Build normalized lookups once at module load.

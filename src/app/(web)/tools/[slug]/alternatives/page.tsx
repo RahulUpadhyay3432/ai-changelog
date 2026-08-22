@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (alts.length < MIN_ALTERNATIVES) return { title: "Not found", robots: { index: false, follow: true } };
 
   const url = `${APP_URL}/tools/${slug}/alternatives`;
-  const title = `${tool.name} alternatives — ${alts.length} options worth considering`;
+  const title = `${tool.name} alternatives, ${alts.length} options worth considering`;
   const description = `Curated alternatives to ${tool.name}, hand-checked rather than scraped. ${alts
     .slice(0, 3)
     .map((a) => a.name)
@@ -158,7 +158,7 @@ export default async function ToolAlternatives({ params }: Props) {
 
       <section style={{ margin: "30px 0 0" }}>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.65, maxWidth: "620px" }}>
-          Every entry here is hand-checked — we sweep the catalog for dead links and stale
+          Every entry here is hand-checked . We sweep the catalog for dead links and stale
           entries rather than scraping a registry. That is the whole difference between this
           and a directory with twelve thousand listings, most of which no longer resolve.
         </p>

@@ -42,14 +42,14 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "gemini-pro",
     verdict:
-      "Two different bets. Opus 5 is the agentic specialist — it holds a task together over many steps. Gemini 3.1 Pro leads reasoning benchmarks and costs meaningfully less per token at the frontier tier. Both carry a million-token context, so the old 'Gemini for long inputs' advantage has largely evaporated.",
+      "Two different bets. Opus 5 is the agentic specialist, it holds a task together over many steps. Gemini 3.1 Pro leads reasoning benchmarks and costs meaningfully less per token at the frontier tier. Both carry a million-token context, so the old 'Gemini for long inputs' advantage has largely evaporated.",
     pickA: [
       "Agent loops that call tools repeatedly and must not drift",
       "Code that has to match an existing house style",
     ],
     pickB: [
       "Hard reasoning problems where you want the benchmark leader",
-      "Cost-sensitive frontier work — it is the cheaper of the two",
+      "Cost-sensitive frontier work. It is the cheaper of the two",
       "Video and audio reasoning in the same request",
     ],
   },
@@ -74,7 +74,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     verdict:
       "Both are pitched at agentic coding. Opus 5 has the deeper track record and twice the context; Grok 4.6 is cheaper below 200K tokens and offers four reasoning-effort levels instead of three. Grok's catch is the long-context toll: cross 200K and the rate doubles for every token in the request, including the ones below the line.",
     pickA: [
-      "Long sessions that will exceed 200K tokens — no pricing cliff",
+      "Long sessions that will exceed 200K tokens, no pricing cliff",
       "Work where the coding track record matters more than the price",
     ],
     pickB: [
@@ -86,7 +86,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-sol",
     b: "grok",
     verdict:
-      "Sol is the safer default and scores higher overall; Grok 4.6 matches it on some agentic work at a fraction of the short-context price. Grok is the newer and less proven of the two — it shipped in August 2026 — so treat it as the value play rather than the reliable one.",
+      "Sol is the safer default and scores higher overall; Grok 4.6 matches it on some agentic work at a fraction of the short-context price. Grok is the newer and less proven of the two, it shipped in August 2026 , so treat it as the value play rather than the reliable one.",
     pickA: [
       "Production work where maturity and ecosystem matter",
       "Requests that routinely run long",
@@ -148,7 +148,7 @@ export const MODEL_PAIRS: ModelPair[] = [
       "Work you cannot easily verify yourself",
     ],
     pickB: [
-      "Almost everything else — it is the better price-to-capability trade",
+      "Almost everything else. It is the better price-to-capability trade",
       "High-volume agentic work where the 2x multiplier compounds",
     ],
   },
@@ -156,7 +156,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "claude-sonnet",
     verdict:
-      "The one most Claude users get wrong by defaulting up. Sonnet 5 handles the large majority of real work at a fraction of Opus 5's price, with the same million-token context. Opus earns its cost on long autonomous runs and architectural reasoning — not on the routine edits people usually point it at.",
+      "The one most Claude users get wrong by defaulting up. Sonnet 5 handles the large majority of real work at a fraction of Opus 5's price, with the same million-token context. Opus earns its cost on long autonomous runs and architectural reasoning, not on the routine edits people usually point it at.",
     pickA: [
       "Long agent runs with no human in the loop",
       "Architecture decisions and gnarly debugging",
@@ -198,7 +198,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-luna",
     b: "gemini-flash",
     verdict:
-      "Both are built for volume, and both got materially cheaper in 2026 — OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August. Luna inherits the GPT-5.6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
+      "Both are built for volume, and both got materially cheaper in 2026, OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August. Luna inherits the GPT-5.6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
     pickA: [
       "You are standardising on the GPT-5.6 ladder",
       "Routing and classification inside an OpenAI stack",
@@ -212,7 +212,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-haiku",
     b: "gpt-luna",
     verdict:
-      "Two small models with different context budgets. Luna inherits the full GPT-5.6 window; Haiku 4.5 stops at 200K. If you are doing short, high-frequency tasks the difference rarely shows up — pick the one whose family you already use and stop optimising.",
+      "Two small models with different context budgets. Luna inherits the full GPT-5.6 window; Haiku 4.5 stops at 200K. If you are doing short, high-frequency tasks the difference rarely shows up, pick the one whose family you already use and stop optimising.",
     pickA: [
       "Extraction and classification inside a Claude pipeline",
       "You want vision on a small model",
@@ -226,7 +226,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "kimi",
     verdict:
-      "Closed frontier against the open model that got closest to it. Kimi K3 ships open weights at roughly 2.8 trillion parameters with a million-token context — you can self-host it, which Opus 5 will never allow. Opus is still ahead on agentic reliability, but the gap is now small enough that data-residency or lock-in concerns can decide this outright.",
+      "Closed frontier against the open model that got closest to it. Kimi K3 ships open weights at roughly 2.8 trillion parameters with a million-token context. You can self-host it, which Opus 5 will never allow. Opus is still ahead on agentic reliability, but the gap is now small enough that data-residency or lock-in concerns can decide this outright.",
     pickA: [
       "Agentic work where reliability is the whole point",
       "You want a vendor with a support relationship",
@@ -255,7 +255,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "deepseek",
     b: "kimi",
     verdict:
-      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder with far more context. If you are picking one open model to self-host in 2026, K3 is the more general answer — but DeepSeek remains hard to beat on cost per solved reasoning problem.",
+      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder with far more context. If you are picking one open model to self-host in 2026, K3 is the more general answer, but DeepSeek remains hard to beat on cost per solved reasoning problem.",
     pickA: [
       "Chain-of-thought reasoning on a tight budget",
       "Smaller footprint to run",
@@ -283,7 +283,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "llama",
     b: "qwen",
     verdict:
-      "The two default local models. Llama has the largest open ecosystem — more tooling, quantisations and fine-tunes than anything else — while Qwen tends to punch above its parameter count on code. Ecosystem versus raw quality per gigabyte.",
+      "The two default local models. Llama has the largest open ecosystem, more tooling, quantisations and fine-tunes than anything else , while Qwen tends to punch above its parameter count on code. Ecosystem versus raw quality per gigabyte.",
     pickA: [
       "Maximum tooling and community support",
       "Existing fine-tunes you want to build on",

@@ -161,7 +161,7 @@ function Block({ block }: { block: BlogBlock }) {
       return (
         <blockquote className={styles.quote}>
           <p>{renderInline(block.text)}</p>
-          {block.cite && <cite className={styles.cite}>— {block.cite}</cite>}
+          {block.cite && <cite className={styles.cite}>, {block.cite}</cite>}
         </blockquote>
       );
 

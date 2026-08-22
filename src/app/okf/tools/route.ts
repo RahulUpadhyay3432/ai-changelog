@@ -71,14 +71,14 @@ export async function GET() {
 
   const md = `---
 type: AI Tools Catalog
-title: Kapyn Radar — AI Tools & Entities (${today})
+title: Kapyn Radar, AI Tools & Entities (${today})
 description: ${total} active AI tools, models, and entities tracked by Kapyn Radar
 resource: ${APP_URL}/radar
 tags: [${allTopics.join(", ")}]
 timestamp: ${now}
 ---
 
-# Kapyn Radar — AI Tools Catalog (${today})
+# Kapyn Radar , AI Tools Catalog (${today})
 
 Tracking ${total} items: ${tools.length} trending tools · ${entities.length} AI entities · ${essentials.length} essentials
 

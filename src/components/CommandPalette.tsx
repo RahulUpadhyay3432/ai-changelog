@@ -123,7 +123,7 @@ export function CommandPalette() {
         <div className="scrollbar-none" style={{ overflowY: "auto", padding: "8px" }}>
           {query.trim().length < 1 ? (
             <p style={{ fontSize: "13px", color: TEXT.muted, padding: "18px 12px", margin: 0, lineHeight: 1.6 }}>
-              Search {KIND_ORDER.length > 0 ? "everything" : ""} across the catalog — tools, MCP servers, AI skills, and guides.
+              Search {KIND_ORDER.length > 0 ? "everything" : ""} across the catalog, tools, MCP servers, AI skills, and guides.
             </p>
           ) : results.length === 0 ? (
             <p style={{ fontSize: "13px", color: TEXT.muted, padding: "18px 12px", margin: 0 }}>

@@ -10,20 +10,20 @@ export const revalidate = 1800;
 
 const APP_URL = "https://kapyn.app";
 const DESC =
-  "A curated radar of the AI worth using — agents, models, tools, MCP servers and skills, kept current by a daily signal. No paywall, ever.";
+  "A curated radar of the AI worth using, agents, models, tools, MCP servers and skills, kept current by a daily signal. No paywall, ever.";
 
 export const metadata: Metadata = {
-  title: "Radar — discover the AI worth using: agents, models, tools, MCP & skills",
+  title: "Radar, discover the AI worth using: agents, models, tools, MCP & skills",
   description: DESC,
   alternates: { canonical: `${APP_URL}/radar` },
   openGraph: {
-    title: "Kapyn Radar — the AI worth using",
+    title: "Kapyn Radar, the AI worth using",
     description: DESC,
     url: `${APP_URL}/radar`,
     siteName: "Kapyn",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "Kapyn Radar — the AI worth using", description: DESC },
+  twitter: { card: "summary_large_image", title: "Kapyn Radar, the AI worth using", description: DESC },
 };
 
 export default async function RadarPage() {

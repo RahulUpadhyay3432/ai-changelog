@@ -7,7 +7,7 @@ import { HackathonsClient } from "../HackathonsClient";
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: "Hackathons — Kapyn Radar",
+  title: "Hackathons, Kapyn Radar",
   description: "AI & tech hackathons to go build in.",
 };
 

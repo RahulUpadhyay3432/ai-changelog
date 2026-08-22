@@ -10,17 +10,17 @@ export const revalidate = 86400;
 
 // The 40-word extractable answer — the format answer engines quote verbatim.
 const WHAT_IS_MCP =
-  "The Model Context Protocol (MCP) is an open standard that lets AI assistants connect to outside tools and data — files, databases, APIs, browsers and apps — through one common interface, so a model can take actions, not just chat.";
+  "The Model Context Protocol (MCP) is an open standard that lets AI assistants connect to outside tools and data, files, databases, APIs, browsers and apps , through one common interface, so a model can take actions, not just chat.";
 
 const DESC =
-  "A curated directory of the most useful MCP (Model Context Protocol) servers, grouped by category — connect your AI assistant to GitHub, databases, search, browsers, payments and more.";
+  "A curated directory of the most useful MCP (Model Context Protocol) servers, grouped by category, connect your AI assistant to GitHub, databases, search, browsers, payments and more.";
 
 export const metadata: Metadata = {
-  title: "Best MCP servers — the Model Context Protocol directory",
+  title: "Best MCP servers, the Model Context Protocol directory",
   description: DESC,
   alternates: { canonical: `${APP_URL}/mcp` },
-  openGraph: { title: "Best MCP servers — Kapyn", description: DESC, url: `${APP_URL}/mcp`, siteName: "Kapyn", type: "website" },
-  twitter: { card: "summary_large_image", title: "Best MCP servers — Kapyn", description: DESC },
+  openGraph: { title: "Best MCP servers, Kapyn", description: DESC, url: `${APP_URL}/mcp`, siteName: "Kapyn", type: "website" },
+  twitter: { card: "summary_large_image", title: "Best MCP servers, Kapyn", description: DESC },
 };
 
 export default function McpHub() {

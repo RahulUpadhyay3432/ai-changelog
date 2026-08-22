@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tool = getToolBySlug(slug);
   if (!tool) return { title: "Not found", robots: { index: false, follow: true } };
   const url = `${APP_URL}/tools/${tool.slug}`;
-  const title = `${tool.name} — ${kindLabel(tool.kind)}`;
+  const title = `${tool.name}, ${kindLabel(tool.kind)}`;
   return {
     title,
     description: tool.valueLine,

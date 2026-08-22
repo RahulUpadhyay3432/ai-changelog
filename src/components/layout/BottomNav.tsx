@@ -62,7 +62,7 @@ export function BottomNav() {
             )}
             <Link
               href={href}
-              aria-label={isExit ? "Leave Radar — back to the Feed" : label}
+              aria-label={isExit ? "Leave Radar, back to the Feed" : label}
               style={{
                 display: "flex",
                 flexDirection: "column",

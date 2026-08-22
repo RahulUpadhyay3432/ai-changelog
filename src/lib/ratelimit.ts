@@ -21,7 +21,7 @@ let warnedNoUpstash = false;
 if (!redis && !warnedNoUpstash) {
   warnedNoUpstash = true;
   console.warn(
-    "[ratelimit] Upstash not configured — using best-effort in-memory fallback. " +
+    "[ratelimit] Upstash not configured, using best-effort in-memory fallback. " +
       "Set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN for real rate limiting."
   );
 }

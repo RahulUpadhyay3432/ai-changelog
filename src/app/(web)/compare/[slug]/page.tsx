@@ -233,7 +233,7 @@ export default async function ComparePair({ params }: Props) {
         </table>
       </div>
       <p style={{ fontSize: "13px", color: "#737373", lineHeight: 1.6, margin: "12px 0 0" }}>
-        Cost is a tier, not a quote — providers change prices often. Check{" "}
+        Cost is a tier, not a quote, providers change prices often. Check{" "}
         <a href={a.pricingUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#a3a3a3" }}>
           {a.provider}
         </a>{" "}

@@ -10,20 +10,20 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 1800;
 
 const DESC =
-  "What's gaining momentum in AI right now — the tools, MCP servers, and stories trending this week. Ranked by movement, refreshed daily.";
+  "What's gaining momentum in AI right now, the tools, MCP servers, and stories trending this week. Ranked by movement, refreshed daily.";
 
 export const metadata: Metadata = {
-  title: "This Week in AI — trending tools, MCP servers & stories",
+  title: "This Week in AI, trending tools, MCP servers & stories",
   description: DESC,
   alternates: { canonical: `${APP_URL}/radar/pulse` },
   openGraph: {
-    title: "This Week in AI — Kapyn Pulse",
+    title: "This Week in AI, Kapyn Pulse",
     description: DESC,
     url: `${APP_URL}/radar/pulse`,
     siteName: "Kapyn",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "This Week in AI — Kapyn Pulse", description: DESC },
+  twitter: { card: "summary_large_image", title: "This Week in AI, Kapyn Pulse", description: DESC },
 };
 
 // Monday of the current week, "Week of Jul 2".

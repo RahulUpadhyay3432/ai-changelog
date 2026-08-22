@@ -335,7 +335,7 @@ const CURATED_HACKATHONS: HackathonInput[] = [
     openState: "upcoming",
     organization: "Government of India",
     description:
-      "India's flagship nationwide hackathon, where student teams build solutions — many AI-driven — for problem statements posed by ministries and industry.",
+      "India's flagship nationwide hackathon, where student teams build solutions, many AI-driven , for problem statements posed by ministries and industry.",
   },
 ];
 

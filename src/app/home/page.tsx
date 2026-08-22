@@ -28,20 +28,20 @@ export const revalidate = 1800;
 
 const APP_URL = "https://kapyn.app";
 const DESC =
-  "The calm map of the AI worth using — agents, models, tools, MCP servers and skills. Curated, kept current by a daily signal, never behind a paywall.";
+  "The calm map of the AI worth using, agents, models, tools, MCP servers and skills. Curated, kept current by a daily signal, never behind a paywall.";
 
 export const metadata: Metadata = {
   title: "Discover the AI worth using: agents, models, tools, MCP servers & skills",
   description: DESC,
   alternates: { canonical: `${APP_URL}/home` },
   openGraph: {
-    title: "Kapyn — Find the AI worth using",
+    title: "Kapyn, Find the AI worth using",
     description: DESC,
     url: `${APP_URL}/home`,
     siteName: "Kapyn",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "Kapyn — Find the AI worth using", description: DESC },
+  twitter: { card: "summary_large_image", title: "Kapyn, Find the AI worth using", description: DESC },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -138,12 +138,12 @@ export default async function LandingPage() {
   ];
 
   const learn = [
-    { q: "What is MCP (Model Context Protocol)?", a: "An open standard that lets an AI assistant call external tools and data sources through a uniform interface — so one agent can reach your files, database, and APIs without bespoke glue for each.", slug: "mcp" },
-    { q: "What is an AI agent?", a: "A system that uses a model to decide and act in a loop — calling tools, reading results, and continuing until a goal is met — rather than returning a single response.", slug: "agents" },
+    { q: "What is MCP (Model Context Protocol)?", a: "An open standard that lets an AI assistant call external tools and data sources through a uniform interface, so one agent can reach your files, database, and APIs without bespoke glue for each.", slug: "mcp" },
+    { q: "What is an AI agent?", a: "A system that uses a model to decide and act in a loop, calling tools, reading results, and continuing until a goal is met , rather than returning a single response.", slug: "agents" },
     { q: "What is RAG?", a: "Retrieval-augmented generation: fetch relevant documents at query time and feed them to the model as context, so answers are grounded in your data instead of the model's memory.", slug: "rag" },
     { q: "What is chain-of-thought?", a: "Prompting a model to reason step by step before answering. Working through intermediate steps tends to improve accuracy on math, logic, and multi-step tasks.", slug: "chain-of-thought" },
-    { q: "What is fine-tuning?", a: "Continuing a model's training on your own examples so it adapts to a specific tone, format, or task — an alternative to packing everything into the prompt.", slug: "fine-tuning" },
-    { q: "What is prompt engineering?", a: "The practice of shaping a model's input — instructions, examples, and structure — to get reliable, useful output without changing the model itself.", slug: "prompt-engineering" },
+    { q: "What is fine-tuning?", a: "Continuing a model's training on your own examples so it adapts to a specific tone, format, or task, an alternative to packing everything into the prompt.", slug: "fine-tuning" },
+    { q: "What is prompt engineering?", a: "The practice of shaping a model's input, instructions, examples, and structure , to get reliable, useful output without changing the model itself.", slug: "prompt-engineering" },
   ];
 
   const cardStyle: React.CSSProperties = {
@@ -156,14 +156,14 @@ export default async function LandingPage() {
     { name: "Claude",        valueLine: "Long-context reasoning and coding with Anthropic's models.",           url: "https://claude.ai" },
     { name: "Gemini",        valueLine: "Multimodal reasoning across text, image, and video.",                  url: "https://gemini.google.com" },
     { name: "Cursor",        valueLine: "AI-native editor that edits across your whole repo.",                  url: "https://cursor.com" },
-    { name: "Claude Code",   valueLine: "Agentic coding in your terminal — plans and edits across files.",      url: "https://claude.com/claude-code" },
+    { name: "Claude Code",   valueLine: "Agentic coding in your terminal, plans and edits across files.",      url: "https://claude.com/claude-code" },
     { name: "Lovable",       valueLine: "Build and ship full web apps from a prompt.",                          url: "https://lovable.dev" },
     { name: "v0",            valueLine: "Generate polished UI components from text or a screenshot.",           url: "https://v0.dev" },
-    { name: "Bolt",          valueLine: "Full-stack AI apps in your browser — no local setup needed.",          url: "https://bolt.new" },
-    { name: "Figma",         valueLine: "The collaborative design tool — now with AI-powered features.",        url: "https://figma.com" },
+    { name: "Bolt",          valueLine: "Full-stack AI apps in your browser, no local setup needed.",          url: "https://bolt.new" },
+    { name: "Figma",         valueLine: "The collaborative design tool, now with AI-powered features.",        url: "https://figma.com" },
     { name: "Supabase",      valueLine: "Postgres + auth + storage + pgvector, ready in minutes.",              url: "https://supabase.com" },
     { name: "Vercel",        valueLine: "Deploy and scale Next.js apps globally with zero config.",             url: "https://vercel.com" },
-    { name: "OpenRouter",    valueLine: "One API for 100+ LLMs — switch models without code changes.",          url: "https://openrouter.ai" },
+    { name: "OpenRouter",    valueLine: "One API for 100+ LLMs, switch models without code changes.",          url: "https://openrouter.ai" },
   ];
 
   // ── JSON-LD ──
@@ -183,7 +183,7 @@ export default async function LandingPage() {
   const catalogJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "The AI worth using — on Kapyn Radar",
+    name: "The AI worth using, on Kapyn Radar",
     itemListElement: marquee.slice(0, 16).map((m, i) => ({ "@type": "ListItem", position: i + 1, name: m.name })),
   };
   const faqJsonLd = {
@@ -209,7 +209,7 @@ export default async function LandingPage() {
               <HeroPill storyCount={storyCount} />
               <HeroHeadline />
               <p style={{ fontSize: "18px", color: TEXT.body, lineHeight: 1.55, margin: "20px 0 0", maxWidth: "480px" }}>
-                Agents, models, tools, MCP servers and skills — curated, kept current by a calm daily signal. No noise, no paywall, ever.
+                Agents, models, tools, MCP servers and skills, curated, kept current by a calm daily signal. No noise, no paywall, ever.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "28px 0 0" }}>
                 <Link className="kt-cta" href="/radar" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "15px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "13px 22px", textDecoration: "none" }}>
@@ -226,7 +226,7 @@ export default async function LandingPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
                   <span style={{ fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary }}>Built for your phone</span>
                   <span style={{ fontSize: "13px", color: TEXT.muted, lineHeight: 1.45, maxWidth: "240px" }}>
-                    Scan for the 30-second daily brief — or{" "}
+                    Scan for the 30-second daily brief , or{" "}
                     <Link href="/?app=1" style={{ color: TEXT.body, fontWeight: 600, textDecoration: "none" }}>open it here →</Link>
                   </span>
                 </div>
@@ -256,7 +256,7 @@ export default async function LandingPage() {
       {/* 3 · The Map ───────────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "48px 24px" }}>
         <div className={styles.inner}>
-          <SectionHead kicker="The map" title="Everything worth knowing, in one place" sub="Not a search box — a curated, current map of the AI ecosystem. Browse by what you're actually doing." />
+          <SectionHead kicker="The map" title="Everything worth knowing, in one place" sub="Not a search box, a curated, current map of the AI ecosystem. Browse by what you're actually doing." />
           <div className={styles.mapGrid}>
             {mapCards.map(({ Icon, title, line, count, chips, href }) => (
               <Link key={title} href={href} style={cardStyle}>
@@ -380,9 +380,9 @@ export default async function LandingPage() {
         <div className={styles.inner}>
           <div className={styles.jobsGrid}>
             {[
-              { Icon: Search, title: "Discover", body: "Surface the agent, model, or MCP server you didn't know to ask for — filed by what you're building, not buried in a feed.", href: "/radar", cta: "Open the Radar" },
-              { Icon: Compass, title: "Track", body: "See what launched, what's trending, and what got deprecated — a calm daily signal that keeps the map honest.", href: "/radar/browse", cta: "Browse what's new" },
-              { Icon: Bookmark, title: "Build", body: "Save any tool into a named Loadout — your RAG stack, your hackathon kit. The map becomes your map.", href: "/radar/toolkit", cta: "Open the Toolkit" },
+              { Icon: Search, title: "Discover", body: "Surface the agent, model, or MCP server you didn't know to ask for, filed by what you're building, not buried in a feed.", href: "/radar", cta: "Open the Radar" },
+              { Icon: Compass, title: "Track", body: "See what launched, what's trending, and what got deprecated, a calm daily signal that keeps the map honest.", href: "/radar/browse", cta: "Browse what's new" },
+              { Icon: Bookmark, title: "Build", body: "Save any tool into a named Loadout. Your RAG stack, your hackathon kit. The map becomes your map.", href: "/radar/toolkit", cta: "Open the Toolkit" },
             ].map(({ Icon, title, body, href, cta }) => (
               <div key={title} style={{ background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "22px" }}>
                 <span style={{ width: "40px", height: "40px", borderRadius: "11px", background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}>
@@ -406,7 +406,7 @@ export default async function LandingPage() {
             </div>
             <div style={{ flex: 1, minWidth: "200px" }}>
               <h3 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Keep it in your pocket</h3>
-              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen — your 30-second daily brief and breaking alerts, one tap away.</p>
+              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen . Your 30-second daily brief and breaking alerts, one tap away.</p>
             </div>
             <Link href="/?app=1" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
               Open the app <ArrowUpRight size={15} strokeWidth={2.3} />
@@ -423,7 +423,7 @@ export default async function LandingPage() {
               <Kicker>Your toolkit</Kicker>
               <h2 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: "10px 0 0", lineHeight: 1.12 }}>Make the map your map.</h2>
               <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.55, margin: "10px 0 18px", maxWidth: "420px" }}>
-                Save any agent, model, MCP server or skill into a named <strong style={{ color: TEXT.primary, fontWeight: 600 }}>Loadout</strong> — a RAG stack, a hackathon kit, a video pipeline. Yours, on-device, no signup.
+                Save any agent, model, MCP server or skill into a named <strong style={{ color: TEXT.primary, fontWeight: 600 }}>Loadout</strong> , a RAG stack, a hackathon kit, a video pipeline. Yours, on-device, no signup.
               </p>
               <Link className="kt-cta" href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
                 Start a Loadout <ArrowRight size={16} strokeWidth={2.4} />
@@ -450,7 +450,7 @@ export default async function LandingPage() {
       {/* 8 · Learn / AEO ───────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "0 24px 48px" }}>
         <div className={styles.inner}>
-          <SectionHead kicker="Learn" title="Straight answers, grounded in the source" sub="The terms everyone uses and few explain — calm, current, and linked to who's actually shipping them." />
+          <SectionHead kicker="Learn" title="Straight answers, grounded in the source" sub="The terms everyone uses and few explain, calm, current, and linked to who's actually shipping them." />
           <div className={styles.learnGrid}>
             {learn.map((l) => (
               <Link key={l.slug} href={`/learn/${l.slug}`} style={cardStyle}>
@@ -514,7 +514,7 @@ export default async function LandingPage() {
           <div style={{ textAlign: "center", borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "40px 24px" }}>
             <h2 style={{ fontFamily: SG, fontSize: "24px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: 0 }}>Calm, source-grounded, free forever.</h2>
             <p style={{ fontSize: "15px", color: TEXT.muted, margin: "10px auto 0", maxWidth: "480px", lineHeight: 1.5 }}>
-              No hype. No paywall. No signup wall. Every claim links to its source — so you can trust the map and move on with your day.
+              No hype. No paywall. No signup wall. Every claim links to its source , so you can trust the map and move on with your day.
             </p>
           </div>
         </div>

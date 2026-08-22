@@ -39,7 +39,7 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
       <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>
-        <span>Kapyn — the calm intelligence layer for AI.</span>
+        <span>Kapyn, the calm intelligence layer for AI.</span>
         <span className={styles.footerDim}>
           Every story that matters, distilled to 30 seconds. No paywall, ever.
         </span>

@@ -104,7 +104,7 @@ export function CompareClient({ embed = false }: { embed?: boolean }) {
                   </span>
                 </td>
                 <td style={{ color: TEXT.muted, fontSize: "12.5px", textTransform: "capitalize" }}>{m.modalities.join(", ")}</td>
-                <td>{m.openWeights ? <Check size={15} strokeWidth={2.5} style={{ color: GOLD }} /> : <span style={{ color: "#5a564f" }}>—</span>}</td>
+                <td>{m.openWeights ? <Check size={15} strokeWidth={2.5} style={{ color: GOLD }} /> : <span style={{ color: "#5a564f" }}>, </span>}</td>
                 <td style={{ color: TEXT.muted, fontSize: "12.5px", maxWidth: "260px" }}>{m.bestFor}</td>
               </tr>
             ))}

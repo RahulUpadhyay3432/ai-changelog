@@ -122,18 +122,18 @@ export function HomeScreenPill() {
             <ol style={{ margin: 0, padding: "0 0 0 16px", fontSize: "12px", color: "#737373", lineHeight: 1.7 }}>
               <li>Tap the <Share size={11} style={{ display: "inline", verticalAlign: "middle" }} /> <strong style={{ color: "#a3a3a3" }}>Share</strong> button in Safari</li>
               <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add to Home Screen"</strong></li>
-              <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add"</strong> — done!</li>
+              <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add"</strong>, done!</li>
             </ol>
           ) : (
             <ol style={{ margin: 0, padding: "0 0 0 16px", fontSize: "12px", color: "#737373", lineHeight: 1.7 }}>
               <li>Tap the <strong style={{ color: "#a3a3a3" }}>⋮ menu</strong> in Chrome</li>
               <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add to Home screen"</strong></li>
-              <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add"</strong> — done!</li>
+              <li>Tap <strong style={{ color: "#a3a3a3" }}>"Add"</strong> , done!</li>
             </ol>
           )}
 
           <p style={{ margin: "10px 0 0", fontSize: "11px", color: "#444", lineHeight: 1.5 }}>
-            Opens like a native app — no browser bar, no friction.
+            Opens like a native app , no browser bar, no friction.
           </p>
         </div>
       )}

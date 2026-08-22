@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const s = getSkill(slug);
   if (!s) return { title: "AI skill not found", robots: { index: false, follow: true } };
   const url = `${APP_URL}/skills/${slug}`;
-  const title = `${s.name} — AI skill for ${s.category}`;
+  const title = `${s.name}, AI skill for ${s.category}`;
   return {
     title,
     description: s.tagline,
@@ -127,7 +127,7 @@ export default async function SkillDetail({ params }: Props) {
         <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em", margin: 0 }}>What it does</h2>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "12px 0 0" }}>{s.description}</p>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "14px 0 0" }}>
-          {s.name} runs inside {platformLabel === "Multi-platform" ? "multiple assistants" : platformLabel.replace(" (ChatGPT)", "")}, so you get a specialised assistant for {s.category.toLowerCase()} without writing a custom prompt — open it and start.
+          {s.name} runs inside {platformLabel === "Multi-platform" ? "multiple assistants" : platformLabel.replace(" (ChatGPT)", "")}, so you get a specialised assistant for {s.category.toLowerCase()} without writing a custom prompt , open it and start.
         </p>
       </section>
 

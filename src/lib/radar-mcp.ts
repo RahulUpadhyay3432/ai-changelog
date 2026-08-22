@@ -142,7 +142,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Git", by: "official", category: "Dev tools",
     tagline: "Run git operations on a local repository.",
-    description: "A reference server exposing git commands — status, diff, log, commit — so an assistant can inspect and manage version history directly.",
+    description: "A reference server exposing git commands, status, diff, log, commit , so an assistant can inspect and manage version history directly.",
     url: "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
   },
   {
@@ -160,7 +160,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Cypress", by: "community", category: "Dev tools",
     tagline: "Run and inspect end-to-end tests from the assistant.",
-    description: "Cypress's MCP server lets an assistant run your end-to-end suite, read failures, and inspect the DOM at each step — one of the production testing platforms wiring directly into agents in 2026.",
+    description: "Cypress's MCP server lets an assistant run your end-to-end suite, read failures, and inspect the DOM at each step, one of the production testing platforms wiring directly into agents in 2026.",
     url: "https://github.com/jams4code/cypress-mcp",
   },
 
@@ -186,7 +186,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Chroma", by: "official", category: "Databases",
     tagline: "Store and semantically search embeddings.",
-    description: "The Chroma MCP server gives an assistant a vector store for retrieval — adding documents, running semantic search, and grounding answers in your own data.",
+    description: "The Chroma MCP server gives an assistant a vector store for retrieval, adding documents, running semantic search, and grounding answers in your own data.",
     url: "https://github.com/chroma-core/chroma-mcp",
   },
   {
@@ -226,7 +226,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Playwright", by: "official", category: "Browser & automation",
     tagline: "Drive a real browser to navigate and act.",
-    description: "Microsoft's Playwright MCP server lets an assistant control a browser — click, type, navigate, and read pages — using accessibility structure rather than screenshots.",
+    description: "Microsoft's Playwright MCP server lets an assistant control a browser, click, type, navigate, and read pages , using accessibility structure rather than screenshots.",
     url: "https://github.com/microsoft/playwright-mcp",
   },
   {
@@ -243,8 +243,8 @@ export const MCP_SERVERS: McpServer[] = [
   },
   {
     name: "Vibium", by: "community", category: "Browser & automation",
-    tagline: "\"Selenium for AI\" — plain-English, self-healing browser tests.",
-    description: "From Selenium's creator Jason Huggins, Vibium ships an MCP server with a full set of browser tools built on WebDriver BiDi — plain-English, self-healing tests an assistant can drive in Cursor or Claude.",
+    tagline: "\"Selenium for AI\", plain-English, self-healing browser tests.",
+    description: "From Selenium's creator Jason Huggins, Vibium ships an MCP server with a full set of browser tools built on WebDriver BiDi, plain-English, self-healing tests an assistant can drive in Cursor or Claude.",
     url: "https://github.com/VibiumDev/vibium",
   },
 
@@ -270,7 +270,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Pipedream", by: "official", category: "Productivity",
     tagline: "Reach 2,500+ apps through one connector.",
-    description: "Pipedream's MCP server exposes thousands of prebuilt actions across 2,500+ APIs, so an assistant can act across your whole SaaS stack — with auth handled — from a single connection.",
+    description: "Pipedream's MCP server exposes thousands of prebuilt actions across 2,500+ APIs, so an assistant can act across your whole SaaS stack, with auth handled , from a single connection.",
     url: "https://github.com/PipedreamHQ/pipedream",
   },
   {
@@ -350,7 +350,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Figma Dev Mode", by: "official", category: "Dev tools",
     tagline: "Pull Figma's official design context into your IDE.",
-    description: "Figma's official Dev Mode MCP server gives an AI coding tool structured access to your selected frames — layout, variables, and components — so generated code matches the design.",
+    description: "Figma's official Dev Mode MCP server gives an AI coding tool structured access to your selected frames, layout, variables, and components , so generated code matches the design.",
     url: "https://developers.figma.com/docs/figma-mcp-server",
   },
   {
@@ -452,7 +452,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Zep", by: "official", category: "Memory & reasoning",
     tagline: "Long-term user memory with semantic search across sessions.",
-    description: "Zep gives an assistant persistent memory with user profiling and semantic recall — facts, preferences and prior context survive across sessions, built for production agent systems.",
+    description: "Zep gives an assistant persistent memory with user profiling and semantic recall, facts, preferences and prior context survive across sessions, built for production agent systems.",
     url: "https://github.com/getzep/zep",
   },
 
@@ -460,25 +460,25 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Vercel", by: "official", category: "Dev tools",
     tagline: "Deploy projects and query logs from the assistant.",
-    description: "Vercel's official MCP server lets an assistant trigger deployments, read build logs, manage environment variables, and inspect project state — all from natural language.",
+    description: "Vercel's official MCP server lets an assistant trigger deployments, read build logs, manage environment variables, and inspect project state, all from natural language.",
     url: "https://vercel.com/docs/mcp/vercel-mcp",
   },
   {
     name: "E2B", by: "official", category: "Dev tools",
     tagline: "Run code in isolated cloud sandboxes.",
-    description: "E2B's MCP server gives an assistant access to secure, long-running cloud sandboxes to execute arbitrary code, install packages, and run processes safely — no local environment needed.",
+    description: "E2B's MCP server gives an assistant access to secure, long-running cloud sandboxes to execute arbitrary code, install packages, and run processes safely, no local environment needed.",
     url: "https://github.com/e2b-dev/mcp-server",
   },
   {
     name: "Stagehand", by: "official", category: "Browser & automation",
     tagline: "Automate browsers using natural language instructions.",
-    description: "Stagehand by Browserbase lets an assistant act on websites in natural language — click, fill forms, and extract data — backed by a managed cloud browser with reliable visual grounding.",
+    description: "Stagehand by Browserbase lets an assistant act on websites in natural language, click, fill forms, and extract data , backed by a managed cloud browser with reliable visual grounding.",
     url: "https://github.com/browserbase/stagehand",
   },
   {
     name: "n8n", by: "official", category: "Productivity",
     tagline: "Trigger and manage workflow automations from the chat.",
-    description: "n8n's MCP server lets an assistant execute workflows, inspect run history, and manage automation pipelines without leaving the conversation — useful for no-code automation at scale.",
+    description: "n8n's MCP server lets an assistant execute workflows, inspect run history, and manage automation pipelines without leaving the conversation, useful for no-code automation at scale.",
     url: "https://github.com/czlonkowski/n8n-mcp",
   },
 
@@ -486,13 +486,13 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "SQLite", by: "official", category: "Databases",
     tagline: "Query and write a local SQLite database.",
-    description: "A reference server for SQLite that lets an assistant read and write a local database file with full SQL support — the simplest way to give a model structured local data.",
+    description: "A reference server for SQLite that lets an assistant read and write a local database file with full SQL support, the simplest way to give a model structured local data.",
     url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
   },
   {
     name: "Qdrant", by: "official", category: "Databases",
     tagline: "Run vector search and manage a Qdrant collection.",
-    description: "Qdrant's official MCP server gives an assistant semantic and hybrid vector search plus collection management — useful for RAG pipelines and similarity-based retrieval.",
+    description: "Qdrant's official MCP server gives an assistant semantic and hybrid vector search plus collection management, useful for RAG pipelines and similarity-based retrieval.",
     url: "https://github.com/qdrant/mcp-server-qdrant",
   },
   {
@@ -504,7 +504,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Snowflake", by: "official", category: "Databases",
     tagline: "Run analytics queries on a Snowflake warehouse.",
-    description: "Snowflake's MCP server lets an assistant query tables, inspect schemas, and run SQL against a cloud data warehouse — turning data questions into direct warehouse calls.",
+    description: "Snowflake's MCP server lets an assistant query tables, inspect schemas, and run SQL against a cloud data warehouse, turning data questions into direct warehouse calls.",
     url: "https://github.com/Snowflake-Labs/mcp",
   },
   {
@@ -518,7 +518,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Google Maps", by: "official", category: "Search & web",
     tagline: "Search places and get directions.",
-    description: "A reference server that adds Google Maps to an assistant — place search, geocoding, directions, and distance calculations for location-aware tasks.",
+    description: "A reference server that adds Google Maps to an assistant, place search, geocoding, directions, and distance calculations for location-aware tasks.",
     url: "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/google-maps",
   },
   {
@@ -532,19 +532,19 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Resend", by: "official", category: "Productivity",
     tagline: "Send transactional and marketing emails.",
-    description: "Resend's official MCP server lets an assistant compose and send emails via the Resend API — useful for building notification flows and outreach automations.",
+    description: "Resend's official MCP server lets an assistant compose and send emails via the Resend API, useful for building notification flows and outreach automations.",
     url: "https://github.com/resend/resend-mcp",
   },
   {
     name: "Airtable", by: "community", category: "Productivity",
     tagline: "Read, create and update Airtable records.",
-    description: "Connects an assistant to Airtable bases to query records, create rows, and update fields — treating your structured data as a lightweight operational database.",
+    description: "Connects an assistant to Airtable bases to query records, create rows, and update fields, treating your structured data as a lightweight operational database.",
     url: "https://github.com/felores/airtable-mcp",
   },
   {
     name: "HubSpot", by: "official", category: "Productivity",
     tagline: "Manage CRM contacts, deals and companies.",
-    description: "HubSpot's MCP server lets an assistant search, create, and update contacts, deals, and companies in your CRM — so sales and support tasks run from natural language.",
+    description: "HubSpot's MCP server lets an assistant search, create, and update contacts, deals, and companies in your CRM, so sales and support tasks run from natural language.",
     url: "https://developers.hubspot.com/mcp",
   },
   {
@@ -556,7 +556,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Twilio", by: "community", category: "Productivity",
     tagline: "Send SMS and voice messages from the assistant.",
-    description: "Connects an assistant to Twilio to send SMS messages and trigger programmatic calls — useful for building notification workflows and conversational outreach.",
+    description: "Connects an assistant to Twilio to send SMS messages and trigger programmatic calls, useful for building notification workflows and conversational outreach.",
     url: "https://github.com/twilio-labs/mcp",
   },
 
@@ -564,13 +564,13 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Firebase", by: "official", category: "Cloud & infra",
     tagline: "Manage Firestore, auth and storage.",
-    description: "Google's official Firebase MCP server lets an assistant interact with Firestore collections, Authentication, and Storage — turning Firebase into a first-class assistant target.",
+    description: "Google's official Firebase MCP server lets an assistant interact with Firestore collections, Authentication, and Storage, turning Firebase into a first-class assistant target.",
     url: "https://firebase.google.com/docs/cli/mcp-server",
   },
   {
     name: "Datadog", by: "official", category: "Cloud & infra",
     tagline: "Query metrics, logs and monitors.",
-    description: "Datadog's MCP server lets an assistant search metrics, logs, traces, and alerts — so observability data is reachable in the chat for incident investigation and debugging.",
+    description: "Datadog's MCP server lets an assistant search metrics, logs, traces, and alerts, so observability data is reachable in the chat for incident investigation and debugging.",
     url: "https://docs.datadoghq.com/bits_ai/mcp_server/",
   },
   // ── Refreshed July 2026 (GitHub trending + market scan) ──

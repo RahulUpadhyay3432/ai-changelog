@@ -169,7 +169,7 @@ export function PulseClient({
           This week in AI
         </h1>
         <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.55, margin: "12px 0 0", maxWidth: "560px" }}>
-          The tools, servers, and stories gaining momentum right now — ranked by movement, not popularity.
+          The tools, servers, and stories gaining momentum right now, ranked by movement, not popularity.
         </p>
 
         {/* Stat tiles */}
@@ -235,13 +235,13 @@ export function PulseClient({
         <section style={{ padding: "26px 24px", borderRadius: "18px", background: SURFACE, border: `1px solid ${HAIRLINE}`, boxShadow: INNER_HIGHLIGHT }}>
           <h2 style={{ fontFamily: SG, fontSize: "19px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", margin: 0 }}>Get this weekly, in your inbox</h2>
           <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.55, margin: "8px 0 16px", maxWidth: "520px" }}>
-            One calm email every Monday — the movement that mattered. No hype, no noise.
+            One calm email every Monday , the movement that mattered. No hype, no noise.
           </p>
           <EmailCapture source="pulse" />
         </section>
 
         <p style={{ marginTop: "28px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.6 }}>
-          Refreshed daily from GitHub, Product Hunt, the official MCP registry, and Kapyn&apos;s news stream. Ranked by momentum — new and fast-rising, not just popular.
+          Refreshed daily from GitHub, Product Hunt, the official MCP registry, and Kapyn&apos;s news stream. Ranked by momentum , new and fast-rising, not just popular.
         </p>
       </div>
     </div>

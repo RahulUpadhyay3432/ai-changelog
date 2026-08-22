@@ -374,7 +374,7 @@ export function HackathonsClient({ hackathons }: { hackathons: Hackathon[] }) {
         <div style={{ padding: "40px 32px", textAlign: "center" }}>
           <Trophy size={26} color="var(--kt-text-muted, #3a3a3a)" strokeWidth={1.6} style={{ marginBottom: "12px" }} />
           <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.5, margin: 0, maxWidth: "260px", marginInline: "auto" }}>
-            {hackathons.length === 0 ? "No hackathons loaded yet — check back after the next refresh." : "Nothing matches these filters."}
+            {hackathons.length === 0 ? "No hackathons loaded yet, check back after the next refresh." : "Nothing matches these filters."}
           </p>
           {isFiltered && (
             <button onClick={clearFilters} style={{ marginTop: "14px", background: "none", border: `1px solid ${HAIRLINE}`, borderRadius: "100px", padding: "7px 16px", color: TEXT.muted, fontSize: "13px", cursor: "pointer", fontFamily: SG }}>

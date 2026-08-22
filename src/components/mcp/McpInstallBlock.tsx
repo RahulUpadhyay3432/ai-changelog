@@ -91,7 +91,7 @@ export function McpInstallBlock({
       <h2 style={h2}>Installing {name}</h2>
       <p style={{ fontSize: "15px", color: "#a3a3a3", lineHeight: 1.7, margin: "8px 0 18px" }}>
         {install.remoteUrl
-          ? "A hosted server — connect to the endpoint, nothing to run locally."
+          ? "A hosted server, connect to the endpoint, nothing to run locally."
           : install.command === "docker"
             ? "Runs as a container. Docker must be installed."
             : install.command === "uvx"
@@ -137,7 +137,7 @@ export function McpInstallBlock({
             (acc, el, i) => (i === 0 ? [el] : [...acc, ", ", el]),
             [],
           )}
-          {" — get "}
+          {", get "}
           {install.env.length > 1 ? "these" : "this"} from{" "}
           <a href={docsUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#cbc7bf" }}>
             the maintainer

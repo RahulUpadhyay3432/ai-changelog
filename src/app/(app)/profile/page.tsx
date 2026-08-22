@@ -163,7 +163,7 @@ export default function ProfilePage() {
         >
           <Bookmark size={16} color="#fbbf24" style={{ opacity: savedCount > 0 ? 1 : 0.4 }} />
           <span style={{ fontSize: "24px", fontWeight: 800, color: "var(--kt-text-primary, #f5f5f5)", letterSpacing: "-0.03em", lineHeight: 1, marginTop: "4px" }}>
-            {isLoading ? "—" : savedCount}
+            {isLoading ? ", " : savedCount}
           </span>
           <span style={{ fontSize: "11px", color: "var(--kt-text-muted, #737373)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Saved
@@ -193,7 +193,7 @@ export default function ProfilePage() {
             style={{ animationDuration: "2s" }}
           />
           <span style={{ fontSize: "24px", fontWeight: 800, color: streakCount > 0 ? "#f97316" : "var(--kt-text-primary, #f5f5f5)", letterSpacing: "-0.03em", lineHeight: 1, marginTop: "2px" }}>
-            {isLoading ? "—" : `${streakCount}d`}
+            {isLoading ? ", " : `${streakCount}d`}
           </span>
           <span style={{ fontSize: "11px", color: streakCount > 0 ? "#ea580c" : "var(--kt-text-muted, #737373)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Streak
@@ -467,7 +467,7 @@ export default function ProfilePage() {
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.6, margin: "0 0 12px", fontWeight: 500 }}>
-            Kapyn delivers AI and tech news in 30-second reads — no noise, no paywalls.
+            Kapyn delivers AI and tech news in 30-second reads, no noise, no paywalls.
           </p>
           <p style={{ fontSize: "13px", color: "var(--kt-text-muted, #525252)", lineHeight: 1.6, margin: 0 }}>
             Sources: OpenAI Blog · Google DeepMind · Hugging Face · TechCrunch AI · VentureBeat · The Verge · Ars Technica · MIT Tech Review · Microsoft AI

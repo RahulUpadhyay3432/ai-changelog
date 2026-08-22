@@ -50,12 +50,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = (
     explainer?.definition ??
     entity.shortDesc ??
-    `${entity.canonicalName}, explained — plus the latest news.`
+    `${entity.canonicalName}, explained, plus the latest news.`
   ).slice(0, 155);
   // Page <title> is templated to "… | Kapyn" by the root layout; OG/Twitter
   // aren't templated, so they carry the branded suffix explicitly.
   const title = `${entity.canonicalName}: what it is and why it matters`;
-  const socialTitle = `${title} — Kapyn`;
+  const socialTitle = `${title} , Kapyn`;
   const url = `${APP_URL}/learn/${entity.slug}`;
 
   return {
@@ -156,7 +156,7 @@ export default async function LearnPage({ params }: Props) {
 
         {explainer && (
           <p className={styles.payoff} style={{ color: accent }}>
-            You can now explain {entity.canonicalName} — what it is, how it works, and why it matters.
+            You can now explain {entity.canonicalName} , what it is, how it works, and why it matters.
           </p>
         )}
 

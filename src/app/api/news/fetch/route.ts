@@ -135,7 +135,7 @@ function getSupabaseAdmin() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!serviceKey) {
-    console.warn("SUPABASE_SERVICE_ROLE_KEY not set — falling back to anon key. Add it to Vercel env vars.");
+    console.warn("SUPABASE_SERVICE_ROLE_KEY not set, falling back to anon key. Add it to Vercel env vars.");
   }
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -179,23 +179,23 @@ function buildClassifyAndSummarizePrompt(
 Classify this dispatch into ONE category slug and write a summary.
 
 CATEGORIES:
-  ai-models      — LLMs, model releases, benchmarks, capabilities, multimodal AI
+  ai-models, LLMs, model releases, benchmarks, capabilities, multimodal AI
                    e.g. "GPT-5 Released", "Claude Scores SOTA on MMLU", "Gemini 2.0 Launch"
-  dev-tools      — Commercial/hosted dev tools, APIs, SDKs, frameworks, CLIs, plugins
+  dev-tools      , Commercial/hosted dev tools, APIs, SDKs, frameworks, CLIs, plugins
                    e.g. "LangChain 0.3 Adds Agent Memory", "Cursor Gets Multi-File Edit Mode"
-  open-source    — New open-source projects, GitHub releases, OSS tools gaining traction
+  open-source    , New open-source projects, GitHub releases, OSS tools gaining traction
                    e.g. "New OSS vector DB hits 10k stars", "Show HN: CLI tool for LLM evals"
-  startups       — New companies, product launches, pivots, early-stage growth
+  startups       , New companies, product launches, pivots, early-stage growth
                    e.g. "Cohere Launches Enterprise Platform", "AI writing startup raises seed"
-  research       — Academic papers, lab findings, benchmarks, evals, university research
+  research       , Academic papers, lab findings, benchmarks, evals, university research
                    e.g. "DeepMind Paper on Reasoning", "MIT Study on LLM Hallucination"
-  funding-ma     — Funding rounds, acquisitions, mergers, acqui-hires, strategic investments
+  funding-ma     , Funding rounds, acquisitions, mergers, acqui-hires, strategic investments
                    e.g. "Anthropic Raises $4B Series E", "Microsoft Acquires Inflection AI"
-  big-tech       — FAANG+, cloud providers (AWS/GCP/Azure), enterprise AI platform updates
+  big-tech       , FAANG+, cloud providers (AWS/GCP/Azure), enterprise AI platform updates
                    e.g. "Google Releases Gemini Ultra", "AWS Bedrock Adds Claude 3"
-  infrastructure — Chips, GPUs, data centers, cloud compute, hardware, edge AI deployment
+  infrastructure , Chips, GPUs, data centers, cloud compute, hardware, edge AI deployment
                    e.g. "Nvidia H200 Now Shipping", "Meta Builds 100K GPU Cluster"
-  policy         — AI regulation, governance, safety frameworks, government orders, compliance
+  policy         , AI regulation, governance, safety frameworks, government orders, compliance
                    e.g. "EU AI Act Enforcement Begins", "Biden Signs AI Executive Order"
 
 If genuinely unsure, use default: ${defaultCategory}
@@ -204,19 +204,20 @@ SUMMARY RULES:
 - FIRST SENTENCE: A single punchy line (10-15 words max) saying exactly what this IS. For products: "X is a [what it does]." For news: the core fact in one line.
 - THEN 2-3 sentences of detail: what changed or was announced, key numbers, why it matters to AI developers
 - Plain English, present tense, active voice
-- Make it substantial — readers should feel informed after reading
+- Make it substantial , readers should feel informed after reading
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
 - NEVER start with "This article", "This release", or "This post"
-- If ONLY a minor patch (dep bump, typo fix, internal refactor — no user-facing change): write LOW_SIGNAL
+- NEVER use em dashes. Use a comma, a colon, or a full stop instead. Em dashes read as machine-written
+- If ONLY a minor patch (dep bump, typo fix, internal refactor , no user-facing change): write LOW_SIGNAL
 - If it is a retirement/deprecation notice for a niche cloud service most AI developers wouldn't know (e.g. "Azure Form Recognizer v2 retiring"): write LOW_SIGNAL. But if it affects a widely-used API or platform (e.g. "OpenAI deprecates GPT-3 API"): cover it normally
-- RELEVANCE GATE (strict — Kapyn is an AI feed): write OFF_TOPIC unless the story is genuinely about AI or machine learning, or the models, developer tools, infrastructure, research, funding, or policy that AI builders actually care about. A company merely being a startup or "in tech" is NOT enough — there must be a real AI/ML angle. Reject as OFF_TOPIC: consumer/D2C brands, general retail, fintech or SaaS with no AI angle, exam or education results (e.g. NEET/board results), sports, entertainment, crypto price moves, and generic business news.
+- RELEVANCE GATE (strict , Kapyn is an AI feed): write OFF_TOPIC unless the story is genuinely about AI or machine learning, or the models, developer tools, infrastructure, research, funding, or policy that AI builders actually care about. A company merely being a startup or "in tech" is NOT enough , there must be a real AI/ML angle. Reject as OFF_TOPIC: consumer/D2C brands, general retail, fintech or SaaS with no AI angle, exam or education results (e.g. NEET/board results), sports, entertainment, crypto price moves, and generic business news.
 
 ENTITY EXTRACTION:
-- After the summary, list up to 6 specific named entities this story is actually ABOUT — models, tools, companies, techniques, or concepts (e.g. GPT-5, vLLM, Anthropic, RAG, mixture of experts).
+- After the summary, list up to 6 specific named entities this story is actually ABOUT , models, tools, companies, techniques, or concepts (e.g. GPT-5, vLLM, Anthropic, RAG, mixture of experts).
 - Only real subjects, not passing mentions. Use the most common canonical name. Skip generic words (AI, software, model, technology, startup).
 - Output a compact JSON array on one line. If none, output [].
 
-Respond in EXACTLY this format — no extra text before or after:
+Respond in EXACTLY this format , no extra text before or after:
 CATEGORY: <slug>
 SUMMARY: <2-3 sentences or LOW_SIGNAL>
 ENTITIES: [{"name":"<name>","type":"<model|tool|company|technique|concept>"}]
@@ -431,10 +432,10 @@ function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
 
 function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
   return repos.map((repo) => ({
-    // Title: "repo-name — one-line description" so cards are readable without
+    // Title: "repo-name, one-line description" so cards are readable without
     // the full summary. Falls back to just the repo name if no description.
     title: repo.description
-      ? `${repo.name} — ${repo.description.slice(0, 120)}`
+      ? `${repo.name} , ${repo.description.slice(0, 120)}`
       : repo.name,
     sourceUrl: repo.htmlUrl,
     sourceName: "GitHub",
@@ -554,9 +555,9 @@ async function insertItems(
       // provider outage doesn't bury it under a hundred identical errors.
       if (!results.llmError) {
         results.llmError = outcome.reason;
-        results.errors.push(`LLM failed — ${outcome.reason}`);
+        results.errors.push(`LLM failed , ${outcome.reason}`);
       }
-      results.errors.push(`LLM failed for "${item.title}" — skipped`);
+      results.errors.push(`LLM failed for "${item.title}" , skipped`);
       return;
     }
     results.llmProviders[outcome.provider] = (results.llmProviders[outcome.provider] ?? 0) + 1;
@@ -645,7 +646,7 @@ export async function GET(request: NextRequest) {
         if (!r.ok || isBadSummary(r.value.summary)) {
           results.errors.push(
             !r.ok
-              ? `Re-summary failed for "${item.title}" — ${r.reason}`
+              ? `Re-summary failed for "${item.title}" , ${r.reason}`
               : `Bad re-summary skipped for "${item.title}"`,
           );
           continue;

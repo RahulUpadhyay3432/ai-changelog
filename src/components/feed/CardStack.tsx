@@ -3,11 +3,12 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { CompletionCard } from "./CompletionCard";
 import { NotificationCard } from "./NotificationCard";
+import { TopicPickerCard } from "./TopicPickerCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
 import { shouldShowNotifCard } from "@/lib/notifications";
-import { updateStreak } from "@/lib/storage";
+import { updateStreak, getFeedPrefs } from "@/lib/storage";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
@@ -29,10 +30,17 @@ const DIRECTION_LOCK_THRESHOLD = 8;
 // end-of-stack. The old end-only placement sat after ~100 cards, so virtually
 // nobody reached it → virtually no subscribers → push reached no one.
 const NOTIF_SLOT = 5;
+// The topic picker sits at slot 2, not 5. Measured: over half of all feed
+// sessions end on card 0, so anything deeper reaches almost nobody — and picking
+// a category in the first session is the strongest retention predictor we have
+// with a real sample (24.5% return vs a 9.5% baseline, n=98).
+// See docs/analytics-findings-aug-2026.md.
+const TOPIC_SLOT = 2;
 
 type FeedEntry =
   | { type: "news"; item: NewsItem; newsIdx: number }
-  | { type: "notif" };
+  | { type: "notif" }
+  | { type: "topics" };
 
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
@@ -46,6 +54,10 @@ export function CardStack({
   // Push opt-in interstitial (end-of-feed). Gated client-side to avoid a
   // hydration mismatch — shouldShowNotifCard() reads localStorage + permission.
   const [showNotif, setShowNotif] = useState(false);
+  // Only for people who have never expressed a preference — getFeedPrefs()
+  // returns null until they do, so this never nags a returning user.
+  const [showTopics, setShowTopics] = useState(false);
+  useEffect(() => { setShowTopics(getFeedPrefs() === null); }, []);
   useEffect(() => { setShowNotif(shouldShowNotifCard()); }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,8 +97,12 @@ export function CardStack({
     if (showNotif && entries.length > NOTIF_SLOT) {
       entries.splice(NOTIF_SLOT, 0, { type: "notif" });
     }
+    // Spliced after the notif so its index isn't shifted by this insert.
+    if (showTopics && entries.length > TOPIC_SLOT) {
+      entries.splice(TOPIC_SLOT, 0, { type: "topics" });
+    }
     return entries;
-  }, [items, showNotif]);
+  }, [items, showNotif, showTopics]);
 
   useEffect(() => {
     updateStreak();
@@ -338,7 +354,7 @@ export function CardStack({
       >
         {feedEntries.map((entry) => (
           <div
-            key={entry.type === "news" ? entry.item.id : "push-optin"}
+            key={entry.type === "news" ? entry.item.id : entry.type}
             style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
           >
             {entry.type === "news" ? (
@@ -347,6 +363,8 @@ export function CardStack({
                 onSave={onSave}
                 isNew={lastVisit != null && new Date(entry.item.publishedAt).getTime() > lastVisit}
               />
+            ) : entry.type === "topics" ? (
+              <TopicPickerCard onDone={() => setShowTopics(false)} />
             ) : (
               <NotificationCard onDone={() => setShowNotif(false)} />
             )}

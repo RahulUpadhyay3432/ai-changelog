@@ -5,6 +5,7 @@ import { BLOG_POSTS } from "@/lib/blog-content";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
 import { MODEL_PAIRS, pairSlug } from "@/lib/model-pairs";
+import { getAllTools } from "@/lib/tools-registry";
 import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";
@@ -101,6 +102,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${APP_URL}/explore`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/compare`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    // Only tools with enough curated peers get an alternatives page — mirrors
+    // the MIN_ALTERNATIVES guard on the route so the sitemap never lists a 404.
+    ...getAllTools()
+      .filter((tl, _i, arr) => arr.filter((o) => o.category === tl.category).length - 1 >= 3)
+      .map((tl) => ({
+        url: `${APP_URL}/tools/${tl.slug}/alternatives`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })),
     ...MODEL_PAIRS.map((pr) => ({
       url: `${APP_URL}/compare/${pairSlug(pr)}`,
       lastModified: new Date(),

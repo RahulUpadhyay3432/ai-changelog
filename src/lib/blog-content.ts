@@ -45,6 +45,8 @@ export interface BlogPost {
   body: BlogBlock[];
 }
 
+import { INDIA_POSTS } from "./blog-india";
+
 // Unsplash served via plain <img> (no next/image remote config needed). Sizing
 // params keep payloads small; the standard Unsplash license permits free use.
 const U = (id: string, w = 1600) =>
@@ -4240,6 +4242,9 @@ limit 8;`,
       },
     ],
   },
+
+  // India vertical + city hubs — see src/lib/blog-india.ts
+  ...INDIA_POSTS,
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

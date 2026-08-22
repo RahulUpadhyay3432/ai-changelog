@@ -144,6 +144,22 @@ export default async function ToolDetailPage({ params }: Props) {
         <McpInstallBlock name={tool.name} install={getMcpInstall(tool.url)} docsUrl={tool.url} />
       )}
 
+      {getAllTools().filter((t) => t.slug !== tool.slug && t.category === tool.category).length >= 3 && (
+        <section style={{ margin: "30px 0 0" }}>
+          <Link
+            href={`/tools/${tool.slug}/alternatives`}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG,
+              fontSize: "14px", fontWeight: 600, color: GOLD,
+              border: `1px solid ${HAIRLINE}`, borderRadius: "12px",
+              padding: "11px 18px", textDecoration: "none",
+            }}
+          >
+            See {tool.name} alternatives
+          </Link>
+        </section>
+      )}
+
       {/* Similar tools */}
       {similar.length > 0 && (
         <section style={{ margin: "40px 0 0" }}>

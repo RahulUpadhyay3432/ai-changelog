@@ -268,6 +268,29 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   throw lastErr;
 }
 
+// DeepSeek's OpenAI-compatible endpoint. v4-flash is the cheap tier and is more
+// than capable of classify-and-summarise; verified against the real prompt, its
+// output parses with parseClassifyResponse unchanged.
+async function callDeepSeek(prompt: string): Promise<string> {
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) throw new Error("DEEPSEEK_API_KEY missing");
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: "deepseek-v4-flash",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+  });
+  if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("DeepSeek returned empty response");
+  return text;
+}
+
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -283,7 +306,7 @@ async function callGemini(prompt: string): Promise<string> {
 }
 
 type ClassifyOutcome =
-  | { ok: true; value: ClassifyResult }
+  | { ok: true; value: ClassifyResult; provider: string }
   | { ok: false; reason: string };
 
 /**
@@ -295,20 +318,42 @@ type ClassifyOutcome =
  * plain `429 RESOURCE_EXHAUSTED — prepayment credits are depleted`. Never
  * swallow this again; the reason is the whole diagnostic.
  */
+// Ordered provider chain. Cheapest first; each is skipped when its key is absent.
+//
+// This is a chain rather than one provider because a single-provider summariser
+// is a single point of failure for the entire feed: when Gemini's prepaid credits
+// ran out on ~2026-08-11, ingestion kept fetching stories and dropping every one
+// of them for eleven days. Any one provider can now go down without freezing the
+// feed. Add keys, not conditionals.
+const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
+  { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
+  { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
+];
+
 async function classifyAndSummarize(
   title: string,
   content: string,
   defaultCategory: CategorySlug
 ): Promise<ClassifyOutcome> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
-  // Gemini only (the main key), retried on transient rate-limit / 5xx errors so a
-  // single 429 no longer silently drops the story.
-  try {
-    const raw = await withRetry(() => callGemini(prompt));
-    return { ok: true, value: parseClassifyResponse(raw, defaultCategory) };
-  } catch (err) {
-    return { ok: false, reason: String(err).slice(0, 300) };
+  const reasons: string[] = [];
+
+  for (const provider of LLM_PROVIDERS) {
+    if (!process.env[provider.envKey]) continue;
+    try {
+      // Retry handles transient 429/5xx within a provider; the loop handles a
+      // provider being down or out of credit entirely.
+      const raw = await withRetry(() => provider.call(prompt));
+      return { ok: true, value: parseClassifyResponse(raw, defaultCategory), provider: provider.name };
+    } catch (err) {
+      reasons.push(`${provider.name}: ${String(err).slice(0, 160)}`);
+    }
   }
+
+  return {
+    ok: false,
+    reason: reasons.length ? reasons.join(" | ") : "no LLM provider configured",
+  };
 }
 
 // ─── Feed types ───────────────────────────────────────────────────────────────
@@ -407,6 +452,8 @@ type IngestResults = {
   llmFailed: number;
   /** First provider error seen, verbatim — the thing you actually need to debug. */
   llmError: string | null;
+  /** Which provider(s) produced summaries this run. */
+  llmProviders: Record<string, number>;
   entitiesUpserted: number;
   mentionsLinked: number;
   errors: string[];
@@ -507,6 +554,7 @@ async function insertItems(
       results.errors.push(`LLM failed for "${item.title}" — skipped`);
       return;
     }
+    results.llmProviders[outcome.provider] = (results.llmProviders[outcome.provider] ?? 0) + 1;
     const { category, summary, entities } = outcome.value;
     if (isBadSummary(summary)) { results.lowSignal++; return; }
 
@@ -713,7 +761,7 @@ export async function GET(request: NextRequest) {
 
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
-    llmFailed: 0, llmError: null,
+    llmFailed: 0, llmError: null, llmProviders: {},
     entitiesUpserted: 0, mentionsLinked: 0, errors: [],
   };
 
@@ -760,6 +808,7 @@ export async function GET(request: NextRequest) {
       low_signal: results.lowSignal,
       llm_failed: results.llmFailed,
       llm_error: results.llmError,
+      llm_providers: JSON.stringify(results.llmProviders),
       entities_upserted: results.entitiesUpserted,
       mentions_linked: results.mentionsLinked,
       errors: results.errors.length,

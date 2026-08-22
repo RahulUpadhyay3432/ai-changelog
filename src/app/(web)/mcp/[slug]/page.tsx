@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { MCP_SERVERS, MCP_CATEGORY_EMOJI, githubFullName, type McpServer } from "@/lib/radar-mcp";
 import { slugify } from "@/lib/entities";
+import { getMcpInstall, claudeCodeCommand } from "@/lib/mcp-install";
+import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
 
 const APP_URL = "https://kapyn.app";
@@ -40,6 +42,7 @@ export default async function McpDetail({ params }: Props) {
   if (!s) notFound();
 
   const repo = githubFullName(s.url);
+  const install = getMcpInstall(s.url);
   const related = MCP_SERVERS.filter((x) => x.category === s.category && x.name !== s.name).slice(0, 6);
   const url = `${APP_URL}/mcp/${slug}`;
   const answer = `${s.tagline} ${s.description}`;
@@ -59,9 +62,38 @@ export default async function McpDetail({ params }: Props) {
     "@type": "FAQPage",
     mainEntity: [
       { "@type": "Question", name: `What is the ${s.name} MCP server?`, acceptedAnswer: { "@type": "Answer", text: answer } },
+      ...(install
+        ? [{
+            "@type": "Question",
+            name: `How do I install the ${s.name} MCP server?`,
+            acceptedAnswer: { "@type": "Answer", text: `Run: ${claudeCodeCommand(s.name, install)}` },
+          }]
+        : []),
       { "@type": "Question", name: `Is the ${s.name} MCP server official?`, acceptedAnswer: { "@type": "Answer", text: s.by === "official" ? `Yes — ${s.name} is an official MCP server.` : `${s.name} is a community-built MCP server.` } },
     ],
   };
+  const howToLd = install
+    ? {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: `How to install the ${s.name} MCP server`,
+        description: `Add ${s.name} to Claude Code, Claude Desktop, Cursor or VS Code.`,
+        step: [
+          {
+            "@type": "HowToStep",
+            position: 1,
+            name: "Add the server",
+            text: claudeCodeCommand(s.name, install),
+          },
+          {
+            "@type": "HowToStep",
+            position: 2,
+            name: "Restart your client",
+            text: `Restart the client so it picks up ${s.name}, then confirm the tools are listed.`,
+          },
+        ],
+      }
+    : null;
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -79,6 +111,7 @@ export default async function McpDetail({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {howToLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />}
 
       <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: SG, fontSize: "13px", fontWeight: 600, color: "#a3a3a3", textDecoration: "none", margin: "0 0 18px" }}>
         <ArrowLeft size={14} strokeWidth={2.3} /> MCP servers
@@ -111,6 +144,8 @@ export default async function McpDetail({ params }: Props) {
           Browse all MCP servers
         </Link>
       </div>
+
+      <McpInstallBlock name={s.name} install={install} docsUrl={s.url} />
 
       {/* What it does */}
       <section style={{ margin: "34px 0 0" }}>

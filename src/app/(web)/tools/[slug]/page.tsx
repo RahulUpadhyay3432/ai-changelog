@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ArrowRight } from "lucide-react";
 import { getAllTools, getToolBySlug, similarTools, kindLabel } from "@/lib/tools-registry";
+import { getMcpInstall } from "@/lib/mcp-install";
+import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { CoverImage } from "@/app/(radar)/radar/radar-shared";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SURFACE, SG, TEXT } from "@/lib/design-tokens";
 
@@ -135,6 +137,12 @@ export default async function ToolDetailPage({ params }: Props) {
           <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px", fontWeight: 600, color: GOLD, marginTop: "4px", fontFamily: SG, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hostOf(tool.url)} <ArrowUpRight size={13} strokeWidth={2.4} /></span>
         </a>
       </section>
+
+      {/* MCP install — this is the in-app landing page for curated MCP servers
+          (McpMarketClient routes taps to /tools/[slug]), so it belongs here too. */}
+      {tool.kind === "mcp" && (
+        <McpInstallBlock name={tool.name} install={getMcpInstall(tool.url)} docsUrl={tool.url} />
+      )}
 
       {/* Similar tools */}
       {similar.length > 0 && (

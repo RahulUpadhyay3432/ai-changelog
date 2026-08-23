@@ -5,7 +5,8 @@ import { BLOG_POSTS } from "@/lib/blog-content";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
 import { AI_SKILLS } from "@/lib/radar-skills";
 import { MODEL_PAIRS, pairSlug } from "@/lib/model-pairs";
-import { getAllTools, getPromotedToolPages } from "@/lib/tools-registry";
+import { getAllTools } from "@/lib/tools-registry";
+import { getPromotedToolPages } from "@/lib/promoted-tools";
 import { slugify } from "@/lib/entities";
 
 export const dynamic = "force-dynamic";

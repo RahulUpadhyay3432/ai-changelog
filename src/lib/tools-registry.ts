@@ -3,10 +3,15 @@
 // into one addressable list with a stable slug per tool. Powers the tool detail
 // pages (/tools/[slug]), "similar tools", and slug lookups from cards/search.
 // The three static catalogs are always page-backed. Discovered items (GitHub
-// trending, Product Hunt) are NOT in this synchronous registry — they live in
-// radar_tools and are resolved asynchronously by getPromotedTool() below, but
-// only once they clear the promotion gate in knowledge.ts. That gate is what
-// keeps auto-generated pages from becoming thin doorway pages.
+// trending, Product Hunt) live in radar_tools and are resolved separately by
+// src/lib/promoted-tools.ts, once they clear its quality gate.
+//
+// That split is deliberate. This module must stay free of runtime dependencies:
+// it reads three static arrays and needs no database, no network and no env.
+// Importing the DB-backed half here made `import { getAllTools }` fail with
+// "supabaseUrl is required" in any context without Supabase credentials — a
+// script, a test, a build step — for a question that never needed a database.
+// Keep the async, DB-backed half in promoted-tools.ts.
 
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
@@ -109,53 +114,6 @@ export function similarTools(tool: UnifiedTool, n = 6): UnifiedTool[] {
   return [...sameCat, ...sameKind].slice(0, n);
 }
 
-// ── Discovered tools promoted to their own page ──────────────────────────────
-//
-// The pipeline finds tools every day and renders them in the Radar, but nothing
-// here was reachable by search — the catalog looked static to Google while
-// actually growing. These helpers close that gap.
-//
-// Async on purpose: promotion depends on live traction and persistence data, so
-// it cannot live in the module-level REGISTRY above. Callers union the two.
-
-import { getPromotedTools, type PromotedTool } from "./knowledge";
-
-function promotedToUnified(p: PromotedTool): UnifiedTool {
-  return {
-    slug: slugify(p.name),
-    kind: "tool",
-    name: p.name,
-    valueLine: p.valueLine,
-    description: p.description ?? undefined,
-    category: p.source === "producthunt" ? "New launches" : "Trending open source",
-    url: p.url,
-  };
-}
-
-/**
- * Promoted tools as UnifiedTool, with any slug that already belongs to a curated
- * entry dropped. The curated version always wins: it has hand-written depth,
- * where a promoted entry has an LLM one-liner.
- */
-export async function getPromotedToolPages(): Promise<UnifiedTool[]> {
-  try {
-    const promoted = await getPromotedTools();
-    const taken = new Set(REGISTRY.map((t) => t.slug));
-    const seen = new Set<string>();
-    return promoted.flatMap((p) => {
-      const u = promotedToUnified(p);
-      if (!u.slug || taken.has(u.slug) || seen.has(u.slug)) return [];
-      seen.add(u.slug);
-      return [u];
-    });
-  } catch {
-    return []; // DB unreachable → fall back to the curated set, never a broken build
-  }
-}
-
-/** Curated first, then promoted. Returns undefined when neither has the slug. */
-export async function getToolBySlugAsync(slug: string): Promise<UnifiedTool | undefined> {
-  const curated = getToolBySlug(slug);
-  if (curated) return curated;
-  return (await getPromotedToolPages()).find((t) => t.slug === slug);
-}
+/** Slugs already owned by the curated catalog. Used by promoted-tools.ts to
+ *  make sure a discovered entry never shadows a hand-written one. */
+export const REGISTRY_SLUGS: ReadonlySet<string> = new Set(REGISTRY.map((t) => t.slug));

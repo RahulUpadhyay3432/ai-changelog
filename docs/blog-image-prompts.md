@@ -1,211 +1,199 @@
 # Blog hero image prompts
 
-**Status: 59 posts, 28 distinct images. 41 of those posts share just 11 images.**
-This file has a subject line for every post, so the set can become one image per post.
+## What went wrong the first time, and the rule that follows
 
-## Read this first — the one thing that decides if it works
+Version one produced near-identical circuit-board schematics from different
+prompts. The cause was a balance error, and it is worth stating plainly so the
+same mistake does not get rebuilt:
 
-59 images generated from 59 unrelated prompts will look like 59 different blogs.
-The fix is that **every prompt starts with the identical STYLE BLOCK below** and
-varies only the SUBJECT line. That constant is what turns separate generations
-into a visual system.
+- The **style block was ~150 words of concrete visual instruction**. The
+  **subject lines were ~15 words of abstract geometry**. A model weights the
+  long concrete part and discards the short vague part.
+- "Two mirrored line-structures facing each other" is not a subject. It is a
+  description of a composition, and there is no such object to photograph. With
+  nothing real to render, every generation fell back on the only concrete thing
+  in the prompt: *flat vector, thin strokes, technical schematic, instrument
+  panel*. That phrase resolves to PCB traces essentially every time.
 
-Variety then comes from **geometry, not styling**. Each cluster below has its own
-motif family (comparisons are bilateral, explainers show one mechanism, opinions
-break a pattern), so the set reads as coherent without any two images being the
-same picture.
+**The rule now: the subject carries the image, the treatment only unifies it.**
 
-Two hard constraints from the actual page CSS:
+- Every subject below is a **real, physical, photographable thing** with named
+  materials. Two subjects cannot collapse into each other because a pegboard of
+  hand tools and a darkroom enlarger are not the same object.
+- The treatment block describes **light, palette, framing and mood only**. It
+  never says what things look like. It is short on purpose so the subject wins.
+- Subject goes **first** in the prompt. Early tokens carry more weight.
 
-- **No text, letters, numbers or logos in the image.** `blog.module.css` overlays
-  the post title, tag and deck on top of the hero. Any text in the image collides.
-- **Keep the bottom-left third calm and dark.** That is exactly where the title
-  sits, under a gradient scrim. Detail belongs top-right.
+The images already on the blog that work, network cables patched into a switch,
+modular components on a workbench, hand tools on a pegboard, are all real
+photographs of real objects. That is the target.
 
-Hero is `min-height: 380px` (280 on mobile) at full content width, `object-fit:
-cover`. Generate **1600x900**; the centre is what survives the crop.
+## Two hard constraints from the page CSS
+
+- **No text, letters, numbers or logos.** `blog.module.css` overlays the post
+  title, tag and deck on the hero. Anything written in the image collides.
+- **The lower-left third must fall away to near-black.** That is exactly where
+  the title sits under the gradient scrim.
+
+Hero is 380px tall on desktop, 280 on mobile, `object-fit: cover`. Generate
+**1600x900** or the nearest 16:9 the tool offers.
 
 ---
 
-## STYLE BLOCK — paste this before every subject
+## TREATMENT — paste this AFTER the subject
 
 ```
-A wide 16:9 abstract graphic for a technical article hero image.
+Photographed as an editorial still life. Wide 16:9 frame.
 
-Style: flat vector geometry on a very dark warm-black background (#0c0b0a).
-Thin precise line work, 1-2px strokes, in muted grey-white. A single accent
-colour, blue #3b82f6, used sparingly on no more than 15% of the image.
-Calm, editorial, restrained. Think technical schematic or instrument panel,
-not illustration.
+Low-key lighting from a single soft source at the upper right, falling away
+into deep shadow toward the lower left. Warm near-black background, #0c0b0a.
+Muted desaturated colour throughout with one restrained cool-blue note.
+Shallow depth of field, 50mm, honest texture, visible material grain, real
+wear. Quiet and considered, not dramatic.
 
-Composition: visual detail concentrated in the upper-right. The lower-left
-third must stay near-empty and dark. Generous negative space throughout.
+The lower-left third of the frame must be near-empty and in shadow.
 
-Absolutely no text, letters, numbers, logos, watermarks or UI chrome.
-No glow, no lens flare, no bokeh, no 3D render, no gradients-as-decoration,
-no photorealism, no people, no stock-photo look, no neon cyberpunk.
-
-Subject:
+No text, letters, numbers, logos or watermarks. No people. No illustration,
+no vector art, no schematic line-work, no 3D render, no neon, no lens flare.
 ```
 
-Then append one SUBJECT line.
+Prompt format is: `<subject sentence>` then a blank line, then the treatment.
 
 ---
 
-## BATCH 1 — the calibration set. Generate these eight first.
+## TEST THREE FIRST
 
-Chosen to stress the style block from every direction: a hub, a bilateral, a
-timeline, a broken pattern, a container, a chart, a layered stack and a lattice.
-If these eight sit together as one system, the rest will too.
+Do not generate 59 of anything again until three come back visibly different
+from one another. These three are chosen because they share no material,
+no scale and no setting. If they still look alike, the approach is wrong again
+and we change it before you spend more time.
 
-| Post | Subject line |
+| Post | Subject |
 |---|---|
-| `best-mcp-servers-2026` | A central hub with exactly six connectors radiating outward, most of the surrounding space intentionally empty. |
-| `claude-vs-gpt-which-to-use` | Two mirrored line-structures facing each other with a narrow gap down the centre. |
-| `ai-tooling-september-2026` | Two parallel horizontal rails carrying small markers that cluster tightly toward one end. |
-| `ai-tool-graveyard-2026` | A row of upright rectangular forms where several have fallen flat to horizontal. |
-| `agent-plugins-1-0-explained` | A single open container outline holding three differently shaped modules that each fit it exactly. |
-| `control-ai-credit-burn-2026` | A steeply rising curve crossing a faint horizontal reference line and continuing well past it. |
-| `best-ai-skills-2026` | Layered translucent planes stacked at slight offsets, implying capability added on top of a base. |
-| `run-llms-locally-2026` | A single enclosed box holding a dense internal lattice, with nothing crossing its boundary. |
-
-**Stop here and compare them side by side before generating anything else.**
-Regenerating 8 is cheap. Regenerating 59 is not. If they do not read as one
-system, tighten the style block, not the subjects.
+| `claude-vs-gpt-which-to-use` | A brass balance scale on dark slate, its two shallow pans holding different small objects, one pan resting slightly lower than the other. |
+| `run-llms-locally-2026` | An open desktop computer case lying on a workbench, a single large graphics card seated inside, dust and cable ties visible. |
+| `best-ai-tools-for-content-creators-2026` | A large studio condenser microphone on a boom arm with a mesh pop filter just in front of it. |
 
 ---
 
-## BATCH 2 — the worst repeats. 11 images currently cover 41 posts.
+## ALL 59 SUBJECTS
 
-### Comparisons, motif: bilateral and mirrored
-| Post | Subject line |
+### Comparisons
+| Post | Subject |
 |---|---|
-| `claude-vs-gemini-which-to-use-2026` | Two interlocking bracket forms of unequal weight meeting off-centre, one denser than the other. |
-| `best-ai-chatbots-2026` | Four vertical columns of stacked horizontal ticks at visibly different densities, side by side. |
-| `gpt-6-astra-what-changed` | A stepped ascending form where one riser is drawn markedly taller than all the others. |
+| `claude-vs-gpt-which-to-use` | A brass balance scale on dark slate, its two shallow pans holding different small objects, one pan resting slightly lower than the other. |
+| `claude-vs-gemini-which-to-use-2026` | Two fountain pens of clearly different design, one steel and one lacquered, lying crossed on dark grained leather. |
+| `best-ai-chatbots-2026` | Four vintage desk telephones lined up on a dark table, each from a different decade, handsets resting in their cradles. |
+| `gpt-6-astra-what-changed` | A disassembled brass telescope eyepiece on dark felt, lens elements laid out in order beside the barrel. |
 
-### Explainers, motif: one mechanism, drawn like a schematic
-| Post | Subject line |
+### Explainers
+| Post | Subject |
 |---|---|
-| `what-is-mcp-model-context-protocol` | A single connector shape linking two dissimilar geometric forms, drawn like a schematic. |
-| `what-is-agentic-ai-2026` | A closed loop of directional arrows passing through three small square gates, like a control diagram. |
+| `what-is-mcp-model-context-protocol` | A single coiled telephone switchboard patch cord with worn brass tips, resting on dark oiled wood. |
+| `what-is-agentic-ai-2026` | The exposed brass movement of a clockwork orrery, gear teeth meshed, mainspring visible. |
+| `agent-plugins-1-0-explained` | An open machinist's case with fitted foam cut-outs, three precision instruments seated exactly in their recesses and one recess empty. |
 
-### Protocol cluster, motif: hubs, spokes and patch panels
-| Post | Subject line |
+### Roundups
+| Post | Subject |
 |---|---|
-| `best-mcp-servers-for-claude-2026` | A hub and spoke arrangement where three of eight spokes are solid and the rest are dashed. |
-| `mcp-2026-07-28-spec-what-changed` | A patch panel grid of small ports, several of them crossed through with a single fine diagonal. |
+| `ai-tooling-august-2026` | A row of wooden-handled date stamps standing on a dark desk beside a well-used ink pad. |
+| `ai-tooling-september-2026` | A 35mm contact sheet lying on a lightbox, strips of frames slightly overlapping, a loupe resting on one corner. |
 
-### Roundups, motif: timeline rails
-| Post | Subject line |
+### The MCP cluster
+| Post | Subject |
 |---|---|
-| `ai-tooling-august-2026` | A horizontal timeline rail with irregularly spaced markers, a few emphasised in blue. |
+| `best-mcp-servers-2026` | A steel pegboard wall with exactly six well-worn hand tools hung on it and many empty hooks around them. |
+| `best-mcp-servers-for-claude-2026` | A vintage telephone operator's switchboard with a small handful of cords patched across a field of unused jacks. |
+| `mcp-2026-07-28-spec-what-changed` | A folded engineering blueprint on a drafting table, revision marks in red pencil, an eraser and a scale rule beside it. |
 
-### Tool guides, motif: collections, arrays and shelves
-| Post | Subject line |
+### Tool guides
+| Post | Subject |
 |---|---|
-| `ai-stack-for-indie-hackers-2026` | A narrow vertical stack of five plates, each a slightly different width, precisely aligned. |
-| `tools-every-vibe-coder-should-know` | A scattered set of small primitives, circle, square and triangle, resting on an implied baseline. |
-| `best-ai-tech-stack-for-any-product-2026` | A layered cross-section of four horizontal bands with thin connector lines threading vertically between them. |
-| `best-ai-coding-assistants-2026` | Nested bracket pairs of decreasing size, like collapsing code blocks reduced to pure outline. |
-| `best-ai-tools-for-designers-2026` | Overlapping translucent rectangles at slight rotations, like artboards stacked on a canvas. |
-| `best-ai-tools-for-startups-2026` | An ascending sequence of bars with wide gaps between them, the final bar left incomplete. |
-| `best-ai-writing-tools-2026` | Long horizontal rules of varying length stacked with generous leading, like abstracted paragraphs. |
-| `best-ai-tools-for-productivity-2026` | A grid of small squares with a single diagonal path of blue ones cutting across it. |
-| `best-free-ai-tools-2026` | Concentric rectangles where only the innermost is filled blue and every outer one is open. |
-| `best-ai-video-generators-2026` | A strip of equal rectangles in a row with fine sprocket-like marks along one edge. |
-| `best-ai-image-generators-2026` | A square divided into a fine grid, one quadrant resolving into noticeably larger cells. |
-| `best-ai-tools-for-seo-2026` | A single rising polyline over a faint measurement grid, no axes drawn. |
-| `best-ai-tools-for-data-analysis-2026` | A scatter of small dots with one fitted straight line passing cleanly through them. |
-| `best-ai-tools-for-email-2026` | A tightly overlapped stack of flat envelope outlines, reduced to triangles over rectangles. |
-| `best-ai-tools-for-research-2026` | Thin lines radiating from an off-centre point, each terminating in a small open circle. |
-| `best-ai-tools-for-project-management-2026` | Horizontal bars arranged at staggered start points, like a Gantt chart stripped of labels. |
-| `best-ai-tools-for-content-creators-2026` | A waveform reduced to vertical ticks of varying height along a single baseline. |
-| `best-ai-tools-for-customer-support-2026` | Two offset speech-bubble outlines reduced to plain geometry, one nested inside the other. |
-| `best-ai-tools-2026` | A loose constellation of small geometric marks of different shapes, unevenly spaced. |
+| `ai-stack-for-indie-hackers-2026` | A worn leather tool roll unrolled on a bench, holding a deliberately small set of tools with empty loops between them. |
+| `tools-every-vibe-coder-should-know` | A letterpress compositor's type case with metal sorts in their compartments, a few lifted out and resting on the frame. |
+| `best-ai-tech-stack-for-any-product-2026` | A cutaway architectural section model on a dark table, its floor plates stacked and visibly separated. |
+| `best-ai-coding-assistants-2026` | A mechanical keyboard with several keycaps lifted off and set aside, bare switches exposed beneath. |
+| `best-ai-tools-for-designers-2026` | Paper colour swatch fans opened and overlapping on a dark surface, with loose printed chips scattered across them. |
+| `best-ai-tools-for-startups-2026` | A brass sextant resting on a folded nautical chart, dividers and a pencil alongside. |
+| `best-ai-writing-tools-2026` | The carriage of a manual typewriter in close-up, a sheet of paper threaded through the platen. |
+| `best-ai-tools-for-productivity-2026` | A row of analogue mechanical kitchen timers of different sizes standing on a dark shelf. |
+| `best-free-ai-tools-2026` | A glass honesty jar half-filled with coins on a wooden counter, lid off and set beside it. |
+| `best-ai-video-generators-2026` | A 16mm film reel with a length of film unspooled across a lightbox, sprocket holes catching the light. |
+| `best-ai-image-generators-2026` | A darkroom enlarger head above an empty easel, developing trays waiting in the foreground shadow. |
+| `best-ai-tools-for-seo-2026` | A library card catalogue drawer pulled fully open, cards fanned upright inside it. |
+| `best-ai-tools-for-data-analysis-2026` | A slide rule lying across a scattered stack of punched cards on dark felt. |
+| `best-ai-tools-for-email-2026` | A wooden pigeonhole letter rack, most slots stuffed with envelopes, a few empty. |
+| `best-ai-tools-for-research-2026` | A bundle of index cards tied with string beside a brass reading lamp casting a tight pool of light. |
+| `best-ai-tools-for-project-management-2026` | A steel planning board covered in small magnetic tiles arranged in staggered rows. |
+| `best-ai-tools-for-content-creators-2026` | A large studio condenser microphone on a boom arm with a mesh pop filter just in front of it. |
+| `best-ai-tools-for-customer-support-2026` | A hotel front-desk call bell on a marble counter, a rack of room keys on hooks behind it. |
+| `best-ai-tools-2026` | A sparse shelf holding four well-worn objects with wide gaps between them, everything else bare. |
+| `best-ai-skills-2026` | A set of machinist's precision gauge blocks stacked in a short tower on a steel surface. |
+| `best-ai-agents-2026` | The exposed brass mechanism of a clockwork automaton, linkages and cams visible through an open back panel. |
+| `best-ai-tools-for-developers-2026` | An electronics workbench with an oscilloscope screen dark, a breadboard part-wired, and a soldering iron in its stand. |
+| `best-ai-tools-for-marketing-2026` | A dented brass megaphone lying on its side on a dark painted floor. |
+| `best-ai-tools-for-social-media-2026` | A grid of small instant-photo frames pinned to a dark corkboard, a few hanging slightly crooked. |
+| `best-ai-tools-for-education-2026` | A wooden schoolroom abacus with beads pushed to one side, worn chalk nubs resting beside it. |
 
-### Process guides, motif: a rule and its exception
-| Post | Subject line |
+### Process guides
+| Post | Subject |
 |---|---|
-| `vibe-coding-explained-2026` | A loose wandering curve that resolves into a precise straight line as it moves to the right. |
-| `vibe-coding-design-checklist` | A layout grid with blue alignment guides, several elements deliberately snapped to them and one not. |
-| `vibe-coding-security-checklist-2026` | A closed perimeter outline with exactly one segment drawn as a dashed gap. |
-| `ai-for-legal-2026` | Strictly nested rectangles in formal alignment, with one inner rectangle drawn dashed. |
-| `ai-for-healthcare-2026` | A steady repeating waveform interrupted once by a completely flat segment. |
+| `vibe-coding-explained-2026` | A half-thrown clay vessel on a potter's wheel, wet and asymmetric, trimmings scattered around the wheel head. |
+| `vibe-coding-design-checklist` | A drafting table with a T-square and set square laid over a sheet ruled in precise pencil lines. |
+| `vibe-coding-security-checklist-2026` | A heavy steel door with the deadbolt thrown but the security chain hanging loose and unlatched. |
+| `run-llms-locally-2026` | An open desktop computer case lying on a workbench, a single large graphics card seated inside, dust and cable ties visible. |
+| `control-ai-credit-burn-2026` | A brass gas meter with its dials in close-up, the housing scratched and the glass slightly clouded. |
+| `ai-for-legal-2026` | A stack of leather-bound legal volumes with cloth ribbon markers trailing from between the pages. |
+| `ai-for-healthcare-2026` | A stethoscope coiled on a stainless steel tray beside a monitor with a blank, unlit screen. |
 
-### Opinion, motif: a broken or asymmetric pattern
-| Post | Subject line |
+### Opinion
+| Post | Subject |
 |---|---|
-| `why-ai-tool-directories-are-useless` | A dense uniform field of identical marks with one single mark isolated in clear space. |
-| `is-your-ai-wrapper-defensible-2026` | A thin outline shell drawn around a conspicuously empty interior. |
-| `distribution-specificity-problem-2026` | A wide dispersed spray of lines beside a single tightly focused convergent bundle. |
-| `is-it-too-late-to-learn-ai-2026` | A long ascending line with an entry point marked low and early, leaving obvious runway ahead. |
+| `why-ai-tool-directories-are-useless` | An overstuffed card catalogue with several drawers hanging open, identical cards spilling from them. |
+| `is-your-ai-wrapper-defensible-2026` | An empty glass and brass museum vitrine standing open on a dark floor, its velvet plinth bare. |
+| `distribution-specificity-problem-2026` | A watering can spraying a wide scatter of droplets beside a single glass pipette releasing one precise drop. |
+| `is-it-too-late-to-learn-ai-2026` | A weathered wooden trail marker at the head of a long empty path, early morning light, the route stretching away. |
+| `ai-tool-graveyard-2026` | A dusty stack of obsolete storage media, floppy disks, MiniDiscs and Zip cartridges, piled unevenly in a crate. |
 
----
+### India series
+See the caveat below before generating any of these.
 
-## BATCH 3 — posts that already have a unique image
-
-Lower priority. These are not repeats, they are just photos rather than system
-pieces. Do them once Batch 1 and 2 are in and the system is proven.
-
-| Post | Subject line |
+| Post | Subject |
 |---|---|
-| `best-ai-agents-2026` | A branching tree of thin lines where every branch terminates in a small filled square. |
-| `best-ai-tools-for-developers-2026` | An exploded axonometric of simple blocks separated by thin alignment lines. |
-| `best-ai-tools-for-marketing-2026` | A funnel drawn as two converging straight lines with tick marks along the inside. |
-| `best-ai-tools-for-social-media-2026` | Small identical rounded rectangles tiled with irregular gaps, a few outlined in blue. |
-| `best-ai-tools-for-education-2026` | A stepped pyramid of thin horizontal lines increasing in width toward the base. |
+| `india-ai-startup-ecosystem-2026` | Stacks of Indian rupee coins of uneven height on a dark stone surface, three stacks far taller than the rest. |
+| `indiaai-mission-explained-2026` | A government office rubber stamp resting on an open ledger beside a well-used purple ink pad. |
+| `sovereign-ai-india-2026` | A server rack seen through the mesh of its closed door, status lights small and dim in a darkened room. |
+| `best-ai-tools-for-indian-startups-2026` | A cutting-chai glass on a saucer beside a laptop on a crowded desk, condensation on the glass. |
+| `ai-startups-in-bengaluru-2026` | Keep the existing photograph. |
+| `ai-startups-in-delhi-ncr-2026` | Keep the existing photograph. |
+| `ai-startups-in-mumbai-2026` | Keep the existing photograph. |
+| `ai-startups-in-hyderabad-2026` | Keep the existing photograph. |
+| `ai-startups-in-pune-2026` | Keep the existing photograph. |
+| `ai-startups-in-chennai-2026` | Keep the existing photograph. |
 
----
-
-## BATCH 4 — the India series. Read the caveat first.
-
-**These ten already have distinct, hand-picked Creative Commons photographs with
-inline attribution, added in PR #53.** They are currently the most visually
-distinctive set on the blog. Converting them to abstracts makes the site more
-consistent and drops the `credit` obligation, but it also trades away real
-photography of real places for schematics.
-
-Recommendation: do this batch last, and only if Batches 1 to 3 have convinced you
-the generated system looks better than what is already there.
-
-| Post | Subject line |
-|---|---|
-| `india-ai-startup-ecosystem-2026` | Concentric rings with small nodes clustered densely at just three points, suggesting capital pooling in a few places. |
-| `indiaai-mission-explained-2026` | A grid of small uniform squares, a minority outlined in blue, implying allocated versus unallocated capacity. |
-| `sovereign-ai-india-2026` | Two overlapping circular boundaries, one solid and one dashed, with a fine lattice inside the overlap. |
-| `best-ai-tools-for-indian-startups-2026` | A sparse toolkit layout: simple geometric shapes on an implied shelf with wide gaps between them. |
-| `ai-startups-in-bengaluru-2026` | A dense radial network, many thin lines converging on one bright central node. |
-| `ai-startups-in-delhi-ncr-2026` | Formal nested rectangles in strict alignment, like an administrative plan drawing. |
-| `ai-startups-in-mumbai-2026` | Vertical parallel lines of varying height, like a dense column chart or a skyline abstraction. |
-| `ai-startups-in-hyderabad-2026` | Two node clusters of unequal size joined by a widening band of lines, suggesting flow from one to the other. |
-| `ai-startups-in-pune-2026` | Interlocking gear-like circles rendered as pure outline, mechanical and precise. |
-| `ai-startups-in-chennai-2026` | A repeating modular tile pattern fading out toward the lower left, orderly and self-similar. |
+**The caveat.** The six city posts already carry real Creative Commons
+photographs of those actual cities, added in PR #53. A generated still life of a
+chai glass cannot beat a real photograph of Bengaluru for a post about
+Bengaluru. Leave them. The four India pillar posts above are more abstract and
+are fair game.
 
 ---
 
 ## Workflow
 
-1. Generate at **1600x900**. If the tool cannot do 16:9 directly, generate square
-   and crop to the centre band; the style block already keeps detail off the edges.
-2. Name each file exactly `<slug>.webp` and put it in `public/blog/`.
-   The slug is the left column of every table above. That naming is what lets the
-   wiring be mechanical rather than a guessing game.
-3. WebP, quality ~80. It is roughly a third of PNG and every target browser
-   supports it. `public/blog/` does not exist yet; create it.
-4. Tell me a batch is in. I will point `hero.src` at `/blog/<slug>.webp`, drop the
-   now-unneeded `credit` field for those posts, and stamp `updated`.
+1. Generate 16:9, ideally 1600x900. Anything near that ratio is fine, the CSS
+   crops to the centre.
+2. Name the file exactly `<slug>.webp`, the left column above, and put it in
+   `public/blog/`. WebP at quality ~80.
+3. Send me a batch. I will point `hero.src` at it, drop the now-unneeded
+   `credit` field, and stamp `updated`.
 
-Partial batches are fine. The code path is per-post, so mixed states work: any
-post without a generated image keeps its current photo until you replace it.
+Partial batches are fine. Any post without a generated image keeps its current
+photograph.
 
-## The risk worth naming
+## If two still come out similar
 
-Generic AI imagery reads as low-effort, and Kapyn's positioning is calm and
-credible. The "no glow, no lens flare, no 3D, no neon" clause in the style block
-is doing the real work there. It is what keeps these looking like schematics
-rather than AI art.
-
-**If a generation comes back glossy, reject it rather than shipping it.** One
-gaudy hero undoes the credibility the other 58 are buying, and the whole reason
-to do this is that repeated stock photos already read as low-effort.
+Say which two. The fix is almost always that their subjects share a material or
+a setting, and the answer is to change one subject rather than to add more words
+to the treatment. Adding words to the treatment is what caused the first
+failure.

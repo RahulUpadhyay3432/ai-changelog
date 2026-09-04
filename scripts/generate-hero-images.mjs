@@ -21,7 +21,7 @@
 // Resumable: anything already present in public/blog/ is skipped, so a run that
 // dies halfway costs nothing to repeat. --force overrides that.
 
-import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import sharp from "sharp";

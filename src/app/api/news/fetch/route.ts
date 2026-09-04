@@ -16,6 +16,7 @@ import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { fetchPageMeta } from "@/lib/page-meta";
+import { callOpenRouter } from "@/lib/llm";
 import { feedCutoffISO } from "@/lib/feed-window";
 import {
   canonicalize,
@@ -344,9 +345,17 @@ type ClassifyOutcome =
 // ran out on ~2026-08-11, ingestion kept fetching stories and dropping every one
 // of them for eleven days. Any one provider can now go down without freezing the
 // feed. Add keys, not conditionals.
+// Ordered best-first. The last entry is the one that keeps the feed alive when the
+// paid tiers are dry, which is not hypothetical: on 2026-09-04 every run for two days
+// pulled ~306 items and inserted zero, because DeepSeek returned 402 Insufficient
+// Balance and Gemini 429 prepayment credits depleted, at the same time. A free tier at
+// the end of the chain turns a total outage into a quality dip. callOpenRouter was
+// already in the repo on a free model and already used by the knowledge generator; it
+// just was not wired in here.
 const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
+  { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },
 ];
 
 async function classifyAndSummarize(

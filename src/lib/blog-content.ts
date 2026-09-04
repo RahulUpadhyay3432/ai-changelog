@@ -3895,7 +3895,7 @@ limit 8;`,
     title: "Best AI skills in 2026: the Claude Skills and agent skills worth installing",
     deck: "Skills are the fastest-moving layer in AI tooling right now. Here are the ones that change how an agent works, not just what it knows.",
     date: "2026-08-14",
-    updated: "2026-08-14",
+    updated: "2026-09-04",
     readingMin: 9,
     tag: "Guide",
     hero: {
@@ -3919,6 +3919,10 @@ limit 8;`,
       {
         type: "paragraph",
         text: "There is no single official store, which is why finding good ones is hard. Three sources cover almost everything worth having: Anthropic's own `anthropics/skills` repository, the plugin marketplace built into Claude Code, and a handful of community collections that have earned real adoption. Everything below comes from one of those.",
+      },
+      {
+        type: "paragraph",
+        text: "There is now a portable way to package them. [Agent Plugins 1.0.0](/blog/agent-plugins-1-0-explained), published in August 2026, defines a single directory format holding skills and MCP servers together so one package loads across clients. It is worth adopting if you publish skills for other people, and worth ignoring for now if your skills only ever run in one client.",
       },
       { type: "heading", level: 2, text: "The engineering skills" },
       {
@@ -3992,9 +3996,9 @@ limit 8;`,
   {
     slug: "best-mcp-servers-2026",
     title: "Best MCP servers in 2026: the ones worth actually installing",
-    deck: "The MCP ecosystem passed 17,000 public servers. You need about eight. Here is which eight, and why the rest are noise.",
+    deck: "Public directories index north of 20,000 MCP servers. You need about eight. Here is which eight, and why the rest are noise.",
     date: "2026-08-14",
-    updated: "2026-08-14",
+    updated: "2026-09-04",
     readingMin: 9,
     tag: "Guide",
     hero: {
@@ -4006,7 +4010,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "The Model Context Protocol won. It was donated to the Linux Foundation's Agentic AI Foundation in December 2025, and OpenAI and Google DeepMind both adopted it. Counting servers is harder than it sounds, the official registry curates to roughly 10,000 records while directories like mcp.so and Glama index north of 20,000, because they count different things. Either way the abundance is the problem: every server you install costs context on every turn, so the useful question is not which exist but which few earn their place.",
+        text: "The Model Context Protocol won. It was donated to the Linux Foundation's Agentic AI Foundation in December 2025, and OpenAI and Google DeepMind both adopted it. Counting servers is harder than it sounds, the official registry curates to roughly 10,000 records while directories like mcp.so and Glama index north of 20,000, because they count different things. The protocol itself also moved in July 2026: the [2026-07-28 specification](/blog/mcp-2026-07-28-spec-what-changed) made the core stateless and started a twelve-month deprecation clock on Roots, Sampling, Logging and the legacy HTTP+SSE transport, which is worth checking against any server you rely on. Either way the abundance is the problem: every server you install costs context on every turn, so the useful question is not which exist but which few earn their place.",
       },
       {
         type: "callout",
@@ -4267,6 +4271,416 @@ limit 8;`,
     ],
   },
 
+  // ─── Monthly roundup ────────────────────────────────────────────────────────
+  {
+    slug: "ai-tooling-september-2026",
+    title: "AI tooling in September 2026: two frontiers in three days",
+    deck: "GPT-6 Astra and Claude Fable 5.1 landed 48 hours apart at the same price, August was the densest release month on record, and the open tier quietly caught up on context.",
+    date: "2026-09-04",
+    readingMin: 8,
+    tag: "Roundup",
+    hero: {
+      src: U("1504384308090-c894fdcc538d"),
+      alt: "A wall calendar and notes on a desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Both frontier labs shipped a new top model in the first three days of September, at the same headline price, 48 hours apart. Behind them, August delivered the densest run of open-weight releases the field has seen. Here is what actually changed for people building things.",
+      },
+      { type: "heading", level: 2, text: "The frontier moved twice in one week" },
+      {
+        type: "paragraph",
+        text: "**Claude Fable 5.1** arrived on 1 September at $10 per million input tokens and $50 per million output. **GPT-6 Astra** followed on the 3rd at the same list price for short context, rising to $20 and $75 past the threshold. Both carry roughly a million tokens of context and cap output at 128K. On the face of it this is a tie.",
+      },
+      {
+        type: "paragraph",
+        text: "The split is in what each is built to do. Astra is a generation change aimed at operating software: OpenAI positions it as state of the art on computer use, browsing and long end-to-end work, the kind of task that spans a spreadsheet, a browser tab and a terminal. Fable 5.1 is a point release aimed at thinking: Anthropic's own numbers put it at 52.6% against Opus 5's 29.0% on scientific research, and 73.4% against 70.0% on coding.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "If you only change one thing",
+        text: "Check what your code defaults to, then check whether it should default lower rather than higher. Anthropic still recommends Opus 5 at $5 and $25 for most workloads, half the flagship price. And Fable 5.1 now bills cache reads at 2.5% of its input price rather than the usual 10%, so an agent that re-reads the same large context every step got materially cheaper without anyone changing a line.",
+      },
+      {
+        type: "paragraph",
+        text: "One release did not go to everyone. **Claude Mythos 5.1** is the same underlying model as Fable with additional safeguards for cybersecurity and life sciences work, and it is restricted to vetted organisations. Astra has a version of the same problem handled differently: it is the first model OpenAI has rated at a Critical cybersecurity capability level, and the version customers get refuses advanced cybersecurity tasks. Capability is starting to ship with an access-control story attached, which is new.",
+      },
+      { type: "heading", level: 2, text: "August was the densest month on the calendar" },
+      {
+        type: "paragraph",
+        text: "The open tier did most of the work. **Qwen3.8** landed as a family rather than a model, the 2.4T-A95B flagship on the 8th, a 27B on the 13th, a Flash-Next variant on the 24th, all at 256K context. **GLM-5.3** and GLM-5.3-Flash arrived from Z.ai on the 25th carrying a full million tokens. **DeepSeek** added a vision variant to the V4 Flash line at the end of the month.",
+      },
+      {
+        type: "paragraph",
+        text: "The number worth noticing is context. A year ago the open models were the 128K tier and long context was the reason to pay for a closed one. GLM-5.3, DeepSeek V4 and Kimi K3 all sit at a million tokens now. That argument is over.",
+      },
+      {
+        type: "paragraph",
+        text: "**Meta shipped Muse Glimmer** on 9 August, a 30B model under Apache 2.0, distilled from the closed Muse Spark and sized to run inside a 24GB VRAM envelope on a consumer GPU. It is worth being precise about what this means for Llama: Meta's last Llama weights are from April 2025, and its new open work now ships under a different name. If your local setup is still built around Llama out of habit, that habit is now about seventeen months old.",
+      },
+      {
+        type: "quote",
+        text: "The interesting releases this month were not the biggest models. They were the ones small enough to run on the machine already on your desk.",
+      },
+      { type: "heading", level: 2, text: "Two standards landed, and they matter more than the models" },
+      {
+        type: "paragraph",
+        text: "**MCP shipped its 2026-07-28 specification**, the largest change since remote servers arrived. The protocol core is stateless now, sessions and the initialize handshake are gone, and a remote MCP server is an ordinary HTTP workload. Roots, Sampling and Logging are deprecated on a twelve-month clock, as is the legacy HTTP+SSE transport. If you maintain a server, this is the item on this page with a deadline attached, see [what the new MCP spec changes](/blog/mcp-2026-07-28-spec-what-changed).",
+      },
+      {
+        type: "paragraph",
+        text: "**Agent Plugins 1.0.0** was published on 6 August: one directory format that packages Agent Skills and MCP servers together, so an extension written once loads in more than one client. The steering committee is five people from Amazon, Cursor, Microsoft, OpenAI and Vercel. We wrote up [what the format actually is](/blog/agent-plugins-1-0-explained), including the part most coverage skipped, which is that its security model is a filesystem containment rule rather than a permissions system.",
+      },
+      { type: "heading", level: 2, text: "Also worth noticing" },
+      {
+        type: "list",
+        items: [
+          "**Gemini 3.8 Flash** continues Google's habit of shipping a new Flash roughly every three weeks, at $0.75 and $3.75 per million tokens on introductory pricing that runs to 31 December 2026",
+          "**Anthropic previewed a Model Hardware Standard** on 27 August, a common driver interface so agents can operate microscopes, liquid handlers and robotic arms without a vendor-specific integration each time",
+          "**Windsurf is now Devin Desktop**. Cognition renamed it in June and both windsurf.com and codeium.com redirect. The editor is now the free entry point to Devin's paid cloud agent, which is a different product strategy from the one people signed up for",
+        ],
+      },
+      { type: "heading", level: 2, text: "What to do about it" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "Audit the model constant in your codebase, and consider moving down a tier rather than up. The mid tiers absorbed most of this year's gains",
+          "If you run an MCP server, read the 2026-07-28 spec now. The deprecations have a twelve-month clock and stateless is a real migration",
+          "If you self-host, re-benchmark. The open tier reached a million tokens of context this month and your last comparison is probably out of date",
+          "Ignore the rest until something you are building actually needs it",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "We publish this monthly. The [tool catalog](/tools), [skills directory](/skills), [MCP directory](/mcp) and [model comparison](/compare) are kept current between roundups. Prices here are list rates as of 4 September 2026 and they move often, confirm on the provider's page before you commit.",
+      },
+    ],
+  },
+
+  // ─── Cluster: the September frontier ────────────────────────────────────────
+  {
+    slug: "gpt-6-astra-what-changed",
+    title: "GPT-6 Astra: what actually changed, and whether you need it",
+    deck: "OpenAI's first GPT-6 model is built to operate software rather than write it. The honest read on what that is worth, and when the cheaper tier is still the right call.",
+    date: "2026-09-04",
+    readingMin: 7,
+    tag: "Comparison",
+    hero: {
+      src: U("1451187580459-43490279c0fa"),
+      alt: "A glowing network of connections wrapping a dark globe",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "GPT-6 Astra shipped on 3 September 2026 at $10 per million input tokens and $50 per million output, with a 1.05M-token context window and 128K maximum output. It is a generation change rather than a point release, and the thing it changes is not text quality. It is that the model is built to drive software.",
+      },
+      { type: "heading", level: 2, text: "The one capability that is genuinely new" },
+      {
+        type: "paragraph",
+        text: "OpenAI describes Astra as state of the art on computer use, browsing, software engineering, cybersecurity and science. Strip the list down and the load-bearing item is computer use: interpreting what is on a screen and acting on it, across applications, without a human clicking each step. Filling forms, moving through spreadsheets, navigating a web app, assembling the result into a document.",
+      },
+      {
+        type: "paragraph",
+        text: "This is a different axis from the one the last two years were fought on. Model comparisons have mostly been about the quality of generated text and code. Astra is a bet that the next constraint is not what a model can write but what it can operate. Whether that bet pays off in your work depends entirely on whether your bottleneck is a blank page or a browser tab.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "The version you get is not the version in the benchmarks",
+        text: "Astra is the first model OpenAI has rated as reaching a Critical cybersecurity capability level under its Preparedness Framework. The version available to customers refuses advanced cybersecurity tasks. If you are reading a headline benchmark on security work, check which model produced it before you plan around the number.",
+      },
+      { type: "heading", level: 2, text: "What it costs, in context" },
+      {
+        type: "paragraph",
+        text: "The list price is $10 and $50 per million tokens for short context, rising to $20 and $75 once a request crosses into the long-context band. That is worth working through against the alternatives, because the gaps are large:",
+      },
+      {
+        type: "list",
+        items: [
+          "**GPT-5.6 Sol**, the tier immediately below, is $4 and $20 with the same 1.05M window. Astra costs two and a half times as much for the same context",
+          "**Claude Opus 5** is $5 and $25, and Anthropic recommends it as the default for most workloads",
+          "**Claude Fable 5.1** matches Astra exactly at $10 and $50",
+          "**Gemini 3.1 Pro** is $2 and $12, a fifth of Astra's price at frontier tier",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "For generation, extraction, summarisation and chat, none of those gaps are justified by output quality. The frontier models have been within a few points of each other for a year. Astra earns its price on the specific work it was built for, and nowhere else.",
+      },
+      { type: "heading", level: 2, text: "When to reach for it" },
+      {
+        type: "list",
+        items: [
+          "The task means driving a real interface rather than producing text about one",
+          "The work spans several applications and a mid-task failure is expensive to recover from",
+          "You have measured a cheaper tier failing, rather than assumed it would",
+        ],
+      },
+      { type: "heading", level: 2, text: "When not to" },
+      {
+        type: "list",
+        items: [
+          "Coding inside one repository. Opus 5 leads the agentic coding indices at half the price",
+          "High-volume classification, routing or extraction. GPT-5.6 Luna does this at $0.20 and $1.20, a fiftieth of Astra",
+          "Anything where the frontier was already comfortably good enough, which is most things",
+        ],
+      },
+      {
+        type: "quote",
+        text: "A generational model is not a general upgrade. It is a specific capability, priced as though it were general.",
+      },
+      { type: "heading", level: 2, text: "The pattern worth taking away" },
+      {
+        type: "paragraph",
+        text: "Both frontier labs shipped a new top model within 48 hours at the same price, and each is pointed at a different job: Astra at operating software, Fable 5.1 at reasoning over hard problems. The era where one model was straightforwardly the best is over, and it is not coming back. The useful question stopped being which model is strongest and became which model is shaped like your problem.",
+      },
+      {
+        type: "paragraph",
+        text: "The practical consequence is that pinning a provider into your code is now the expensive decision, not the model choice itself. Build against an abstraction layer and switching costs an afternoon.",
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "OpenAI API", valueLine: "GPT-6 Astra and the GPT-5.6 tiers, plus the dedicated realtime and speech models.", url: "https://platform.openai.com" },
+          { name: "Anthropic API", valueLine: "Fable 5.1, Opus 5, Sonnet 5 and Haiku 4.5, the strongest agentic coding line.", url: "https://www.anthropic.com/api" },
+          { name: "OpenRouter", valueLine: "One API across hundreds of models, so you can benchmark tiers against your own traffic.", url: "https://openrouter.ai" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Full side-by-side numbers on the [model comparison](/compare), and the family-level breakdown in [Claude vs GPT](/blog/claude-vs-gpt-which-to-use). Prices are list rates as of 4 September 2026.",
+      },
+    ],
+  },
+  {
+    slug: "agent-plugins-1-0-explained",
+    title: "Agent Plugins 1.0: one folder that every agent client can read",
+    deck: "The packaging standard for Agent Skills and MCP servers, what is actually in the spec, and the security model most of the coverage skipped.",
+    date: "2026-09-04",
+    readingMin: 8,
+    tag: "Explainer",
+    hero: {
+      src: U("1526379095098-d400fd0bf935"),
+      alt: "Modular components arranged on a workbench",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Agent Plugins 1.0.0 was published on 6 August 2026. It is a package format: one directory, one manifest, and optional skills and MCP servers inside it, so an extension written once can be loaded by more than one agent client. It is deliberately small, and the interesting parts are the constraints rather than the features.",
+      },
+      { type: "heading", level: 2, text: "The whole format, in one directory" },
+      {
+        type: "paragraph",
+        text: "The smallest useful plugin is three files:",
+      },
+      {
+        type: "code",
+        lang: "text",
+        code: "hello-plugin/\n├── plugin.json\n└── skills/\n    └── greet/\n        └── SKILL.md",
+      },
+      {
+        type: "paragraph",
+        text: "The manifest is minimal by design. Only two fields are required, `$schema` and `name`:",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: "{\n  \"$schema\": \"https://agent-plugins.org/schemas/1.0.0/plugin.schema.json\",\n  \"name\": \"hello-plugin\"\n}",
+      },
+      {
+        type: "paragraph",
+        text: "A client that supports skills reads `plugin.json`, discovers `skills/greet/SKILL.md`, and exposes it however it likes. How the skill is surfaced to a user or a model is explicitly outside the specification, which is the right call: that is where clients should differ.",
+      },
+      { type: "heading", level: 2, text: "The schema is closed, and that is the point" },
+      {
+        type: "paragraph",
+        text: "The manifest permits exactly ten top-level fields: `$schema`, `name`, `version`, `description`, `author`, `homepage`, `repository`, `license`, `keywords` and `extensions`. Anything else is unknown, and a client must report it, ignore it, and carry on loading. Clients must not assign meaning to fields the spec did not define.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the clause that decides whether the standard survives contact with five competing vendors. Without it, the first client to read a convenient extra key turns it into a de facto requirement, and portability erodes one field at a time. Client-specific data has a designated home instead: the `extensions` object, keyed by reverse-domain namespaces that each client owns.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "A small clause with real consequences",
+        text: "Clients must not retrieve a schema over the network while loading a plugin. Validation is local, against rules the client already ships. That keeps plugin loading offline, deterministic, and free of a remote dependency that could change under you or fail at the worst moment.",
+      },
+      { type: "heading", level: 2, text: "The security model is containment, not permissions" },
+      {
+        type: "paragraph",
+        text: "This is the part most of the coverage skipped, and it is the part worth understanding before you package anything. The spec's safety property is that every path a client touches must resolve inside the plugin root. Symlinks may point to targets within the root; anything resolving outside must be rejected.",
+      },
+      {
+        type: "paragraph",
+        text: "It then defines the failure boundary precisely, narrowest first. A `plugin.json` outside the root rejects the whole plugin. A component location outside it invalidates that component type. A stray `SKILL.md` is skipped individually. An MCP server whose `command` or `cwd` escapes containment invalidates that server entry. One bad path does not take down a plugin that is otherwise fine.",
+      },
+      {
+        type: "paragraph",
+        text: "There is a deliberate hole in that, and it is documented: command arguments and environment variable values are opaque strings, and clients must not treat them as package paths. So containment covers the package, not what the package tells your machine to run. An MCP server entry is still a command executing on your computer with your privileges.",
+      },
+      {
+        type: "quote",
+        text: "The specification defines a package format. It does not define installation, permissions, security policy, distribution, or trust. Those are still yours to solve.",
+      },
+      {
+        type: "paragraph",
+        text: "That is not a criticism of the spec, which says so itself. It is a warning about how these things get read. \"There is a standard now\" is not the same as \"this is safe now\", and the gap between those two sentences is where supply-chain problems live. The same caution that applies to installing an MCP server applies here, with an extra layer of packaging in between you and the command.",
+      },
+      { type: "heading", level: 2, text: "Who is actually behind it" },
+      {
+        type: "paragraph",
+        text: "The Technical Steering Committee is five people: Clare Liguori (Amazon), Roshan Sadanani (Cursor), Harald Kirschner (Microsoft), Gav Verma (OpenAI) and Jonathan Hefner (Vercel), who is Lead Core Maintainer. The charter is unusually explicit that roles are held by individuals rather than organisations, that no seats are reserved for companies, and that no single vendor may hold a majority.",
+      },
+      {
+        type: "paragraph",
+        text: "One absence is worth naming plainly, because it shapes how you should plan: Agent Skills originated at Anthropic, and Anthropic is not on the steering committee of the standard that packages them. Read that as a reason to check client support before you commit a distribution strategy to this format, not as a prediction about anyone's intentions.",
+      },
+      { type: "heading", level: 2, text: "Should you package your skills this way" },
+      {
+        type: "list",
+        items: [
+          "**If you publish skills for other people**: yes, the format costs almost nothing to adopt and the manifest is two required fields",
+          "**If your skills are internal to one client**: not yet. You gain portability you are not using and a directory layer you now maintain",
+          "**If you ship MCP servers**: bundle them, but do not treat the containment rule as a sandbox. It is not one",
+          "**Either way**: version-pin the `$schema` value. It identifies the spec version, and 1.1.0 is already a working draft",
+        ],
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "Agent Plugins specification", valueLine: "The normative spec, JSON schemas and governance charter.", url: "https://github.com/agentplugins/agent-plugins-spec" },
+          { name: "Anthropic Skills", valueLine: "The official skills repository, the largest source of SKILL.md examples to package.", url: "https://github.com/anthropics/skills" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "For the skills themselves rather than the wrapper, see [the AI skills worth installing](/blog/best-ai-skills-2026) and the [skills directory](/skills). For the MCP servers a plugin can bundle, the [MCP directory](/mcp).",
+      },
+    ],
+  },
+  {
+    slug: "mcp-2026-07-28-spec-what-changed",
+    title: "The new MCP spec: what changes if you already run a server",
+    deck: "The 2026-07-28 release makes the protocol stateless, moves routing into HTTP headers, and starts a twelve-month clock on three features you may be using.",
+    date: "2026-09-04",
+    readingMin: 9,
+    tag: "Guide",
+    hero: {
+      src: U("1558494949-ef010cbdcc31"),
+      alt: "Network cables patched into a switch",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "MCP's 2026-07-28 specification is the largest change since remote servers arrived. The short version: the protocol core is stateless, a remote MCP server is now an ordinary HTTP workload, and three features you may currently depend on are deprecated with a twelve-month support window. If you maintain a server, this is a migration rather than an upgrade.",
+      },
+      { type: "heading", level: 2, text: "Sessions are gone" },
+      {
+        type: "paragraph",
+        text: "The `initialize` and `initialized` exchange is gone, and so is the `Mcp-Session-Id` header. Protocol-level sessions have been removed entirely. Every request is self-describing, with an optional discovery call for clients that want to know capabilities up front.",
+      },
+      {
+        type: "paragraph",
+        text: "The practical consequence is the whole reason for the change. A stateful, bidirectional protocol needs sticky routing, connection affinity and somewhere to keep session state, which is why hosting a remote MCP server was harder than hosting an API. Stateless removes all of that. You can put a server behind an ordinary load balancer and scale it horizontally like anything else you already run.",
+      },
+      {
+        type: "paragraph",
+        text: "If your server keeps per-session state in memory between calls, that assumption no longer holds, and this is the part of the migration that is actual work rather than a config change.",
+      },
+      { type: "heading", level: 2, text: "Routing moved into headers" },
+      {
+        type: "paragraph",
+        text: "Method and tool names now travel in `Mcp-Method` and `Mcp-Name` HTTP headers. A gateway can route a request without parsing the JSON body, which means rate limiting, authorisation and traffic splitting can happen at the edge with the infrastructure you already have.",
+      },
+      {
+        type: "paragraph",
+        text: "Two more additions matter for anything long-running. **Multi Round-Trip Requests** replace server-initiated requests that needed an open stream, so a server can still ask the user to confirm something mid-call over a stateless connection. And list results for tools, prompts and resources are now cacheable, carrying `ttlMs` and `cacheScope` so clients can stop re-fetching a catalog that rarely changes.",
+      },
+      { type: "heading", level: 2, text: "The deprecations, and the clock" },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Twelve months, starting now",
+        text: "Roots, Sampling and Logging are deprecated with a minimum twelve-month support window. The legacy HTTP+SSE transport is deprecated with a year-long transition. Nothing breaks today. Everything on that list breaks eventually, and \"eventually\" is the kind of deadline that arrives without warning.",
+      },
+      {
+        type: "paragraph",
+        text: "Sampling is the one to check first. It was the mechanism for a server asking the client's model to generate something, and servers that used it are architecturally coupled to a feature with an expiry date. Roots and Logging are more mechanical to replace.",
+      },
+      { type: "heading", level: 2, text: "Authorization got stricter" },
+      {
+        type: "list",
+        items: [
+          "**RFC 9207 issuer validation** is now required before a code is redeemed, closing a class of mix-up attack",
+          "**Client credentials are bound to the issuing authorization server**, so a credential from one cannot be replayed at another",
+          "**Dynamic Client Registration is deprecated** in favour of Client ID Metadata Documents",
+          "**An `application_type` parameter** during registration stops localhost redirects being rejected outright, which was a real friction point for local clients",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "If you run an authenticated remote server, this section is not optional reading. The DCR deprecation in particular changes how clients get registered with you.",
+      },
+      { type: "heading", level: 2, text: "Extensions are now a real thing" },
+      {
+        type: "paragraph",
+        text: "Tasks has moved out of the experimental core and into a formal extension, `io.modelcontextprotocol/tasks`, with poll-based `tasks/get` and a new `tasks/update`. It joins MCP Apps, which lets a server render its own UI, and Enterprise Managed Authorization in a proper extensions framework.",
+      },
+      {
+        type: "paragraph",
+        text: "This is a healthier shape than the alternative. The core stays small enough to implement completely, and the ambitious pieces evolve on their own schedule without every client having to support them to claim conformance.",
+      },
+      { type: "heading", level: 2, text: "What to actually do" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "Grep your server for `initialize`, session identifiers, and any state held between calls. That is the migration",
+          "Check whether you use Sampling, Roots or Logging. If yes, plan the replacement now rather than at month eleven",
+          "If you are on the legacy HTTP+SSE transport, move to the current one while it is a choice",
+          "Update your SDK. TypeScript, Python, Go and C# all support the new spec, Rust is in beta",
+          "If you run behind a gateway, the header routing is free capability you can now use",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "If you only consume MCP servers",
+        text: "Almost none of this is your problem. Keep your client updated and the transport changes underneath you. The one thing worth checking is whether any server you depend on is actively maintained, because a server that misses this migration will eventually stop working and an abandoned one will not be fixed.",
+      },
+      {
+        type: "paragraph",
+        text: "For scale, the Tier 1 SDKs now see close to half a billion downloads a month, and TypeScript and Python have each crossed a billion total. That is the size of the installed base this migration is moving, which is also why the deprecation windows are a year rather than a quarter.",
+      },
+      {
+        type: "tools",
+        items: [
+          { name: "MCP specification", valueLine: "The 2026-07-28 release notes and the normative spec.", url: "https://blog.modelcontextprotocol.io/posts/2026-07-28/" },
+          { name: "MCP registry", valueLine: "The official registry, for checking whether a server is still actively published.", url: "https://registry.modelcontextprotocol.io" },
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn keeps a curated [MCP directory](/mcp) with live registry status, and a [config path reference](/mcp/config) for every major client. If you are new to the protocol, start with [what MCP is](/blog/what-is-mcp-model-context-protocol).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
 ];

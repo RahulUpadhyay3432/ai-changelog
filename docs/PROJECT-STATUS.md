@@ -1,7 +1,7 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-08-14 — *content freshness pass: `/compare` rebuilt around the August 2026 frontier, head-to-head comparison pages added, 24 dead links fixed across the MCP/skills catalogs.*
+> **Last updated:** 2026-09-04 — *September content pass: the model data, comparison verdicts and catalogs brought back to true after GPT-6 Astra and Claude Fable 5.1, the Windsurf-to-Devin-Desktop rename swept, four new posts, and `npm run check:freshness` added so the next lapse fails CI instead of sitting there.*
 >
 > **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` before any product/UI work.
 
@@ -49,13 +49,19 @@ Is it **activation** (first-timers bounce on the opening cards) or a **return tr
 
 **The Radar** — the discovery surface and the real retention bet: Today, Browse, Toolkit, Packs, Pulse, Hackathons, MCP market. Lives in the `(radar)` route group with its own layout.
 
-**SEO/AEO surface** — `/mcp` + `/mcp/[slug]`, `/skills` + `/skills/[slug]`, `/tools` + `/tools/[slug]`, `/compare` + `/compare/[a]-vs-[b]`, `/blog` (41 posts), `/learn`, `/explore`, `/search`, `llms.txt`, `feed.xml`, sitemap.
+**SEO/AEO surface** — `/mcp` + `/mcp/[slug]`, `/skills` + `/skills/[slug]`, `/tools` + `/tools/[slug]`, `/compare` + `/compare/[a]-vs-[b]`, `/blog` (59 posts), `/learn`, `/explore`, `/search`, `llms.txt`, `feed.xml`, sitemap.
 
 **Ingestion** — GitHub Actions cron every 2h ([fetch-news.yml](../.github/workflows/fetch-news.yml)) plus Vercel crons for the radar/knowledge/email jobs. A retry workflow (PR #46) re-runs the fetch when GitHub fails to allocate a runner.
 
 ### Recent merges
 | PR | What |
 |---|---|
+| — | **Sep 2026 content pass**: models.ts + `/compare` brought current (GPT-6 Astra, Fable 5.1, GLM, Muse Glimmer); Windsurf→Devin Desktop swept across catalogs and 6 posts; two ended hackathons removed; fabricated category counts deleted; 4 new posts; `check:freshness` added |
+| #56 | Keep tools-registry free of the database |
+| #55 | Indexable pages for discovered tools, behind a quality gate |
+| #54 | Security: SSRF bypass, open redirect, content poisoning, XSS sinks |
+| #53 | Real depth and attributed images for the India posts |
+| #51–52 | India vertical, city hubs, 254 alternatives pages, MCP config reference |
 | #46 | Auto-recover from runner-acquisition failures in the news cron |
 | #45 | `feed_session_ended` — the activation-vs-trigger diagnostic |
 | #42–44 | Packs + weekly recap surfaced; grid Pulse; denser Today tiles |
@@ -85,10 +91,22 @@ Catalogs and model data go stale fast and quietly. The August 2026 audit found `
 
 **Single source of truth:** [models.ts](../src/lib/models.ts) — `name` is the family, `currentVersion` is the release it points at. Updating a model family should be a one-field edit plus `LAST_UPDATED`. Never put a minor version in `name`; that is exactly how it went stale.
 
-**Recommended cadence — monthly:**
-1. Re-check `LAST_UPDATED` in `models.ts` against the current frontier.
-2. Run a dead-link sweep over `radar-mcp.ts`, `radar-skills.ts`, `radar-essentials.ts` (upstream repos get archived and renamed constantly — `modelcontextprotocol/servers` moved seven reference servers to `servers-archived`).
-3. Grep the blog for retired model names before they embarrass a ranking page.
+**This is now enforced, not just recommended.** `npm run check:freshness`
+([scripts/check-freshness.mjs](../scripts/check-freshness.mjs)) fails when `models.ts` is
+older than 45 days, when a MODELS entry has no `currentVersion`, when a retired model name
+appears in a live blog post or a `/compare` verdict, when a post's `updated` predates its
+`date`, or when a curated hackathon's `openState` contradicts its own dates. Dated
+`Roundup` posts are exempt: they are records of their month, not live pages.
+[content-freshness.yml](../.github/workflows/content-freshness.yml) runs it on PRs touching
+the content files, and weekly with `--links` for the dead-link sweep.
+
+**Still a human job, monthly:**
+1. Re-check `LAST_UPDATED` in `models.ts` against the current frontier. The check tells you
+   it is stale; only you can tell it what is true.
+2. Read the `--links` failures. Upstream repos get archived and renamed constantly
+   (`modelcontextprotocol/servers` moved seven reference servers to `servers-archived`).
+3. Re-read the tool verdicts in `radar-tool-depth.ts`. Nothing automated can notice that
+   "the best AI editor today" stopped being true, or that a product was renamed.
 
 ---
 

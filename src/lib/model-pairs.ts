@@ -1,5 +1,5 @@
 // ─── Head-to-head model comparisons ──────────────────────────────────────────
-// Powers /compare/[a]-vs-[b]. Deliberately CURATED, not generated: 15 models
+// Powers /compare/[a]-vs-[b]. Deliberately CURATED, not generated: 18 models
 // would permute into 105 pages, and ~85 of them ("Llama vs Mistral for vision")
 // are doorway pages nobody searches for. We ship the matchups people actually
 // type, each with a hand-written verdict — the same editorial standard as
@@ -23,18 +23,78 @@ export interface ModelPair {
 
 export const MODEL_PAIRS: ModelPair[] = [
   {
+    a: "claude-fable",
+    b: "gpt-astra",
+    verdict:
+      "The top of the market, and the two land within 48 hours of each other: Fable 5.1 on 1 September 2026, GPT-6 Astra on the 3rd. They also cost the same, $10 per million input tokens and $50 per million output. Astra is the stronger operator, state of the art on computer use and built for work that spans applications. Fable 5.1 is the stronger reasoner and the cheaper one to run repeatedly, because its cache reads bill at 2.5% of the input price. Pick by whether the job is thinking or doing.",
+    pickA: [
+      "Deep reasoning and research where the answer matters more than the click path",
+      "Long agent runs over a large repeated context, where caching dominates the bill",
+      "You want a model available on AWS, Google Cloud and Azure from day one",
+    ],
+    pickB: [
+      "Driving real interfaces, spreadsheets, forms and browsers end to end",
+      "Work that spans several applications rather than one codebase",
+      "You are already building on OpenAI tooling",
+    ],
+  },
+  {
+    a: "claude-opus",
+    b: "gpt-astra",
+    verdict:
+      "The practical version of the frontier question, because Opus 5 costs half what Astra does, $5 and $25 per million tokens against $10 and $50, and Anthropic recommends it as the default for most workloads. Astra is the more capable model on the hardest end-to-end tasks and clearly ahead on computer use. Most teams should establish that Opus fails a task before paying twice as much to fix it.",
+    pickA: [
+      "The default for agentic coding, at half the token price",
+      "Enterprise work where the cost of a long agent run is the constraint",
+      "Reasoning-effort control to trade depth against spend",
+    ],
+    pickB: [
+      "Tasks that need the model to operate software rather than write it",
+      "The hardest end-to-end problems where capability decides the outcome",
+    ],
+  },
+  {
+    a: "gpt-astra",
+    b: "gpt-sol",
+    verdict:
+      "The within-OpenAI upgrade question. Astra is the generational step and costs $10 and $50 per million tokens; Sol sits at $4 and $20 after August's price cut, and both carry the same 1.05M context window. Astra earns the difference on computer use and long end-to-end work. On ordinary generation, extraction and chat, Sol is the same tool for less than half the money.",
+    pickA: [
+      "Computer use, browsing, and multi-application workflows",
+      "Long autonomous runs where a mid-task failure is expensive",
+    ],
+    pickB: [
+      "High-volume production work that does not need the top tier",
+      "You want frontier-family context without the flagship bill",
+    ],
+  },
+  {
+    a: "gpt-astra",
+    b: "gemini-pro",
+    verdict:
+      "A five-fold price gap between two frontier models. Gemini 3.1 Pro runs at $2 and $12 per million tokens against Astra's $10 and $50, carries a comparable context window, and takes audio natively, which Astra does not. Astra is the stronger agent and the better operator of software. For work that is reading, reasoning and writing rather than clicking, Gemini is the substantially better value.",
+    pickA: [
+      "Agentic work that drives real interfaces",
+      "The hardest engineering and research tasks",
+    ],
+    pickB: [
+      "Long documents, video or audio in the prompt",
+      "High-volume frontier-tier work where the token bill matters",
+      "You already pay for Google Cloud",
+    ],
+  },
+  {
     a: "claude-opus",
     b: "gpt-sol",
     verdict:
-      "The headline matchup, and closer than either vendor's marketing suggests. GPT-5.6 Sol edges ahead on the overall benchmark snapshot; Claude Opus 5 leads on agentic and coding work. Sol is the better generalist across modalities, Opus the better engineer. At this point the deciding factor is usually which ecosystem your code already lives in, not raw capability.",
+      "Two mid-frontier models at almost the same price, now that GPT-6 Astra sits above Sol and Claude Fable 5.1 sits above Opus. Sol is the broader generalist; Opus 5 leads on agentic and coding work and is the model Anthropic itself tells you to start with. Sol is a little cheaper per token. The deciding factor is usually which ecosystem your code already lives in, not raw capability.",
     pickA: [
       "Multi-step agentic coding where the model runs for a long time without supervision",
       "Large refactors that must respect an existing codebase's conventions",
       "You want reasoning-effort control to trade cost against depth",
     ],
     pickB: [
-      "One model for text, vision and audio in the same pipeline",
       "You are already deep in OpenAI tooling and want the least migration friction",
+      "Slightly lower token cost on the same class of work",
       "General knowledge and scientific work rather than shipping code",
     ],
   },
@@ -57,7 +117,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-sol",
     b: "gemini-pro",
     verdict:
-      "Sol is the stronger all-round generalist; Gemini 3.1 Pro is the better value and the reasoning-benchmark leader. Both handle roughly a million tokens of context and all three modalities, so this comes down to price sensitivity and which cloud you already pay.",
+      "Sol is the stronger all-round generalist; Gemini 3.1 Pro is the better value and the reasoning-benchmark leader. Both handle roughly a million tokens of context, though only Gemini takes audio natively, so this comes down to price sensitivity and which cloud you already pay.",
     pickA: [
       "You want the top overall scores and the widest third-party ecosystem",
       "Audio-native workflows",
@@ -114,7 +174,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-sonnet",
     b: "gpt-terra",
     verdict:
-      "The workhorse tier, where most production traffic actually runs. Both sit around the same price and both inherit their family's million-token context. Sonnet 5 keeps Claude's habit of matching an existing codebase; Terra keeps OpenAI's ecosystem breadth and audio support. For most teams this is a coin flip decided by existing integrations.",
+      "The workhorse tier, where most production traffic actually runs. Both sit around the same price and both inherit their family's million-token context. Sonnet 5 keeps Claude's habit of matching an existing codebase; Terra keeps OpenAI's ecosystem breadth and a lower input price. For most teams this is a coin flip decided by existing integrations.",
     pickA: [
       "Code generation inside an established repo",
       "Long conditional instructions that must be followed exactly",
@@ -142,7 +202,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-fable",
     b: "claude-opus",
     verdict:
-      "The within-Claude question. Fable 5 is the ceiling and costs twice Opus 5. Opus 5 landed in July 2026 delivering near-Fable capability at half the price, which made Fable a specialist rather than a default. Start on Opus and escalate only when you can point at a task it actually fails.",
+      "The within-Claude question. Fable 5.1 landed on 1 September 2026 at $10 and $50 per million tokens, exactly twice Opus 5, and Anthropic still tells you to start on Opus for most workloads. Fable 5.1 is the escalation path for demanding reasoning and long-horizon agentic runs, and its cache reads cost a quarter of a percent of the input price, which changes the maths on long repeated contexts. Escalate when you can point at a task Opus actually fails.",
     pickA: [
       "The genuinely hardest problems where being right dominates cost",
       "Work you cannot easily verify yourself",
@@ -184,7 +244,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-haiku",
     b: "gemini-flash",
     verdict:
-      "The cheap tier, where the shape of the job matters more than the leaderboard. Gemini 3.7 Flash carries a million-token context and is priced to run constantly, which makes it the better agent workhorse. Haiku 4.5 caps at 200K but stays inside the Claude family, so prompts and tool definitions port cleanly from Sonnet.",
+      "The cheap tier, where the shape of the job matters more than the leaderboard. Gemini Flash, now on 3.8, carries a million-token context and is priced to run constantly, which makes it the better agent workhorse. Haiku 4.5 caps at 200K but stays inside the Claude family, so prompts and tool definitions port cleanly from Sonnet.",
     pickA: [
       "You already run Claude and want one prompt style across tiers",
       "Latency-sensitive classification",
@@ -198,7 +258,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-luna",
     b: "gemini-flash",
     verdict:
-      "Both are built for volume, and both got materially cheaper in 2026, OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August. Luna inherits the GPT-5.6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
+      "Both are built for volume, and both got materially cheaper in 2026, OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August and 3.8 Flash since. Luna inherits the GPT-5.6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
     pickA: [
       "You are standardising on the GPT-5.6 ladder",
       "Routing and classification inside an OpenAI stack",
@@ -244,7 +304,7 @@ export const MODEL_PAIRS: ModelPair[] = [
       "The open-versus-closed question at the top of the market. Sol scores higher and comes with the largest ecosystem; Kimi K3 is open-weight, comparable in context, and dramatically cheaper to run through a provider or on your own hardware. In 2026 the open models are close enough that this is a deployment decision, not a capability one.",
     pickA: [
       "Best available generalist quality with no ops burden",
-      "Audio and vision in one model",
+      "The largest third-party tooling ecosystem",
     ],
     pickB: [
       "Self-hosting, on-prem, or strict data residency",
@@ -255,14 +315,14 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "deepseek",
     b: "kimi",
     verdict:
-      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder with far more context. If you are picking one open model to self-host in 2026, K3 is the more general answer, but DeepSeek remains hard to beat on cost per solved reasoning problem.",
+      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder. Context is no longer the separator, DeepSeek V4 carries a million tokens too. If you are picking one open model to self-host, K3 is the more general answer, but DeepSeek remains hard to beat on cost per solved reasoning problem.",
     pickA: [
       "Chain-of-thought reasoning on a tight budget",
       "Smaller footprint to run",
     ],
     pickB: [
       "One open model to cover most workloads",
-      "Long-context work",
+      "Broad general capability rather than reasoning alone",
     ],
   },
   {
@@ -283,7 +343,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "llama",
     b: "qwen",
     verdict:
-      "The two default local models. Llama has the largest open ecosystem, more tooling, quantisations and fine-tunes than anything else , while Qwen tends to punch above its parameter count on code. Ecosystem versus raw quality per gigabyte.",
+      "The two default local models, moving at very different speeds. Llama still has the largest open ecosystem, more tooling, quantisations and fine-tunes than anything else, but Llama 4 dates to April 2025 and Meta's newer open work ships under the Muse name instead. Qwen has shipped through 3.8 in the same window and tends to punch above its parameter count on code. Ecosystem versus momentum.",
     pickA: [
       "Maximum tooling and community support",
       "Existing fine-tunes you want to build on",
@@ -297,14 +357,14 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "llama",
     b: "mistral",
     verdict:
-      "Both are open and self-hostable; Llama wins on ecosystem breadth, Mistral on efficiency and European data governance. Mistral's larger context also makes it the easier fit for document-heavy on-prem work.",
+      "Both are open and self-hostable; Llama wins on ecosystem breadth and, with Scout's 10M window, on raw context. Mistral wins on efficiency and European data governance, and Medium 3.5 is the more recent release of the two. For most on-prem work the deciding factor is the governance story rather than the benchmark.",
     pickA: [
       "The widest selection of tooling and community fine-tunes",
       "You want the most-documented path",
     ],
     pickB: [
       "On-prem deployments with EU data requirements",
-      "Longer inputs without leaving the open tier",
+      "A more recently updated model with a smaller serving footprint",
     ],
   },
 ];

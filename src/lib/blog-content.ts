@@ -60,6 +60,7 @@ export const BLOG_POSTS: BlogPost[] = [
     deck:
       "The exact tools, models, code assistants, infrastructure, and MCP servers , a solo builder actually needs. No survey. A prescription.",
     date: "2026-06-23",
+    updated: "2026-09-04",
     readingMin: 9,
     tag: "Guide",
     hero: {
@@ -91,7 +92,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "For most indie work, **Claude Sonnet** is the right call. It reads code like a senior engineer, follows multi-step instructions without losing the thread, and rarely invents APIs you then have to go and verify. When you're optimizing for cost at volume, classification, extraction, the boring high-throughput stuff , **GPT-5.6 Luna** is fast and cheap and good enough. And when the bill needs to be zero, **Gemini 3.7 Flash** has a free tier that is genuinely usable for prototyping.",
+        text: "For most indie work, **Claude Sonnet** is the right call. It reads code like a senior engineer, follows multi-step instructions without losing the thread, and rarely invents APIs you then have to go and verify. When you're optimizing for cost at volume, classification, extraction, the boring high-throughput stuff , **GPT-5.6 Luna** is fast and cheap and good enough. And when the bill needs to be zero, **Gemini 3.8 Flash** has a free tier that is genuinely usable for prototyping.",
       },
       {
         type: "quote",
@@ -102,7 +103,7 @@ export const BLOG_POSTS: BlogPost[] = [
         items: [
           { name: "Anthropic API", valueLine: "Claude Sonnet, the model that reads code like a senior engineer.", url: "https://www.anthropic.com/api" },
           { name: "OpenAI API", valueLine: "GPT-5.6 Luna, fast, cheap, right for high-volume extraction and classification.", url: "https://platform.openai.com" },
-          { name: "Google AI Studio", valueLine: "Gemini 3.7 Flash, capable, free tier, good for prototyping before you have a budget.", url: "https://aistudio.google.com" },
+          { name: "Google AI Studio", valueLine: "Gemini 3.8 Flash, capable, free tier, good for prototyping before you have a budget.", url: "https://aistudio.google.com" },
         ],
       },
 
@@ -113,7 +114,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "They complement each other; don't try to make one do the other's job. If Cursor's pricing rubs you the wrong way, **Windsurf** is a real alternative with the same model access and a slightly different collaboration philosophy, worth a week of side-by-side before you commit.",
+        text: "They complement each other; don't try to make one do the other's job. If Cursor's pricing rubs you the wrong way, **Devin Desktop** (the editor Cognition renamed from Windsurf in June 2026) is a real alternative with the same model access and a hand-off to its cloud agent, worth a week of side-by-side before you commit.",
       },
       {
         type: "figure",
@@ -127,7 +128,7 @@ export const BLOG_POSTS: BlogPost[] = [
         items: [
           { name: "Cursor", valueLine: "AI-native code editor, the fastest way to navigate and edit a codebase with LLM assistance.", url: "https://cursor.com" },
           { name: "Claude Code", valueLine: "Terminal-first AI coding agent, best for multi-file refactors and long-horizon tasks.", url: "https://www.anthropic.com/claude-code" },
-          { name: "Windsurf", valueLine: "AI code editor from Codeium, solid Cursor alternative with a different collaboration model.", url: "https://codeium.com/windsurf" },
+          { name: "Devin Desktop", valueLine: "Cognition's AI editor, formerly Windsurf, a solid Cursor alternative with a cloud-agent hand-off.", url: "https://devin.ai/desktop" },
         ],
       },
 
@@ -711,6 +712,7 @@ limit 8;`,
     title: "Best AI coding assistants in 2026",
     deck: "The five tools that actually belong in a developer's workflow, ranked by what they do best, not by hype cycle position.",
     date: "2026-06-25",
+    updated: "2026-09-04",
     readingMin: 9,
     tag: "Guide",
     hero: {
@@ -770,14 +772,14 @@ limit 8;`,
         type: "paragraph",
         text: "The suggestion quality has improved significantly with Copilot's upgrade to the Claude and GPT-5.6 families as underlying models. It's no longer the quality-laggard it was in 2023. For an organization that needs single-vendor, audited, SLA-backed AI tooling, it's the clear answer.",
       },
-      { type: "heading", level: 2, text: "Windsurf, best Cursor alternative" },
+      { type: "heading", level: 2, text: "Devin Desktop, best Cursor alternative" },
       {
         type: "paragraph",
-        text: "Windsurf (from Codeium) is the closest full-feature alternative to Cursor. It has a similar composer panel, the same model choices, and a free tier that's genuinely useful, unlimited slow requests on the Claude Haiku level model. The UX philosophy is slightly different: Windsurf leans more into long-running flows it calls \"Cascade\", which track your intent across multiple files and many turns.",
+        text: "Devin Desktop, which was called Windsurf until Cognition renamed it in June 2026, is the closest full-feature alternative to Cursor. It has a similar composer panel, the same model choices, and a free tier. The UX philosophy is slightly different: it leans into long-running flows it calls \"Cascade\", which track your intent across multiple files and many turns, and it now sits one click from Devin's cloud agent for work you would rather hand over entirely.",
       },
       {
         type: "paragraph",
-        text: "If Cursor's pricing is a blocker, or if you want to evaluate the field before committing, Windsurf is the right test drive. Most developers who switch stay.",
+        text: "If Cursor's pricing is a blocker, or if you want to evaluate the field before committing, Devin Desktop is the right test drive. Note what you are joining, though: the editor is now the free entry point to a paid cloud agent, so the roadmap has a direction.",
       },
       { type: "heading", level: 2, text: "Aider, best for the command line" },
       {
@@ -795,14 +797,14 @@ limit 8;`,
           { name: "Cursor", valueLine: "AI-native code editor, multi-file context, inline edit, best for interactive codebase work.", url: "https://cursor.com" },
           { name: "Claude Code", valueLine: "Terminal-first AI agent, hand it a task, come back to a diff. Best for long-horizon agentic work.", url: "https://www.anthropic.com/claude-code" },
           { name: "GitHub Copilot", valueLine: "Enterprise-grade AI completion across every major IDE, the safe, auditable choice for teams.", url: "https://github.com/features/copilot" },
-          { name: "Windsurf", valueLine: "Cursor alternative from Codeium, generous free tier, strong multi-file Cascade flows.", url: "https://codeium.com/windsurf" },
+          { name: "Devin Desktop", valueLine: "Cursor alternative from Cognition, formerly Windsurf, strong multi-file Cascade flows.", url: "https://devin.ai/desktop" },
           { name: "Aider", valueLine: "Open-source terminal AI agent, use any model, full control, no subscription.", url: "https://aider.chat" },
         ],
       },
       { type: "divider" },
       {
         type: "paragraph",
-        text: "The answer to \"which AI coding assistant should I use?\" is rarely one tool. Pick an editor for your day-to-day work and an agent for the tasks you'd otherwise batch. For most developers that's Cursor + Claude Code, or Windsurf + Claude Code if you want to keep the bill lower. Find all of them and more on the [Radar](/radar/browse).",
+        text: "The answer to \"which AI coding assistant should I use?\" is rarely one tool. Pick an editor for your day-to-day work and an agent for the tasks you'd otherwise batch. For most developers that's Cursor + Claude Code, or Devin Desktop + Claude Code if you want to keep the bill lower. Find all of them and more on the [Radar](/radar/browse).",
       },
     ],
   },
@@ -996,6 +998,7 @@ limit 8;`,
     title: "What is MCP? The Model Context Protocol explained",
     deck: "MCP is the USB-C of AI tooling: a single standard that lets any model talk to any tool. Here's what it is, why it matters, and how to get started in 10 minutes.",
     date: "2026-06-22",
+    updated: "2026-09-04",
     readingMin: 7,
     tag: "Explainer",
     hero: {
@@ -1011,7 +1014,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "The analogy that sticks: MCP is the USB-C of AI tooling. Before USB-C, every device had its own proprietary connector. USB-C created one standard that works everywhere. MCP does the same for AI tools, one integration protocol, usable across Claude, GPT-4, Gemini, and any model that adopts the spec. A server you build once works with every MCP client.",
+        text: "The analogy that sticks: MCP is the USB-C of AI tooling. Before USB-C, every device had its own proprietary connector. USB-C created one standard that works everywhere. MCP does the same for AI tools, one integration protocol, usable across Claude, ChatGPT, Gemini, and any client that adopts the spec. A server you build once works with every MCP client.",
       },
       { type: "heading", level: 2, text: "How MCP works, without the jargon" },
       {
@@ -1100,10 +1103,14 @@ limit 8;`,
 
   // ─── SEO: Claude vs GPT ─────────────────────────────────────────────────────
   {
-    slug: "claude-vs-gpt5-which-to-use-2026",
-    title: "Claude vs GPT-5.6: Which AI model should you use in 2026?",
+    // Slug is deliberately version-free and year-free. It has been renamed once already
+    // (gpt4o -> gpt5) and a generational rename every few months burns the page's history.
+    // Both old slugs redirect here from next.config.ts.
+    slug: "claude-vs-gpt-which-to-use",
+    title: "Claude vs GPT: which AI model should you use in 2026?",
     deck: "The honest comparison. Not a benchmark table, a breakdown of which tasks each family handles better, and when the difference actually matters.",
     date: "2026-08-14",
+    updated: "2026-09-04",
     readingMin: 8,
     tag: "Comparison",
     hero: {
@@ -1115,7 +1122,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "For most developers in August 2026: use **Claude Opus 5** for agentic coding and long autonomous runs, **Claude Sonnet 5** as the everyday default, and **GPT-5.6 Sol** when you want the strongest all-round generalist or need text, vision and audio in one model. The two families are close enough on raw capability that the deciding factor is usually workflow fit and price, not quality.",
+        text: "For most developers in September 2026: use **Claude Opus 5** for agentic coding and long autonomous runs, **Claude Sonnet 5** as the everyday default, and **GPT-6 Astra** when the job is operating software rather than writing it. Both families shipped a new top tier in the first three days of September, and they are close enough on raw capability that the deciding factor is usually workflow fit and price, not quality.",
       },
       {
         type: "paragraph",
@@ -1124,16 +1131,20 @@ limit 8;`,
       {
         type: "callout",
         variant: "note",
-        title: "What changed in 2026",
-        text: "If you last compared these families in 2025, most of what you remember is out of date. The context-window gap has closed, Sonnet, Opus and Fable all carry a million tokens, and so does every tier of GPT-5.6. Reasoning is now an effort setting on a frontier model rather than a separate product line. And OpenAI split GPT-5.6 into three tiers (Sol, Terra, Luna) rather than shipping one model.",
+        title: "What changed in September 2026",
+        text: "Both frontiers moved in the same week. Anthropic shipped **Claude Fable 5.1** on 1 September at $10 and $50 per million tokens. OpenAI shipped **GPT-6 Astra** on the 3rd at the same headline price, and it is a generation change rather than a point release. GPT-5.6 Sol is now the second tier of the OpenAI line, and it got cheaper on the way down.",
       },
       { type: "heading", level: 2, text: "The lineups, briefly" },
       {
         type: "list",
         items: [
-          "**Anthropic**: Fable 5 (the ceiling) · Opus 5 (near-Fable capability at half the price, released July 2026) · Sonnet 5 (the workhorse) · Haiku 4.5 (small and fast, 200K context)",
-          "**OpenAI**: GPT-5.6 Sol (flagship) · Terra (production tier) · Luna (high-volume, cut 80% in price in July 2026), all three share the same ~1M-token window",
+          "**Anthropic**: Fable 5.1 (the ceiling, $10/$50 per million tokens) · Opus 5 (the recommended default, $5/$25) · Sonnet 5 (the workhorse, $2/$10) · Haiku 4.5 (small and fast, $1/$5, 200K context). Everything above Haiku carries a million-token window.",
+          "**OpenAI**: GPT-6 Astra (the new flagship, $10/$50) · GPT-5.6 Sol ($4/$20) · Terra ($2/$12) · Luna ($0.20/$1.20). All four share the same 1.05M-token window.",
         ],
+      },
+      {
+        type: "paragraph",
+        text: "Two things fall out of those numbers. The tiers now line up almost exactly across the two vendors, which was not true a year ago. And the cheapest capable tier, Luna, costs about a fiftieth of the flagship, so the interesting question is rarely \"which vendor\" and usually \"how far down can this task go\".",
       },
       { type: "heading", level: 2, text: "Where Claude is better" },
       {
@@ -1142,20 +1153,28 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "**Code that fits an existing codebase**: Claude reliably matches the file structure, import style, naming conventions and error handling already present in a repo, without being told to. GPT-5.6 produces correct code at least as often, but is more likely to introduce new patterns or miss contextual norms.",
+        text: "**Code that fits an existing codebase**: Claude reliably matches the file structure, import style, naming conventions and error handling already present in a repo, without being told to. GPT produces correct code at least as often, but is more likely to introduce new patterns or miss contextual norms.",
       },
       {
         type: "paragraph",
         text: "**Instruction following**: Multi-step conditional instructions (\"if the user is a new account do X; if returning do Y; and in both cases never do Z\") are handled more consistently by Claude. The failure mode on the other side is selectively dropping constraints mid-response, especially in long outputs.",
       },
       {
+        type: "paragraph",
+        text: "**Repeated long contexts**: Fable 5.1 bills cache reads at 2.5% of its input price rather than the usual 10%. If your agent re-reads the same large context on every step, that is a real change to the bill rather than a rounding error.",
+      },
+      {
         type: "quote",
         text: "Claude writes code that fits your codebase. GPT writes code that works. The difference shows up at scale.",
       },
-      { type: "heading", level: 2, text: "Where GPT-5.6 is better" },
+      { type: "heading", level: 2, text: "Where GPT is better" },
       {
         type: "paragraph",
-        text: "**Breadth across modalities**: Sol handles text, vision and audio natively in one model. Claude covers text and vision but not audio, so a voice pipeline means bolting on a second provider.",
+        text: "**Computer use**: this is Astra's headline claim and the clearest gap in the comparison. Where a task means driving a real interface, filling forms, moving through spreadsheets, clicking through a web app, Astra is built for it in a way the Claude line is not positioned against.",
+      },
+      {
+        type: "paragraph",
+        text: "**Voice pipelines**: neither family's flagship takes audio. OpenAI's text models are text and image in, text out, exactly like Claude's. The difference is that OpenAI also ships dedicated realtime, speech and transcription models on the same platform and Anthropic ships none, so a voice product is one vendor instead of two.",
       },
       {
         type: "paragraph",
@@ -1163,17 +1182,18 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "**A cheaper floor**: Luna dropped 80% in price in July 2026, which makes it very hard to beat for classification, routing and extraction at volume, and unlike Haiku it keeps the full million-token context. Haiku 4.5 is the Anthropic equivalent, but caps at 200K.",
+        text: "**A cheaper floor**: Luna dropped 80% in price in July 2026 and sits at $0.20 and $1.20 per million tokens, which makes it very hard to beat for classification, routing and extraction at volume, and unlike Haiku it keeps the full million-token context. Haiku 4.5 is the Anthropic equivalent, but caps at 200K.",
       },
       { type: "heading", level: 2, text: "The verdict by use case" },
       {
         type: "list",
         items: [
-          "**Agentic coding / long autonomous runs**: Claude Opus 5, leads the agentic benchmarks",
+          "**Agentic coding / long autonomous runs**: Claude Opus 5, leads the agentic benchmarks at half the flagship price",
           "**Everyday coding assistant**: Claude Sonnet 5, most of Opus's judgment at a fraction of the cost",
-          "**Strongest single generalist**: GPT-5.6 Sol, top overall scores, widest ecosystem",
+          "**Driving software, browsers and desktop apps**: GPT-6 Astra, state of the art on computer use",
+          "**The hardest reasoning and research**: Claude Fable 5.1 or GPT-6 Astra, same price, pick by whether the work is thinking or doing",
           "**High-volume extraction / classification**: GPT-5.6 Luna, cheapest capable option with a large window",
-          "**Voice or audio pipelines**: GPT-5.6, Claude has no native audio",
+          "**Voice or audio pipelines**: OpenAI, for the dedicated realtime and speech models beside the text ones",
           "**Existing OpenAI stack**: GPT-5.6 Terra, least migration friction",
           "**MCP / complex tool chains**: Claude, native MCP origin, better tool use on long chains",
         ],
@@ -1182,20 +1202,20 @@ limit 8;`,
         type: "callout",
         variant: "tip",
         title: "Test on your actual task",
-        text: "The single best way to choose is to run 50 examples from your real use case through both, score the outputs, and pick the winner. Benchmarks tell you nothing about performance on your specific data. Prices and rankings in this piece are current as of August 2026 and move often, confirm on the provider's page before you commit.",
+        text: "The single best way to choose is to run 50 examples from your real use case through both, score the outputs, and pick the winner. Benchmarks tell you nothing about performance on your specific data. Prices here are the published list rates as of 4 September 2026 and they move often, confirm on the provider's page before you commit.",
       },
       {
         type: "tools",
         items: [
-          { name: "Anthropic API", valueLine: "Opus 5, Sonnet 5 and Haiku 4.5, best for agentic coding, long-context reasoning, and tool chains.", url: "https://www.anthropic.com/api" },
-          { name: "OpenAI API", valueLine: "GPT-5.6 Sol, Terra and Luna, widest ecosystem, native audio, cheapest high-volume tier.", url: "https://platform.openai.com" },
-          { name: "OpenRouter", valueLine: "Single API for 200+ models, test both families side by side with one integration.", url: "https://openrouter.ai" },
+          { name: "Anthropic API", valueLine: "Fable 5.1, Opus 5, Sonnet 5 and Haiku 4.5, best for agentic coding, long-context reasoning, and tool chains.", url: "https://www.anthropic.com/api" },
+          { name: "OpenAI API", valueLine: "GPT-6 Astra plus the GPT-5.6 tiers, widest ecosystem, dedicated voice models, cheapest high-volume tier.", url: "https://platform.openai.com" },
+          { name: "OpenRouter", valueLine: "One API across hundreds of models, test both families side by side with a single integration.", url: "https://openrouter.ai" },
         ],
       },
       { type: "divider" },
       {
         type: "paragraph",
-        text: "The \"which model?\" question keeps getting less interesting as quality converges, the top models now sit within a few points of each other, and open weights are close behind. What does not converge is ecosystem and workflow fit. Build against an abstraction layer (the Vercel AI SDK, OpenRouter) rather than a provider directly, and switching when the picture shifts costs you an afternoon rather than a sprint.",
+        text: "The \"which model?\" question keeps getting less interesting as quality converges, the top models now sit within a few points of each other, and open weights are close behind. What does not converge is ecosystem and workflow fit. Build against an abstraction layer (the Vercel AI SDK, OpenRouter) rather than a provider directly, and switching when the picture shifts costs you an afternoon rather than a sprint. The live [model comparison](/compare) tracks the current lineup between refreshes of this page.",
       },
     ],
   },
@@ -1499,6 +1519,7 @@ limit 8;`,
     title: "Best free AI tools in 2026",
     deck: "The AI tools with meaningful free tiers, ranked by how far you can actually get before hitting a paywall.",
     date: "2026-06-16",
+    updated: "2026-09-04",
     readingMin: 7,
     tag: "Guide",
     hero: {
@@ -1510,7 +1531,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "The best free AI tools in 2026, tools with genuinely useful free tiers, not crippled demos: **Claude.ai** (free tier covers most personal use), **Gemini 3.7 Flash** via Google AI Studio (free with a Google account), **Perplexity** (free tier good enough for most research), **Windsurf** (generous free coding tier), and **Canva AI** (free image generation in a full design tool). Every tool on this list is usable without a credit card for real work.",
+        text: "The best free AI tools in 2026, tools with genuinely useful free tiers, not crippled demos: **Claude.ai** (free tier covers most personal use), **Gemini 3.8 Flash** via Google AI Studio (free with a Google account), **Perplexity** (free tier good enough for most research), **Devin Desktop** (generous free coding tier), and **Canva AI** (free image generation in a full design tool). Every tool on this list is usable without a credit card for real work.",
       },
       {
         type: "paragraph",
@@ -1524,11 +1545,11 @@ limit 8;`,
       { type: "heading", level: 2, text: "AI coding tools" },
       {
         type: "paragraph",
-        text: "**Windsurf** (Codeium) has the most generous free tier in the AI code editor category: unlimited autocomplete and a set of free AI calls per month on the Cascade agent. For developers who need an AI editor but can't justify $20/month for Cursor, Windsurf free is a genuinely useful tool rather than a taste. **GitHub Copilot** also has a free tier with 2,000 completions per month, enough to evaluate whether it's worth paying for.",
+        text: "**Devin Desktop** (Cognition, formerly Windsurf) has one of the most generous free tiers in the AI code editor category, and since the June 2026 rebrand the editor is explicitly the free rung of Devin's ladder rather than a standalone product. For developers who need an AI editor but can't justify $20/month for Cursor, it is a genuinely useful tool rather than a taste. **GitHub Copilot** also has a free tier, enough to evaluate whether it's worth paying for.",
       },
       {
         type: "paragraph",
-        text: "**Google AI Studio** lets you use Gemini Flash and Pro via the API for free up to the quota limit, and Gemini 3.7 Flash is a legitimately capable model, not a stripped-down freeware version. For developers who want to experiment with AI features in their own apps without a billing commitment, this is the lowest-friction starting point.",
+        text: "**Google AI Studio** lets you use Gemini Flash and Pro via the API for free up to the quota limit, and Gemini 3.8 Flash is a legitimately capable model, not a stripped-down freeware version. For developers who want to experiment with AI features in their own apps without a billing commitment, this is the lowest-friction starting point.",
       },
       { type: "heading", level: 2, text: "Image generation" },
       {
@@ -1551,8 +1572,8 @@ limit 8;`,
         title: "Free AI tools worth bookmarking",
         items: [
           { name: "Claude", valueLine: "Free tier covers most personal use, Sonnet model, daily limit, 32K context.", url: "https://claude.ai" },
-          { name: "Google AI Studio", valueLine: "Gemini 3.7 Flash free via API, best free starting point for developers building AI features.", url: "https://aistudio.google.com" },
-          { name: "Windsurf", valueLine: "Free AI code editor with unlimited autocomplete, the best free Cursor alternative.", url: "https://codeium.com/windsurf" },
+          { name: "Google AI Studio", valueLine: "Gemini 3.8 Flash free via API, best free starting point for developers building AI features.", url: "https://aistudio.google.com" },
+          { name: "Devin Desktop", valueLine: "Free AI code editor, formerly Windsurf, the best free Cursor alternative.", url: "https://devin.ai/desktop" },
           { name: "Perplexity", valueLine: "Free AI research with citations, 5 Pro searches/day, unlimited standard.", url: "https://perplexity.ai" },
           { name: "Canva AI", valueLine: "Free AI image generation inside a full design tool, better than a standalone generator.", url: "https://canva.com" },
         ],
@@ -1560,7 +1581,7 @@ limit 8;`,
       { type: "divider" },
       {
         type: "paragraph",
-        text: "Free tiers are good enough to build a meaningful daily AI workflow. Start with Claude for reasoning, Windsurf or Copilot for coding, and Perplexity for research, and upgrade only when a specific tool has clearly earned the spend by recovering more time than the subscription costs.",
+        text: "Free tiers are good enough to build a meaningful daily AI workflow. Start with Claude for reasoning, Devin Desktop or Copilot for coding, and Perplexity for research, and upgrade only when a specific tool has clearly earned the spend by recovering more time than the subscription costs.",
       },
     ],
   },
@@ -1571,6 +1592,7 @@ limit 8;`,
     title: "Best AI tools for developers in 2026",
     deck: "The complete developer AI stack: editors, agents, APIs, testing, and infrastructure tools that belong in every engineering workflow.",
     date: "2026-06-15",
+    updated: "2026-09-04",
     readingMin: 10,
     tag: "Guide",
     hero: {
@@ -1582,7 +1604,7 @@ limit 8;`,
       {
         type: "paragraph",
         lead: true,
-        text: "The essential AI tools for developers in 2026: **Cursor** or **Windsurf** for daily editing, **Claude Code** for agentic tasks, **GitHub Copilot** for team environments, **Vercel AI SDK** for building AI features into products, and the **Anthropic API** (Claude) or **OpenAI API** (GPT-5.6) as the model layer. Beyond these, the right additions depend on your stack, here's what to add and when.",
+        text: "The essential AI tools for developers in 2026: **Cursor** or **Devin Desktop** for daily editing, **Claude Code** for agentic tasks, **GitHub Copilot** for team environments, **Vercel AI SDK** for building AI features into products, and the **Anthropic API** (Claude) or **OpenAI API** (GPT-5.6) as the model layer. Beyond these, the right additions depend on your stack, here's what to add and when.",
       },
       {
         type: "paragraph",
@@ -1595,7 +1617,7 @@ limit 8;`,
       },
       {
         type: "paragraph",
-        text: "**Windsurf** (Codeium) is the strongest alternative with a more generous free tier. Its Cascade agent handles long, multi-step editing flows well. If you want to evaluate before committing to Cursor's $20/month, Windsurf is the right test drive.",
+        text: "**Devin Desktop** (Cognition, renamed from Windsurf in June 2026) is the strongest alternative with a more generous free tier. Its Cascade agent handles long, multi-step editing flows well, and the same account reaches Devin's cloud agent. If you want to evaluate before committing to Cursor's $20/month, it is the right test drive.",
       },
       {
         type: "paragraph",
@@ -1638,7 +1660,7 @@ limit 8;`,
           { name: "Vercel AI SDK", valueLine: "Streaming, tool use, and agent loops for Next.js, model-agnostic, well-maintained.", url: "https://sdk.vercel.ai" },
           { name: "Anthropic API", valueLine: "Claude Sonnet, best for coding tasks, long-context reasoning, and agent chains.", url: "https://www.anthropic.com/api" },
           { name: "Braintrust", valueLine: "Evaluation framework for AI features, run prompts across versions, track quality regressions.", url: "https://braintr.us" },
-          { name: "Windsurf", valueLine: "Cursor alternative, strong free tier, Cascade multi-step agent flows.", url: "https://codeium.com/windsurf" },
+          { name: "Devin Desktop", valueLine: "Cursor alternative from Cognition, strong free tier, Cascade multi-step agent flows.", url: "https://devin.ai/desktop" },
         ],
       },
       { type: "divider" },
@@ -2688,6 +2710,7 @@ limit 8;`,
     deck:
       "You describe what you want, the AI writes the code. Here's what vibe coding actually is, the stack that works, where it falls apart, and how to ship something real without a CS degree.",
     date: "2026-07-01",
+    updated: "2026-09-04",
     readingMin: 12,
     tag: "Guide",
     hero: {
@@ -2729,7 +2752,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "The vibe coding stack that works" },
       {
         type: "paragraph",
-        text: "There are two families of tools, and which you want depends on how much control you're willing to trade for speed. **Prompt-to-app builders** (Lovable, Bolt, v0, Replit Agent) take you from a description to a deployed app fastest, great for prototypes, landing pages, and internal tools. **AI-native editors** (Cursor, Windsurf) give you a real codebase you own, with the AI editing inside it , slower to start, but the right call the moment you want to grow the thing.",
+        text: "There are two families of tools, and which you want depends on how much control you're willing to trade for speed. **Prompt-to-app builders** (Lovable, Bolt, v0, Replit Agent) take you from a description to a deployed app fastest, great for prototypes, landing pages, and internal tools. **AI-native editors** (Cursor, Devin Desktop) give you a real codebase you own, with the AI editing inside it , slower to start, but the right call the moment you want to grow the thing.",
       },
       {
         type: "tools",
@@ -2842,6 +2865,7 @@ limit 8;`,
     deck:
       "Why enterprises and developers are moving models onto their own machines, which tools to use, what hardware you actually need, and how to get a private model running today.",
     date: "2026-07-01",
+    updated: "2026-09-04",
     readingMin: 13,
     tag: "Guide",
     hero: {
@@ -2911,7 +2935,7 @@ limit 8;`,
       {
         type: "list",
         items: [
-          "**A modern laptop (16GB+):** runs 7-8B models comfortably, Llama 3.2, Qwen, Mistral. This covers most everyday use: drafting, summarizing, coding help, chat.",
+          "**A modern laptop (16GB+):** runs 4-9B models comfortably, Qwen3.5-4B or 9B, Gemma 4, Mistral. This covers most everyday use: drafting, summarizing, coding help, chat.",
           "**Apple Silicon (M-series, 32GB+):** unified memory makes Macs unusually good at this, a 32GB Mac runs mid-size models at genuinely usable speeds with no discrete GPU.",
           "**A gaming PC with a recent GPU:** an NVIDIA card with 12-24GB of VRAM runs larger models fast. This is the sweet spot for people who already have the hardware.",
           "**No special hardware at all:** smaller quantized models run on ordinary machines, just slower. Fine for non-realtime work.",
@@ -2983,7 +3007,7 @@ limit 8;`,
       { type: "heading", level: 3, text: "What's the best local model right now?" },
       {
         type: "paragraph",
-        text: "It depends on your memory budget and task, but Llama, Qwen, DeepSeek, and Mistral families are all strong. For most people, a recent 7-8B model (like Llama 3.2) is the right starting point, capable, fast, and comfortable on a normal laptop.",
+        text: "It depends on your memory budget and task, but Qwen, Gemma, DeepSeek and Mistral are all strong, and Meta's newer open work ships under the Muse name rather than Llama. For most people a recent 4-9B model (Qwen3.5-9B or Gemma 4) is the right starting point, capable, fast, and comfortable on a normal laptop.",
       },
       { type: "heading", level: 3, text: "Do I need a powerful GPU?" },
       {
@@ -4077,7 +4101,7 @@ limit 8;`,
     title: "Best AI tools in 2026: the honest shortlist",
     deck: "Most AI tool lists are affiliate pages with 60 entries. This one is short, opinionated, and points you at the deeper guide for whatever you actually do.",
     date: "2026-08-14",
-    updated: "2026-08-14",
+    updated: "2026-09-04",
     readingMin: 8,
     tag: "Guide",
     hero: {
@@ -4105,7 +4129,7 @@ limit 8;`,
       { type: "heading", level: 2, text: "Writing code" },
       {
         type: "paragraph",
-        text: "**Cursor** is still the broadest default for editor-based work. **Claude Code** is the strongest agentic option for tasks you hand over whole. **GitHub Copilot** wins in organisations that need single-vendor, audited, SLA-backed tooling. **Windsurf**, **Cline**, **Codex** and **Zed** all have real constituencies. Full breakdown in [best AI coding assistants](/blog/best-ai-coding-assistants-2026).",
+        text: "**Cursor** is still the broadest default for editor-based work. **Claude Code** is the strongest agentic option for tasks you hand over whole. **GitHub Copilot** wins in organisations that need single-vendor, audited, SLA-backed tooling. **Devin Desktop**, **Cline**, **Codex** and **Zed** all have real constituencies. Full breakdown in [best AI coding assistants](/blog/best-ai-coding-assistants-2026).",
       },
       { type: "heading", level: 2, text: "Everything else, by job" },
       {

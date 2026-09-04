@@ -9,8 +9,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#7c3aed",
     colorBg: "#1a0533",
     colorLabel: "#c4b5fd",
-    storyCount: 47,
-    lastUpdated: "14m ago",
   },
   {
     slug: "dev-tools",
@@ -20,8 +18,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#2563eb",
     colorBg: "#0d1f3c",
     colorLabel: "#60a5fa",
-    storyCount: 38,
-    lastUpdated: "32m ago",
   },
   {
     slug: "open-source",
@@ -31,8 +27,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#ea580c",
     colorBg: "#2d1200",
     colorLabel: "#fb923c",
-    storyCount: 0,
-    lastUpdated: ", ",
   },
   {
     slug: "startups",
@@ -42,8 +36,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#16a34a",
     colorBg: "#0a2015",
     colorLabel: "#4ade80",
-    storyCount: 23,
-    lastUpdated: "41m ago",
   },
   {
     slug: "research",
@@ -53,8 +45,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#0891b2",
     colorBg: "#001f2e",
     colorLabel: "#22d3ee",
-    storyCount: 18,
-    lastUpdated: "2h ago",
   },
   {
     slug: "funding-ma",
@@ -64,8 +54,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#d97706",
     colorBg: "#2d1a00",
     colorLabel: "#fbbf24",
-    storyCount: 12,
-    lastUpdated: "3h ago",
   },
   {
     slug: "big-tech",
@@ -75,8 +63,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#4f46e5",
     colorBg: "#0f0f2d",
     colorLabel: "#818cf8",
-    storyCount: 31,
-    lastUpdated: "1h ago",
   },
   {
     slug: "infrastructure",
@@ -86,8 +72,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#0f766e",
     colorBg: "#001f1d",
     colorLabel: "#2dd4bf",
-    storyCount: 9,
-    lastUpdated: "4h ago",
   },
   {
     slug: "policy",
@@ -97,8 +81,6 @@ export const CATEGORIES: Category[] = [
     colorAccent: "#9333ea",
     colorBg: "#1e0a2e",
     colorLabel: "#d8b4fe",
-    storyCount: 7,
-    lastUpdated: "5h ago",
   },
 ];
 

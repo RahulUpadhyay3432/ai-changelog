@@ -80,9 +80,9 @@ const RAW: Record<string, ToolDepth> = {
     whoItsFor: "Founders and non-engineers who want a working app without setting up a stack.",
     whereUsed: "MVPs, internal tools, and landing pages built without a dev team.",
   },
-  "https://windsurf.com": {
-    whatItIs: "An agentic IDE that builds features end to end.",
-    howItWorks: "Its agent keeps track of your project state and takes multi-step actions, editing files, running commands , while you stay in the loop.",
+  "https://devin.ai/desktop": {
+    whatItIs: "An agentic IDE that builds features end to end, called Windsurf until June 2026.",
+    howItWorks: "Its agent keeps track of your project state and takes multi-step actions, editing files, running commands , while you stay in the loop. Cognition now sits it alongside the Devin cloud agent, so local and hand-off work share one account.",
     whoItsFor: "Developers who want a more autonomous coding agent inside a full editor.",
     whereUsed: "Feature development and larger changes where the agent handles several steps at once.",
   },
@@ -529,12 +529,12 @@ const VERDICTS: Record<string, { verdict: Verdict; take: string }> = {
   "https://claude.com/claude-code":      { verdict: "worth-it", take: "The strongest terminal agent right now, if you live in the CLI. GUI-first devs will bounce; it assumes you trust it with your shell." },
   "https://lovable.dev":  { verdict: "watch", take: "Magic for a demo, brittle past it. Perfect for a v0 or a pitch; painful to maintain once real users arrive. Prototype, don't ship." },
   "https://bolt.new":     { verdict: "watch", take: "Idea to running app in a browser tab, genuinely fun. The generated code is a sketch, not a foundation; expect to rebuild what you keep." },
-  "https://windsurf.com": { verdict: "watch", take: "A capable agentic IDE chasing Cursor. Real, but you're picking the challenger, the momentum is on Cursor's side." },
+  "https://devin.ai/desktop": { verdict: "watch", take: "The editor formerly known as Windsurf, rebranded by Cognition in June 2026 and now the free rung of the Devin funnel. Capable, and the local-to-cloud hand-off is a real advantage over Cursor. You are also betting on a roadmap that is steering toward the paid cloud agent." },
   "https://replit.com":   { verdict: "watch", take: "The friendliest way to ship from a browser, and great for learning. You're all-in on their cloud, which gets pricey as you grow." },
   "https://aider.chat":   { verdict: "worth-it", take: "The open, git-native terminal agent, free, honest, every change committed. Less polished than Cursor, and that's the trade." },
   "https://cline.bot":    { verdict: "worth-it", take: "An open, transparent agent inside VS Code. You approve every step. Slower than a closed tool, by design." },
   "https://zed.dev":      { verdict: "watch", take: "Blazing fast and a joy to type in. The AI is still catching Cursor's. You're buying the speed today and betting on the AI later." },
-  "https://devin.ai":     { verdict: "skip",  take: "Over-promised at launch and still finding its feet. Impressive demos, uneven in the wild, watch it, don't staff a sprint on it yet." },
+  "https://devin.ai":     { verdict: "watch", take: "The launch over-promised and the reputation stuck, but Cognition now owns Windsurf too and has cut entry pricing hard, so this is no longer a $500 leap of faith. Still uneven on open-ended work. Give it well-scoped tasks, not a sprint." },
 
   // UI & design
   "https://v0.dev":         { verdict: "worth-it", take: "The fastest path to a real React first draft. It won't know your design system, expect to re-skin most of what it hands you." },

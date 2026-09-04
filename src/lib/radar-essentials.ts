@@ -37,7 +37,7 @@ export const CURATED_ESSENTIALS: EssentialTool[] = [
   { name: "Gemini CLI", valueLine: "Google's open-source agentic coding assistant, in your terminal.", url: "https://github.com/google-gemini/gemini-cli", category: "AI coding" },
   { name: "Claude Code", valueLine: "Agentic coding in your terminal, plans and edits across files.", url: "https://claude.com/claude-code", category: "AI coding" },
   { name: "Lovable", valueLine: "Build and ship full web apps from a prompt.", url: "https://lovable.dev", category: "AI coding" },
-  { name: "Windsurf", valueLine: "Agentic IDE that builds features end-to-end.", url: "https://windsurf.com", category: "AI coding" },
+  { name: "Devin Desktop", valueLine: "The agentic IDE formerly called Windsurf, now Cognition's editor.", url: "https://devin.ai/desktop", category: "AI coding" },
   { name: "Bolt.new", valueLine: "Prompt full-stack web apps that run in the browser.", url: "https://bolt.new", category: "AI coding" },
   { name: "Replit", valueLine: "Build, run, and deploy apps in the browser with an AI agent.", url: "https://replit.com", category: "AI coding" },
   { name: "Aider", valueLine: "Pair-program with AI from your terminal, committing as it goes.", url: "https://aider.chat", category: "AI coding" },

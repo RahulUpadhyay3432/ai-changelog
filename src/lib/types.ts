@@ -18,8 +18,6 @@ export interface Category {
   colorAccent: string;
   colorBg: string;
   colorLabel: string;
-  storyCount?: number;
-  lastUpdated?: string;
 }
 
 export interface NewsItem {

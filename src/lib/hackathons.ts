@@ -237,7 +237,7 @@ function decodeEntities(s: string): string {
 }
 
 export async function fetchMlhEvents(): Promise<HackathonInput[]> {
-  const res = await fetch("https://mlh.com/seasons/2026/events", {
+  const res = await fetch(`https://mlh.com/seasons/${new Date().getFullYear()}/events`, {
     headers: { Accept: "text/html", "User-Agent": "Mozilla/5.0" },
     redirect: "follow",
     next: { revalidate: 21600 },
@@ -285,54 +285,23 @@ export async function fetchMlhEvents(): Promise<HackathonInput[]> {
 // structurally miss — e.g. Devpost subdomain microsites the themed listing can't
 // see, and national programmes off Devpost entirely. Mirrors CURATED_ESSENTIALS.
 // These are guaranteed present and ranked first. Keep tight + currently-live.
+// Marquee events the Devpost and MLH feeds miss. Nothing expires these automatically, so a
+// dated entry here goes wrong silently. `npm run check:freshness` fails when an openState
+// contradicts its own dates; verify against the organiser's page before adding or reviving one.
 const CURATED_HACKATHONS: HackathonInput[] = [
-  {
-    source: "curated",
-    externalId: "google-cloud-rapid-agent-2026",
-    title: "Google Cloud Rapid Agent Hackathon",
-    url: "https://rapid-agent.devpost.com",
-    imageUrl: "https://d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/004/595/623/datas/original.jpg",
-    dates: "Starts Jul 13, 2026",
-    prize: null,
-    location: "Online",
-    isOnline: true,
-    themes: ["AI agents", "Google Cloud", "Gemini"],
-    participants: null,
-    openState: "upcoming",
-    organization: "Google Cloud",
-    description:
-      "Google Cloud's sprint to build AI agents for real-world challenges, using Gemini and the Agent Development Kit. Open to builders worldwide.",
-  },
-  {
-    source: "curated",
-    externalId: "build-with-gemini-xprize-2026",
-    title: "Build with Gemini XPRIZE",
-    url: "https://xprize.devpost.com",
-    imageUrl: "https://d112y698adiu2z.cloudfront.net/photos/production/challenge_thumbnails/004/686/462/datas/original.png",
-    dates: "May 19 - Aug 17, 2026",
-    prize: "$2,000,000",
-    location: "Online",
-    isOnline: true,
-    themes: ["Gemini", "AI", "Multimodal"],
-    participants: null,
-    openState: "open",
-    organization: "XPRIZE × Google",
-    description:
-      "A global competition to build breakthrough applications on Gemini, with a $2M prize pool across multiple tracks.",
-  },
   {
     source: "curated",
     externalId: "smart-india-hackathon-2026",
     title: "Smart India Hackathon 2026",
     url: "https://www.sih.gov.in",
     imageUrl: null,
-    dates: "2026",
+    dates: "2026 edition, registrations open",
     prize: null,
     location: "India",
     isOnline: false,
     themes: ["AI", "Innovation", "Government"],
     participants: null,
-    openState: "upcoming",
+    openState: "open",
     organization: "Government of India",
     description:
       "India's flagship nationwide hackathon, where student teams build solutions, many AI-driven , for problem statements posed by ministries and industry.",

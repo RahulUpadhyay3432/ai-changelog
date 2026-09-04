@@ -81,7 +81,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const blogUrls: MetadataRoute.Sitemap = BLOG_POSTS.map((p) => ({
     url: `${APP_URL}/blog/${p.slug}`,
-    lastModified: new Date(p.date),
+    // `updated` is the whole point of refreshing an evergreen hub. Reading only `date` here
+    // meant a refresh moved dateModified in the JSON-LD but never the sitemap's lastmod.
+    lastModified: new Date(p.updated ?? p.date),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));

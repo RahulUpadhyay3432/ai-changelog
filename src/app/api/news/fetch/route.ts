@@ -16,6 +16,7 @@ import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { fetchPageMeta } from "@/lib/page-meta";
+import { callOpenRouter } from "@/lib/llm";
 import { feedCutoffISO } from "@/lib/feed-window";
 import {
   canonicalize,
@@ -40,8 +41,21 @@ const VALID_SLUGS: CategorySlug[] = [
 const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string; maxItems?: number }[] = [
   // ── Model labs — first-party announcements ────────────────────────────────
   { url: "https://openai.com/blog/rss.xml",                               defaultCategory: "ai-models",      sourceName: "OpenAI Blog" },
-  // Note: Anthropic has no public RSS — covered via TechCrunch/The Decoder
+  { url: "https://mistral.ai/rss.xml",                                    defaultCategory: "ai-models",      sourceName: "Mistral AI" },
   { url: "https://the-decoder.com/feed/",                                 defaultCategory: "ai-models",      sourceName: "The Decoder" },
+  // models.ts tracks Grok, DeepSeek, Kimi, Qwen, GLM and Mistral as families, but only
+  // Mistral publishes a feed. Checked 2026-09-04, so the next person does not repeat it:
+  //   xAI          x.ai/{news,blog}/rss.xml, /rss.xml, /feed.xml   403 to non-browsers
+  //   DeepSeek     api-docs.deepseek.com/rss.xml                   200 but zero items
+  //   Moonshot     moonshotai.github.io/{feed,blog/index}.xml      404
+  //   Z.ai (GLM)   z.ai/{blog/rss,rss,feed}.xml                    404
+  //   Anthropic    anthropic.com/{rss,news/rss,feed}.xml           404, still no feed
+  //   Qwen         qwenlm.github.io/blog/index.xml                 200, 44 items, but the
+  //                newest is Sep 2025. The blog is abandoned; Qwen ships to Hugging Face
+  //                now. Adding it would have looked like coverage and delivered none.
+  // openai.com/blog/rss.xml above is the legacy path but 301s to /news/rss.xml and serves
+  // the full 1,169 items, so it stays. The gap these leave is Chinese and xAI releases;
+  // closing it properly means a Hugging Face releases source, not another RSS URL.
 
   // ── Big tech — official blogs (catches cross-team launches like MS Discovery)
   { url: "https://blog.google/technology/ai/rss/",                        defaultCategory: "big-tech",       sourceName: "Google AI Blog" },
@@ -331,9 +345,17 @@ type ClassifyOutcome =
 // ran out on ~2026-08-11, ingestion kept fetching stories and dropping every one
 // of them for eleven days. Any one provider can now go down without freezing the
 // feed. Add keys, not conditionals.
+// Ordered best-first. The last entry is the one that keeps the feed alive when the
+// paid tiers are dry, which is not hypothetical: on 2026-09-04 every run for two days
+// pulled ~306 items and inserted zero, because DeepSeek returned 402 Insufficient
+// Balance and Gemini 429 prepayment credits depleted, at the same time. A free tier at
+// the end of the chain turns a total outage into a quality dip. callOpenRouter was
+// already in the repo on a free model and already used by the knowledge generator; it
+// just was not wired in here.
 const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
+  { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },
 ];
 
 async function classifyAndSummarize(
@@ -462,6 +484,8 @@ type IngestResults = {
   llmProviders: Record<string, number>;
   entitiesUpserted: number;
   mentionsLinked: number;
+  /** Items returned per feed this run. 0 means the feed is dead, -1 means it threw. */
+  feedItems: Record<string, number>;
   errors: string[];
 };
 
@@ -768,7 +792,7 @@ export async function GET(request: NextRequest) {
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
     llmFailed: 0, llmError: null, llmProviders: {},
-    entitiesUpserted: 0, mentionsLinked: 0, errors: [],
+    entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, errors: [],
   };
 
   // RSS feeds — parallel fetch
@@ -779,11 +803,20 @@ export async function GET(request: NextRequest) {
   for (let i = 0; i < rssSettled.length; i++) {
     const result = rssSettled[i];
     if (result.status === "fulfilled") {
+      // A feed that parses but yields nothing is a dead feed wearing a healthy face.
+      // Surfacing the count is what makes a silent 404-behind-a-redirect visible.
+      results.feedItems[RSS_FEEDS[i].sourceName] = result.value.length;
       await insertItems(result.value, supabase, results);
     } else {
+      results.feedItems[RSS_FEEDS[i].sourceName] = -1;
       results.errors.push(`RSS "${RSS_FEEDS[i].url}": ${String(result.reason)}`);
     }
   }
+
+  const emptyFeeds = Object.entries(results.feedItems)
+    .filter(([, n]) => n <= 0)
+    .map(([name, n]) => (n < 0 ? `${name} (failed)` : `${name} (0 items)`));
+  if (emptyFeeds.length) results.errors.push(`Empty feeds: ${emptyFeeds.join(", ")}`);
 
   // Product Hunt GraphQL
   try {

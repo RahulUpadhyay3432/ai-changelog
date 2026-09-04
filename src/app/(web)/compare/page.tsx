@@ -115,7 +115,7 @@ export default function ComparePage() {
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Go deeper</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 0", maxWidth: "620px" }}>
           The matrix is the quick answer. For the reasoning behind a pick, read{" "}
-          <Link href="/blog/claude-vs-gpt5-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs GPT-5.6</Link>,{" "}
+          <Link href="/blog/claude-vs-gpt-which-to-use" style={{ color: GOLD, textDecoration: "none" }}>Claude vs GPT</Link>,{" "}
           <Link href="/blog/claude-vs-gemini-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs Gemini</Link>, or{" "}
           <Link href="/blog/run-llms-locally-2026" style={{ color: GOLD, textDecoration: "none" }}>running open models locally</Link>. Every category above , {" "}
           {Object.values(CATEGORY_LABELS).join(", ")} , maps to a use case, not a leaderboard rank.

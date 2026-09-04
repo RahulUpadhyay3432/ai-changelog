@@ -34,6 +34,11 @@ function headline(a: AIModel, b: AIModel): string {
   return `${a.name} vs ${b.name}`;
 }
 
+/** Family names carry the page; the release names carry the search query people type. */
+function releaseHeadline(a: AIModel, b: AIModel): string {
+  return `${a.currentVersion ?? a.name} vs ${b.currentVersion ?? b.name}`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const found = getPair(slug);
@@ -44,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Always point at the canonical order so the reversed slug does not compete.
   const canonical = `${APP_URL}/compare/${pairSlug(found.pair)}`;
-  const title = `${headline(a, b)}: which should you use in 2026?`;
+  const title = `${releaseHeadline(a, b)}: which should you use in 2026?`;
   const description = found.pair.verdict.split(". ")[0] + ".";
 
   return {

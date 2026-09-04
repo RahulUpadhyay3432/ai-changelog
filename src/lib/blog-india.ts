@@ -228,7 +228,7 @@ export const INDIA_POSTS: BlogPost[] = [
     title: "Best AI tools for Indian startups in 2026",
     deck: "The same tools everyone else uses, priced in dollars against a rupee runway. What actually survives that constraint.",
     date: "2026-08-22",
-    updated: "2026-08-22",
+    updated: "2026-09-04",
     readingMin: 8,
     tag: "India",
     hero: { src: "https://live.staticflickr.com/86/208216078_8764ece19d_b.jpg", alt: "Desk, August 6, 2006", credit: "Delwin Steven Campbell / flickr (CC BY)" },
@@ -241,7 +241,7 @@ export const INDIA_POSTS: BlogPost[] = [
       { type: "heading", level: 2, text: "The model layer" },
       {
         type: "paragraph",
-        text: "The cheap tiers got dramatically better in 2026 and this matters more here than anywhere. **GPT-5.6 Luna** dropped 80% in price in July while keeping the full context window. **Gemini 3.7 Flash** is priced to run constantly and has a genuinely usable free tier. Both handle classification, extraction and routing perfectly well. Reserve frontier models for work that actually needs them, the [model comparison](/compare) lays out the tiers.",
+        text: "The cheap tiers got dramatically better in 2026 and this matters more here than anywhere. **GPT-5.6 Luna** dropped 80% in price in July while keeping the full context window. **Gemini 3.8 Flash** is priced to run constantly and has a genuinely usable free tier. Both handle classification, extraction and routing perfectly well. Reserve frontier models for work that actually needs them, the [model comparison](/compare) lays out the tiers.",
       },
       {
         type: "paragraph",
@@ -250,7 +250,7 @@ export const INDIA_POSTS: BlogPost[] = [
       { type: "heading", level: 2, text: "Building and shipping" },
       {
         type: "paragraph",
-        text: "**Cursor** or **Windsurf** for editor work, **Claude Code** for tasks you hand over whole. **Supabase** for backend, the free tier carries a real product further than most people expect. **Vercel** for deployment, though watch the function-duration limits before you commit to long-running jobs.",
+        text: "**Cursor** or **Devin Desktop** for editor work, **Claude Code** for tasks you hand over whole. **Supabase** for backend, the free tier carries a real product further than most people expect. **Vercel** for deployment, though watch the function-duration limits before you commit to long-running jobs.",
       },
       {
         type: "callout",

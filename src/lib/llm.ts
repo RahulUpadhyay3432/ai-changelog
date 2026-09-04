@@ -3,7 +3,12 @@
 // Mirrors the pattern in api/breakdown; centralised here for the knowledge
 // generator. Both tiers are free, so marginal cost stays ~$0.
 
-const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
+// z-ai/glm-4.5-air:free was retired from OpenRouter and this module had been silently
+// falling through to Gemini ever since, which stopped mattering only because nobody
+// noticed until Gemini's credits also ran dry. GLM 5.2 is the same vendor's current
+// free model. Check it is still listed before assuming this path works:
+//   curl -s https://openrouter.ai/api/v1/models | jq -r '.data[].id' | grep ':free'
+const OPENROUTER_MODEL = "z-ai/glm-5.2:free";
 const OPENROUTER_TIMEOUT_MS = 14_000;
 
 export async function callOpenRouter(prompt: string, maxTokens = 800): Promise<string> {

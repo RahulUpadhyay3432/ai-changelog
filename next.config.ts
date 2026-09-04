@@ -39,12 +39,18 @@ const nextConfig: NextConfig = {
         destination: "https://kapyn.app/:path*",
         permanent: true,
       },
-      // The Claude-vs-GPT post was renamed when GPT-4o stopped being current
-      // (Aug 2026). Keep the old URL alive so existing links and any accrued
-      // ranking transfer to the rewritten piece.
+      // The Claude-vs-GPT post has now been renamed twice, once when GPT-4o stopped
+      // being current (Aug 2026) and again when GPT-6 Astra shipped (Sep 2026). The
+      // slug is version-free now so there should not be a third. Both old URLs point
+      // straight at the final destination rather than chaining through each other.
       {
         source: "/blog/claude-vs-gpt4o-which-to-use-2026",
-        destination: "/blog/claude-vs-gpt5-which-to-use-2026",
+        destination: "/blog/claude-vs-gpt-which-to-use",
+        permanent: true,
+      },
+      {
+        source: "/blog/claude-vs-gpt5-which-to-use-2026",
+        destination: "/blog/claude-vs-gpt-which-to-use",
         permanent: true,
       },
     ];

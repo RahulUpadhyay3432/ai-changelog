@@ -1,0 +1,43 @@
+name: Content freshness
+
+# The catalogs, model data and blog prose are hand-maintained and rot quietly. The
+# August 2026 audit found /compare presenting GPT-4o as frontier and 24 dead links,
+# all of it invisible because nothing failed when the monthly checklist was skipped.
+#
+# On a PR this runs offline and takes seconds. The weekly run adds the link sweep and
+# opens nothing, it just goes red, which is the point: staleness needs a place to show.
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/models.ts"
+      - "src/lib/model-pairs.ts"
+      - "src/lib/blog-content.ts"
+      - "src/lib/blog-india.ts"
+      - "src/lib/hackathons.ts"
+      - "src/lib/radar-*.ts"
+      - "scripts/check-freshness.mjs"
+  schedule:
+    # Mondays 07:00 UTC, before the week's content work starts.
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check content freshness
+        run: |
+          set -euo pipefail
+          # The link sweep hits ~250 third-party hosts, so keep it off the PR path.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            node scripts/check-freshness.mjs
+          else
+            node scripts/check-freshness.mjs --links
+          fi

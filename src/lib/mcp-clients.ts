@@ -76,7 +76,7 @@ export const MCP_CLIENTS: McpClient[] = [
   },
   {
     id: "windsurf",
-    name: "Windsurf",
+    name: "Devin Desktop (Windsurf)",
     rootKey: "mcpServers",
     paths: [
       { os: "macOS / Linux", path: "~/.codeium/windsurf/mcp_config.json" },
@@ -85,6 +85,7 @@ export const MCP_CLIENTS: McpClient[] = [
     notes: [
       "The file is **not created on first launch**. You have to make it yourself, directories included.",
       "Cmd+Shift+P → \"Windsurf: Configure MCP Servers\" opens it without hunting for the path.",
+      "Windsurf became **Devin Desktop** in June 2026. The rename did not move the config: the directory is still `.codeium/windsurf`.",
     ],
   },
 ];

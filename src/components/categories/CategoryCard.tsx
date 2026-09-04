@@ -135,27 +135,22 @@ export function CategoryCard({ category, onPress }: CategoryCardProps) {
         {category.name}
       </span>
 
-      {/* Meta */}
-      <div
+      {/* Meta. Was a hardcoded story count and "14m ago", neither of which was ever real.
+          The description is static too, but it is at least true. */}
+      <span
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
+          fontSize: "11px",
+          lineHeight: 1.45,
+          color: "#8a8a8a",
           marginTop: "auto",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
         }}
       >
-        <span style={{ fontSize: "11px", color: "#a3a3a3", fontWeight: 500 }}>
-          {category.storyCount} dispatches
-        </span>
-        {category.lastUpdated && (
-          <>
-            <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.15)" }}>·</span>
-            <span style={{ fontSize: "11px", color: "#737373" }}>
-              {category.lastUpdated}
-            </span>
-          </>
-        )}
-      </div>
+        {category.description}
+      </span>
     </div>
   );
 }

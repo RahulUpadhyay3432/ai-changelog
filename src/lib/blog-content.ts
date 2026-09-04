@@ -41,7 +41,10 @@ export interface BlogPost {
   updated?: string;
   readingMin: number;
   tag: string;
-  hero: { src: string; alt: string; credit?: string };
+  /** `credit` is the photographer's name when `creditUrl` is set, otherwise a plain
+   *  source label. Unsplash's API guidelines require attribution that links back to
+   *  the photographer and to Unsplash, both carrying utm_source and utm_medium. */
+  hero: { src: string; alt: string; credit?: string; creditUrl?: string };
   body: BlogBlock[];
 }
 

@@ -17,7 +17,24 @@
 //   ... --limit 5         first N
 //
 // Demo-tier keys allow 50 requests an hour, so a full run of 53 needs two passes.
-// Already-picked slugs are skipped, making that automatic.
+// Already-picked slugs are skipped, making that automatic. The demo tier is enough:
+// production (1,000/hour) needs Unsplash's 5-10 day review and we do not need it.
+//
+// UNSPLASH API GUIDELINES, and how this stays inside them:
+//   "non-automated, high-quality, authentic"  This picks candidates; a human looks at
+//     every one before it ships. `--sheet` builds the contact sheet for that, and the
+//     wiring step refuses any pick not marked reviewed. Searching is a one-off
+//     editorial pass, not a service running against their API.
+//   "cannot replicate the core Unsplash experience"  Kapyn is a news reader. It shows
+//     one hero per article and offers no browsing, searching or downloading of photos.
+//   "keys must remain confidential"  Read from .env.local, which is gitignored and has
+//     never been committed. Never pass the key as an argument, it would land in shell
+//     history and process listings.
+//   "do not abuse the API"  One request per post, 300ms apart, resumable, and it stops
+//     dead on a 403 rather than hammering.
+//   Attribution and download tracking are required, not optional. `--track` pings each
+//     photo's download_location, and the picks carry the photographer name and profile
+//     URL that blog-content.ts renders as a real link.
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -63,8 +80,30 @@ async function search(key, query) {
   return (await res.json()).results ?? [];
 }
 
+/** Unsplash requires this ping when a photo is actually used. Run it after review. */
+async function track(key) {
+  const entries = Object.entries(picks).filter(([, p]) => p.downloadLocation && !p.tracked);
+  console.log(`  pinging download_location for ${entries.length} picks\n`);
+  for (const [slug, p] of entries) {
+    try {
+      const res = await fetch(p.downloadLocation, {
+        headers: { Authorization: `Client-ID ${key}`, "Accept-Version": "v1" },
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      p.tracked = true;
+      writeFileSync(PICKS, JSON.stringify(picks, null, 2) + "\n");
+      console.log(`  ok    ${slug}`);
+    } catch (e) {
+      console.log(`  FAIL  ${slug} — ${e.message}`);
+    }
+    await new Promise((r) => setTimeout(r, 300));
+  }
+}
+
 async function main() {
   const key = accessKey();
+  if (argv.includes("--track")) return track(key);
   const only = value("--only");
   let todo = Object.entries(queries).filter(([slug]) => (only ? slug === only : !picks[slug]));
   const limit = value("--limit");
@@ -86,7 +125,10 @@ async function main() {
         query,
         alt: pick.alt_description || pick.description || query,
         photographer: pick.user?.name ?? "Unknown",
-        photographerUrl: pick.user?.links?.html ?? "",
+        photographerUrl: pick.user?.links?.html
+          ? `${pick.user.links.html}?utm_source=kapyn&utm_medium=referral`
+          : "",
+        reviewed: false,
         width: pick.width,
         height: pick.height,
         // Unsplash asks that this be pinged when a photo is actually put to use.

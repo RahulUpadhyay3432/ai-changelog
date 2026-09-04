@@ -13,6 +13,8 @@ import styles from "../blog.module.css";
 import { serializeJsonLd } from "@/lib/json-ld";
 
 const APP_URL = "https://kapyn.app";
+// Unsplash's API guidelines require the referral parameters on attribution links.
+const UNSPLASH_REFERRAL = "https://unsplash.com/?utm_source=kapyn&utm_medium=referral";
 
 export const revalidate = 3600;
 
@@ -125,10 +127,28 @@ export default async function BlogPostPage({ params }: Props) {
                   position: "absolute", right: "10px", bottom: "8px", zIndex: 2,
                   fontSize: "10.5px", color: "rgba(255,255,255,0.62)",
                   background: "rgba(0,0,0,0.38)", borderRadius: "5px",
-                  padding: "2px 7px", pointerEvents: "none",
+                  padding: "2px 7px",
+                  // Links must stay clickable, so pointer events are only disabled
+                  // for the plain-text form.
+                  pointerEvents: post.hero.creditUrl ? "auto" : "none",
                 }}
               >
-                {post.hero.credit}
+                {post.hero.creditUrl ? (
+                  <>
+                    Photo by{" "}
+                    <a href={post.hero.creditUrl} target="_blank" rel="noopener noreferrer"
+                       style={{ color: "rgba(255,255,255,0.82)", textDecoration: "underline" }}>
+                      {post.hero.credit}
+                    </a>{" "}
+                    on{" "}
+                    <a href={UNSPLASH_REFERRAL} target="_blank" rel="noopener noreferrer"
+                       style={{ color: "rgba(255,255,255,0.82)", textDecoration: "underline" }}>
+                      Unsplash
+                    </a>
+                  </>
+                ) : (
+                  post.hero.credit
+                )}
               </span>
             )}
             <div className={styles.heroInner}>

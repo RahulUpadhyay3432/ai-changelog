@@ -7,7 +7,13 @@ on:
 
 jobs:
   rerun:
+    # Disabled 2026-09-06. This exists for runner-acquisition failures, which a
+    # re-run does fix. It cannot fix a depleted billing account, and while all
+    # three LLM providers are out of credit it was turning every failure into two
+    # runs and two notification emails: 17 failures became 40 retry runs in four
+    # days. Re-enable by restoring the conclusion check below.
     if: >-
+      false &&
       github.event.workflow_run.conclusion != 'success' &&
       github.event.workflow_run.run_attempt < 2
     runs-on: ubuntu-latest

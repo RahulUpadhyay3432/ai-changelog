@@ -311,6 +311,36 @@ async function callDeepSeek(prompt: string): Promise<string> {
   return text;
 }
 
+/**
+ * Groq's free tier allows roughly 1,000 requests a day against OpenRouter free's ~50,
+ * which is why it leads the chain. The API is OpenAI-compatible, so this is the
+ * DeepSeek call with a different base URL and model.
+ *
+ * Model choice: openai/gpt-oss-20b is on the 1,000/day tier and is strong enough for
+ * classify-and-summarise. Check the current free-tier list before changing it,
+ * console.groq.com/docs/rate-limits, because the allowance is per model and the
+ * cheap-looking ones are often capped at 100/day.
+ */
+async function callGroq(prompt: string): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) throw new Error("GROQ_API_KEY missing");
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.GROQ_MODEL ?? "openai/gpt-oss-20b",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+  });
+  if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("Groq returned empty response");
+  return text;
+}
+
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -353,6 +383,7 @@ type ClassifyOutcome =
 // already in the repo on a free model and already used by the knowledge generator; it
 // just was not wired in here.
 const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
+  { name: "groq-gpt-oss", envKey: "GROQ_API_KEY", call: callGroq },
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
   { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },

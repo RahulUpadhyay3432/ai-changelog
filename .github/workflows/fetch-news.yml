@@ -2,13 +2,10 @@ name: Fetch News (4x daily)
 
 on:
   schedule:
-    # Every 6h, not every 2h, while the summariser is on a rate-limited free tier.
-    # OpenRouter's free allowance is roughly 50 requests a day below $10 lifetime
-    # credit and a single run needs ~280, so twelve runs a day spent the whole
-    # budget before breakfast and inserted 0 on most of them. Four runs a day give
-    # each one a real share. Put this back to "0 */2 * * *" once the account has
-    # credit; the workflow name already assumes 4x daily.
-    - cron: "0 */6 * * *"
+    # Every 2h. A failed run emails Rahul, and that mail is the only monitoring
+    # this pipeline has, so the frequency is a feature rather than noise. The
+    # answer to a loud cron is to stop it failing, not to check less often.
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 jobs:

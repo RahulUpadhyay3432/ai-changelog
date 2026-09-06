@@ -2,7 +2,13 @@ name: Fetch News (4x daily)
 
 on:
   schedule:
-    - cron: "0 */2 * * *"
+    # Every 6h, not every 2h, while the summariser is on a rate-limited free tier.
+    # OpenRouter's free allowance is roughly 50 requests a day below $10 lifetime
+    # credit and a single run needs ~280, so twelve runs a day spent the whole
+    # budget before breakfast and inserted 0 on most of them. Four runs a day give
+    # each one a real share. Put this back to "0 */2 * * *" once the account has
+    # credit; the workflow name already assumes 4x daily.
+    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 jobs:

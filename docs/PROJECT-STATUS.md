@@ -124,6 +124,13 @@ the content files, and weekly with `--links` for the dead-link sweep.
 
 ## ⚙️ Working notes
 
+- **Vercel auto-deploy on merge** was suspected broken on 2026-09-06 after PR #63
+  appeared not to deploy. The repo IS connected (`vercel git connect` reports it),
+  and PR previews build fine. If production ever looks stale, check
+  `npx vercel ls --prod` before assuming, and `npx vercel --prod --yes` deploys
+  from local main without needing a local build (Vercel builds remotely, so it does
+  not OOM this machine).
+
 - **Local `next build` OOMs this machine.** Verify with `npx tsc --noEmit` + `eslint`, and rely on the Vercel build gate.
 - **Local `npm run dev` does not load `.env.local`** when started from Claude — DB pages 500. Verify on the Vercel preview instead.
 - **Screenshots work**: `google-chrome --headless=new --disable-gpu --no-sandbox --hide-scrollbars --window-size=430,2400 --virtual-time-budget=17000 --screenshot=<out> <url>`. The `--virtual-time-budget` is load-bearing (client fetch needs ~15s). Chrome is the snap build — it can only write to `/home/rahul/snap/chromium/common/`.

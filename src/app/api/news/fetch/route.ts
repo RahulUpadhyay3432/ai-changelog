@@ -311,6 +311,70 @@ async function callDeepSeek(prompt: string): Promise<string> {
   return text;
 }
 
+/**
+ * Groq leads the chain because its free tier allows roughly 1,000 requests a day per
+ * key against OpenRouter free's ~50, and needs no card. The API is OpenAI-compatible,
+ * so this is the DeepSeek call with a different base URL.
+ *
+ * GROQ_API_KEY holds a COMMA-SEPARATED list. The limits are per key, so three keys is
+ * three times the daily allowance and three times the per-minute ceiling. Keys are
+ * used round-robin from a rotating cursor rather than always starting at the first,
+ * so a single run spreads across them instead of exhausting key one and spilling over.
+ * A 429 or 413 moves to the next key; anything else is a real error and stops.
+ *
+ * Model: openai/gpt-oss-20b is on the 1,000/day tier and returns clean JSON for
+ * classify-and-summarise in about a second. Check the current per-model allowance at
+ * console.groq.com/docs/rate-limits before switching, because the cheap-looking models
+ * are often the ones capped at 100/day.
+ */
+let groqCursor = 0;
+
+function groqKeys(): string[] {
+  return (process.env.GROQ_API_KEY ?? "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+async function callGroq(prompt: string): Promise<string> {
+  const keys = groqKeys();
+  if (!keys.length) throw new Error("GROQ_API_KEY missing");
+
+  const errors: string[] = [];
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[(groqCursor + i) % keys.length];
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+        body: JSON.stringify({
+          model: process.env.GROQ_MODEL ?? "openai/gpt-oss-20b",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 700,
+          temperature: 0.3,
+        }),
+      });
+      if (res.status === 429 || res.status === 413) {
+        // This key is spent or the payload is over its limit. Try the next one.
+        errors.push(`key${i + 1}:${res.status}`);
+        continue;
+      }
+      if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      const data = await res.json();
+      const text = (data.choices?.[0]?.message?.content ?? "").trim();
+      if (!text) throw new Error("Groq returned empty response");
+      // Advance so the next call starts on a different key.
+      groqCursor = (groqCursor + i + 1) % keys.length;
+      return text;
+    } catch (err) {
+      // A thrown error is not a rate limit, so retrying other keys will not help.
+      if (err instanceof Error && !err.message.startsWith("Groq 4")) throw err;
+      errors.push(String(err).slice(0, 60));
+    }
+  }
+  throw new Error(`Groq: all ${keys.length} key(s) rate limited (${errors.join(", ")})`);
+}
+
 async function callGemini(prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
@@ -353,6 +417,7 @@ type ClassifyOutcome =
 // already in the repo on a free model and already used by the knowledge generator; it
 // just was not wired in here.
 const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
+  { name: "groq-gpt-oss", envKey: "GROQ_API_KEY", call: callGroq },
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
   { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },

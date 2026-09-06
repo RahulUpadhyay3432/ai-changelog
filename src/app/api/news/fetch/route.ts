@@ -336,43 +336,68 @@ function groqKeys(): string[] {
     .filter(Boolean);
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * One attempt on one key. Returns null when the answer is retryable, throws when it
+ * is not, so the caller can tell "wait and try again" from "this will never work".
+ *
+ * An empty 200 counts as retryable. gpt-oss occasionally returns a well-formed
+ * response with no content, and the first live run lost 136 of 281 items to exactly
+ * that, treating it as fatal when the same prompt succeeds on a second attempt.
+ */
+async function groqAttempt(key: string, prompt: string): Promise<string | null> {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.GROQ_MODEL ?? "openai/gpt-oss-20b",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+  });
+  if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
+  if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  return text || null;
+}
+
+/**
+ * Groq leads the chain: the free tier allows roughly 1,000 requests a day per key and
+ * needs no card, against OpenRouter free's ~50. The API is OpenAI-compatible.
+ *
+ * GROQ_API_KEY holds a COMMA-SEPARATED list. Limits are per organisation, and these
+ * keys are verified to sit in three different orgs, so three keys really is three
+ * times the allowance rather than three names for one bucket. Worth re-checking if
+ * keys are ever swapped: a 429 body names the org, so keys from one org would show
+ * the same id and rotation would buy nothing.
+ *
+ * Rotation alone is not enough. The per-minute ceiling is what actually bites during
+ * a bulk run, so each round tries every key and then backs off before trying again.
+ * The first live run inserted 122 of 281 without this; the rest were bursts that gave
+ * up instead of waiting a second.
+ */
 async function callGroq(prompt: string): Promise<string> {
   const keys = groqKeys();
   if (!keys.length) throw new Error("GROQ_API_KEY missing");
 
-  const errors: string[] = [];
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[(groqCursor + i) % keys.length];
-    try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-        body: JSON.stringify({
-          model: process.env.GROQ_MODEL ?? "openai/gpt-oss-20b",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 700,
-          temperature: 0.3,
-        }),
-      });
-      if (res.status === 429 || res.status === 413) {
-        // This key is spent or the payload is over its limit. Try the next one.
-        errors.push(`key${i + 1}:${res.status}`);
-        continue;
+  const ROUNDS = 3;
+  for (let round = 0; round < ROUNDS; round++) {
+    for (let i = 0; i < keys.length; i++) {
+      const idx = (groqCursor + i) % keys.length;
+      const text = await groqAttempt(keys[idx], prompt);
+      if (text) {
+        groqCursor = (idx + 1) % keys.length;
+        return text;
       }
-      if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
-      const data = await res.json();
-      const text = (data.choices?.[0]?.message?.content ?? "").trim();
-      if (!text) throw new Error("Groq returned empty response");
-      // Advance so the next call starts on a different key.
-      groqCursor = (groqCursor + i + 1) % keys.length;
-      return text;
-    } catch (err) {
-      // A thrown error is not a rate limit, so retrying other keys will not help.
-      if (err instanceof Error && !err.message.startsWith("Groq 4")) throw err;
-      errors.push(String(err).slice(0, 60));
     }
+    // Every key was limited or empty this round. The per-minute window is the thing
+    // being waited out, so back off before spending another full cycle on it.
+    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
   }
-  throw new Error(`Groq: all ${keys.length} key(s) rate limited (${errors.join(", ")})`);
+  throw new Error(`Groq: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
 }
 
 async function callGemini(prompt: string): Promise<string> {

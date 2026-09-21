@@ -39,5 +39,7 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             node scripts/check-freshness.mjs
           else
-            node scripts/check-freshness.mjs --links
+            # --max-http-header-size: some sites' response headers overflow undici's
+            # default parser buffer and throw even though the page loads fine in a browser.
+            node --max-http-header-size=65536 scripts/check-freshness.mjs --links
           fi

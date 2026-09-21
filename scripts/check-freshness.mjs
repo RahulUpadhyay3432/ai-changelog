@@ -135,15 +135,33 @@ for (const block of curated.split(/\n  \{\n/).slice(1)) {
 }
 
 // ─── 5. Optional: the dead-link sweep the monthly checklist asks for ─────────────────
+// A plain fetch() misreads plenty of live sites as dead: Cloudflare/Akamai-style bot
+// defense on big consumer products (chatgpt.com, claude.ai, ...) answers scripted CI
+// requests with 403 regardless of headers, and undici's header parser throws
+// UND_ERR_HEADERS_OVERFLOW on a handful of sites (gemini.google.com, ampcode.com) whose
+// response headers exceed its default buffer even though the page loads fine in a
+// browser (raise --max-http-header-size on the node invocation to fix that one). So
+// only DNS-not-found and outright "gone" statuses count as proof of death; 403 and
+// other network hiccups are logged but don't fail the run.
 if (process.argv.includes("--links")) {
   const CATALOGS = ["src/lib/radar-mcp.ts", "src/lib/radar-skills.ts", "src/lib/radar-essentials.ts"];
   const urls = new Set();
   for (const f of CATALOGS) {
-    for (const m of read(f).matchAll(/url: "(https?:\/\/[^"]+)"/g)) urls.add(m[1]);
+    for (const m of read(f).matchAll(/url: "(https?:\/\/[^"]+)"/g)) {
+      urls.add(m[1].split("#")[0]); // fragments aren't sent to the server; dedupe on them
+    }
   }
   const list = [...urls];
   process.stdout.write(`  sweeping ${list.length} catalog URLs`);
   let checked = 0;
+  const blocked = [];
+  const BROWSER_HEADERS = {
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+  };
+  const DEAD_STATUSES = new Set([404, 410]);
   const CONCURRENCY = 12;
   const queue = list.slice();
   const worker = async () => {
@@ -152,21 +170,35 @@ if (process.argv.includes("--links")) {
       try {
         const ctrl = new AbortController();
         const t = setTimeout(() => ctrl.abort(), 15_000);
-        let res = await fetch(url, { method: "HEAD", redirect: "follow", signal: ctrl.signal });
+        let res = await fetch(url, { method: "HEAD", redirect: "follow", headers: BROWSER_HEADERS, signal: ctrl.signal });
         // Plenty of sites reject HEAD but serve GET. Only a second refusal counts.
         if (res.status === 405 || res.status === 403 || res.status === 501) {
-          res = await fetch(url, { method: "GET", redirect: "follow", signal: ctrl.signal });
+          res = await fetch(url, { method: "GET", redirect: "follow", headers: BROWSER_HEADERS, signal: ctrl.signal });
         }
         clearTimeout(t);
-        if (res.status >= 400 && res.status !== 429) fail("catalog link", `${res.status}  ${url}`);
+        if (DEAD_STATUSES.has(res.status) || res.status >= 500) {
+          fail("catalog link", `${res.status}  ${url}`);
+        } else if (res.status >= 400 && res.status !== 429) {
+          blocked.push(`${res.status}  ${url}`);
+        }
       } catch (e) {
-        fail("catalog link", `unreachable (${e.name})  ${url}`);
+        // ENOTFOUND means the domain itself is gone — that's real. Anything else
+        // (reset connections, header-parser quirks, timeouts) is inconclusive.
+        if (e.cause?.code === "ENOTFOUND") {
+          fail("catalog link", `domain not found  ${url}`);
+        } else {
+          blocked.push(`${e.cause?.code ?? e.name}  ${url}`);
+        }
       }
       if (++checked % 25 === 0) process.stdout.write(".");
     }
   };
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
   process.stdout.write("\n");
+  if (blocked.length) {
+    console.log(`\n  ${blocked.length} link(s) blocked the checker without confirming they're dead (not failing on these):`);
+    for (const b of blocked) console.log(`  BLOCKED  ${b}`);
+  }
 }
 
 // ─── Report ──────────────────────────────────────────────────────────────────────────

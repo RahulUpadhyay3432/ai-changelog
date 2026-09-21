@@ -465,6 +465,60 @@ async function callMistral(prompt: string): Promise<string> {
   throw new Error(`Mistral: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
 }
 
+/**
+ * DeepInfra. OpenAI-compatible chat completions, same shape as Groq/Mistral.
+ * DEEPINFRA_API_KEY holds a COMMA-SEPARATED list (five accounts here), rotated the
+ * same way as Groq's keys so one account's balance/rate limit doesn't stall the
+ * whole provider. A 402 (no balance) is treated like a 429 — try the next key
+ * rather than aborting the provider outright, since accounts get topped up
+ * independently of each other.
+ */
+let deepinfraCursor = 0;
+
+function deepinfraKeys(): string[] {
+  return (process.env.DEEPINFRA_API_KEY ?? "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+async function deepinfraAttempt(key: string, prompt: string): Promise<string | null> {
+  const res = await fetch("https://api.deepinfra.com/v1/openai/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.DEEPINFRA_MODEL ?? "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+  });
+  if (res.status === 429 || res.status === 402 || res.status === 413 || res.status >= 500) return null;
+  if (!res.ok) throw new Error(`DeepInfra ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  return text || null;
+}
+
+async function callDeepInfra(prompt: string): Promise<string> {
+  const keys = deepinfraKeys();
+  if (!keys.length) throw new Error("DEEPINFRA_API_KEY missing");
+
+  const ROUNDS = 3;
+  for (let round = 0; round < ROUNDS; round++) {
+    for (let i = 0; i < keys.length; i++) {
+      const idx = (deepinfraCursor + i) % keys.length;
+      const text = await deepinfraAttempt(keys[idx], prompt);
+      if (text) {
+        deepinfraCursor = (idx + 1) % keys.length;
+        return text;
+      }
+    }
+    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
+  }
+  throw new Error(`DeepInfra: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+}
+
 type ClassifyOutcome =
   | { ok: true; value: ClassifyResult; provider: string }
   | { ok: false; reason: string };
@@ -497,6 +551,7 @@ const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promis
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
   { name: "mistral-small", envKey: "MISTRAL_API_KEY", call: callMistral },
+  { name: "deepinfra-llama-8b", envKey: "DEEPINFRA_API_KEY", call: callDeepInfra },
   { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },
 ];
 

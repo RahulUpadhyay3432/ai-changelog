@@ -121,6 +121,17 @@ only half met.
 
 ## 2b. Kapyn production incident — ingestion is timing out (found 2026-09-22, NOT caused by this slice)
 
+> **RESOLVED 2026-09-22 17:48 UTC.** PR #66 (squash `a70d731`) is live. It is the fail-fast
+> change below, plus two review fixes: `key(s) exhausted` needs 3 consecutive strikes before a
+> provider is marked dead, and our own `TimeoutError` is not retried. First production run
+> (GH Actions run `35762300347`) **finished in ~7.5 min with no 504**: `inserted: 45`,
+> `llmFailed: 219`, **`backlogged: 219`**, `deferred: 0`, `llmProviders: {groq-gpt-oss: 51}`,
+> `deadProviders: [deepseek, gemini, mistral, deepinfra, groq]`, OpenRouter free 429.
+> **Groq is the only working provider, and only until its daily quota runs out. The Mistral and
+> DeepInfra keys produced zero successes.** `GET /api/hermes/tasks` now serves genuine stories.
+> Consequence: HERMES is now the *main* summariser for ~80% of each run, not an occasional
+> fallback, so throughput (job D) matters.
+
 Discovered while verifying the above. This is the reason no genuine backlog task exists yet, and
 it blocks the real bridge proof.
 
@@ -151,6 +162,19 @@ it blocks the real bridge proof.
 ---
 
 ## 2c. ⚠️ SAFETY: the scheduler would auto-resume protected Buffer missions (job B — AGY)
+
+> **Guard DONE 2026-09-22.** AGY commit `5c84aa1`: `protected_missions.json` (10 IDs), enforced in
+> `Ledger.get_resumable_paused_missions` (excluded; fails closed to `[]`) and in
+> `durable_runner_v2.py --resume` (refused before the mission lock; fails closed). The runner
+> guard also covers the other `--resume` dispatch sites (`scheduler.py` queued path,
+> `trigger_gateway.py`). Claude reviewed the diff, re-ran the suite (**456/456 OK**) and confirmed
+> read-only that `mission.db` was untouched.
+>
+> **Still do not start `scheduler.py`:** 4 NON-protected test-pollution missions from
+> 2026-09-16/17 are still resumable: `m_d_5eb282c0`, `m_d_4bab3496`, `q_reboot_16874be9`,
+> `q_reboot_f047501d` (step 1 `browser.open`, status `unknown`). Rahul approved AGY cancelling
+> them via the Ledger API (back up `mission.db` first). Nits in the same commit: remove the unused
+> `is_protected_mission` imports.
 
 **Do not start `scheduler.py` until this is fixed.** Verified read-only against the real
 `mission.db` on 2026-09-22.
@@ -330,12 +354,12 @@ and hand work to the backlog for HERMES to take over at all.
 
 | Job | Owner | State |
 |---|---|---|
-| **A — Kapyn fail-fast ingestion** (fixes §2b) | Sonnet writes the PR, Claude reviews/merges/verifies | in flight |
-| **B — protected-mission guard** (fixes §2c) | AGY implements, Claude reviews | in flight, parallel with A |
-| **C — prove the real bridge:** one *genuine* backlog task → `news_items` | AGY runs, Claude verifies | blocked on A; needs Rahul's explicit go |
+| **A — Kapyn fail-fast ingestion** (fixes §2b) | Sonnet writes the PR, Claude reviews/merges/verifies | **DONE** — PR #66 `a70d731`, verified in production (§2b) |
+| **B — protected-mission guard** (fixes §2c) | AGY implements, Claude reviews | **DONE** — `5c84aa1`, 456/456. Follow-up: cancel the 4 test missions (§2c), approved |
+| **C — prove the real bridge:** one *genuine* backlog task → `news_items` | AGY runs, Claude verifies | **UNBLOCKED, approved by Rahul** — 219 genuine tasks in the backlog |
 | **D — scale HERMES to absorb volume** (batching via `limit` ≤ 5 or steps mode, then a `schedule:` block) | design after C | not started |
 
-A and B are independent (different repos, different files) and run in parallel.
+A and B are done. The cleanup follow-up and C can run in parallel. D starts after C.
 
 **C acceptance (the handoff's real §14 milestone):** a genuine `ingest_backlog` row (not
 `is_test`) is served, summarised by the AGY planner, accepted by Kapyn, and persisted through
@@ -367,6 +391,9 @@ before we trust the path unattended. If A leaves the backlog empty (providers he
 ---
 
 ## 8. Last Update Timestamp
+
+2026-09-22 ~17:55 UTC (Claude): A merged and verified, B reviewed, C unblocked.
+
 
 - **Timestamp:** 2026-09-22, late evening (session-local; see git commit timestamps on the
   identifiers above for exact times).

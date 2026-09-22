@@ -19,10 +19,11 @@ import { fetchPageMeta } from "@/lib/page-meta";
 import { callOpenRouter } from "@/lib/llm";
 import { feedCutoffISO } from "@/lib/feed-window";
 import {
-  canonicalize,
-  parseExtractedEntities,
-  type ExtractedEntity,
-} from "@/lib/entities";
+  buildClassifyAndSummarizePrompt,
+  parseClassifyResponse,
+  persistStory,
+  type ClassifyResult,
+} from "@/lib/news-ingest";
 
 export const runtime = "nodejs";
 // 800s is the Pro + Fluid compute ceiling (Hobby caps at 300s). Sized off real
@@ -31,12 +32,6 @@ export const runtime = "nodejs";
 // while the summarizer failed instantly; once DeepSeek started doing real work
 // the run needed more clock than the function was allowed.
 export const maxDuration = 800;
-
-// Valid category slugs — used for AI classifier validation
-const VALID_SLUGS: CategorySlug[] = [
-  "ai-models", "dev-tools", "open-source", "startups", "research",
-  "funding-ma", "big-tech", "infrastructure", "policy",
-];
 
 const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: string; maxItems?: number }[] = [
   // ── Model labs — first-party announcements ────────────────────────────────
@@ -176,96 +171,9 @@ function extractImageUrl(item: ParserItem): string | null {
 }
 
 // ─── Classification + Summarization ──────────────────────────────────────────
-
-/**
- * Single-pass LLM prompt: classifies into the new taxonomy AND writes the
- * summary. One call per item — no extra round-trips.
- *
- * Returns "LOW_SIGNAL" in the SUMMARY field for minor patches.
- */
-function buildClassifyAndSummarizePrompt(
-  title: string,
-  content: string,
-  defaultCategory: string
-): string {
-  return `You are a tech editor for "Kapyn", a premium intelligence feed for AI developers.
-
-Classify this dispatch into ONE category slug and write a summary.
-
-CATEGORIES:
-  ai-models, LLMs, model releases, benchmarks, capabilities, multimodal AI
-                   e.g. "GPT-5 Released", "Claude Scores SOTA on MMLU", "Gemini 2.0 Launch"
-  dev-tools      , Commercial/hosted dev tools, APIs, SDKs, frameworks, CLIs, plugins
-                   e.g. "LangChain 0.3 Adds Agent Memory", "Cursor Gets Multi-File Edit Mode"
-  open-source    , New open-source projects, GitHub releases, OSS tools gaining traction
-                   e.g. "New OSS vector DB hits 10k stars", "Show HN: CLI tool for LLM evals"
-  startups       , New companies, product launches, pivots, early-stage growth
-                   e.g. "Cohere Launches Enterprise Platform", "AI writing startup raises seed"
-  research       , Academic papers, lab findings, benchmarks, evals, university research
-                   e.g. "DeepMind Paper on Reasoning", "MIT Study on LLM Hallucination"
-  funding-ma     , Funding rounds, acquisitions, mergers, acqui-hires, strategic investments
-                   e.g. "Anthropic Raises $4B Series E", "Microsoft Acquires Inflection AI"
-  big-tech       , FAANG+, cloud providers (AWS/GCP/Azure), enterprise AI platform updates
-                   e.g. "Google Releases Gemini Ultra", "AWS Bedrock Adds Claude 3"
-  infrastructure , Chips, GPUs, data centers, cloud compute, hardware, edge AI deployment
-                   e.g. "Nvidia H200 Now Shipping", "Meta Builds 100K GPU Cluster"
-  policy         , AI regulation, governance, safety frameworks, government orders, compliance
-                   e.g. "EU AI Act Enforcement Begins", "Biden Signs AI Executive Order"
-
-If genuinely unsure, use default: ${defaultCategory}
-
-SUMMARY RULES:
-- FIRST SENTENCE: A single punchy line (10-15 words max) saying exactly what this IS. For products: "X is a [what it does]." For news: the core fact in one line.
-- THEN 2-3 sentences of detail: what changed or was announced, key numbers, why it matters to AI developers
-- Plain English, present tense, active voice
-- Make it substantial , readers should feel informed after reading
-- NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
-- NEVER start with "This article", "This release", or "This post"
-- NEVER use em dashes. Use a comma, a colon, or a full stop instead. Em dashes read as machine-written
-- If ONLY a minor patch (dep bump, typo fix, internal refactor , no user-facing change): write LOW_SIGNAL
-- If it is a retirement/deprecation notice for a niche cloud service most AI developers wouldn't know (e.g. "Azure Form Recognizer v2 retiring"): write LOW_SIGNAL. But if it affects a widely-used API or platform (e.g. "OpenAI deprecates GPT-3 API"): cover it normally
-- RELEVANCE GATE (strict , Kapyn is an AI feed): write OFF_TOPIC unless the story is genuinely about AI or machine learning, or the models, developer tools, infrastructure, research, funding, or policy that AI builders actually care about. A company merely being a startup or "in tech" is NOT enough , there must be a real AI/ML angle. Reject as OFF_TOPIC: consumer/D2C brands, general retail, fintech or SaaS with no AI angle, exam or education results (e.g. NEET/board results), sports, entertainment, crypto price moves, and generic business news.
-
-ENTITY EXTRACTION:
-- After the summary, list up to 6 specific named entities this story is actually ABOUT , models, tools, companies, techniques, or concepts (e.g. GPT-5, vLLM, Anthropic, RAG, mixture of experts).
-- Only real subjects, not passing mentions. Use the most common canonical name. Skip generic words (AI, software, model, technology, startup).
-- Output a compact JSON array on one line. If none, output [].
-
-Respond in EXACTLY this format , no extra text before or after:
-CATEGORY: <slug>
-SUMMARY: <2-3 sentences or LOW_SIGNAL>
-ENTITIES: [{"name":"<name>","type":"<model|tool|company|technique|concept>"}]
-
-Title: ${title}
-Content: ${content.slice(0, 2000)}`;
-}
-
-interface ClassifyResult {
-  category: CategorySlug;
-  summary: string; // "LOW_SIGNAL" triggers isBadSummary
-  entities: ExtractedEntity[];
-}
-
-function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyResult {
-  const categoryMatch = text.match(/CATEGORY:\s*(\S+)/);
-  // Summary runs from "SUMMARY:" up to the ENTITIES marker (or end of text), so
-  // the entities JSON never leaks into the summary body. The boundary tolerates
-  // the LLM putting ENTITIES on the same line (no preceding newline) — it just
-  // has to be followed by the opening "[".
-  const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)(?:\s*ENTITIES:\s*\[|\s*$)/);
-  const entitiesMatch = text.match(/ENTITIES:\s*(\[[\s\S]*?\])/);
-
-  const rawSlug = categoryMatch?.[1]?.trim() ?? "";
-  const category: CategorySlug = VALID_SLUGS.includes(rawSlug as CategorySlug)
-    ? (rawSlug as CategorySlug)
-    : fallback;
-
-  const summary = summaryMatch?.[1]?.trim() ?? "";
-  const entities = parseExtractedEntities(entitiesMatch?.[1]);
-  return { category, summary, entities };
-}
-
-// isBadSummary now lives in @/lib/quality (shared with the knowledge generator).
+// buildClassifyAndSummarizePrompt / parseClassifyResponse now live in
+// @/lib/news-ingest (shared with the HERMES backlog path). isBadSummary lives
+// in @/lib/quality (shared with the knowledge generator).
 
 // Retry transient LLM failures (rate limits / 5xx / network blips). Most "LLM
 // failed — skipped" drops were a single 429 with no retry; a short exponential
@@ -683,68 +591,58 @@ type IngestResults = {
   mentionsLinked: number;
   /** Items returned per feed this run. 0 means the feed is dead, -1 means it threw. */
   feedItems: Record<string, number>;
+  /** Failed-summary items kept in ingest_backlog for HERMES to retry. */
+  backlogged: number;
   errors: string[];
 };
 
-// Mirror an inserted story into the durable story_archive (insert-or-ignore on
-// source_url) and return the canonical archive id. news_items rotates every 48h
-// but the archive never does — so the knowledge graph and /digest keep working.
-// For a re-seen URL the existing archive id is returned (NOT overwritten), which
-// is why we can't use a replacing upsert here.
-async function mirrorToArchive(
+// mirrorToArchive / linkEntities now live in @/lib/news-ingest, used inside
+// persistStory below.
+
+// Best-effort: every LLM failure keeps the story in ingest_backlog instead of
+// dropping it, so HERMES (see the Kapyn<->HERMES connection plan) can retry it
+// with its own planner. Wrapped so a backlog write can never affect ingestion
+// itself — only vercel_failures/last_error are bumped on a repeat failure for
+// the same source_url; a row HERMES or a later run already resolved (status
+// != 'pending') is left untouched.
+async function backlogFailedStory(
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  id: string,
   item: FeedItem,
-  summary: string,
-  category: CategorySlug
-): Promise<string | null> {
-  await supabase.from("story_archive").upsert(
-    {
-      id,
-      title: item.title,
-      summary,
+  reason: string
+): Promise<boolean> {
+  try {
+    const { data: existing } = await supabase
+      .from("ingest_backlog")
+      .select("id, vercel_failures, status")
+      .eq("source_url", item.sourceUrl)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.status !== "pending") return false;
+      const { error } = await supabase
+        .from("ingest_backlog")
+        .update({
+          vercel_failures: existing.vercel_failures + 1,
+          last_error: reason.slice(0, 500),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id);
+      return !error;
+    }
+
+    const { error } = await supabase.from("ingest_backlog").insert({
       source_url: item.sourceUrl,
+      title: item.title,
       source_name: item.sourceName,
-      category_slug: category,
+      default_category: item.defaultCategory,
+      content: item.content.slice(0, 2000),
       image_url: item.imageUrl,
       published_at: item.publishedAt,
-    },
-    { onConflict: "source_url", ignoreDuplicates: true }
-  );
-  const { data } = await supabase
-    .from("story_archive")
-    .select("id")
-    .eq("source_url", item.sourceUrl)
-    .single();
-  return data?.id ?? null;
-}
-
-// Canonicalise + atomically upsert each extracted entity and its mention via the
-// kb_upsert_entity_mention RPC. Dedupes within a story by slug.
-async function linkEntities(
-  supabase: ReturnType<typeof getSupabaseAdmin>,
-  storyId: string,
-  entities: ExtractedEntity[],
-  results: IngestResults
-): Promise<void> {
-  const seen = new Set<string>();
-  for (const e of entities) {
-    const c = canonicalize(e.name, e.type);
-    if (!c || seen.has(c.slug)) continue;
-    seen.add(c.slug);
-    const { error } = await supabase.rpc("kb_upsert_entity_mention", {
-      p_slug: c.slug,
-      p_name: c.canonicalName,
-      p_type: c.entityType,
-      p_alias: c.alias,
-      p_story_id: storyId,
+      last_error: reason.slice(0, 500),
     });
-    if (error) {
-      results.errors.push(`Entity "${c.slug}": ${error.message}`);
-    } else {
-      results.entitiesUpserted++;
-      results.mentionsLinked++;
-    }
+    return !error;
+  } catch {
+    return false;
   }
 }
 
@@ -779,41 +677,24 @@ async function insertItems(
         results.errors.push(`LLM failed , ${outcome.reason}`);
       }
       results.errors.push(`LLM failed for "${item.title}" , skipped`);
+      if (await backlogFailedStory(supabase, item, outcome.reason)) {
+        results.backlogged++;
+      }
       return;
     }
     results.llmProviders[outcome.provider] = (results.llmProviders[outcome.provider] ?? 0) + 1;
     const { category, summary, entities } = outcome.value;
     if (isBadSummary(summary)) { results.lowSignal++; return; }
 
-    const { data: inserted, error } = await supabase
-      .from("news_items")
-      .insert({
-        title: item.title,
-        summary,
-        source_url: item.sourceUrl,
-        source_name: item.sourceName,
-        category_slug: category,
-        published_at: item.publishedAt,
-        image_url: item.imageUrl,
-      })
-      .select("id")
-      .single();
-    if (error || !inserted) {
-      results.errors.push(`Insert "${item.title}": ${error?.message ?? "no row"}`);
+    const outcome2 = await persistStory(supabase, item, { category, summary, entities });
+    if (!outcome2.ok) {
+      results.errors.push(`Insert "${item.title}": ${outcome2.error}`);
       return;
     }
     results.inserted++;
-
-    // Knowledge-graph enrichment is best-effort: a failure here must NEVER
-    // affect the news insert above, so it's isolated in its own try/catch.
-    try {
-      const archiveId = await mirrorToArchive(supabase, inserted.id, item, summary, category);
-      if (archiveId && entities.length > 0) {
-        await linkEntities(supabase, archiveId, entities, results);
-      }
-    } catch (err) {
-      results.errors.push(`KB enrich "${item.title}": ${String(err)}`);
-    }
+    results.entitiesUpserted += outcome2.entitiesUpserted;
+    results.mentionsLinked += outcome2.mentionsLinked;
+    results.errors.push(...outcome2.errors);
   };
 
   for (let i = 0; i < newItems.length; i += INSERT_CONCURRENCY) {
@@ -989,7 +870,7 @@ export async function GET(request: NextRequest) {
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
     llmFailed: 0, llmError: null, llmProviders: {},
-    entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, errors: [],
+    entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0, errors: [],
   };
 
   // RSS feeds — parallel fetch
@@ -1047,6 +928,7 @@ export async function GET(request: NextRequest) {
       llm_providers: JSON.stringify(results.llmProviders),
       entities_upserted: results.entitiesUpserted,
       mentions_linked: results.mentionsLinked,
+      backlogged: results.backlogged,
       errors: results.errors.length,
     },
   });

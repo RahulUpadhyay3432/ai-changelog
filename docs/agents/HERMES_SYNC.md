@@ -464,3 +464,37 @@ session. The laptop-off rule still holds.
 - **Updated by:** Claude Code (Kapyn side) — reconciling AGY's completed connector build and
   verified production run, then recording the ingestion incident (§2b), the scheduler safety
   hazard (§2c) and the A–D job sequence under Claude's technical lead.
+
+---
+
+## ⭐ Session 2 update (Claude, 2026-09-23) — current state, supersedes §7/§8 where they differ
+
+**Verified by Claude, independently of AGY's reports:**
+- **Job C CLOSED.** In prod Supabase (`rebytgjctycpifwtvvly`): the `story_archive` row plus 5
+  `entity_mentions` for news_items `2a2e3a8d-bbbf-4f74-87ef-09c91a64be17` (Claude Opus 5.5,
+  Anthropic, "Claude Fable 5.1", GPT-6 Astra, OpenAI). Slip: "Claude Fable 5.1" should be
+  "Fable 5.1".
+- **D0 DONE** (AGY `e5431c1`): 0/133 schedules active; the 4 test missions are `failed`; protected
+  rows unchanged; the suite passes 456/456 (re-run by Claude). Backup: `mission.db.bak-2026-09-23-preflight`.
+- **Capability probe** (AGY `29f0cbe`, KAPYN_SYNC §12): the 3 probe images exist in `brain/` at
+  the claimed times. The plumbing works; the quality failed the house rules.
+
+**agy facts Claude measured (these drive the slice 2+3 spec):**
+- `--output-format json` returns `conversation_id`, which locates the brain image deterministically.
+- `--json-schema` `structured_output` **disagreed with the prose in the same reply**. Only
+  structured_output counts, re-validated locally.
+- Image generation works without `--dangerously-skip-permissions`. A concrete physical subject gives
+  a clean still life.
+- The lower-left gate needs mean ≤ 40 **and** p95 ≤ 90: the neon-brain failure has a mean of 38.2
+  and a p95 of 126.
+
+**Blog pipeline slices:**
+| Slice | Owner | State |
+|---|---|---|
+| 1 steps mode | AGY | ✅ `12d99af` |
+| 2 `llm.generate` + 3 `image.generate` (agy CLI, no keys) | AGY | ⏳ building. Spec: `~/.claude/plans/agy-prompt-slices-2-3-2026-09-23.md` |
+| 4 `playbook/` | Claude | ✅ PR #67 → `32abcd9` |
+| 5 `GET /api/blog/candidates` + generated-post loader + TS rubric validator | Claude | next |
+| 6 `missions/kapyn_weekly_blog.yaml` → 2 shadow runs → auto-publish | both | later |
+
+**Still NOT approved:** starting `scheduler.py`, D1 batch summaries (parked), and Buffer/Instagram changes.

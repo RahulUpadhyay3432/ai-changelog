@@ -175,6 +175,8 @@ function extractImageUrl(item: ParserItem): string | null {
 // @/lib/news-ingest (shared with the HERMES backlog path). isBadSummary lives
 // in @/lib/quality (shared with the knowledge generator).
 
+const LLM_TIMEOUT_MS = 20_000; // bound a single provider call so a stall can't eat the run's time budget
+
 // Retry transient LLM failures (rate limits / 5xx / network blips). Most "LLM
 // failed — skipped" drops were a single 429 with no retry; a short exponential
 // backoff clears them and stops silently shrinking the feed.
@@ -186,6 +188,9 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
     } catch (err) {
       lastErr = err;
       const m = String(err);
+      // Our own AbortSignal.timeout: a provider that stalled 20s will stall again, and
+      // retrying it three times is what lets a late batch run past maxDuration.
+      if (err instanceof Error && err.name === "TimeoutError") break;
       const transient =
         /\b(429|500|502|503|504)\b/.test(m) ||
         /fetch failed|timeout|ETIMEDOUT|ECONNRESET|overloaded|network/i.test(m);
@@ -211,6 +216,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
       max_tokens: 700,
       temperature: 0.3,
     }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json();
@@ -264,6 +270,7 @@ async function groqAttempt(key: string, prompt: string): Promise<string | null> 
       max_tokens: 700,
       temperature: 0.3,
     }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -314,6 +321,7 @@ async function callGemini(prompt: string): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
   const data = await res.json();
@@ -346,6 +354,7 @@ async function mistralAttempt(key: string, prompt: string): Promise<string | nul
       max_tokens: 700,
       temperature: 0.3,
     }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Mistral ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -400,6 +409,7 @@ async function deepinfraAttempt(key: string, prompt: string): Promise<string | n
       max_tokens: 700,
       temperature: 0.3,
     }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 402 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`DeepInfra ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -463,23 +473,40 @@ const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promis
   { name: "openrouter-free", envKey: "OPENROUTER_API_KEY", call: (prompt) => callOpenRouter(prompt) },
 ];
 
+// Auth/balance/missing key won't recover mid-run: drop the provider at once. "key(s)
+// exhausted" is also what a per-minute 429 burst looks like, so it takes several in a row.
+const DEAD_PROVIDER_PATTERN = /\b(401|402|403)\b|API_KEY missing/i;
+const EXHAUSTED_PATTERN = /key\(s\) exhausted/i;
+const EXHAUSTED_STRIKES = 3;
+
+/** Per-request (never module-level: Fluid Compute reuses instances). */
+type ProviderHealth = { dead: string[]; strikes: Record<string, number> };
+
 async function classifyAndSummarize(
   title: string,
   content: string,
-  defaultCategory: CategorySlug
+  defaultCategory: CategorySlug,
+  health: ProviderHealth = { dead: [], strikes: {} }
 ): Promise<ClassifyOutcome> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
   const reasons: string[] = [];
 
   for (const provider of LLM_PROVIDERS) {
     if (!process.env[provider.envKey]) continue;
+    if (health.dead.includes(provider.name)) continue;
     try {
       // Retry handles transient 429/5xx within a provider; the loop handles a
       // provider being down or out of credit entirely.
       const raw = await withRetry(() => provider.call(prompt));
+      health.strikes[provider.name] = 0;
       return { ok: true, value: parseClassifyResponse(raw, defaultCategory), provider: provider.name };
     } catch (err) {
-      reasons.push(`${provider.name}: ${String(err).slice(0, 160)}`);
+      const errStr = String(err);
+      reasons.push(`${provider.name}: ${errStr.slice(0, 160)}`);
+      const strikes = EXHAUSTED_PATTERN.test(errStr) ? (health.strikes[provider.name] ?? 0) + 1 : 0;
+      health.strikes[provider.name] = strikes;
+      const dead = DEAD_PROVIDER_PATTERN.test(errStr) || strikes >= EXHAUSTED_STRIKES;
+      if (dead && !health.dead.includes(provider.name)) health.dead.push(provider.name);
     }
   }
 
@@ -576,6 +603,7 @@ function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
 // ─── Insert pipeline ──────────────────────────────────────────────────────────
 
 const INSERT_CONCURRENCY = 3; // parallel LLM calls — lower + retry keeps us under provider rate limits
+const RUN_DEADLINE_MS = 600_000; // leave ~200s of the 800s ceiling for RSS/PH/GH fetch + PostHog flush
 
 type IngestResults = {
   inserted: number;
@@ -593,6 +621,10 @@ type IngestResults = {
   feedItems: Record<string, number>;
   /** Failed-summary items kept in ingest_backlog for HERMES to retry. */
   backlogged: number;
+  /** Items not yet attempted when the run hit its time budget; next run's source_url dedup picks them up. */
+  deferred: number;
+  /** Providers this run flagged dead (quota/auth/balance) and stopped calling for the rest of the run. */
+  deadProviders: string[];
   errors: string[];
 };
 
@@ -649,7 +681,9 @@ async function backlogFailedStory(
 async function insertItems(
   items: FeedItem[],
   supabase: ReturnType<typeof getSupabaseAdmin>,
-  results: IngestResults
+  results: IngestResults,
+  runStart: number,
+  health: ProviderHealth
 ) {
   const validItems = items.filter(i => i.title && i.sourceUrl);
   if (validItems.length === 0) return;
@@ -665,9 +699,13 @@ async function insertItems(
   const newItems = validItems.filter(i => !existingUrls.has(i.sourceUrl));
   results.skipped += validItems.length - newItems.length;
 
+  // Freshest stories first: if the run hits the deadline mid-way, new items win the
+  // remaining time budget instead of losing to feed/array order.
+  newItems.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
   // ── Process new items with bounded concurrency ────────────────────────────
   const processOne = async (item: FeedItem) => {
-    const outcome = await classifyAndSummarize(item.title, item.content, item.defaultCategory);
+    const outcome = await classifyAndSummarize(item.title, item.content, item.defaultCategory, health);
     if (!outcome.ok) {
       results.llmFailed++;
       // Keep the first reason verbatim; the per-item lines stay terse so a
@@ -698,6 +736,10 @@ async function insertItems(
   };
 
   for (let i = 0; i < newItems.length; i += INSERT_CONCURRENCY) {
+    if (Date.now() - runStart >= RUN_DEADLINE_MS) {
+      results.deferred += newItems.length - i;
+      break;
+    }
     await Promise.allSettled(newItems.slice(i, i + INSERT_CONCURRENCY).map(processOne));
   }
 }
@@ -705,6 +747,7 @@ async function insertItems(
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
+  const runStart = Date.now();
   if (!isAuthorizedCron(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -870,8 +913,10 @@ export async function GET(request: NextRequest) {
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
     llmFailed: 0, llmError: null, llmProviders: {},
-    entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0, errors: [],
+    entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0,
+    deferred: 0, deadProviders: [], errors: [],
   };
+  const health: ProviderHealth = { dead: results.deadProviders, strikes: {} };
 
   // RSS feeds — parallel fetch
   const rssSettled = await Promise.allSettled(
@@ -884,7 +929,7 @@ export async function GET(request: NextRequest) {
       // A feed that parses but yields nothing is a dead feed wearing a healthy face.
       // Surfacing the count is what makes a silent 404-behind-a-redirect visible.
       results.feedItems[RSS_FEEDS[i].sourceName] = result.value.length;
-      await insertItems(result.value, supabase, results);
+      await insertItems(result.value, supabase, results, runStart, health);
     } else {
       results.feedItems[RSS_FEEDS[i].sourceName] = -1;
       results.errors.push(`RSS "${RSS_FEEDS[i].url}": ${String(result.reason)}`);
@@ -900,7 +945,7 @@ export async function GET(request: NextRequest) {
   try {
     const phPosts = await fetchProductHuntPosts(48);
     const phItems = phPostsToFeedItems(phPosts);
-    await insertItems(phItems, supabase, results);
+    await insertItems(phItems, supabase, results, runStart, health);
   } catch (err) {
     results.errors.push(`Product Hunt API: ${String(err)}`);
   }
@@ -909,7 +954,7 @@ export async function GET(request: NextRequest) {
   try {
     const ghRepos = await fetchGitHubTrendingRepos(48);
     const ghItems = githubReposToFeedItems(ghRepos);
-    await insertItems(ghItems, supabase, results);
+    await insertItems(ghItems, supabase, results, runStart, health);
   } catch (err) {
     results.errors.push(`GitHub API: ${String(err)}`);
   }
@@ -929,6 +974,8 @@ export async function GET(request: NextRequest) {
       entities_upserted: results.entitiesUpserted,
       mentions_linked: results.mentionsLinked,
       backlogged: results.backlogged,
+      deferred: results.deferred,
+      dead_providers: JSON.stringify(results.deadProviders),
       errors: results.errors.length,
     },
   });

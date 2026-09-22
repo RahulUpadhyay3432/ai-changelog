@@ -32,6 +32,18 @@ Is it **activation** (first-timers bounce on the opening cards) or a **return tr
 
 ---
 
+## 🤖 Parallel track — HERMES connection (2026-09-22, not a retention fix, don't let it distract from the above)
+
+Slice 1 shipped and is **live in production**: failed-story summarisation backlog
+(`ingest_backlog` table) + `GET/POST /api/hermes/tasks`, `/api/hermes/results`, authed via
+`HERMES_SECRET`. Full details, exact contracts, and the current handoff state live in
+**`docs/agents/HERMES_SYNC.md`** — read that (not this doc) before touching anything
+HERMES-related. Counterpart on the HERMES side: `/home/rahul/hermes-poc/mission-runner/KAPYN_SYNC.md`.
+Next step is AGY building the HERMES-side connector and running one real task — check
+`HERMES_SYNC.md` §1/§2 for whether that's happened yet.
+
+---
+
 ## 🔴 Blocked on the founder (not code)
 
 - [ ] **Gemini credits** — prepaid credits depleted → 429 `RESOURCE_EXHAUSTED` → summarisation fails → the feed cannot ingest. Top up at ai.studio and confirm the *same* key is in Vercel prod.

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kapyn blog topic selection",
+  "type": "object",
+  "properties": {
+    "selected": { "type": "boolean" },
+    "entity_slug": { "type": "string" },
+    "working_title": { "type": "string", "maxLength": 70 },
+    "angle": { "type": "string" },
+    "story_ids": { "type": "array", "items": { "type": "string" }, "maxItems": 12 },
+    "post_type": { "type": "string", "enum": ["Analysis", "Explainer", "Roundup"] },
+    "reason": { "type": "string" }
+  },
+  "required": ["selected", "reason"],
+  "additionalProperties": false
+}

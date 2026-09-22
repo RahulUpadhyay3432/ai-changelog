@@ -1,0 +1,29 @@
+{
+  "rubric_version": 1,
+
+  "output": { "width": 1600, "height": 900, "format": "webp", "quality": 80 },
+
+  "deterministic": {
+    "aspect_tolerance": 0.01,
+    "lower_left_max_mean": 40,
+    "lower_left_max_p95": 90,
+    "dhash_min_distance": 10,
+    "calibration": "Measured 2026-09-23 on 4 agy probe images (1376x768). The neon-brain image that failed the house rules has a lower-left mean of 38.2 but a p95 of 126, because its bright code text sits there. A mean-only gate would pass it, so both limits apply. Unrelated images are 21-34 dHash bits apart. Recalibrate after the first shadow runs, with images made using the treatment."
+  },
+
+  "judged": {
+    "step": "image judge (vision), added after image.generate works",
+    "hard_fail": [
+      "Any text, letters, numbers, logos or signage anywhere in the frame",
+      "People, hands or faces",
+      "Screens, UIs, robots, brains, glowing networks, circuit boards, holograms",
+      "Illustration, vector art, 3D render look, neon, lens flare"
+    ],
+    "criteria": {
+      "subject_match": { "threshold": 4, "question": "Does the photo show the subject in the concept, with its named materials?" },
+      "treatment":     { "threshold": 4, "question": "Low-key light from the upper right, warm near-black ground, muted colour, lower-left in shadow?" },
+      "photographic":  { "threshold": 4, "question": "Does it read as a real editorial still-life photograph?" }
+    },
+    "selection": "Among the candidates that pass every deterministic gate and every hard_fail check, pick the highest total judged score. If none pass, the run publishes nothing and keeps all candidates as evidence."
+  }
+}

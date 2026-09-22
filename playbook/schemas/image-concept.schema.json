@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kapyn hero image concept",
+  "type": "object",
+  "properties": {
+    "subject": { "type": "string", "maxLength": 300 },
+    "metaphor": { "type": "string" },
+    "alt": { "type": "string", "maxLength": 120 },
+    "materials": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 3 },
+    "setting": { "type": "string", "maxLength": 40 }
+  },
+  "required": ["subject", "metaphor", "alt", "materials", "setting"],
+  "additionalProperties": false
+}

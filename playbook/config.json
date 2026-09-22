@@ -1,0 +1,62 @@
+{
+  "playbook_version": 1,
+
+  "enabled": true,
+  "publish_mode": "shadow",
+  "shadow_runs_required": 2,
+
+  "cadence": { "cron": "0 6 * * 1", "timezone": "UTC" },
+  "posts_per_run": 1,
+
+  "candidates": {
+    "endpoint": "https://www.kapyn.app/api/blog/candidates",
+    "days": 7,
+    "min_stories": 3,
+    "min_distinct_sources": 2
+  },
+
+  "models": {
+    "topic": "gemini-3.8-flash-medium",
+    "distill": "gemini-3.8-flash-high",
+    "write": "gemini-3.1-pro-high",
+    "critique": "gemini-3.1-pro-high",
+    "revise": "gemini-3.1-pro-high",
+    "image_concept": "gemini-3.8-flash-high"
+  },
+
+  "steps": {
+    "topic":         { "prompt_files": ["voice.md", "topic-selection.md"],
+                       "inputs": ["candidates.json"],
+                       "schema": "schemas/topic.schema.json", "output": "topic.json" },
+    "distill":       { "prompt_files": ["research.md"],
+                       "inputs": ["topic.json", "candidates.json"],
+                       "schema": "schemas/factsheet.schema.json", "output": "factsheet.json" },
+    "write":         { "prompt_files": ["voice.md", "blog-writing.md"],
+                       "inputs": ["topic.json", "factsheet.json"],
+                       "schema": "schemas/post.schema.json", "output": "post.json" },
+    "validate":      { "rubric": "rubrics/post.json", "deterministic": true,
+                       "inputs": ["post.json", "factsheet.json"], "output": "validator.json" },
+    "critique":      { "prompt_files": ["voice.md", "critique.md", "rubrics/post.json"],
+                       "inputs": ["factsheet.json", "post.json", "validator.json"],
+                       "schema": "schemas/critique.schema.json", "output": "critique.json" },
+    "revise":        { "prompt_files": ["voice.md", "blog-writing.md", "revise.md"],
+                       "inputs": ["factsheet.json", "post.json", "critique.json", "validator.json"],
+                       "schema": "schemas/post.schema.json", "output": "post.revised.json" },
+    "image_concept": { "prompt_files": ["image-concept.md"],
+                       "inputs": ["post.json", "used-subjects.json"],
+                       "schema": "schemas/image-concept.schema.json", "output": "image-concept.json" },
+    "image":         { "treatment_file": "image-treatment.txt", "subject_from": "image-concept.json",
+                       "candidates": 3, "rubric": "rubrics/image.json" }
+  },
+
+  "post_rubric": "rubrics/post.json",
+  "image_rubric": "rubrics/image.json",
+  "max_revisions": 1,
+
+  "output": {
+    "branch_prefix": "hermes/",
+    "post_path": "content/blog/generated/{slug}.json",
+    "hero_path": "public/blog/{slug}.webp",
+    "run_report_path": "playbook/runs/{date}-{slug}.md"
+  }
+}

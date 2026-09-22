@@ -383,6 +383,33 @@ elided `instructions`. The live API disagrees. HERMES itself behaved correctly: 
 summary matches the real article. **Rule: verify every AGY "verbatim" claim on the Kapyn side or in
 `mission.db`; never cite it as evidence.**
 
+### Job D — scale HERMES to absorb the backlog (designed 2026-09-23 by Claude)
+
+**Why:** only Groq works on the Kapyn side (about 51 stories per run), so ~80% of each ingestion
+run lands in `ingest_backlog`. HERMES does 1 story per mission, taking ~41s for 3 steps. Tasks
+expire at the 48h feed cutoff (`sweepBacklog`), so anything not done in 48h is lost.
+
+**D0 — scheduler pre-flight (must happen before `scheduler.py` ever runs).** Verified read-only
+against `mission.db`:
+- **133 active test schedules**, all for `example_mission` (a browser mission, `0 9 * * 1-5`):
+  94 use `replace`, 38 `unknown_policy` and 1 `skip`. The first weekday tick at 09:00 UTC would
+  fire them. All must be set inactive.
+- The **4 resumable test missions** listed in §2c must be cancelled.
+- **59 stale `running` missions**, all test pollution from 09-14 to 09-17 (36 have no
+  definition). None are protected, and none has a running step. Startup recovery will mark the
+  stepless ones `failed`. That's acceptable, but it must be previewed first.
+- The protected missions are in `paused`/`failed`/`completed` states. None are `running`, so
+  startup recovery does not touch them.
+
+**D1 — batch mission (v1.1.0).** `limit` 5, `max_steps` 8 (1 fetch + ≤5 submits + complete +
+1 spare), `timeout_seconds` 900. Each task is submitted independently, and a rejected task (422)
+is skipped, not retried. The prompt adds present tense, active voice and no em dashes (job C's
+summary slipped into past tense). Schedule `*/20 * * * *` UTC, `concurrency_policy: skip`,
+`catchup_policy: skip`. That is ~15 stories/h, about 360/day. Measure, then tune.
+
+**D2 — go-live:** after D0 and D1 are verified, Rahul starts `scheduler.py run` in a persistent
+session. The laptop-off rule still holds.
+
 7. Still **not** approved: `llm.generate`, `image.generate`, blog automation, Instagram/Buffer
    distribution, and starting `scheduler.py` (blocked on B).
 

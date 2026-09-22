@@ -36,11 +36,15 @@ Is it **activation** (first-timers bounce on the opening cards) or a **return tr
 
 Slice 1 shipped and is **live in production**: failed-story summarisation backlog
 (`ingest_backlog` table) + `GET/POST /api/hermes/tasks`, `/api/hermes/results`, authed via
-`HERMES_SECRET`. Full details, exact contracts, and the current handoff state live in
-**`docs/agents/HERMES_SYNC.md`** — read that (not this doc) before touching anything
-HERMES-related. Counterpart on the HERMES side: `/home/rahul/hermes-poc/mission-runner/KAPYN_SYNC.md`.
-Next step is AGY building the HERMES-side connector and running one real task — check
-`HERMES_SYNC.md` §1/§2 for whether that's happened yet.
+`HERMES_SECRET`. **The Kapyn ↔ HERMES connection is now built and verified end-to-end
+(2026-09-22):** AGY built the HERMES-side connector (`integrations/kapyn.py` + mission YAML +
+hermetic tests) and ran one real task against production — independently confirmed by Claude
+(git log, HERMES's local mission ledger, live `GET` checks), not just taken on AGY's word. Full
+details live in **`docs/agents/HERMES_SYNC.md`** — read that (not this doc) before touching
+anything HERMES-related. Counterpart on the HERMES side:
+`/home/rahul/hermes-poc/mission-runner/KAPYN_SYNC.md`. Milestone is at STOP/report — no new
+HERMES work (`llm.generate`, images, blog, distribution) is approved without Rahul's explicit
+go-ahead, and this track is still secondary to the retention priority above.
 
 ---
 

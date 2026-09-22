@@ -71,13 +71,43 @@ ask for this explicitly but the earlier planning session's contract required it)
   841 pre-existing static `/mcp/[slug]` pages, unrelated to this slice; not a regression it
   introduced). **This is the durable URL for HERMES to poll going forward — use
   `https://www.kapyn.app`, not any `*.vercel.app` preview URL.**
-- **No genuine failed story has appeared yet** — give it time now that the backlog-write path
-  is live (cron runs every 2h per CLAUDE.md). The synthetic `is_test` row used for verification above is now
-  `status=done`, harmless, and can be ignored/left in place.
-- **HERMES side:** confirmed read-only — `master` branch, working tree clean, HEAD `1859b4f`.
-  Claude has made exactly one commit there this session: `99f5d6f` (git init + baseline,
-  before any of AGY's steps-mode work was known to be in progress). Nothing else in
-  `mission-runner` has been touched by Claude.
+- **No genuine failed story has appeared yet** — still true. AGY's real acceptance run (below)
+  used the same synthetic `is_test` row, reset to `pending` with fresh content via a manual
+  Supabase SQL `UPDATE` Rahul ran by hand (safe: `is_test=true` rows are hard-blocked in
+  `results/route.ts` from ever reaching `news_items`, unchanged by this).
+- **HERMES side — AGY's connector build (2026-09-22, in AGY's own terminal, outside any Claude
+  Code session):** `master` branch, working tree clean, HEAD now `7891046`. AGY built and
+  committed `integrations/kapyn.py` (`KapynAdapter`: `get_tasks`/`submit_result`/`get_result`,
+  strict validation, credential resolution via `~/.config/hermes/kapyn.env`),
+  `missions/kapyn_summary_backlog.yaml` (planner-mode, `capabilities: [api]`,
+  `allowed_domains: [kapyn.app, www.kapyn.app]`, `max_steps: 4`), and
+  `tests/test_kapyn_adapter.py` (25/25 hermetic unit tests + AGY reports 441/441 on the full
+  HERMES regression suite, zero regressions). Commits: `2fbf4a5 feat(kapyn): implement Kapyn
+  integration adapter and verify live end-to-end task execution`, `7891046 docs(sync): record
+  HEAD commit 2fbf4a5 in KAPYN_SYNC.md`. Claude's only commit in that repo all session remains
+  `99f5d6f` (git init + baseline) — everything else, including this build, is AGY's.
+
+### Independent verification (Claude, 2026-09-22 late evening — not just trusting AGY's `KAPYN_SYNC.md` self-report)
+
+`KAPYN_SYNC.md` claimed task `8d182d10-d1bb-49b1-8443-25886b511738` was pulled, classified,
+submitted, and accepted, and that mission `0a941b7c-ebd9-462b-92d2-291e0b43d2fb` completed in 3
+steps. Given the documented ~90-minute mid-air-crash risk between these two docs, this was
+checked directly rather than taken on faith:
+
+1. **HERMES git log** — commits `2fbf4a5`/`7891046` genuinely exist, working tree clean, all
+   three claimed files present on disk with mtimes (~20:35–20:36) consistent with the run.
+2. **HERMES's local mission ledger** (`~/hermes-poc/mission-runner/mission.db`, read-only
+   `sqlite3` query) — mission `0a941b7c-ebd9-462b-92d2-291e0b43d2fb` exists,
+   `status=completed`, `definition_name=kapyn_summary_backlog`, timestamps consistent with the
+   claimed run.
+3. **Live production `GET` requests against `https://www.kapyn.app`** (read-only, using the
+   stored `HERMES_SECRET`):
+   - `GET /api/hermes/results?task_id=8d182d10-d1bb-49b1-8443-25886b511738` → `{"status":"done"}`
+   - `GET /api/hermes/tasks?kind=summary_backlog&limit=5` → `{"tasks":[]}` (no eligible backlog
+     tasks pending — nothing dangling or stuck)
+
+**Conclusion: the Kapyn ↔ HERMES Task Connection milestone is genuinely complete and verified
+live in production**, confirmed independently on the Kapyn side, not solely on AGY's report.
 
 ---
 
@@ -99,6 +129,12 @@ Read in full. No conflicts found.
   actually `1859b4f` (one commit later, "remove duplicate sync file"). Not a conflict, just
   worth AGY refreshing on its next write.
 - §14 open questions are answered in full in §4 below.
+
+**Re-reconciled 2026-09-22 late evening, after AGY's connector build + production run.**
+`KAPYN_SYNC.md` (its §1–§11, timestamp `2026-09-22T21:15:00+05:30`) and this file now agree:
+both sides list the same milestone as complete, the same commit hashes, and the same protected
+items as untouched. No conflicts found on this pass either — see the independent verification
+above for why this isn't just taking AGY's write at face value.
 
 ---
 
@@ -193,22 +229,20 @@ identically.
 2. ~~**Claude:** finish the preview verification checklist~~ — **DONE, all green** (§2).
 3. ~~**Claude:** merge PR #65 to `main`, confirm production deploy~~ — **DONE.** Merged as
    `2d7dec7`, production build finished and verified live (§2).
-4. **AGY — this is your green light.** Build `integrations/kapyn.py` (`get_tasks`,
-   `submit_result`, `prepare_observation_request`, `reconcile`, `parse_response` per the
-   contract in §4), register it, add `missions/kapyn_summary_backlog.yaml` (capabilities
-   `[api]`, `max_steps: 4`, `policy.api.allowed_domains: [kapyn.app]`,
-   `credential_bindings: {kapyn: HERMES_SECRET}`, planner-mode `prompt_template`, **not**
-   steps mode — this slice was always planner-driven), and hermetic adapter tests. Then attempt
-   exactly one real task pull + submit against **production**
-   (`https://www.kapyn.app` — the durable URL, not any ephemeral preview URL) as the actual
-   acceptance test. No genuine failed story has appeared yet as of this writing — if none has
-   by the time you're ready, insert one more `is_test=true` row yourself (same shape as §2's
-   example) rather than waiting indefinitely; just don't touch `news_items`/`story_archive`
-   directly, only `ingest_backlog`.
+4. ~~**AGY — this is your green light.** Build `integrations/kapyn.py` ... attempt exactly one
+   real task pull + submit against production ...~~ — **DONE.** AGY built the adapter, mission
+   YAML, and hermetic tests, and ran the real acceptance task against `https://www.kapyn.app`
+   (task `8d182d10-...`, mission `0a941b7c-...`, `200 {"accepted":true}`). Independently
+   verified by Claude, not just AGY's self-report — see the verification block above.
 5. **Do not** start `llm.generate`, `image.generate`, blog automation, or Instagram work
-   (unchanged from KAPYN_SYNC.md §13).
-6. When AGY's run completes, update this file's §1/§2 with the result and hand back to Claude
-   for inspection (per the original plan: BUILD → TEST → ONE REAL RUN → INSPECT → STOP/report).
+   (unchanged from KAPYN_SYNC.md §13) — **still applies, nothing here changes it.**
+6. ~~When AGY's run completes, update this file's §1/§2 ... hand back to Claude for
+   inspection~~ — **DONE, this update is that inspection.** Per the agreed cycle
+   (`BUILD → TEST → ONE REAL RUN → INSPECT → STOP/report`), this milestone has now reached
+   **STOP/report**: the connection is live, verified, and complete. No further HERMES work is
+   approved without a fresh, explicit go-ahead from Rahul — and per `docs/PROJECT-STATUS.md`,
+   this track was never the priority to begin with (retention is). Next action is Rahul's call,
+   not an automatic continuation into a new slice.
 
 ---
 
@@ -219,14 +253,19 @@ identically.
 - **PR:** https://github.com/RahulUpadhyay3432/ai-changelog/pull/65 (**MERGED**).
 - **Production URL (durable — use this):** `https://www.kapyn.app`
 - **Migration file:** `supabase/migrations/0013_ingest_backlog.sql` (written AND applied).
-- **HERMES repo:** branch `master`, HEAD `1859b4f` as of Claude's last read. Claude's only
-  commit there all session: `99f5d6f` (git init + baseline).
+- **HERMES repo:** branch `master`, HEAD `7891046` as of Claude's last read (AGY's commits
+  `2fbf4a5`/`7891046` on top of Claude's baseline). Claude's only commit there all session:
+  `99f5d6f` (git init + baseline).
+- **Verified task/mission (2026-09-22 real acceptance run):** task
+  `8d182d10-d1bb-49b1-8443-25886b511738`, mission `0a941b7c-ebd9-462b-92d2-291e0b43d2fb`,
+  status `done`/`completed` on both sides, confirmed live.
 - **Secret file for HERMES:** `~/.config/hermes/kapyn.env` (`HERMES_SECRET=...`, chmod 600).
 
 ---
 
 ## 8. Last Update Timestamp
 
-- **Timestamp:** 2026-09-22 (session-local; see git commit timestamps on the identifiers above
-  for exact times).
-- **Updated by:** Claude Code (Kapyn side).
+- **Timestamp:** 2026-09-22, late evening (session-local; see git commit timestamps on the
+  identifiers above for exact times).
+- **Updated by:** Claude Code (Kapyn side) — reconciling AGY's completed connector build +
+  verified production run.

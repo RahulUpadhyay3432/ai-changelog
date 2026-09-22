@@ -1,0 +1,98 @@
+{
+  "rubric_version": 1,
+  "applies_to": "schemas/post.schema.json",
+
+  "text_scope": "Checks run over every text field in body (paragraph text, list items, callout title and text, heading text) plus title and deck, unless a check says otherwise. The final Sources list is excluded from word_count and forbidden_patterns but included in url checks.",
+
+  "deterministic": [
+    { "id": "schema", "check": "json_schema", "schema": "schemas/post.schema.json",
+      "message": "Post does not match the schema." },
+
+    { "id": "word_count", "check": "word_count", "min": 450, "max": 1100,
+      "message": "Body must be 450-1,100 words, excluding the Sources list." },
+
+    { "id": "words_per_fact", "check": "words_per_cited_fact", "max": 110,
+      "message": "Too many words per cited fact. The post is padded; cut rather than stretch." },
+
+    { "id": "em_dash", "check": "forbidden_pattern", "pattern": "[\\u2014\\u2013]",
+      "message": "No em or en dashes. Use a comma, colon or full stop." },
+    { "id": "dash_residue", "check": "forbidden_pattern", "pattern": "\\s,\\s|\\s-\\s",
+      "message": "' , ' or ' - ' left where a dash was removed. Rewrite the sentence." },
+    { "id": "exclamation", "check": "forbidden_pattern", "pattern": "!",
+      "message": "No exclamation marks." },
+    { "id": "emoji", "check": "no_emoji", "codepoint_ranges": [["2600", "27BF"], ["1F000", "1FAFF"]],
+      "message": "No emojis." },
+    { "id": "hype", "check": "forbidden_pattern", "flags": "i",
+      "pattern": "\\b(revolutionar\\w*|game[- ]chang\\w*|groundbreaking|cutting[- ]edge|unprecedented|paradigm shift|supercharg\\w*|unleash\\w*|unlock\\w*|seamless\\w*|transformative|next[- ]level|mind[- ]blowing|disrupt\\w*|skyrocket\\w*|exciting)\\b",
+      "message": "Hype word. State the fact instead." },
+    { "id": "filler", "check": "forbidden_pattern", "flags": "i",
+      "pattern": "(in today's fast-paced|ever[- ]evolving|it's worth noting|it is worth noting|let's dive|dive in|in conclusion|buckle up|\\bdelve|tapestry|navigate the complexities|in the world of)",
+      "message": "Filler phrase. Cut it." },
+    { "id": "self_reference", "check": "forbidden_pattern", "flags": "i",
+      "pattern": "^(this article|this post|in this post|in this article)",
+      "message": "Do not open a paragraph by referring to the post itself." },
+
+    { "id": "numbers_grounded", "check": "numbers_in_facts",
+      "pattern": "\\d+(?:[.,]\\d+)*",
+      "message": "Every number in the post must appear verbatim in the fact sheet. This is the main anti-fabrication gate." },
+    { "id": "urls_grounded", "check": "urls_in_sources",
+      "message": "Every link must point to a URL in the fact sheet's sources." },
+    { "id": "fact_refs_valid", "check": "fact_refs_exist",
+      "message": "A block cites a fact ID that is not in the fact sheet." },
+    { "id": "numeric_blocks_cite", "check": "blocks_with_digits_cite_facts",
+      "message": "A block states a number but cites no fact." },
+    { "id": "min_sources", "check": "distinct_sources_linked", "min": 2,
+      "message": "Link at least 2 distinct sources." },
+    { "id": "sources_section", "check": "sources_section",
+      "message": "The post must end with a level-2 'Sources' heading and one list linking every cited source." },
+
+    { "id": "lead_first", "check": "first_block_is_lead",
+      "message": "The first block must be the lead paragraph." },
+    { "id": "headings", "check": "heading_count", "level": 2, "min": 3, "max": 6,
+      "message": "Use 3-6 level-2 headings, including 'Sources'." },
+    { "id": "title_no_question", "check": "forbidden_pattern", "field": "title", "pattern": "\\?",
+      "message": "The title states the development. It is not a question." },
+    { "id": "slug_unique", "check": "slug_not_in", "source": "existing_slugs",
+      "message": "Slug already exists on the blog." }
+  ],
+
+  "judged": {
+    "step": "critique",
+    "scale": "1-5",
+    "criteria": {
+      "grounding": {
+        "threshold": 5,
+        "5": "Every factual claim traces to a fact, at its stated certainty.",
+        "3": "Mostly grounded, but one or two claims are stronger than the facts or unsupported.",
+        "1": "Claims, numbers or names appear that are not in the fact sheet."
+      },
+      "synthesis": {
+        "threshold": 4,
+        "5": "Connects the sources into a clear picture a reader could not get from any one story.",
+        "3": "Accurate, but reads as a list of story summaries.",
+        "1": "Misreads the facts or presents one source's view as consensus."
+      },
+      "voice": {
+        "threshold": 4,
+        "5": "Calm, plain, specific. Reads like a sharp colleague, not a model.",
+        "3": "Mostly on voice, with some generic or marketing phrasing.",
+        "1": "Hype, filler or obviously machine-written."
+      },
+      "value": {
+        "threshold": 3,
+        "5": "A busy engineer learns something useful and knows what to watch.",
+        "3": "Informative but restates the news without adding understanding.",
+        "1": "Padded or repetitive, with nothing a reader would miss."
+      },
+      "structure": {
+        "threshold": 4,
+        "5": "The lead states the development, headings are specific, there is a 'What to watch' section and a Sources list.",
+        "3": "Workable, with generic headings or a buried lead.",
+        "1": "No clear shape."
+      }
+    },
+    "pass_rule": "verdict is 'pass', no blocking issues, and every criterion at or above its threshold."
+  },
+
+  "on_failure": "One revision (config.max_revisions). If the deterministic checks or the judged rubric still fail after it, the run ends with no post, and the run report records why. Never publish a failing post."
+}

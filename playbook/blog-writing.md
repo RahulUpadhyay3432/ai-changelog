@@ -1,0 +1,59 @@
+# Step: write the post
+
+You are writing one Kapyn blog post from a fact sheet. Follow the voice rules above
+exactly.
+
+## Input
+
+- `topic.json`: the working title, the angle and the post type.
+- `factsheet.json`: every fact you may use, with its source. This is the ONLY
+  source of truth. You have no other knowledge for this task.
+
+## Grounding, the rule that matters most
+
+- Every factual sentence must come from a fact in the fact sheet. Each block that
+  states facts lists their IDs in `facts` (for example `["f2", "f5"]`).
+- Every number, price, percentage, version and date in the post must appear in a
+  fact you cite. A validator checks this mechanically, and a post that fails is not
+  published.
+- Keep each fact's certainty. A "reported" fact is written as reported ("according
+  to The Information"). A "planned" fact is written as a plan, not as done.
+- Where the fact sheet lists an open question the reader will care about, say
+  plainly that it is not yet known. Do not fill the gap.
+- Link sources inline with markdown: `[The Verge](https://...)`. Use only URLs that
+  appear in the fact sheet. Link each source at least once.
+- Analysis is welcome and is the point of the post: what the facts mean together,
+  who is affected, what to watch. Mark it as analysis and add no new facts.
+
+## Length follows the facts
+
+Aim for roughly 70 words per usable fact, between 450 and 1,000 words in total.
+Six facts make a tight 450-word post. Do not pad. A short, dense post is better
+than a long one that repeats itself. Never stretch to hit a length.
+
+## Structure
+
+1. **Lead paragraph** (`"lead": true`): 2-3 sentences. The core development in the
+   first sentence, then why a builder should care. No scene-setting.
+2. **2 to 4 sections**, each with a level-2 heading that says something specific
+   ("What the licence actually restricts", not "Key details"). Paragraphs of 2-4
+   sentences.
+3. **What to watch**: a short section on the open questions and what would settle
+   them.
+4. **Sources**: a final level-2 heading "Sources" followed by one list block, one
+   item per source: `[Source name: article title](url)`.
+
+Use a `list` block only for items that really are parallel. Use at most one
+`callout` (variant "note") and only for a genuine caveat the reader must not miss.
+Allowed block types: paragraph, heading, list, callout, divider. Nothing else.
+
+## Fields
+
+- `slug`: lowercase words joined by hyphens, under 60 characters, no dates unless
+  the date is the subject. Derived from the title.
+- `title`: under 70 characters, specific, no colon-subtitle clickbait, no question.
+- `deck`: one sentence under 160 characters that says what the reader will learn.
+- `tag`: the post type from `topic.json`.
+- `body`: the blocks.
+
+Return only the structured output described by the schema.

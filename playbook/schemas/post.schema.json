@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kapyn generated blog post (a subset of BlogPost in src/lib/blog-content.ts)",
+  "type": "object",
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 60 },
+    "title": { "type": "string", "maxLength": 70 },
+    "deck": { "type": "string", "maxLength": 160 },
+    "tag": { "type": "string", "enum": ["Analysis", "Explainer", "Roundup"] },
+    "body": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["paragraph", "heading", "list", "callout", "divider"] },
+          "text": { "type": "string" },
+          "lead": { "type": "boolean" },
+          "level": { "type": "integer", "enum": [2, 3] },
+          "items": { "type": "array", "items": { "type": "string" } },
+          "ordered": { "type": "boolean" },
+          "variant": { "type": "string", "enum": ["note"] },
+          "title": { "type": "string" },
+          "facts": { "type": "array", "items": { "type": "string", "pattern": "^f[0-9]+$" } }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["slug", "title", "deck", "tag", "body"],
+  "additionalProperties": false
+}

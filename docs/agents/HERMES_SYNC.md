@@ -34,31 +34,43 @@ ask for this explicitly but the earlier planning session's contract required it)
 
 ## 2. Current Production State (as of this writing)
 
-- **Migration NOT yet applied.** Confirmed live just now: a correctly-authenticated request to
-  the preview deployment's `/api/hermes/tasks` returns
-  `500 {"error":"Could not find the table 'public.ingest_backlog' in the schema cache"}`.
-  **This is the current blocking dependency** — Rahul is applying it by hand in the Supabase
-  SQL editor (no psql/Supabase CLI available in this environment); not yet confirmed done.
-- **PR #65 NOT yet merged.** Production (`www.kapyn.app`) is still running the old
-  `api/news/fetch` code — no `ingest_backlog` writes are happening in production yet, and
-  `/api/hermes/*` does not exist in production yet.
-- **`HERMES_SECRET` IS already set** in Vercel — both **Preview** and **Production**
-  environments (confirmed via `vercel env ls`, values hidden as expected). Stored for HERMES
-  at `~/.config/hermes/kapyn.env` (chmod 600, outside both repos), key name `HERMES_SECRET`.
-- **Preview deployment is live** and reachable:
-  `https://ai-changelog-7sshfk65k-rahul-upadhyays-projects-8dd82149.vercel.app`
-  (ephemeral — tied to the branch/PR, will change/disappear on merge. Not a durable URL for
-  HERMES to poll long-term; production `https://www.kapyn.app` is the durable one, live only
-  after merge+deploy).
-- **Preview checks done so far:** 401 with no `Authorization` header ✅, 401 with a wrong
-  secret ✅ (both return this route's own `{"error":"Unauthorized"}` JSON, not a Vercel
-  SSO/deployment-protection wall — confirmed by inspecting the response body, not just the
-  status code), 200-reachable auth path with the correct secret ✅ (then hit the missing-table
-  error above, which is expected pre-migration).
-  **Not yet done** (blocked on the migration): empty `tasks` list, 422 on a bad summary, 404 on
-  an unknown task id, duplicate-submit idempotency, one full `is_test` round trip.
-- **No `is_test` row exists yet. No genuine failed story has been captured yet** — the
-  backlog-write code isn't live in production, so nothing has had the chance to fail into it.
+- **Migration APPLIED.** Rahul ran it in the Supabase SQL editor. `ingest_backlog` exists in
+  the one production Supabase project (Preview and Production point at the same physical DB —
+  there is no separate staging database for this project).
+- **PR #65 verification COMPLETE — full round trip passed on the Preview deployment**
+  (`https://ai-changelog-7sshfk65k-rahul-upadhyays-projects-8dd82149.vercel.app`, ephemeral,
+  will disappear on merge). Every check in the original hermetic list passed:
+  - 401 with no `Authorization` header, 401 with a wrong secret (this route's own
+    `{"error":"Unauthorized"}` JSON, not a Vercel SSO wall — confirmed via response body).
+  - Empty `tasks` list on an empty/all-resolved backlog; unknown `kind` also returns `[]`.
+  - `GET /api/hermes/tasks` returns the correct task shape (verified against a real
+    `is_test=true` row — see below).
+  - `404 {"error":"unknown task"}` on both `POST /api/hermes/results` and
+    `GET /api/hermes/results?task_id=` for a made-up id.
+  - `400` on a malformed `POST /api/hermes/results` body (missing `result.task_id`/`output`).
+  - `422 {"accepted":false,"reason":"summary length 9 outside 80-900","attempts_left":2}` on a
+    deliberately bad submission; `hermes_attempts` incremented, row stayed `pending`.
+  - Valid submission on the same (`is_test=true`) row →
+    `200 {"accepted":true,"news_item_id":null,"duplicate":false}` — confirms the `is_test`
+    write-skip actually works (never touched `news_items`).
+  - Same submission resubmitted → `200 {"accepted":true,"news_item_id":null,"duplicate":true}`
+    — idempotency confirmed.
+  - Status flipped `pending → done`; `GET /api/hermes/tasks` then correctly excludes it.
+  - **One real gotcha found during testing, not a code bug:** running two INSERT statements
+    stacked in the same Supabase SQL editor buffer (leftover text from an earlier paste) rolled
+    both back when the second hit a unique-constraint conflict with the first, within the same
+    implicit transaction. Symptom looked exactly like a query-logic bug (row existed per the
+    constraint error, `SELECT *` showed 0 rows) but was purely an SQL-editor buffer mixup.
+    Nothing in `src/app/api/hermes/*` needed to change.
+- **`HERMES_SECRET` IS set** in Vercel — both **Preview** and **Production** environments
+  (confirmed via `vercel env ls`, values hidden as expected). Stored for HERMES at
+  `~/.config/hermes/kapyn.env` (chmod 600, outside both repos), key name `HERMES_SECRET`.
+- **PR #65 NOT yet merged** (about to be). Production (`www.kapyn.app`) is still running the
+  old `api/news/fetch` code — `/api/hermes/*` does not exist in production yet. This section
+  will be updated the moment merge + prod deploy is confirmed.
+- **No genuine failed story has appeared yet** — expected, since the backlog-write code isn't
+  live in production yet. The synthetic `is_test` row used for verification above is now
+  `status=done`, harmless, and can be ignored/left in place.
 - **HERMES side:** confirmed read-only — `master` branch, working tree clean, HEAD `1859b4f`.
   Claude has made exactly one commit there this session: `99f5d6f` (git init + baseline,
   before any of AGY's steps-mode work was known to be in progress). Nothing else in
@@ -174,14 +186,11 @@ identically.
 
 ## 6. Exact Next Approved Step
 
-1. **Rahul:** apply `supabase/migrations/0013_ingest_backlog.sql` in the Supabase SQL editor
-   (in progress, not yet confirmed).
-2. **Claude:** once confirmed, finish the preview verification checklist (empty tasks, 422,
-   404, duplicate-submit idempotency, one full `is_test` round trip through
-   `/api/hermes/tasks` → `/api/hermes/results` on the **preview** deployment).
-3. **Claude:** merge PR #65 to `main`, confirm production deploy (`npx vercel ls --prod`),
-   update this file with the production URL/commit and confirmation the migration + routes are
-   live in production.
+1. ~~**Rahul:** apply `supabase/migrations/0013_ingest_backlog.sql`~~ — **DONE.**
+2. ~~**Claude:** finish the preview verification checklist~~ — **DONE, all green** (§2).
+3. **Claude (in progress now):** merge PR #65 to `main`, confirm production deploy
+   (`npx vercel ls --prod`), update this file with the production URL/commit and confirmation
+   the migration + routes are live in production.
 4. **AGY:** only after step 3 is confirmed in this file — build `integrations/kapyn.py`
    (`get_tasks`, `submit_result`, `prepare_observation_request`, `reconcile`,
    `parse_response` per the contract in §4), register it, add

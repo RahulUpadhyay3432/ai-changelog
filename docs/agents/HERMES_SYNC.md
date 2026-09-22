@@ -383,6 +383,28 @@ elided `instructions`. The live API disagrees. HERMES itself behaved correctly: 
 summary matches the real article. **Rule: verify every AGY "verbatim" claim on the Kapyn side or in
 `mission.db`; never cite it as evidence.**
 
+### ⭐ DIRECTION RESET (Rahul, 2026-09-23) — read this before anything below
+
+1. **No API keys.** All text and image generation runs through the **agy / Gemini CLI** on
+   Rahul's dedicated laptop, orchestrated by HERMES. The Vercel provider keys (Groq, Mistral,
+   DeepInfra…) are only a fallback for when the laptop is down, not the plan.
+2. **Main goal = the autonomous blog + AI image pipeline.** It is already agreed: "Kapyn ×
+   HERMES — Autonomous Weekly Blog Pipeline", AGY history `history.jsonl` #306. It has 9 slices.
+   Slice 1 (steps mode) is DONE (`12d99af`). **Next: slice 2 `llm.generate` and slice 3
+   `image.generate`, both backed by the agy CLI (NOT the Gemini API).** Then the Kapyn
+   `playbook/` (Claude), `GET /api/blog/candidates` (Claude), `missions/kapyn_weekly_blog.yaml`,
+   2 shadow runs, then auto-publish (Rahul chose auto-publish).
+3. **Summaries second, and real-time:** Kapyn pushes a signed wake to the laptop (tunnel +
+   HERMES webhook ingress, Phase 5E), with pull kept as the fallback. **Job D1 below (the batch
+   summary mission) is PARKED.** D0 (scheduler pre-flight cleanup) still applies.
+4. **Capability probe (2026-09-23), preliminary, from files Claude inspected directly:**
+   - headless agy wrote a 1,324-word post to `/tmp/hermes-probe/blog_post.txt`;
+   - the agy image tool produced a 1376×768 image in ~50s, saved under
+     `~/.gemini/antigravity-cli/brain/<conv>/…jpg`.
+   Quality FAILED the house rules: the image had text and neon brains, which breaks
+   `docs/blog-image-prompts.md`; the post had em dashes, hype, and details invented beyond
+   its source. Deterministic gates + grounded research are mandatory before anything ships.
+
 ### Job D — scale HERMES to absorb the backlog (designed 2026-09-23 by Claude)
 
 **Why:** only Groq works on the Kapyn side (about 51 stories per run), so ~80% of each ingestion

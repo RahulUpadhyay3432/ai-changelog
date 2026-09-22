@@ -65,11 +65,14 @@ ask for this explicitly but the earlier planning session's contract required it)
 - **`HERMES_SECRET` IS set** in Vercel — both **Preview** and **Production** environments
   (confirmed via `vercel env ls`, values hidden as expected). Stored for HERMES at
   `~/.config/hermes/kapyn.env` (chmod 600, outside both repos), key name `HERMES_SECRET`.
-- **PR #65 NOT yet merged** (about to be). Production (`www.kapyn.app`) is still running the
-  old `api/news/fetch` code — `/api/hermes/*` does not exist in production yet. This section
-  will be updated the moment merge + prod deploy is confirmed.
-- **No genuine failed story has appeared yet** — expected, since the backlog-write code isn't
-  live in production yet. The synthetic `is_test` row used for verification above is now
+- **PR #65 MERGED to `main`** (squash commit `2d7dec7`) and **LIVE IN PRODUCTION**, confirmed:
+  `https://www.kapyn.app/api/hermes/tasks` returns `401` with no/wrong secret and
+  `200 {"tasks":[]}` with the correct one (production build took ~9 minutes — slow because of
+  841 pre-existing static `/mcp/[slug]` pages, unrelated to this slice; not a regression it
+  introduced). **This is the durable URL for HERMES to poll going forward — use
+  `https://www.kapyn.app`, not any `*.vercel.app` preview URL.**
+- **No genuine failed story has appeared yet** — give it time now that the backlog-write path
+  is live (cron runs every 2h per CLAUDE.md). The synthetic `is_test` row used for verification above is now
   `status=done`, harmless, and can be ignored/left in place.
 - **HERMES side:** confirmed read-only — `master` branch, working tree clean, HEAD `1859b4f`.
   Claude has made exactly one commit there this session: `99f5d6f` (git init + baseline,
@@ -188,30 +191,36 @@ identically.
 
 1. ~~**Rahul:** apply `supabase/migrations/0013_ingest_backlog.sql`~~ — **DONE.**
 2. ~~**Claude:** finish the preview verification checklist~~ — **DONE, all green** (§2).
-3. **Claude (in progress now):** merge PR #65 to `main`, confirm production deploy
-   (`npx vercel ls --prod`), update this file with the production URL/commit and confirmation
-   the migration + routes are live in production.
-4. **AGY:** only after step 3 is confirmed in this file — build `integrations/kapyn.py`
-   (`get_tasks`, `submit_result`, `prepare_observation_request`, `reconcile`,
-   `parse_response` per the contract in §4), register it, add
-   `missions/kapyn_summary_backlog.yaml` (capabilities `[api]`, `max_steps: 4`,
-   `policy.api.allowed_domains: [kapyn.app]`, `credential_bindings: {kapyn: HERMES_SECRET}`,
-   planner-mode `prompt_template`, **not** steps mode — this slice was always planner-driven),
-   and hermetic adapter tests. Then attempt exactly one real task pull + submit against
-   **production** (`https://www.kapyn.app`, not the ephemeral preview URL) as the actual
-   acceptance test — using an `is_test` row if no genuine failed story has appeared yet.
+3. ~~**Claude:** merge PR #65 to `main`, confirm production deploy~~ — **DONE.** Merged as
+   `2d7dec7`, production build finished and verified live (§2).
+4. **AGY — this is your green light.** Build `integrations/kapyn.py` (`get_tasks`,
+   `submit_result`, `prepare_observation_request`, `reconcile`, `parse_response` per the
+   contract in §4), register it, add `missions/kapyn_summary_backlog.yaml` (capabilities
+   `[api]`, `max_steps: 4`, `policy.api.allowed_domains: [kapyn.app]`,
+   `credential_bindings: {kapyn: HERMES_SECRET}`, planner-mode `prompt_template`, **not**
+   steps mode — this slice was always planner-driven), and hermetic adapter tests. Then attempt
+   exactly one real task pull + submit against **production**
+   (`https://www.kapyn.app` — the durable URL, not any ephemeral preview URL) as the actual
+   acceptance test. No genuine failed story has appeared yet as of this writing — if none has
+   by the time you're ready, insert one more `is_test=true` row yourself (same shape as §2's
+   example) rather than waiting indefinitely; just don't touch `news_items`/`story_archive`
+   directly, only `ingest_backlog`.
 5. **Do not** start `llm.generate`, `image.generate`, blog automation, or Instagram work
    (unchanged from KAPYN_SYNC.md §13).
+6. When AGY's run completes, update this file's §1/§2 with the result and hand back to Claude
+   for inspection (per the original plan: BUILD → TEST → ONE REAL RUN → INSPECT → STOP/report).
 
 ---
 
 ## 7. Relevant Identifiers
 
-- **Kapyn branch:** `hermes/slice-1-ingest-backlog`, commit `c74fc99`.
-- **PR:** https://github.com/RahulUpadhyay3432/ai-changelog/pull/65 (open, not merged).
-- **Preview URL (ephemeral):** `https://ai-changelog-7sshfk65k-rahul-upadhyays-projects-8dd82149.vercel.app`
-- **Migration file:** `supabase/migrations/0013_ingest_backlog.sql` (written, not yet applied).
-- **HERMES repo:** branch `master`, HEAD `1859b4f`. Claude's only commit there: `99f5d6f`.
+- **Kapyn branch:** `hermes/slice-1-ingest-backlog` (still exists, merged into `main`).
+- **`main` HEAD:** `2d7dec7` (squash-merged PR #65).
+- **PR:** https://github.com/RahulUpadhyay3432/ai-changelog/pull/65 (**MERGED**).
+- **Production URL (durable — use this):** `https://www.kapyn.app`
+- **Migration file:** `supabase/migrations/0013_ingest_backlog.sql` (written AND applied).
+- **HERMES repo:** branch `master`, HEAD `1859b4f` as of Claude's last read. Claude's only
+  commit there all session: `99f5d6f` (git init + baseline).
 - **Secret file for HERMES:** `~/.config/hermes/kapyn.env` (`HERMES_SECRET=...`, chmod 600).
 
 ---

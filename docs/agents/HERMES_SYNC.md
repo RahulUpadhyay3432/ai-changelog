@@ -106,8 +106,90 @@ checked directly rather than taken on faith:
    - `GET /api/hermes/tasks?kind=summary_backlog&limit=5` → `{"tasks":[]}` (no eligible backlog
      tasks pending — nothing dangling or stuck)
 
-**Conclusion: the Kapyn ↔ HERMES Task Connection milestone is genuinely complete and verified
-live in production**, confirmed independently on the Kapyn side, not solely on AGY's report.
+**Conclusion: the connection *plumbing* is genuinely complete and verified live in production**,
+confirmed independently on the Kapyn side, not solely on AGY's report.
+
+**But read this carefully — the bridge is NOT yet proven on real work.** The task AGY processed
+was a synthetic `is_test` row whose content AGY itself wrote. What that proves: auth, task
+serving, planner classification, submission, validation, idempotency, status transitions. What it
+does **not** prove: that a genuine failed story reaches the backlog, and that a HERMES result
+persists into `news_items` via `persistStory` (the `is_test` path deliberately skips that write).
+Until one genuine story completes that loop, the handoff's "verified end-to-end" milestone is
+only half met.
+
+---
+
+## 2b. Kapyn production incident — ingestion is timing out (found 2026-09-22, NOT caused by this slice)
+
+Discovered while verifying the above. This is the reason no genuine backlog task exists yet, and
+it blocks the real bridge proof.
+
+- **Symptom:** every `GET /api/news/fetch` since ~2026-09-21 16:00 UTC returns `504` — "Vercel
+  Runtime Timeout Error: Task timed out after 800 seconds" (`maxDuration = 800`, not the 300 that
+  CLAUDE.md claims). The GitHub Actions workflow (`.github/workflows/fetch-news.yml`, every 2h)
+  is killed at its own 20-minute cap; the last five runs show `cancelled`.
+- **Last successfully completed run:** 2026-09-21 09:48 UTC (PostHog `news_fetch_completed`).
+- **Root cause (from the last completed runs' telemetry):** `classifyAndSummarize` walks
+  `LLM_PROVIDERS` in order **for every story**. Groq exhausts its free daily quota partway
+  through a run ("Groq: 3 key(s) exhausted after 3 rounds"), DeepSeek returns `402 Insufficient
+  Balance`, and Gemini returns `402 prepayment credits depleted`. Each dead provider still costs
+  key-rotation rounds, sleeps and `withRetry` attempts **per story**, before Mistral/DeepInfra
+  (keys added 2026-09-21) are even reached. With ~250 new items per run at
+  `INSERT_CONCURRENCY = 3`, the run never finishes. Last completed runs: `inserted` 27–45,
+  `llm_failed` 191–255.
+- **Consequences that matter to HERMES:**
+  1. No run completes, so no `news_fetch_completed` telemetry — **nobody yet knows whether the new
+     Mistral/DeepInfra keys work.**
+  2. Stories after the kill point never reach `ingest_backlog`, so **HERMES cannot see them**.
+  3. PR #65's backlog-write path has **never executed in production** — no ingestion run has
+     happened since it deployed (~2026-09-22 14:20 UTC).
+- **Fix in flight (Kapyn side, job A):** fail fast — per-run dead-provider skip list, a 20s
+  `AbortSignal.timeout` per provider call, a ~600s wall-clock deadline that stops starting new
+  stories (untried items reported as `deferred`, not backlogged), and newest-first ordering.
+  Expected result: runs finish, telemetry returns, and genuine failures land in `ingest_backlog`.
+
+---
+
+## 2c. ⚠️ SAFETY: the scheduler would auto-resume protected Buffer missions (job B — AGY)
+
+**Do not start `scheduler.py` until this is fixed.** Verified read-only against the real
+`mission.db` on 2026-09-22.
+
+`scheduler.py::resume_paused_missions` (~line 902) dispatches
+`durable_runner_v2.py --resume` for every mission returned by
+`Ledger.get_resumable_paused_missions` (`ledger_v2.py` ~line 1014): status `paused`,
+`definition_name NOT NULL`, latest step not `blocked`/`failed`, and not a succeeded `wait`.
+Two **protected** missions match that filter exactly today:
+
+| Mission | Definition | Latest step |
+|---|---|---|
+| `2a4ebc62-2395-4426-af30-1559867698be` | `ai_gtdaily_buffer_social_pipeline` | `api.call` → `unknown` |
+| `2ab9da65-9307-47aa-a018-9dc0c2532323` | `ai_gtdaily_buffer_publish_pipeline` | `api.call` → `unknown` |
+
+Any recurring HERMES job (the planned "failed-story summarisation every 30 minutes") requires the
+scheduler, so starting it today would resume a Buffer **publish** pipeline on an early tick.
+
+### Job B spec (AGY implements; Claude reviews)
+
+1. Add a versioned `protected_missions.json` at the HERMES repo root listing these 10 IDs:
+   `2a4ebc62-2395-4426-af30-1559867698be`, `2a537e7f-3e91-4758-8354-1030f236dca4`,
+   `f6497d12-e7e7-423b-8f7a-5e2049ca3b17`, `2ab9da65-9307-47aa-a018-9dc0c2532323`,
+   `73eeff1e-7b67-41e5-a19d-5d35227b562b`, `033c00d4-41ae-4d02-bf41-6a174ce1826a`,
+   `4ae1c530-5d8d-476c-984f-a9da7aff804f`, `3beb3e39-ec36-43d5-ac68-98d012ca98af`,
+   `9cfb3653-b08e-4f83-a1aa-65e706149d91`, `f4e99069-2d0f-4511-8429-28f1d9923ed3`.
+   **Note the last-but-one ID:** the original handoff listed `…-65e7067691d91`, which does not
+   exist in the ledger. The real ID is `9cfb3653-b08e-4f83-a1aa-65e706149d91`.
+2. Enforce in **two** places: exclude protected IDs in `Ledger.get_resumable_paused_missions`,
+   **and** make `durable_runner_v2.py --resume` refuse a protected ID (clear error, non-zero
+   exit). **Fail closed:** a missing or unparseable file means resume is refused.
+3. Hermetic tests only (isolated roots, never the real `mission.db`): a scheduler resume tick
+   dispatches nothing for a protected mission in the paused + latest-step-`unknown` state; an
+   equivalent non-protected mission is still resumable; `--resume` on a protected ID refuses.
+4. Full suite green: `python3 -m unittest discover -s tests -p "test_*.py"` (441/441 baseline).
+5. Read-only proof against the real ledger (`sqlite3 -readonly mission.db`): the new candidate
+   filter no longer returns `2a4ebc62` or `2ab9da65`.
+6. **Do not** change any row in `mission.db`, resume/run any mission, or start the scheduler.
+   Commit, update `KAPYN_SYNC.md`, stop. Paste actual command output verbatim in the report.
 
 ---
 
@@ -237,12 +319,33 @@ identically.
 5. **Do not** start `llm.generate`, `image.generate`, blog automation, or Instagram work
    (unchanged from KAPYN_SYNC.md §13) — **still applies, nothing here changes it.**
 6. ~~When AGY's run completes, update this file's §1/§2 ... hand back to Claude for
-   inspection~~ — **DONE, this update is that inspection.** Per the agreed cycle
-   (`BUILD → TEST → ONE REAL RUN → INSPECT → STOP/report`), this milestone has now reached
-   **STOP/report**: the connection is live, verified, and complete. No further HERMES work is
-   approved without a fresh, explicit go-ahead from Rahul — and per `docs/PROJECT-STATUS.md`,
-   this track was never the priority to begin with (retention is). Next action is Rahul's call,
-   not an automatic continuation into a new slice.
+   inspection~~ — **DONE, this update is that inspection.**
+
+### Current sequence (set 2026-09-22, Claude now technical lead)
+
+Rahul moved technical leadership of this build from ChatGPT to Claude, and confirmed the
+direction: **HERMES is intended to become the persistent summarisation layer that replaces
+reliance on paid per-provider API keys.** That raises the stakes on §2b — Kapyn must fail fast
+and hand work to the backlog for HERMES to take over at all.
+
+| Job | Owner | State |
+|---|---|---|
+| **A — Kapyn fail-fast ingestion** (fixes §2b) | Sonnet writes the PR, Claude reviews/merges/verifies | in flight |
+| **B — protected-mission guard** (fixes §2c) | AGY implements, Claude reviews | in flight, parallel with A |
+| **C — prove the real bridge:** one *genuine* backlog task → `news_items` | AGY runs, Claude verifies | blocked on A; needs Rahul's explicit go |
+| **D — scale HERMES to absorb volume** (batching via `limit` ≤ 5 or steps mode, then a `schedule:` block) | design after C | not started |
+
+A and B are independent (different repos, different files) and run in parallel.
+
+**C acceptance (the handoff's real §14 milestone):** a genuine `ingest_backlog` row (not
+`is_test`) is served, summarised by the AGY planner, accepted by Kapyn, and persisted through
+`persistStory` — with the `news_items` row, `story_archive` mirror and linked entities verified,
+a resubmit returning `duplicate: true`, and the summary reviewed against Kapyn's voice rules
+before we trust the path unattended. If A leaves the backlog empty (providers healthy again),
+**do not invent production work** — report that condition and stop.
+
+7. Still **not** approved: `llm.generate`, `image.generate`, blog automation, Instagram/Buffer
+   distribution, and starting `scheduler.py` (blocked on B).
 
 ---
 
@@ -267,5 +370,6 @@ identically.
 
 - **Timestamp:** 2026-09-22, late evening (session-local; see git commit timestamps on the
   identifiers above for exact times).
-- **Updated by:** Claude Code (Kapyn side) — reconciling AGY's completed connector build +
-  verified production run.
+- **Updated by:** Claude Code (Kapyn side) — reconciling AGY's completed connector build and
+  verified production run, then recording the ingestion incident (§2b), the scheduler safety
+  hazard (§2c) and the A–D job sequence under Claude's technical lead.

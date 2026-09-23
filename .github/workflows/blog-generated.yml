@@ -1,0 +1,37 @@
+name: Generated blog posts
+
+# The gate for HERMES's weekly blog PRs (hermes/<slug>). Auto-publish merges only
+# when this is green, so it re-runs the deterministic post rubric
+# (playbook/rubrics/post.json) against the committed fact sheet, checks the
+# manifest and the hero, and runs the rubric fixtures (the parity suite HERMES's
+# own Python engine also passes). Offline, no npm install, a few seconds.
+
+on:
+  pull_request:
+    paths:
+      - "content/blog/generated/**"
+      - "public/blog/**"
+      - "playbook/**"
+      - "scripts/validate-blog-post.ts"
+      - ".github/workflows/blog-generated.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rubric fixtures
+        run: node scripts/validate-blog-post.ts --self-test
+
+      - name: Generated posts
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+        run: node scripts/validate-blog-post.ts --all

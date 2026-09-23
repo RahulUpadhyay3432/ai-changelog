@@ -49,6 +49,7 @@ export interface BlogPost {
 }
 
 import { INDIA_POSTS } from "./blog-india";
+import { GENERATED_POSTS } from "./blog-generated";
 
 // Unsplash served via plain <img> (no next/image remote config needed). Sizing
 // params keep payloads small; the standard Unsplash license permits free use.
@@ -4686,6 +4687,8 @@ limit 8;`,
   },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
+  // HERMES weekly blog — see src/lib/blog-generated.ts
+  ...GENERATED_POSTS,
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

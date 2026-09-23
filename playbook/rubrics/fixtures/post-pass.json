@@ -1,0 +1,40 @@
+{
+  "slug": "model-q-2-input-price-cut",
+  "title": "Model Q 2 cuts input prices and opens a 400,000 token window",
+  "deck": "Example Labs lowered input prices and widened the context window. The coding claims still need outside tests.",
+  "tag": "Analysis",
+  "body": [
+    { "type": "paragraph", "lead": true, "facts": ["f1", "f2"],
+      "text": "Example Labs released Model Q 2 on 14 September 2026, and the headline change is price. Input now costs $3 per million tokens, down from $5 for Model Q 1, according to the [launch post](https://example.com/labs/model-q-2). For teams that run long prompts at volume, that is the number that decides whether a migration is worth scheduling this quarter." },
+    { "type": "paragraph", "facts": ["f3", "f4"],
+      "text": "The model also takes more context. Model Q 2 accepts up to 400,000 tokens, which is enough to hold a mid-sized codebase or a long contract in a single request. Example Labs reports a score of 71.5 on its internal coding benchmark, against 64.2 for the previous model. That figure comes from the vendor alone, so treat it as a claim rather than a result." },
+    { "type": "heading", "level": 2, "text": "What changed in Model Q 2" },
+    { "type": "paragraph", "facts": ["f2", "f3"],
+      "text": "Two things moved at once, and they compound. A lower input price matters most when prompts are long, and a larger context window invites longer prompts. A team that already pads requests with retrieved documents can now send more of them and pay less per token for each one. The saving on any single request depends on how much of the new window a team actually fills, which is why the price cut and the context change should be modelled together rather than one at a time." },
+    { "type": "paragraph", "facts": ["f10"],
+      "text": "What the launch does not change is the output side. The launch post says nothing about output pricing, so workloads that generate long answers, such as report drafting or code generation, will see a smaller effect than the input figure suggests. Anyone estimating a budget should split their traffic into input and output tokens before assuming a saving, and should rerun that estimate once output pricing is stated." },
+    { "type": "heading", "level": 2, "text": "Where it runs" },
+    { "type": "paragraph", "facts": ["f5", "f6"],
+      "text": "Access starts with Example Labs itself. Sample Cloud [plans to offer](https://example.org/cloud/model-q-2-regions) Model Q 2 in 3 regions from 1 October 2026, but it has not yet published a price for the model on its platform. Teams that buy through a cloud marketplace for billing or data residency reasons should wait for that price before they plan a move, because marketplace pricing does not always match the vendor's own." },
+    { "type": "paragraph", "facts": ["f9", "f8"],
+      "text": "Early adoption is thin but real. The Example Journal [reports](https://example.net/journal/model-q-2-first-week) that 2 large customers moved workloads to Model Q 2 in the first week. No independent tests have been published yet, so the coding score above still rests on the vendor's own numbers, and early customers are taking that on trust." },
+    { "type": "callout", "variant": "note", "title": "Deadline", "facts": ["f7"],
+      "text": "Example Labs plans to retire Model Q 1 on 31 January 2027. Anything pinned to the old model needs a tested replacement before then." },
+    { "type": "heading", "level": 2, "text": "What to watch" },
+    { "type": "list", "facts": ["f4", "f5", "f6", "f10"],
+      "items": [
+        "Independent coding results. If outside tests land near 71.5, the upgrade case is simple. If they land closer to 64.2, the price cut is the main reason to switch.",
+        "The Sample Cloud price. The 3 region launch on 1 October 2026 only helps marketplace buyers once a price is attached.",
+        "Output pricing. A change there would matter more than the input cut for products that generate a lot of text."
+      ] },
+    { "type": "paragraph", "facts": ["f7"],
+      "text": "The practical move for most teams is a small trial now, measured on their own prompts, with a decision well before the 31 January 2027 retirement date. The price is known. The quality claim is not, and the next few weeks of outside testing will settle it." },
+    { "type": "heading", "level": 2, "text": "Sources" },
+    { "type": "list",
+      "items": [
+        "[Introducing Model Q 2](https://example.com/labs/model-q-2), Example Labs",
+        "[Model Q 2 comes to Sample Cloud](https://example.org/cloud/model-q-2-regions), Sample Cloud",
+        "[Early customers try Model Q 2](https://example.net/journal/model-q-2-first-week), The Example Journal"
+      ] }
+  ]
+}

@@ -50,6 +50,8 @@
     { "name": "question title", "fail": ["title_no_question"],
       "patch": [{ "op": "replace", "path": "/title", "value": "Is Model Q 2 worth the switch?" }] },
     { "name": "slug taken", "fail": ["slug_unique"],
-      "existing_slugs": ["model-q-2-input-price-cut"] }
+      "existing_slugs": ["model-q-2-input-price-cut"] },
+    { "name": "heading level out of range", "fail": ["schema"],
+      "patch": [{ "op": "replace", "path": "/body/2/level", "value": 4 }] }
   ]
 }

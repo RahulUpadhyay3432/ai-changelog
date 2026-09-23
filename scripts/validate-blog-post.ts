@@ -50,7 +50,7 @@ const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !
 
 const SCHEMA_KEYWORDS = new Set([
   "$schema", "title", "description", "type", "properties", "required", "additionalProperties",
-  "enum", "pattern", "maxLength", "minLength", "minItems", "maxItems", "items",
+  "enum", "pattern", "maxLength", "minLength", "minItems", "maxItems", "items", "minimum", "maximum",
 ]);
 
 function typeOk(type: string, v: unknown): boolean {
@@ -74,6 +74,10 @@ function validateSchema(schema: Obj, v: unknown, path: string, errors: string[])
     return;
   }
   if (Array.isArray(schema.enum) && !schema.enum.includes(v)) errors.push(`${path}: not one of ${schema.enum.join(", ")}`);
+  if (typeof v === "number") {
+    if (typeof schema.minimum === "number" && v < schema.minimum) errors.push(`${path}: less than ${schema.minimum}`);
+    if (typeof schema.maximum === "number" && v > schema.maximum) errors.push(`${path}: greater than ${schema.maximum}`);
+  }
   if (typeof v === "string") {
     if (typeof schema.pattern === "string" && !new RegExp(schema.pattern, "u").test(v)) errors.push(`${path}: does not match ${schema.pattern}`);
     if (typeof schema.maxLength === "number" && [...v].length > schema.maxLength) errors.push(`${path}: longer than ${schema.maxLength}`);

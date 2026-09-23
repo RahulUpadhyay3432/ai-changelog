@@ -57,6 +57,7 @@
     "branch_prefix": "hermes/",
     "post_path": "content/blog/generated/{slug}.json",
     "hero_path": "public/blog/{slug}.webp",
+    "factsheet_path": "playbook/runs/{date}-{slug}.factsheet.json",
     "run_report_path": "playbook/runs/{date}-{slug}.md"
   }
 }

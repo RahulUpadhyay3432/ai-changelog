@@ -48,15 +48,43 @@ its report. A skipped week is fine. A wrong post is not.
 
 ## Output contract
 
-A published post is two files on the run's branch:
+A published post is these files on the run's branch (`config.json` → `output`):
 
 - `content/blog/generated/<slug>.json`: the validated post (`schemas/post.schema.json`)
-  plus `date`, `readingMin` (computed, not generated), `hero` and `playbook_sha`.
-- `public/blog/<slug>.webp`: the 1600×900 hero.
+  plus an envelope of `date` (YYYY-MM-DD), `hero: {alt}` (from `image-concept.json`)
+  and `playbook_sha`. `readingMin` is computed by the loader; any value in the file
+  is ignored.
+- `content/blog/generated/index.ts`: the manifest. Rewrite it with one sorted
+  `import pN from "./<slug>.json";` per post, all listed in `GENERATED_RAW`. Posts are
+  static imports because the blog list also ships to the browser (search, ⌘K).
+- `public/blog/<slug>.webp`: the 1600×900 hero, at most 500 KB.
+- `playbook/runs/<date>-<slug>.factsheet.json`: the fact sheet the post was written
+  from, so CI can re-run the grounding checks.
+- `playbook/runs/<date>-<slug>.md`: the run report.
 
-The blog reads `content/blog/generated/` alongside the hand-written posts in
-`src/lib/blog-content.ts`. (That loader is not built yet; it ships with the
-candidates endpoint.)
+`src/lib/blog-generated.ts` maps the posts into `BLOG_POSTS` alongside the
+hand-written ones in `src/lib/blog-content.ts`. A malformed file is skipped with a
+warning instead of breaking the build.
+
+## Validation
+
+`scripts/validate-blog-post.ts` implements the `deterministic` section of
+`rubrics/post.json` (plain Node 22, no dependencies, fails closed on an unknown check).
+
+- `--all` is the CI gate (`.github/workflows/blog-generated.yml`). It checks the
+  manifest, the envelope, the schema, the hero and slug uniqueness for every generated
+  post. It runs the full rubric on the posts the PR adds or changes. Auto-publish
+  merges only when it is green.
+- `--self-test` runs `rubrics/fixtures/cases.json`: one passing post and one case per
+  check, each listing the exact ids that must fail. **HERMES's Python rubric engine
+  must produce the same results on the same fixtures.** Add a case whenever a check
+  is added or changed.
+- `<post.json> --factsheet <f.json> [--existing-slugs a,b]` validates one post and
+  prints JSON.
+
+`GET /api/blog/candidates?days=7` (Bearer `HERMES_SECRET`) is the intake. It returns
+entity clusters from the story archive that meet `candidates.min_stories` and
+`min_distinct_sources`, with at most 12 stories each, plus `already_covered`.
 
 ## Rules for editing the playbook
 

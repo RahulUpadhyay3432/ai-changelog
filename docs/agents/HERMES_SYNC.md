@@ -492,9 +492,44 @@ session. The laptop-off rule still holds.
 | Slice | Owner | State |
 |---|---|---|
 | 1 steps mode | AGY | ✅ `12d99af` |
-| 2 `llm.generate` + 3 `image.generate` (agy CLI, no keys) | AGY | ⏳ building. Spec: `~/.claude/plans/agy-prompt-slices-2-3-2026-09-23.md` |
+| 2 `llm.generate` + 3 `image.generate` (agy CLI, no keys) | AGY | ✅ `412a4f1`..`1799d31`, verified by Claude (see Session 3) |
 | 4 `playbook/` | Claude | ✅ PR #67 → `32abcd9` |
-| 5 `GET /api/blog/candidates` + generated-post loader + TS rubric validator | Claude | next |
+| 5 `GET /api/blog/candidates` + generated-post loader + TS rubric validator | Claude | ✅ PR `feat/blog-candidates` (see Session 3) |
 | 6 `missions/kapyn_weekly_blog.yaml` → 2 shadow runs → auto-publish | both | later |
 
 **Still NOT approved:** starting `scheduler.py`, D1 batch summaries (parked), and Buffer/Instagram changes.
+
+
+## ⭐ Session 3 update (Claude, 2026-09-23)
+
+**Slices 2+3 VERIFIED independently** (HERMES `412a4f1`, `944ea5b`, `90899c7`, `0e35a16`, `1799d31`):
+- Commit stats match AGY's report. Claude re-ran the suite: `Ran 490 tests ... OK`.
+- Ledger rows for `m_llm_4a2a10d4cc4d` and `m_img_ccfdefa7b636` match the on-disk sha256s. Step
+  results hold metadata only, no generated text.
+- Gates recomputed with AGY's own functions: lower-left luma within 0.3, same dHash. The 3
+  `probe_slate_key` candidates are clean, on-brief still lifes (all pass).
+- Protected rows unchanged, 0/133 schedules active, no scheduler running, `llm-home` purged.
+
+**Open gaps sent to AGY (non-blocking):**
+1. `imagegen-home` settings is a denylist of named tools, not "deny all except the image tool".
+2. `extract_effective_prompt` strips quotes instead of JSON-decoding (the saved prompt has
+   literal `\n\n`).
+3. 4 unpurged conversations are left in imagegen-home.
+4. Slice 6 must point `prompt_roots` at the Kapyn `playbook/`, not HERMES's `playbook/treatment.md`.
+
+**Lesson:** dHash does not catch a repeated subject (a different brass-key image is 30-42 bits
+away). Subject variety comes from `used-subjects.json`. Recorded in `playbook/lessons.md`.
+
+**Slice 5 (Kapyn, PR `feat/blog-candidates`):**
+- `GET /api/blog/candidates?days=7`: Bearer `HERMES_SECRET`, anon Supabase client, clusters
+  by entity, at most 12 stories per cluster, `already_covered` from `BLOG_POSTS`.
+- Prod, 7 days to 2026-09-22: 208 stories, 151 with entities, **21 clusters** meet 3 stories
+  from 2 sources. The payload is about 83 KB inline (HERMES `max_input_bytes` is 200 KB).
+  Broad companies dominate (OpenAI 35, Anthropic 21); picking among them is the topic step's job.
+- Loader: `src/lib/blog-generated.ts` + manifest `content/blog/generated/index.ts` (static
+  imports; HERMES rewrites the manifest).
+- Validator: `scripts/validate-blog-post.ts` (`--all`, `--self-test`) + CI
+  `.github/workflows/blog-generated.yml`. It uses the output contract in `playbook/README.md`,
+  which adds the fact sheet at `playbook/runs/{date}-{slug}.factsheet.json`.
+- **Slice 6 needs:** HERMES's own deterministic step, a Python rubric engine that passes
+  `playbook/rubrics/fixtures/cases.json` with identical failing ids.

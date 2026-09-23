@@ -16,7 +16,7 @@
           "type": { "type": "string", "enum": ["paragraph", "heading", "list", "callout", "divider"] },
           "text": { "type": "string" },
           "lead": { "type": "boolean" },
-          "level": { "type": "integer", "enum": [2, 3] },
+          "level": { "type": "integer", "minimum": 2, "maximum": 3 },
           "items": { "type": "array", "items": { "type": "string" } },
           "ordered": { "type": "boolean" },
           "variant": { "type": "string", "enum": ["note"] },

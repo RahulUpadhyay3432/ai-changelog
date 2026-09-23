@@ -163,6 +163,11 @@ function linksIn(text: string): string[] {
 
 const normUrl = (u: string): string => u.trim().replace(/#.*$/, "").replace(/\/+$/, "");
 
+/** Version numbers glued to a capitalized product name ("GPT-6", "Opus 5.5") are not
+ * claims that need a citation the way a statistic is. Strip them before checking for digits. */
+const MODEL_VERSION_RE = /\b[A-Z][A-Za-z]*(?:-\d+(?:\.\d+)*|\s+\d+(?:\.\d+)*)\b/g;
+const withoutModelVersions = (t: string): string => t.replace(MODEL_VERSION_RE, "");
+
 function citedFacts(blocks: Block[]): string[] {
   return [...new Set(blocks.flatMap((b) => b.facts ?? []))];
 }
@@ -256,7 +261,7 @@ const CHECKS: Record<string, CheckFn> = {
   blocks_with_digits_cite_facts: (_c, post) => {
     const bad = mainBlocks(post.body).flatMap((b) => {
       if (b.type === "heading") return [];
-      const hasDigit = blockTexts(b).some((t) => /\d/.test(withoutUrls(t)));
+      const hasDigit = blockTexts(b).some((t) => /\d/.test(withoutModelVersions(withoutUrls(t))));
       return hasDigit && !(b.facts ?? []).length ? [`body/${post.body.indexOf(b)}`] : [];
     });
     return bad.length ? sample(bad) : null;

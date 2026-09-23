@@ -52,6 +52,9 @@
     { "name": "slug taken", "fail": ["slug_unique"],
       "existing_slugs": ["model-q-2-input-price-cut"] },
     { "name": "heading level out of range", "fail": ["schema"],
-      "patch": [{ "op": "replace", "path": "/body/2/level", "value": 4 }] }
+      "patch": [{ "op": "replace", "path": "/body/2/level", "value": 4 }] },
+    { "name": "model version number needs no citation", "fail": [],
+      "patch": [{ "op": "add", "path": "/body/4",
+        "value": { "type": "paragraph", "text": "Model Q 3 also appeared in the same announcement without further detail." } }] }
   ]
 }

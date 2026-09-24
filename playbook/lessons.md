@@ -4,6 +4,37 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · Active voice for a gap turned "unknown" into a confident negative
+
+**What happened:** mission `2ebab517` ("Meta's Muse agent faces macOS control,
+zero-day and Amazon block") failed `POST_JUDGED` at grounding 1/5, the worst
+score, on a paragraph built entirely from `open_questions`: "Meta has not
+released a security patch for the critical zero-day ClickFix vulnerability...
+Amazon has not established a permission protocol for shopping agents. OpenAI
+has not detailed its response to the copying claims." Every clause passed
+`numbers_grounded`/`fact_refs_valid` (no numbers, no invented facts) and every
+deterministic check on this run passed — it failed purely at the LLM judge.
+Checked against the real `factsheet.json`: `open_questions` were phrased as
+genuine questions ("Has Meta released a security patch...?"), not established
+negatives. PR #74's active-voice rule ("Anthropic has not published pricing",
+not "Pricing is not yet known") was applied literally to every open question,
+including ones where the underlying fact is genuinely unknown, not just
+undisclosed — "Meta has not released a patch" asserts Meta hasn't patched it,
+which silence in the sources cannot support (they may have patched it and no
+outlet covered it). PR #74's own example was actually safe (a company not
+publishing pricing is reliably newsworthy if it happens), but the rule as
+written didn't teach that distinction, so it generalized to unsafe cases too.
+**Rule:** an open question is a gap in disclosure, not a known negative. Say
+what the named party hasn't confirmed or said ("Meta has not confirmed whether
+it patched X"), never assert the underlying event didn't happen ("Meta has not
+patched X") — same active voice, narrower claim. See `blog-writing.md`.
+
+**Also observed, not yet a rule:** two smaller, likely one-off grounding/
+synthesis slips in the same run (attributing the zero-day report to
+"researchers" when the fact sheet only cites Ars Technica; a sentence that
+implied rapid *adoption* itself sparked the IP dispute, when it's the copying
+*claims* that did) — not fixed here, no repeat pattern seen yet to generalize
+from.
 ## 2026-09-24 · A conflict note's own prose isn't a citable source
 
 **What happened:** mission `a09156f7` ("Meta's Muse agent faces a zero-day flaw

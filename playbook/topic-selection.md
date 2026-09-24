@@ -18,8 +18,11 @@ stories. Prefer, in this order:
 1. **Consequence.** Something changed that affects what engineers build, buy or
    decide this quarter: a model release, a pricing or licence change, a policy with
    a date, a widely used tool changing behaviour.
-2. **Convergence.** Several independent sources report the same development from
-   different angles. That is what makes a synthesis post worth reading.
+2. **Convergence.** Several independent sources add distinct facts about the same
+   development, not just multiple write-ups of the same announcement. A launch
+   article, an availability notice and a tooling update about one release often
+   report the same handful of facts three times, not three times as many facts —
+   check what each story adds beyond what the others already said.
 3. **Substance in the summaries.** The stories themselves contain concrete facts:
    numbers, dates, names, specifics. You can only write what the sources say.
 
@@ -30,6 +33,13 @@ stories. Prefer, in this order:
 - It substantially overlaps a post in `already_covered`.
 - Its summaries are thin (they restate the headline and add nothing).
 - It is not really about AI (the entity is a generic company doing non-AI things).
+- Its stories, read together, describe one event from a handful of angles rather
+  than several distinct developments. Mentally list the non-duplicate facts across
+  all the summaries combined; a post needs roughly 10+ to reach 450 words
+  (`blog-writing.md`) without padding. A cluster that passes the source-count
+  check but nets under 10 distinct facts (a release, its availability on one
+  platform, one CLI tool adding support) will force invention at the word-count
+  floor later — reject it here instead.
 
 If no cluster passes, choose nothing: return `"selected": false` with the reason.
 A skipped week is fine. A thin post is not.

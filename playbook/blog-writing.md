@@ -31,6 +31,12 @@ Aim for roughly 70 words per usable fact, between 450 and 1,000 words in total.
 Six facts make a tight 450-word post. Do not pad. A short, dense post is better
 than a long one that repeats itself. Never stretch to hit a length.
 
+Combine related facts into fuller sentences rather than listing each one on its
+own. Two sentences that connect three facts about the same development read as
+synthesis; three short sentences that each restate the same subject read as a
+fact dump. If a section feels thin, go deeper on what the facts mean (who is
+affected, what to watch) rather than adding more one-fact sentences.
+
 ## Structure
 
 1. **Lead paragraph** (`"lead": true`): 2-3 sentences. The core development in the

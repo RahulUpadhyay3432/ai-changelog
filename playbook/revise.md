@@ -16,6 +16,11 @@ You are revising the draft to fix every issue the editor raised.
   an unsupported sentence always beats rewording it.
 - Change nothing the editor did not flag, apart from what a fix forces (a changed
   transition, say).
+- If the flagged issue is length (too short), do not fix it by adding more short,
+  one-fact sentences. Combine facts already cited into fuller sentences, or go
+  deeper on what they mean. Padding this way can pass the word count check while
+  failing voice and value: read the whole paragraph back and ask whether it
+  connects the facts or just lists them.
 - The rules for writing the post above still apply in full.
 
 Return the complete revised post as structured output, in the same schema as the

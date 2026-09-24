@@ -4,6 +4,31 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · A conflict note's own prose isn't a citable source
+
+**What happened:** mission `a09156f7` ("Meta's Muse agent faces a zero-day flaw
+and an Amazon shopping block") failed earlier than any run since PR #76 — at
+`POST_DETERMINISTIC`, before the LLM judge ever ran. The revised post had a
+callout: "The Decoder reported Muse attracted 500,000 users by September 23,
+whereas TechCrunch reported it debuted at Meta Connect on September 24." Both
+numbers (23, 24) failed `numbers_grounded`. Tracing it in the real
+`factsheet.json`: the underlying facts (f1: "attracts 500,000 users in its
+first week", f27: "debuted at Meta's Connect event") never state a date in
+their own `text` — the actual calendar dates existed only in each fact's
+`published_at` metadata and in `conflicts[].note`'s free-form prose ("The
+Decoder reported on September 23, 2026... whereas TechCrunch reported on
+September 24, 2026..."). The deterministic validator (`numbers_in_facts` in
+`scripts/validate-blog-post.ts`) only ever checks numbers against `facts[].text`
+— it never reads `conflicts[].note` or `published_at`. The writer's instinct to
+make the conflict concrete with real dates was reasonable; the note was simply
+the only place those dates existed as readable prose, and using it looked
+identical to citing a fact.
+**Rule:** a conflict's `note` is context for the writer, never a citable source.
+Any date or number that needs to appear in the post must be written into a
+fact's own `text` at distillation time — not left only in `published_at` or the
+conflict note. See `research.md` (capture it at the source) and `blog-writing.md`
+(never copy a number from the conflict note directly).
+
 ## 2026-09-24 · Restructuring a sentence for flow silently drops its hedge
 
 **What happened:** mission `b7cb02c0` ("Meta's Muse agent hits 500,000 users amid

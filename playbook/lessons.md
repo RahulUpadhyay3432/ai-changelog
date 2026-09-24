@@ -4,6 +4,38 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · The closest run yet: an unmarked opinion in the lead
+
+**What happened:** mission `f2af14d7` (another Muse post) is the closest run
+so far — grounding 5/5, structure 5/5, synthesis 5/5, value 5/5, voice 4/5,
+every score at or above threshold. It still failed `POST_JUDGED`, because
+`critique.md` makes `verdict: "pass"` conditional on zero blocking issues, not
+just on scores clearing threshold ("`verdict` is 'pass' only when there are no
+blocking issues and every criterion scores at or above its threshold"), and
+this run had exactly 2, both voice, both on the same two sentences: the lead's
+"why a builder should care" clause, unchanged from the very first draft
+(never flagged or touched by the earlier critique/revise pass either) —
+"Builders deploying local agents must weigh the benefits of deep system
+access against the reality of basic social engineering threats and closed
+commercial ecosystems." That is a judgment, stated as a bare assertion, never
+marked as opinion the way `voice.md` requires everywhere else in the post
+("Our read is...", "The likely effect is..."). The critique's suggested fixes
+also pushed toward naming the three actual issues (a zero-day, an IP dispute,
+a platform block) instead of describing them abstractly ("the practical risks
+of building autonomous agents").
+**Rule:** the lead's "why a builder should care" sentence is interpretation,
+not a plain fact, almost by definition — it needs an opinion marker and
+specific naming, same as analysis anywhere else in the post. `blog-writing.md`
+now says so explicitly in the lead structure rule, since nothing had connected
+it to the opinion rule before.
+
+**Also observed, not a rule yet:** `critique.final.json`'s first issue quoted
+text that doesn't appear verbatim anywhere in `post.revised.json` or
+`post.json` — a paraphrase, not an exact quote, despite `critique.md` asking
+for "the exact offending text". Didn't change the diagnosis here (the second
+issue's quote was exact and pointed at the same two sentences), but worth
+watching: if a future run's only evidence for an issue is an inexact quote,
+don't trust it without finding the real text it's pointing at.
 ## 2026-09-24 · Fixing voice can quietly break the word-count floor
 
 **What happened:** mission `20cc5ea6` ("Meta's Muse agent faces a zero-day flaw

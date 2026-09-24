@@ -1,0 +1,115 @@
+{
+  "facts": [
+    {
+      "id": "f1",
+      "text": "Example Labs released Model Q 2 on 14 September 2026.",
+      "kind": "fact",
+      "certainty": "confirmed",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    },
+    {
+      "id": "f2",
+      "text": "Model Q 2 costs $3 per million input tokens, down from $5 for Model Q 1.",
+      "kind": "fact",
+      "certainty": "confirmed",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    },
+    {
+      "id": "f3",
+      "text": "Model Q 2 accepts up to 400,000 tokens of context.",
+      "kind": "fact",
+      "certainty": "confirmed",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    },
+    {
+      "id": "f4",
+      "text": "Example Labs says Model Q 2 scores 71.5 on its internal coding benchmark, against 64.2 for Model Q 1.",
+      "kind": "fact",
+      "certainty": "reported",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    },
+    {
+      "id": "f5",
+      "text": "Sample Cloud will offer Model Q 2 in 3 regions from 1 October 2026.",
+      "kind": "fact",
+      "certainty": "planned",
+      "source_url": "https://example.org/cloud/model-q-2-regions",
+      "source_name": "Sample Cloud",
+      "published_at": "2026-09-16"
+    },
+    {
+      "id": "f6",
+      "text": "Sample Cloud has not published a price for Model Q 2 on its platform.",
+      "kind": "fact",
+      "certainty": "confirmed",
+      "source_url": "https://example.org/cloud/model-q-2-regions",
+      "source_name": "Sample Cloud",
+      "published_at": "2026-09-16"
+    },
+    {
+      "id": "f7",
+      "text": "Example Labs plans to retire Model Q 1 on 31 January 2027.",
+      "kind": "fact",
+      "certainty": "planned",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    },
+    {
+      "id": "f8",
+      "text": "No independent tests of Model Q 2 have been published yet.",
+      "kind": "context",
+      "certainty": "confirmed",
+      "source_url": "https://example.net/journal/model-q-2-first-week",
+      "source_name": "The Example Journal",
+      "published_at": "2026-09-21"
+    },
+    {
+      "id": "f9",
+      "text": "The Example Journal reports that 2 large customers moved workloads to Model Q 2 in the first week.",
+      "kind": "fact",
+      "certainty": "reported",
+      "source_url": "https://example.net/journal/model-q-2-first-week",
+      "source_name": "The Example Journal",
+      "published_at": "2026-09-21"
+    },
+    {
+      "id": "f10",
+      "text": "The Model Q 2 launch post does not mention output token pricing.",
+      "kind": "context",
+      "certainty": "confirmed",
+      "source_url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "published_at": "2026-09-14"
+    }
+  ],
+  "conflicts": [],
+  "open_questions": [
+    "Will independent coding results match the vendor's 71.5?"
+  ],
+  "sources": [
+    {
+      "url": "https://example.com/labs/model-q-2",
+      "source_name": "Example Labs",
+      "title": "Introducing Model Q 2"
+    },
+    {
+      "url": "https://example.org/cloud/model-q-2-regions",
+      "source_name": "Sample Cloud",
+      "title": "Model Q 2 comes to Sample Cloud"
+    },
+    {
+      "url": "https://example.net/journal/model-q-2-first-week",
+      "source_name": "The Example Journal",
+      "title": "Early customers try Model Q 2"
+    }
+  ]
+}

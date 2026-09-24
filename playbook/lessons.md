@@ -4,6 +4,26 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · "Opinion" became a loophole for inventing scenarios
+
+**What happened:** mission `3cfc4d17` ("Anthropic releases Claude Opus 5.5")
+failed `POST_JUDGED` at grounding 1/5, the harshest score seen yet, despite the
+two prior lessons' fixes holding (structure 5/5). Every flagged sentence was
+marked as opinion ("Our read is...") but invented a specific scenario the fact
+sheet does not describe: "engineers crafting custom prompts to force a neutral
+tone", "teams evaluating replacements" and "migrating high-volume tasks away
+from OpenAI", "plugging into evaluation pipelines... testing against
+proprietary data". `voice.md`/`blog-writing.md` already said opinion may
+interpret facts but never add new ones; the model was following that rule for
+prose it thought of as opinion while still inventing concrete, specific facts
+under it. A prior real run's opinion paragraphs stayed at a general level
+("changes the calculus", "affects engineering budgets") and scored grounding
+5/5, so the boundary is one of specificity, not the presence of opinion itself.
+**Rule:** analysis may state direction and scale in general terms (cheaper,
+faster, who benefits, broadly) but must never invent a specific scenario,
+activity or persona the fact sheet doesn't describe, even when marked as
+opinion. See `blog-writing.md`.
+
 ## 2026-09-24 · "It is not yet known" is the passive voice the prompt itself asked for
 
 **What happened:** the first real run after the previous lesson's fix (mission

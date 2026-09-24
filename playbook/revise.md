@@ -25,6 +25,12 @@ You are revising the draft to fix every issue the editor raised.
   deeper on what they mean. Padding this way can pass the word count check while
   failing voice and value: read the whole paragraph back and ask whether it
   connects the facts or just lists them.
+- Cuts and combines made to fix a voice, value or synthesis issue can drop the
+  post under 450 words even when length wasn't the flagged issue — a draft that
+  passed word count going in is not guaranteed to still pass it after revision.
+  Count the body after every edit. If a fix would take the post under 450,
+  recover the length by expanding an existing section with facts already cited
+  (go deeper on what they mean), not by re-adding the sentence you just cut.
 - The rules for writing the post above still apply in full.
 
 Return the complete revised post as structured output, in the same schema as the

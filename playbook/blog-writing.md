@@ -17,7 +17,14 @@ exactly.
   fact you cite. A validator checks this mechanically, and a post that fails is not
   published.
 - Keep each fact's certainty. A "reported" fact is written as reported ("according
-  to The Information"). A "planned" fact is written as a plan, not as done.
+  to The Information"). A "planned" fact is written as a plan, not as done. The
+  hedge travels with the claim, not with the citation link — moving where the
+  link sits in a sentence must never drop the attribution. Bad: "Muse has nearly
+  identical [file names and contents](url) to OpenClaw." (states a reported
+  claim as settled fact). Good: "[The Decoder](url) reports that Muse has nearly
+  identical file names and contents to OpenClaw." or "Muse reportedly has nearly
+  identical file names and contents to OpenClaw, according to [The
+  Decoder](url)."
 - Where the fact sheet lists an open question the reader will care about, say
   plainly what is missing, in active voice naming who hasn't said it ("Anthropic
   has not published pricing", not "Pricing is not yet known"). Do not fill the gap.

@@ -4,6 +4,30 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · Restructuring a sentence for flow silently drops its hedge
+
+**What happened:** mission `b7cb02c0` ("Meta's Muse agent hits 500,000 users amid
+security flaws and bans") was the first run since the topic-selection fix (PR
+#76) — the topic itself was genuinely broad (7 stories, 4 publications,
+distinct developments: adoption, a zero-day, an Amazon ban, an IP dispute) and
+every other score hit 5/5 (structure, synthesis, value, voice). It still failed
+`POST_JUDGED` on grounding 3/5, with exactly 2 blocking issues, both about facts
+the fact sheet tagged `"certainty": "reported"` (f35, f36, f38: Muse's alleged
+similarity to OpenClaw, and OpenAI's reported response). One was written as a
+bare, unhedged claim in the original draft already ("These claims prompt OpenAI
+to consider a response.") and slipped past the first critique pass. The other
+was written correctly in the draft ("[The Decoder] reports that Muse has nearly
+identical file names and contents to OpenClaw.") but the revise step, while
+fixing unrelated voice issues flagged in the same paragraph, moved the citation
+link from the attribution phrase onto the claim itself and dropped "reports
+that" in the process — turning a properly hedged claim into a bare assertion
+that wasn't even the sentence the editor flagged.
+**Rule:** the certainty hedge travels with the claim, not with the citation
+link — restructuring a sentence for flow or to move a link must never drop
+"reportedly"/"according to X". See `blog-writing.md` (write) and `revise.md`
+(revise, where "change nothing the editor did not flag" now says this applies
+inside a paragraph, not just to whole sentences).
+
 ## 2026-09-24 · A convergent topic can still be too thin to write honestly
 
 **What happened:** mission `4b173f15` ("Claude Opus 5.5 cuts costs by 40% while

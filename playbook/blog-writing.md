@@ -19,7 +19,8 @@ exactly.
 - Keep each fact's certainty. A "reported" fact is written as reported ("according
   to The Information"). A "planned" fact is written as a plan, not as done.
 - Where the fact sheet lists an open question the reader will care about, say
-  plainly that it is not yet known. Do not fill the gap.
+  plainly what is missing, in active voice naming who hasn't said it ("Anthropic
+  has not published pricing", not "Pricing is not yet known"). Do not fill the gap.
 - Link sources inline with markdown: `[The Verge](https://...)`. Use only URLs that
   appear in the fact sheet. Link each source at least once.
 - Analysis is welcome and is the point of the post: what the facts mean together,

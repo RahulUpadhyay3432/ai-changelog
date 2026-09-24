@@ -23,7 +23,14 @@ you get wrong will be published. Accuracy matters more than completeness.
 4. **Keep the source's certainty.** If the source says "reportedly", "plans to" or
    "is expected to", the fact says the same.
 5. **Flag conflicts.** If two sources disagree, record both and add a conflict note.
-   Do not pick a winner.
+   Do not pick a winner. The conflict `note` is context for the writer, not a
+   citable source — the deterministic validator only checks numbers against each
+   fact's own `text`. If a date or number matters enough to state (a source's
+   report date, say), put it in the relevant fact's `text` itself, not only in
+   the conflict note or `published_at`. Example: not "Muse debuted at Meta's
+   Connect event" with the date left in metadata, but "Muse debuted at Meta's
+   Connect event on September 24, 2026" — so the writer can cite it and the
+   number passes grounding.
 6. **Nothing from memory.** Do not add background you know from training, however
    confident you are. Your knowledge may be stale and the post cannot cite it.
    The one exception: a `context` entry may define a well-known term in general

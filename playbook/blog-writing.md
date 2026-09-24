@@ -15,7 +15,12 @@ exactly.
   states facts lists their IDs in `facts` (for example `["f2", "f5"]`).
 - Every number, price, percentage, version and date in the post must appear in a
   fact you cite. A validator checks this mechanically, and a post that fails is not
-  published.
+  published. `factsheet.json`'s `conflicts[].note` is context for you, not a
+  citable source: it can describe a disagreement in prose without every number
+  in that prose being safe to use. If you want to state a specific date or
+  number from a conflict (when The Decoder reported something, say), it must
+  also appear in the `text` of a fact you cite — never copy it from the
+  conflict note or a fact's `published_at` alone.
 - Keep each fact's certainty. A "reported" fact is written as reported ("according
   to The Information"). A "planned" fact is written as a plan, not as done. The
   hedge travels with the claim, not with the citation link — moving where the

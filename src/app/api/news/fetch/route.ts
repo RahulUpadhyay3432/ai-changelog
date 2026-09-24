@@ -404,7 +404,7 @@ async function deepinfraAttempt(key: string, prompt: string): Promise<string | n
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: process.env.DEEPINFRA_MODEL ?? "meta-llama/Meta-Llama-3.1-8B-Instruct",
+      model: process.env.DEEPINFRA_MODEL ?? "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 700,
       temperature: 0.3,

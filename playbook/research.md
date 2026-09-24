@@ -33,9 +33,15 @@ you get wrong will be published. Accuracy matters more than completeness.
    number passes grounding.
 6. **Nothing from memory.** Do not add background you know from training, however
    confident you are. Your knowledge may be stale and the post cannot cite it.
-   The one exception: a `context` entry may define a well-known term in general
-   words (what an API is, what open weights means), marked `"kind": "context"`,
-   with no numbers, dates or claims about specific companies.
+   The one exception: a `context` entry may define a term, marked
+   `"kind": "context"`, with no numbers, dates or claims about specific
+   companies — but only a term Kapyn's own audience (busy, technical engineers,
+   founders and operators, per `voice.md`) would not already know. "Zero-day
+   vulnerability" and "on-device AI" do not qualify — this audience knows them
+   cold, and a definition of either reads as padding, not help. A specific,
+   less common attack technique or a story-specific piece of jargon does
+   qualify. When in doubt, leave it out: the writer can only pad with a
+   context fact that exists.
 7. **Note the gaps.** List the questions a reader would ask that the sources do not
    answer. The writer uses these to say "not yet known" instead of guessing.
 

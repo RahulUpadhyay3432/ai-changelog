@@ -4,6 +4,40 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · A grounded definition can still be padding
+
+**What happened:** mission `f2f1319a` (another Muse post) failed `POST_JUDGED`
+at value 2/5 and voice 2/5, with 6 blocking issues. Grounding stayed clean
+(5/5) — nothing was invented. Three of the six were "cut" issues on the exact
+same failure: "Target engineers already know what a zero-day is. This
+definition is padding." and the same for "on-device AI". Traced the draft
+(368 words, well under the 450 floor) against the revised post (482 words):
+the revise step closed the gap partly by inserting two textbook definitions
+("A zero-day vulnerability is a software security flaw unknown to the
+vendor..."; "On-device AI refers to running artificial intelligence models
+directly on local hardware..."). Both are real `context` facts from the
+factsheet, correctly cited — that's why grounding stayed clean — but the
+research step created them for terms Kapyn's own audience (busy, technical
+engineers, per `voice.md`'s own framing) already knows cold. This is the same
+underlying failure as PR #76 (a word-count shortfall forcing the reviser to
+pad) wearing a new disguise: the padding passes every mechanical check
+(grounded, cited, no invented facts) while still being padding.
+**Rule:** two additions. (1) `research.md`'s context-fact exception now
+requires the term be genuinely unfamiliar to Kapyn's specific technical
+audience, not just "well-known" in the abstract — a context fact can only
+pad the post if it exists, so keep it from existing. (2) `revise.md` now
+names this pattern explicitly as the same trap as short-sentence padding,
+even though it passes the word-count and grounding checks.
+
+**Also observed, not fixed here:** 3 of the 6 blocking issues were voice —
+short choppy sentences restating a subject or repeating a phrase ("rapid
+adoption... rapid adoption") — the exact pattern PR #73/#83 already cover.
+Not a new instruction gap, just the model not applying an existing rule
+perfectly on this run's specific sentences. Adding a third restatement of the
+same rule has diminishing returns; the real lever is likely structural (a
+second revision pass within one run, not another run from scratch) — see
+`~/.claude/plans/hermes-kapyn-handoff-2026-09-23.md` "Session 8" for the
+discussion with Rahul.
 ## 2026-09-24 · Paraphrasing can lose precision without inventing anything
 
 **What happened:** mission `b5f73396` (another Muse post) failed `POST_JUDGED`

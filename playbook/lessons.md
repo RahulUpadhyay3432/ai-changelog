@@ -4,6 +4,30 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · Paraphrasing can lose precision without inventing anything
+
+**What happened:** mission `b5f73396` (another Muse post) failed `POST_JUDGED`
+at grounding 3/5 (worst since PR #76) and voice 3/5, with 4 blocking grounding
+issues — none of them invented facts, all of them paraphrases that quietly
+dropped precision. (1) The fact sheet's own definition, `f43`: "a security
+flaw... known to attackers or researchers before the vendor has created and
+distributed a patch" became "known to attackers before the vendor provides a
+patch" — "or researchers" dropped. (2) Twice, "AI agent" (the term every fact
+about Muse uses) became "autonomous models" in analysis sentences — a broader,
+vaguer category the fact sheet never uses, which reads as grounded but isn't.
+(3) Two open questions with different specific gaps — "when and at what
+price" for the smart glasses, "specifications, pricing, and release date" for
+the edge wearable — got combined by PR #80's own "combine related open
+questions" rule into one blurred sentence, "release date, pricing, or
+specifications for its smart glasses and edge wearables," which implies both
+devices are missing the same three things when they aren't.
+**Rule:** paraphrasing must not lose precision — dropping a qualifier from a
+definition, swapping in a broader or vaguer term the fact sheet doesn't use,
+or merging two facts' distinct specifics into one blurred claim are all forms
+of losing grounding, the same as inventing something outright. The open-
+questions combining rule from PR #80 now says explicitly: combine only
+questions about the same party and the same missing detail, not different
+gaps for different things. See `blog-writing.md`.
 ## 2026-09-24 · Saying the same idea twice, once per sentence, once per paragraph
 
 **What happened:** mission `359bf502` (another Muse post, on the playbook that

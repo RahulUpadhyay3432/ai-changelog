@@ -24,7 +24,12 @@ exactly.
 - Link sources inline with markdown: `[The Verge](https://...)`. Use only URLs that
   appear in the fact sheet. Link each source at least once.
 - Analysis is welcome and is the point of the post: what the facts mean together,
-  who is affected, what to watch. Mark it as analysis and add no new facts.
+  who is affected, what to watch. Mark it as analysis and add no new facts. This
+  means staying at the level the facts support (direction and scale: cheaper,
+  faster, who benefits in general terms) and never inventing a specific scenario,
+  activity or persona the fact sheet doesn't describe ("teams evaluating
+  replacements", "engineers crafting custom prompts", "plugging into evaluation
+  pipelines" are invented facts, not analysis, even when marked as opinion).
 
 ## Length follows the facts
 

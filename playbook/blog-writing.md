@@ -33,6 +33,14 @@ exactly.
 - Where the fact sheet lists an open question the reader will care about, say
   plainly what is missing, in active voice naming who hasn't said it ("Anthropic
   has not published pricing", not "Pricing is not yet known"). Do not fill the gap.
+  An open question is a gap in disclosure, not a known negative — say what the
+  named party hasn't confirmed or said, never assert the underlying fact didn't
+  happen. "Has Meta patched vulnerability X?" being unanswered supports "Meta
+  has not confirmed whether it patched X" (a true, grounded claim about
+  disclosure); it does not support "Meta has not patched X" (a claim about the
+  world that silence alone cannot prove — Meta may have patched it without
+  anyone reporting so). Same test as any other fact: cite or cut, applied to the
+  gap itself.
 - Link sources inline with markdown: `[The Verge](https://...)`. Use only URLs that
   appear in the fact sheet. Link each source at least once.
 - Analysis is welcome and is the point of the post: what the facts mean together,

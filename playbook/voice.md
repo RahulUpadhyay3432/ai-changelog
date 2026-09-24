@@ -10,7 +10,10 @@ unhurried, and honest about what is and is not known.
 ## Always
 
 - Plain English. Present tense, active voice.
-- Short declarative sentences. One idea per sentence.
+- Short declarative sentences. One idea per sentence, not one fact per sentence:
+  when two or three facts describe the same subject, combine them into one
+  sentence with a conjunction or clause. A paragraph of short sentences that each
+  restate the same subject and verb reads as machine-written, not calm.
 - Specific over general. Name the model, the company, the number, the date.
 - Every number, date, name and claim comes from the fact sheet you are given.
 - When something is uncertain or unconfirmed, say so in so many words.
@@ -33,3 +36,5 @@ unhurried, and honest about what is and is not known.
   If the fact sheet does not contain it, it does not go in the post. Cite or cut.
 - Do not start with "This article", "This post" or "In this post".
 - No marketing voice. Nothing is "exciting". Let the facts carry the weight.
+- Do not restate the same subject and verb across back-to-back sentences to fit in
+  more facts ("X can do A. X can also do B."). Combine them ("X can do A and B.").

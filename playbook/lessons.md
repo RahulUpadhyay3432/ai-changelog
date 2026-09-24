@@ -4,6 +4,24 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · One fact per sentence reads as machine-written
+
+**What happened:** the first real weekly run to clear both deterministic checks
+(mission `b023ed75`, "Anthropic launches Claude Opus 5.5") failed `POST_JUDGED` at
+voice 1/5 and value 1/5, despite grounding 5/5 and structure 5/5. Nearly every
+paragraph mapped facts to sentences one-for-one instead of combining them, e.g.
+"Developers can integrate Claude Opus 5.5 via the Claude Platform on AWS to build
+autonomous agents. Developers can also integrate Claude Opus 5.5 via the Claude
+Platform on AWS to automate intricate workflows." The revise step made it worse:
+the only blocking issue on the first draft was `word_count` (295 words, too
+short), and the model hit length by adding more one-fact sentences rather than
+deepening the analysis already grounded in the fact sheet.
+**Rule:** "one idea per sentence" (`voice.md`) means one idea, not one fact.
+Closely related facts about the same subject belong in one sentence with a
+conjunction or clause. When length is short, fix it by synthesizing facts
+together or going deeper on what they mean, never by adding more short,
+repetitive sentences. See `voice.md`, `blog-writing.md`, `revise.md`.
+
 ## 2026-09-23 · The dHash gate does not catch a repeated subject
 
 **What happened:** the slice 3 real run (HERMES mission `m_img_ccfdefa7b636`) made

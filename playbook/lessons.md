@@ -4,6 +4,21 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · "It is not yet known" is the passive voice the prompt itself asked for
+
+**What happened:** the first real run after the previous lesson's fix (mission
+`16311347`, "Anthropic releases Claude Opus 5.5") was dramatically better
+(synthesis 3→5, value 1→4, voice 1→3) but still failed `POST_JUDGED` at voice
+3/4. All 3 remaining voice issues were the same pattern: "The supported context
+window length... are not yet known," which the critique flagged as passive and
+rewrote as "Anthropic does not state the supported context window length...".
+The instruction was contradicting itself: `blog-writing.md` literally told the
+writer to phrase open questions as "it is not yet known" while `voice.md`
+requires active voice throughout.
+**Rule:** phrase an open question by naming who hasn't said it ("Anthropic has
+not published X"), never as an impersonal "X is not yet known". See
+`blog-writing.md`.
+
 ## 2026-09-24 · One fact per sentence reads as machine-written
 
 **What happened:** the first real weekly run to clear both deterministic checks

@@ -66,7 +66,17 @@ affected, what to watch) rather than adding more one-fact sentences.
 ## Structure
 
 1. **Lead paragraph** (`"lead": true`): 2-3 sentences. The core development in the
-   first sentence, then why a builder should care. No scene-setting.
+   first sentence, then why a builder should care. No scene-setting. "Why a
+   builder should care" is almost always interpretation, not a plain fact — it
+   gets the same treatment as opinion anywhere else in the post: mark it ("Our
+   read is...", "The likely effect is...") and name the specific things at
+   stake rather than describing them abstractly. Bad, unmarked and abstract:
+   "The rapid adoption of this highly privileged system exposes the practical
+   risks of building autonomous agents... Builders deploying local agents must
+   weigh the benefits of deep system access against the reality of basic
+   social engineering threats." Good: name the actual risk the post covers
+   (a zero-day, a copyright dispute, a platform block), and mark the judgment
+   about what it means as opinion, the same as any other analysis.
 2. **2 to 4 sections**, each with a level-2 heading that says something specific
    ("What the licence actually restricts", not "Key details"). Paragraphs of 2-4
    sentences.

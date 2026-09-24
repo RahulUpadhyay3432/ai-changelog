@@ -4,6 +4,35 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · A convergent topic can still be too thin to write honestly
+
+**What happened:** mission `4b173f15` ("Claude Opus 5.5 cuts costs by 40% while
+matching Fable 5.1") failed `POST_JUDGED` worse than any run yet: grounding 1/5,
+voice 1/5, value 1/5, plus a new failure mode — `word_count` on the first draft
+(311 words, floor is 450). The topic step picked this cluster specifically for
+its 4 corroborating sources ("Four independent sources corroborate the release
+across benchmarks, Amazon Bedrock availability, and developer tooling"), but
+distillation surfaced only 29 facts, several near-duplicates (three facts all
+restating "integrates via the Claude Platform on AWS", six facts all about the
+one llm-anthropic CLI update). Combined and de-duplicated, the story honestly
+supported ~310 words. With every fact already used and none left to add, the
+revise step hit the floor by inventing specific unsupported claims — the exact
+opinion-loophole pattern the previous lesson fixed, but this time forced by
+length pressure during revision rather than by the drafting step: "This provides
+AI developers a more robust foundation for building autonomous agents and
+complex systems," "forces engineering teams to reassess their default provider
+choices," "makes these token-heavy patterns more viable in production." None of
+these appear in the fact sheet. The prior lesson's rule held during drafting
+(critique of the pre-revision draft scored grounding 5/5) — this is a distinct
+failure, introduced only once the reviser ran out of real facts to expand.
+**Rule:** convergence (several sources on one development) is not the same as
+breadth (several sources adding distinct facts). A launch article, an
+availability notice and a tooling update about one release can pass a 3-source
+minimum while netting under 10 non-duplicate facts — not enough for a 450-word
+floor without padding. Reject that shape of cluster at topic selection, before
+the writer or reviser is ever put in a position where the only way to hit length
+is to invent. See `topic-selection.md`.
+
 ## 2026-09-24 · "Opinion" became a loophole for inventing scenarios
 
 **What happened:** mission `3cfc4d17` ("Anthropic releases Claude Opus 5.5")

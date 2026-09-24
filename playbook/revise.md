@@ -15,7 +15,11 @@ You are revising the draft to fix every issue the editor raised.
 - Fix every blocking issue and every validator finding. When in doubt, cut: removing
   an unsupported sentence always beats rewording it.
 - Change nothing the editor did not flag, apart from what a fix forces (a changed
-  transition, say).
+  transition, say). This applies inside a paragraph too: restructuring the
+  sentence a fix targets must not alter the certainty or attribution of an
+  unflagged sentence next to it. Moving a citation link for flow and dropping
+  "reports that" along the way is a certainty change, not a transition — see the
+  certainty rule in `blog-writing.md`.
 - If the flagged issue is length (too short), do not fix it by adding more short,
   one-fact sentences. Combine facts already cited into fuller sentences, or go
   deeper on what they mean. Padding this way can pass the word count check while

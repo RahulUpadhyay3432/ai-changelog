@@ -14,6 +14,14 @@ unhurried, and honest about what is and is not known.
   when two or three facts describe the same subject, combine them into one
   sentence with a conjunction or clause. A paragraph of short sentences that each
   restate the same subject and verb reads as machine-written, not calm.
+- Say a given idea once. Two sentences that restate the same outcome in
+  different words are still one idea, not two ("can fully hijack the system"
+  then "leaves the agent open to complete takeover" is the same claim told
+  twice) — cut the second telling, don't just vary its wording. Check this
+  across a paragraph break too: if the sentence opening a new section restates
+  what the sentence closing the last one already said (the same device or
+  feature introduced twice, once per paragraph), cut whichever repeats the
+  other.
 - Specific over general. Name the model, the company, the number, the date.
 - Every number, date, name and claim comes from the fact sheet you are given.
 - When something is uncertain or unconfirmed, say so in so many words.

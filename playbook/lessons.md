@@ -4,6 +4,27 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · Saying the same idea twice, once per sentence, once per paragraph
+
+**What happened:** mission `359bf502` (another Muse post, on the playbook that
+fixed the unmarked-lead-opinion bug) failed `POST_JUDGED` at voice 3/5 (value
+also dropped to 3/5), with 2 blocking issues. Both pre-existed unchanged in the
+very first draft and were never flagged by the first critique pass either —
+purely a write-step gap. (1) Within one paragraph: "A simple ClickFix attack...
+can fully hijack the system. This flaw leaves the agent open to complete
+takeover through basic social engineering techniques." — "fully hijack" and
+"complete takeover" are the same claim told twice, not two facts. (2) Across a
+paragraph break: one paragraph ended "...set to power Meta's upcoming AI
+glasses, promising multimodal interaction..." and the next opened "The company
+is embedding the system in its new smart glasses for voice-activated task
+assistance..." — both introduce "Muse is going into smart glasses" as if for
+the first time. `voice.md`'s existing "one idea per sentence, not one fact per
+sentence" rule covers merging *distinct* facts about the same subject; neither
+case here added a new fact, both restated the same one in different words, so
+the existing rule didn't apply.
+**Rule:** say a given idea once — restating it in different words across two
+sentences, or across a paragraph break, is repetition, not new information.
+Cut the second telling. See `voice.md`.
 ## 2026-09-24 · The closest run yet: an unmarked opinion in the lead
 
 **What happened:** mission `f2af14d7` (another Muse post) is the closest run

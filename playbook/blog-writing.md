@@ -43,6 +43,15 @@ exactly.
   gap itself.
 - Link sources inline with markdown: `[The Verge](https://...)`. Use only URLs that
   appear in the fact sheet. Link each source at least once.
+- Paraphrasing a fact must not lose precision. A definition fact loses a
+  qualifier ("known to attackers" for a fact that says "known to attackers or
+  researchers") the same way a number would if you rounded it. Use the term the
+  fact sheet actually uses for the subject ("AI agent", if that's what the
+  facts call it) rather than a broader or vaguer category word ("autonomous
+  models") the facts never use — that swap reads as grounded but isn't. When
+  combining two related facts (see "What to watch" below), keep each one's
+  specific detail distinct; don't blur two different missing details into one
+  generic list that overstates what's true of both.
 - Analysis is welcome and is the point of the post: what the facts mean together,
   who is affected, what to watch. Mark it as analysis and add no new facts. This
   means staying at the level the facts support (direction and scale: cheaper,
@@ -87,7 +96,12 @@ affected, what to watch) rather than adding more one-fact sentences.
    addressed Y."). Group by who hasn't said it, not one sentence per question —
    six near-identical "X has not confirmed Y" sentences in a row is exactly the
    repeated subject-and-verb pattern `voice.md` already bans, just applied to
-   open questions instead of facts.
+   open questions instead of facts. Combine only questions about the same
+   party and the same missing detail — two devices with different specific
+   gaps ("when and at what price" for one, "specifications, pricing and
+   release date" for the other) stay in separate clauses, not one blurred
+   "release date, pricing, or specifications for X and Y" that implies both
+   are missing the same things.
 4. **Sources**: a final level-2 heading "Sources" followed by one list block, one
    item per source: `[Source name: article title](url)`.
 

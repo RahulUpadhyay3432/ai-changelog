@@ -4,6 +4,30 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-24 · Fixing voice can quietly break the word-count floor
+
+**What happened:** mission `20cc5ea6` ("Meta's Muse agent faces a zero-day flaw
+and an Amazon shopping block", another run on the Muse cluster) failed at
+`POST_DETERMINISTIC` on `word_count` (412 words) — never reached the judge. The
+draft (`post.json`) was 482 words and passed every deterministic check cleanly,
+including grounding-adjacent ones; `critique.json` scored grounding 5/5 and
+flagged only voice/value/synthesis (2/5 each). The factsheet had 9
+`open_questions`, and the draft answered them with 6 near-identical "X has not
+confirmed Y" sentences in a row — individually correct under the PR #79 rule,
+but exactly the repeated-subject-and-verb pattern `voice.md` already bans, just
+applied to open questions instead of facts. The critique flagged this (voice)
+and revision correctly combined/shortened those sentences, plus cut two other
+unrelated sentences for value/voice — netting a ~70-word drop that took the
+post from comfortably over the floor to under it. Nothing in `revise.md` told
+the reviser to re-check the total after fixing issues that weren't originally
+about length.
+**Rule:** two additions. (1) "What to watch" must combine related open
+questions into fuller sentences the same way the rest of the post does, not
+one sentence per question — see `blog-writing.md`. (2) Revision must recount
+the body after every edit; a draft passing word count going in doesn't
+guarantee the revised post still does, especially when cuts/combines are made
+for voice or value reasons that have nothing to do with length — see
+`revise.md`.
 ## 2026-09-24 · Active voice for a gap turned "unknown" into a confident negative
 
 **What happened:** mission `2ebab517` ("Meta's Muse agent faces macOS control,

@@ -71,7 +71,13 @@ affected, what to watch) rather than adding more one-fact sentences.
    ("What the licence actually restricts", not "Key details"). Paragraphs of 2-4
    sentences.
 3. **What to watch**: a short section on the open questions and what would settle
-   them.
+   them. When the fact sheet lists several open questions, combine related ones
+   into one sentence the same way the rest of the post does ("Meta has not
+   disclosed X or addressed Y" beats "Meta has not disclosed X. Meta has not
+   addressed Y."). Group by who hasn't said it, not one sentence per question —
+   six near-identical "X has not confirmed Y" sentences in a row is exactly the
+   repeated subject-and-verb pattern `voice.md` already bans, just applied to
+   open questions instead of facts.
 4. **Sources**: a final level-2 heading "Sources" followed by one list block, one
    item per source: `[Source name: article title](url)`.
 

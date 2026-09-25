@@ -51,7 +51,7 @@
 
   "post_rubric": "rubrics/post.json",
   "image_rubric": "rubrics/image.json",
-  "max_revisions": 2,
+  "max_revisions": 4,
 
   "output": {
     "branch_prefix": "hermes/",

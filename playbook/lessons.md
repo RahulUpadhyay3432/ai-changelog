@@ -4,6 +4,38 @@ Append-only. Each lesson says what went wrong, the evidence, and the rule it
 produced. Claude reviews run reports periodically and adds entries here, then
 updates the prompt or rubric the lesson points to. Newest first.
 
+## 2026-09-25 · Four revision rounds converge on issues, not on the gate
+
+**What happened:** mission `8cd4b600` (the same Muse story again) ran all four
+`blog.revision_loop` rounds and still failed `POST_JUDGED`. Blocking issues fell
+10, 6, 3 and synthesis went 2 to 4, but grounding bounced 3, 5, 3, 3 and voice
+stuck at 2, 2, 3, 3 (needs 4). Round 2 was wasted: the reviser cut the post to
+442 words, under the 450 floor, so the deterministic check failed and the critic
+never ran. The lesson of 2026-09-24 ("count the body after every edit") was
+already in `revise.md` and did not prevent it: a model cannot count words by eye.
+The three blocking issues left in round 4 were small and real: an inference
+stated as fact ("The move to block the assistant limits Meta's real-world
+testing"), a sentence chaining four features, and a sentence the reviser had
+written itself that restated the point. The critic also missed a contradiction
+a reader would catch: the body said Amazon's block "illustrates how platforms
+react to unmitigated risks" while "What to watch" said Amazon has not explained
+why it blocked Muse. Run 14 (`61b40cd7`) had flagged the same voice pattern, a
+long multi-item "What to watch" paragraph.
+**Rule:** four additions. (1) `revise.md` works to a 500-word margin instead of
+counting to 450. (2) `voice.md` caps one sentence at three combined facts; the
+earlier "combine facts" rule had pushed the writer into four-item chains.
+(3) `voice.md` and `critique.md`: an unstated consequence is an inference that
+needs the opinion marker, and "reportedly" is never the fix for one.
+(4) `blog-writing.md` and `critique.md`: "What to watch" takes at most three open
+questions per sentence, and the body may not state as fact anything that section
+lists as unknown.
+
+**Also observed, not fixed here:** across 37 critiques in 17 missions the critic
+has never returned "pass" (voice reaches 4 in 7 of 37; grounding 5 and voice 4
+together in 3 of 37), and the last 8 runs were all the same Muse story because
+nothing has been published, so `already_covered` never excludes it. A pass on
+Muse would not show the playbook works on other stories.
+
 ## 2026-09-24 · A grounded definition can still be padding
 
 **What happened:** mission `f2f1319a` (another Muse post) failed `POST_JUDGED`

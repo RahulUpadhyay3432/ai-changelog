@@ -24,7 +24,11 @@ You are revising the draft to fix every issue the editor raised.
   one-fact sentences. Combine facts already cited into fuller sentences, or go
   deeper on what they mean. Padding this way can pass the word count check while
   failing voice and value: read the whole paragraph back and ask whether it
-  connects the facts or just lists them.
+  connects the facts or just lists them. A `context` fact defining a term the
+  target audience already knows (see `research.md`) is the same trap in a
+  different shape — it passes the word count and the grounding check while
+  still being padding. Reaching for one to fix a length problem is exactly
+  the failure to avoid, not a legitimate fix.
 - Cuts and combines made to fix a voice, value or synthesis issue can drop the
   post under 450 words even when length wasn't the flagged issue — a draft that
   passed word count going in is not guaranteed to still pass it after revision.

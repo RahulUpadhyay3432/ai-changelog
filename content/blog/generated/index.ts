@@ -5,4 +5,8 @@
 // files in this directory disagree. Posts are static imports, not fs reads,
 // because BLOG_POSTS also ships to the client (search index, ⌘K palette).
 
-export const GENERATED_RAW: unknown[] = [];
+import p1 from "./meta-launches-muse-agent-amid-security-flaws.json";
+
+export const GENERATED_RAW: unknown[] = [
+  p1,
+];

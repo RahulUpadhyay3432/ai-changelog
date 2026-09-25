@@ -13,7 +13,10 @@ unhurried, and honest about what is and is not known.
 - Short declarative sentences. One idea per sentence, not one fact per sentence:
   when two or three facts describe the same subject, combine them into one
   sentence with a conjunction or clause. A paragraph of short sentences that each
-  restate the same subject and verb reads as machine-written, not calm.
+  restate the same subject and verb reads as machine-written, not calm. Combine
+  two or three facts, never more: a sentence that chains four or more items
+  ("integrating X, releasing Y, adding Z and W") is a list written as a
+  sentence. Split it, or use a `list` block when the items really are parallel.
 - Say a given idea once. Two sentences that restate the same outcome in
   different words are still one idea, not two ("can fully hijack the system"
   then "leaves the agent open to complete takeover" is the same claim told
@@ -26,7 +29,11 @@ unhurried, and honest about what is and is not known.
 - Every number, date, name and claim comes from the fact sheet you are given.
 - When something is uncertain or unconfirmed, say so in so many words.
 - When you give an opinion, mark it as one ("The likely effect is...", "Our read...").
-  Opinion may interpret facts. It may never add new ones.
+  Opinion may interpret facts. It may never add new ones. A consequence the
+  sources do not state ("this limits their testing", "this shows platforms
+  restrict risky products") is an inference and needs the marker too.
+  "Reportedly" is for a fact a source reports, never a way to soften an
+  inference: mark it as opinion or cut it.
 
 ## Never
 

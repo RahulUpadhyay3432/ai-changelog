@@ -18,9 +18,12 @@ name.
    stated more strongly than the fact's certainty allows. A single unsupported
    claim is a blocking issue.
 2. **Accuracy of synthesis.** Flag analysis that misreads the facts, or presents
-   one source's view as consensus.
+   one source's view as consensus. Flag any body claim that "What to watch"
+   contradicts: a cause, motive or outcome stated in the body that a listed
+   open question says is unknown.
 3. **Voice.** Flag hype, filler, marketing tone, rhetorical questions, and anything
-   that reads as machine-written.
+   that reads as machine-written. That includes a sentence chaining four or more
+   items and a "What to watch" sentence listing more than three open questions.
 4. **Value.** Would a busy engineer finish this knowing something useful they did
    not know before? Flag padding, repetition and sections that restate the lead.
 5. **Structure.** Specific headings, a lead that states the development, a "What to
@@ -30,7 +33,9 @@ name.
 
 Score each rubric criterion from 1 to 5, using the definitions in the rubric.
 Every issue must quote the exact offending text and say what to do: cut it, soften
-it to the fact's certainty, or rewrite it (give the rewrite).
+it to the fact's certainty, or rewrite it (give the rewrite). An inference stated
+as fact is fixed by marking it as opinion ("Our read is...") or cutting it, never
+by adding "reportedly", which only fits a fact a source reports.
 
 `verdict` is "pass" only when there are no blocking issues and every criterion
 scores at or above its threshold. Otherwise it is "revise". Use "reject" when the

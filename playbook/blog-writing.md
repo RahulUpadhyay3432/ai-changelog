@@ -101,7 +101,12 @@ affected, what to watch) rather than adding more one-fact sentences.
    gaps ("when and at what price" for one, "specifications, pricing and
    release date" for the other) stay in separate clauses, not one blurred
    "release date, pricing, or specifications for X and Y" that implies both
-   are missing the same things.
+   are missing the same things. Cap it at three open questions per sentence:
+   if one party has more, keep the three that matter most to a builder, or
+   put the rest in a short `list` block. The body must never contradict this
+   section. If it says a party has not explained something (why a
+   platform blocked a product, say), the body cannot state that reason or
+   motive as fact: cut it, or mark it as opinion.
 4. **Sources**: a final level-2 heading "Sources" followed by one list block, one
    item per source: `[Source name: article title](url)`.
 

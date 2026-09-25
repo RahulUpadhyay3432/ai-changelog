@@ -32,7 +32,9 @@ You are revising the draft to fix every issue the editor raised.
 - Cuts and combines made to fix a voice, value or synthesis issue can drop the
   post under 450 words even when length wasn't the flagged issue — a draft that
   passed word count going in is not guaranteed to still pass it after revision.
-  Count the body after every edit. If a fix would take the post under 450,
+  You cannot count words reliably by eye (a real revision came back at 442 after
+  being counted against the 450 floor), so work to a margin: treat 500 words as
+  the working floor, not 450. If the revised body is not clearly above 500,
   recover the length by expanding an existing section with facts already cited
   (go deeper on what they mean), not by re-adding the sentence you just cut.
 - The rules for writing the post above still apply in full.

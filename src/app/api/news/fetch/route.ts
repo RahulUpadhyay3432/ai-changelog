@@ -251,7 +251,6 @@ function groqKeys(): string[] {
     .filter(Boolean);
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * One attempt on one key. Returns null when the answer is retryable, throws when it

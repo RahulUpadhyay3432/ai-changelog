@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Brain, Wrench, Building2, Lightbulb, Rocket, Code2, Sparkles, type LucideIcon } from "lucide-react";
 import { getCategoryBySlug } from "@/lib/categories";
 import type { CategorySlug } from "@/lib/types";
@@ -174,10 +174,22 @@ export function CoverImage({
 }) {
   const accent = category ? accentFor(category) : face ? accentForFace(face) : NEUTRAL;
   const Icon = fallbackIcon ?? (face ? FACE_ICON[face] ?? Sparkles : Sparkles);
-  // A broken/empty image falls back to the category gradient. The proxy answers
-  // 404 rather than 204 precisely so onError fires; an empty src never fires it
-  // at all, so we also branch on falsy src below.
+  // A broken/empty image falls back to the category gradient. Two ways it can
+  // break and both have to be covered:
+  //
+  //  - it fails after hydration → the onError handler below catches it.
+  //  - it fails BEFORE hydration, which is the common case on a server-rendered
+  //    page: the browser starts the request straight from the HTML, the error
+  //    event fires before React attaches any handler, and onError never runs.
+  //    That is why a 404 from the proxy still left a broken-image icon sitting
+  //    in the hero. The ref re-checks on mount: a finished image with zero
+  //    natural width has failed, whatever we did or did not hear about it.
+  //
+  // An empty src fires nothing either way, so we also branch on falsy src.
   const [failed, setFailed] = useState(false);
+  const checkLoaded = useCallback((img: HTMLImageElement | null) => {
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
   const showImage = !!src && !failed;
   return (
     <div
@@ -198,6 +210,7 @@ export function CoverImage({
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={checkLoaded}
             src={src!}
             alt=""
             loading="lazy"

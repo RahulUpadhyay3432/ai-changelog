@@ -28,6 +28,11 @@ const OPENROUTER_TIMEOUT_MS = 30_000;
 // OPENROUTER_API_KEY is a COMMA-SEPARATED list, matching GROQ/MISTRAL/DEEPINFRA.
 // It used to be read as a single bearer token, so pasting a list here produced
 // `Bearer key1,key2,key3` and a 401 on every call.
+//
+// Free-model daily caps are per ACCOUNT, not per key, so rotation is only worth
+// real extra quota when the keys sit on separate accounts. Rahul confirmed on
+// 2026-10-03 that these do, which is what makes the full round-robin below pay
+// rather than just spreading retries over one shared bucket.
 let openrouterCursor = 0;
 
 function openrouterKeys(): string[] {
@@ -37,14 +42,21 @@ function openrouterKeys(): string[] {
     .filter(Boolean);
 }
 
-export async function callOpenRouter(prompt: string, maxTokens = 2500): Promise<string> {
-  const keys = openrouterKeys();
-  if (!keys.length) throw new Error("OPENROUTER_API_KEY missing");
-  // Free-model limits are per ACCOUNT, not per key, so rotation buys retry spread
-  // across congested upstreams rather than extra quota unless the keys sit on
-  // separate accounts. Worth verifying before counting on the headroom.
-  const key = keys[openrouterCursor % keys.length];
-  openrouterCursor = (openrouterCursor + 1) % keys.length;
+/**
+ * One attempt on one key. null means "retryable, try the next key"; a throw means
+ * the whole provider is wrong and no key will save it.
+ *
+ * The free pool 429s constantly from upstream congestion (measured 2026-10-02:
+ * both Gemma variants 429'd repeatedly across different keys), so a 429 must mean
+ * "next account", not "give up". 404 throws instead, because a retired model slug
+ * is identical on every key and rotating through five of them to learn that is
+ * exactly the waste this module already paid for twice.
+ */
+async function openrouterAttempt(
+  key: string,
+  prompt: string,
+  maxTokens: number
+): Promise<string | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
   try {
@@ -61,22 +73,52 @@ export async function callOpenRouter(prompt: string, maxTokens = 2500): Promise<
       }),
       signal: controller.signal,
     });
+    if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
     if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
     };
     const text = (data.choices?.[0]?.message?.content ?? "").trim();
-    if (!text) throw new Error("OpenRouter returned empty response");
-    return text;
+    return text || null;
   } finally {
     clearTimeout(timer);
   }
 }
 
+/**
+ * Rotates every key before giving up, the same shape as callGroq. Previously this
+ * picked ONE key per call and threw, so the only rotation came from withRetry's
+ * three attempts: with four keys configured, the fourth was never reached on a
+ * burst, and a single 429 spent a whole retry instead of moving to the next
+ * account. ROUNDS x keys fixes both.
+ */
+export async function callOpenRouter(prompt: string, maxTokens = 2500): Promise<string> {
+  const keys = openrouterKeys();
+  if (!keys.length) throw new Error("OPENROUTER_API_KEY missing");
+
+  const ROUNDS = 3;
+  for (let round = 0; round < ROUNDS; round++) {
+    for (let i = 0; i < keys.length; i++) {
+      const idx = (openrouterCursor + i) % keys.length;
+      const text = await openrouterAttempt(keys[idx], prompt, maxTokens);
+      if (text) {
+        openrouterCursor = (idx + 1) % keys.length;
+        return text;
+      }
+    }
+    // Every account was limited this round: wait out the per-minute window.
+    if (round < ROUNDS - 1) await new Promise((r) => setTimeout(r, 1500 * (round + 1)));
+  }
+  throw new Error(`OpenRouter: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+}
+
 export async function callGemini(prompt: string): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY missing");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${key}`;
+  // Overridable for the same reason as every other model in the chain: a slug is
+  // the likeliest thing to go stale and a redeploy is the wrong response to that.
+  const model = process.env.GEMINI_MODEL ?? "gemini-flash-lite-latest";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -103,6 +145,9 @@ export async function callLLM(prompt: string, maxTokens = 2500): Promise<LLMResu
     // "glm-4.5-air" for two slugs after that model stopped existing.
     return { text: await callOpenRouter(prompt, maxTokens), model: OPENROUTER_MODEL };
   } catch {
-    return { text: await callGemini(prompt), model: "gemini-flash-lite-latest" };
+    return {
+      text: await callGemini(prompt),
+      model: process.env.GEMINI_MODEL ?? "gemini-flash-lite-latest",
+    };
   }
 }

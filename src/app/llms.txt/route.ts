@@ -17,7 +17,7 @@ export async function GET() {
   const lines: string[] = [
     "# Kapyn",
     "",
-    "> Kapyn is the calm intelligence layer for AI, AI/tech news distilled to 30-second dispatches, plus an auto-generated, source-grounded knowledge base that explains the concepts behind the news. Every explainer is generated from Kapyn's own news stream and cites its sources.",
+    "> Kapyn is the calm map of the AI worth using: a curated catalog of agents, models, tools, MCP servers and skills, a 30-second daily brief on what changed, and a source-grounded knowledge base explaining the concepts behind the news. Catalog entries are written by hand; explainers are generated from Kapyn's own news stream and cite their sources. No paid placement, no affiliate rankings.",
     "",
     "## AI concepts & techniques",
   ];
@@ -38,14 +38,16 @@ export async function GET() {
     `- [AI tools radar](${APP_URL}/okf/tools): active AI tools, models, and entities tracked by Kapyn`,
     "",
     "## Key pages",
-    `- [Explore , the AI glossary](${APP_URL}/explore): index of every concept explainer`,
+    `- [Explore: the AI glossary](${APP_URL}/explore): index of every concept explainer`,
     `- [Radar](${APP_URL}/radar): curated AI agents, models, tools, MCP servers & skills`,
     `- [MCP servers](${APP_URL}/mcp): directory of Model Context Protocol servers, by category`,
     `- [AI tools](${APP_URL}/tools): the essential AI tools worth knowing, by category`,
     `- [AI skills](${APP_URL}/skills): custom GPTs, Claude Skills & Gemini Gems, by use case`,
-    `- [Compare AI models](${APP_URL}/compare): Claude, GPT, Gemini, Llama and more side by side , context, cost, modalities, best-for`,
+    `- [Compare AI models](${APP_URL}/compare): Claude, GPT, Gemini, Llama and more side by side on context, cost, modalities and best-for`,
     `- [Blog](${APP_URL}/blog): guides on the AI and tools worth using`,
     `- [Kapyn](${APP_URL}): the swipeable AI/tech news feed`,
+    `- [How Kapyn is made](${APP_URL}/methodology): selection, curation, momentum ranking and freshness policy`,
+    `- [About Kapyn](${APP_URL}/about): who maintains it, and the no-paid-placement commitment`,
     ""
   );
 

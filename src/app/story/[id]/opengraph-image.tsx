@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { OG_STORY_EYEBROW } from "@/lib/brand";
 import { fetchNewsItemById } from "@/lib/supabase";
 import { getCategoryBySlug } from "@/lib/categories";
 
@@ -80,7 +81,7 @@ export default async function OgImage({
               letterSpacing: "0.01em",
             }}
           >
-            AI & tech news in 30-second reads
+            {OG_STORY_EYEBROW}
           </span>
         </div>
 

@@ -3,6 +3,7 @@ import { fetchNewsItemById } from "@/lib/supabase";
 import { getCategoryBySlug } from "@/lib/categories";
 import { ClientRedirect } from "./ClientRedirect";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { TITLE_DEFAULT, DESCRIPTION } from "@/lib/brand";
 
 const APP_URL = "https://kapyn.app";
 
@@ -16,8 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!story) {
     return {
-      title: "Kapyn, AI & tech news in 30-second reads",
-      description: "AI and tech news distilled into 30-second reads.",
+      title: TITLE_DEFAULT,
+      description: DESCRIPTION,
     };
   }
 

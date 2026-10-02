@@ -104,7 +104,7 @@ function ServerCard({ server, stars, onOpen }: { server: McpServer; stars?: numb
       </div>
       <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{server.tagline}</span>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
-        {stars != null && stars > 0 ? <MetricChip>{compact(stars)} stars</MetricChip> : <span />}
+        {stars != null && stars > 0 ? <MetricChip>{compact(stars)} GitHub stars</MetricChip> : <span />}
         <span role="button" tabIndex={-1} aria-label="Open website" onClick={openExternal} style={{ flexShrink: 0, display: "inline-flex", padding: "2px", borderRadius: "6px", cursor: "pointer" }}>
           <ArrowUpRight size={15} strokeWidth={2} color={TEXT.muted} />
         </span>

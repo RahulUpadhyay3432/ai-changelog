@@ -11,7 +11,7 @@ const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const DESC =
-  "Compare the major AI models side by side, Claude Opus 5, GPT-5.6, Gemini 3.1 Pro, Grok, Kimi K3 and more , by context window, cost, modalities, and what each is genuinely best for. Calm, sourced, and free.";
+  "Compare the major AI models side by side: Claude Opus 5.5, GPT-6 Astra, Gemini 3.1 Pro, Grok, Kimi K3 and more, by context window, cost, modalities, and what each is genuinely best for. Calm, sourced, and free.";
 
 export const metadata: Metadata = {
   title: "AI Model Comparison, Claude vs GPT vs Gemini and more",
@@ -78,7 +78,7 @@ export default function ComparePage() {
       <section style={{ margin: "40px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Head to head</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 16px", maxWidth: "620px" }}>
-          The matrix answers &ldquo;what exists&rdquo;. These answer &ldquo;which one for me&rdquo; , each with the honest tradeoff, not a
+          The matrix answers &ldquo;what exists&rdquo;. These answer &ldquo;which one for me&rdquo;, each with the honest tradeoff, not a
           leaderboard.
         </p>
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -117,8 +117,8 @@ export default function ComparePage() {
           The matrix is the quick answer. For the reasoning behind a pick, read{" "}
           <Link href="/blog/claude-vs-gpt-which-to-use" style={{ color: GOLD, textDecoration: "none" }}>Claude vs GPT</Link>,{" "}
           <Link href="/blog/claude-vs-gemini-which-to-use-2026" style={{ color: GOLD, textDecoration: "none" }}>Claude vs Gemini</Link>, or{" "}
-          <Link href="/blog/run-llms-locally-2026" style={{ color: GOLD, textDecoration: "none" }}>running open models locally</Link>. Every category above , {" "}
-          {Object.values(CATEGORY_LABELS).join(", ")} , maps to a use case, not a leaderboard rank.
+          <Link href="/blog/run-llms-locally-2026" style={{ color: GOLD, textDecoration: "none" }}>running open models locally</Link>. Every category above ({" "}
+          {Object.values(CATEGORY_LABELS).join(", ")}) maps to a use case, not a leaderboard rank.
         </p>
       </section>
 
@@ -126,7 +126,7 @@ export default function ComparePage() {
       <section style={{ margin: "36px 0 0", paddingTop: "28px", borderTop: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))" }}>
         <h2 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Embed this comparison</h2>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.6, margin: "10px 0 14px", maxWidth: "620px" }}>
-          Free to use on your own site , paste this snippet where you want the live, auto-updating matrix to appear.
+          Free to use on your own site: paste this snippet where you want the live, auto-updating matrix to appear.
         </p>
         <pre style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: "12px", color: TEXT.body, background: "var(--kt-code-bg, #141310)", border: "1px solid var(--kt-hairline, rgba(255,255,255,0.09))", borderRadius: "12px", padding: "16px", overflowX: "auto", lineHeight: 1.6, margin: 0, userSelect: "all" }}>
           {EMBED_SNIPPET}

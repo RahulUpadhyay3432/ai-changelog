@@ -211,7 +211,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: "deepseek-v4-flash",
+      model: process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 700,
       temperature: 0.3,
@@ -316,7 +316,10 @@ async function callGroq(prompt: string): Promise<string> {
 }
 
 async function callGemini(prompt: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  // Overridable like the rest of the chain: a model name is the single most likely
+  // thing to go stale, and a redeploy is the wrong unit of response to that.
+  const model = process.env.GEMINI_MODEL ?? "gemini-flash-lite-latest";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

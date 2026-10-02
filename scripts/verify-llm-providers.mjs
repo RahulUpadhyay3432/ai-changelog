@@ -57,7 +57,7 @@ const PROVIDERS = [
   { name: "mistral",    env: "MISTRAL_API_KEY",    call: openai("https://api.mistral.ai/v1/chat/completions", process.env.MISTRAL_MODEL ?? "open-mistral-nemo") },
   { name: "deepinfra",  env: "DEEPINFRA_API_KEY",  call: openai("https://api.deepinfra.com/v1/openai/chat/completions", process.env.DEEPINFRA_MODEL ?? "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo") },
   { name: "openrouter", env: "OPENROUTER_API_KEY", call: openai("https://openrouter.ai/api/v1/chat/completions", process.env.OPENROUTER_MODEL ?? "inclusionai/ling-3.0-flash-sante:free") },
-  { name: "deepseek",   env: "DEEPSEEK_API_KEY",   call: openai("https://api.deepseek.com/chat/completions", process.env.DEEPSEEK_MODEL ?? "deepseek-chat") },
+  { name: "deepseek",   env: "DEEPSEEK_API_KEY",   call: openai("https://api.deepseek.com/chat/completions", process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash") },
 ];
 
 // Cloudflare Workers AI: account-scoped URL, so keys pair with CLOUDFLARE_ACCOUNT_IDS.

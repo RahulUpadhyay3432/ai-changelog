@@ -2,10 +2,21 @@ name: Fetch News (4x daily)
 
 on:
   schedule:
-    # Every 2h. A failed run emails Rahul, and that mail is the only monitoring
-    # this pipeline has, so the frequency is a feature rather than noise. The
-    # answer to a loud cron is to stop it failing, not to check less often.
-    - cron: "0 */2 * * *"
+    # Gap-filler on the ODD hours at :37, offset from Vercel Cron's every-2h on the
+    # even hours at :00. Two independent schedulers, so the feed keeps moving when
+    # either one misses, and combined they land a fetch roughly hourly.
+    #
+    # This used to be "0 */2 * * *" and was MEASURED on 2026-10-02 delivering ~4
+    # runs a day instead of 12 (observed gaps: 5.5h, 7.8h, 5.8h, 8.5h, 7.25h).
+    # GitHub runs scheduled workflows on a best-effort queue and sheds them under
+    # load, and the top of the hour is where every cron on the platform piles up,
+    # so ":00" was the worst possible minute to ask for. Hence :37. GitHub can
+    # still drop these, which is precisely why it is no longer the primary.
+    #
+    # Frequent runs are cheap, not expensive: source_url is UNIQUE, so a run an
+    # hour later only summarises genuinely new items. Smaller batches also keep
+    # each run well clear of the 800s function ceiling.
+    - cron: "37 1-23/2 * * *"
   workflow_dispatch:
 
 jobs:

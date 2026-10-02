@@ -42,12 +42,12 @@ export function BlogIndexClient({
   posts,
   tags,
   toolCounts,
-  topPosts,
+  deepDives,
 }: {
   posts: BlogPost[];
   tags: string[];
   toolCounts: Record<string, number>;
-  topPosts: BlogPost[];
+  deepDives: BlogPost[];
 }) {
   const [activeTag, setActiveTag] = useState<string>("All");
 
@@ -136,11 +136,11 @@ export function BlogIndexClient({
         )}
       </div>
 
-      {/* ── Right sidebar: top reads ──────────────────────────────────────────── */}
+      {/* ── Right sidebar: the most in-depth posts ────────────────────────────── */}
       <aside className={styles.rightSidebar}>
-        <p className={styles.sidebarLabel}>Top reads</p>
+        <p className={styles.sidebarLabel}>Most in-depth</p>
         <ul className={styles.topReadsList}>
-          {topPosts.map((p, i) => (
+          {deepDives.map((p, i) => (
             <li key={p.slug}>
               <Link href={`/blog/${p.slug}`} className={styles.topReadCard}>
                 <span className={styles.topReadRank}>{String(i + 1).padStart(2, "0")}</span>

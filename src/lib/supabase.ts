@@ -172,6 +172,10 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
   return dbToNewsItem({ ...(archived as Omit<DbNewsItem, "created_at">), created_at: "" } as DbNewsItem);
 }
 
+// How many rows the feed reads at once. Copy that prints a story count has to
+// know this, or a capped number reads as a real total.
+export const FEED_ROW_CAP = 100;
+
 export async function fetchNewsItems(
   categorySlug?: string,
   opts?: { rankOpener?: boolean }
@@ -183,7 +187,7 @@ export async function fetchNewsItems(
     .select("*")
     .gte("published_at", cutoff)
     .order("published_at", { ascending: false })
-    .limit(100);
+    .limit(FEED_ROW_CAP);
 
   if (categorySlug && categorySlug !== "all") {
     query = query.eq("category_slug", categorySlug);

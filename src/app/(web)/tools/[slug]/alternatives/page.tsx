@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const url = `${APP_URL}/tools/${slug}/alternatives`;
   const title = `${tool.name} alternatives, ${alts.length} options worth considering`;
-  const description = `Curated alternatives to ${tool.name}, hand-checked rather than scraped. ${alts
+  const description = `Alternatives to ${tool.name} from a hand-written catalog, not a scraped registry. ${alts
     .slice(0, 3)
     .map((a) => a.name)
     .join(", ")} and more.`;
@@ -70,9 +70,11 @@ export default async function ToolAlternatives({ params }: Props) {
 
   const url = `${APP_URL}/tools/${slug}/alternatives`;
   // 40-word extractable answer — the thing an AI fetcher or a snippet will lift.
-  const answer = `The best ${tool.name} alternatives are ${alts
+  // Honest about the derivation: these are same-category peers from a hand-written
+  // catalog. We do not test substitutability, so we do not claim it.
+  const answer = `The closest ${tool.name} alternatives are ${alts
     .map((a) => a.name)
-    .join(", ")}. All sit in ${tool.category} and are curated by hand, so each one is a genuine substitute rather than a directory listing.`;
+    .join(", ")}. All sit in ${tool.category}, and every entry is written by hand rather than scraped from a registry.`;
 
   const itemListLd = {
     "@context": "https://schema.org",
@@ -159,7 +161,7 @@ export default async function ToolAlternatives({ params }: Props) {
 
       <section style={{ margin: "30px 0 0" }}>
         <p style={{ fontSize: "14px", color: TEXT.muted, lineHeight: 1.65, maxWidth: "620px" }}>
-          Every entry here is hand-checked . We sweep the catalog for dead links and stale
+          Every entry here is hand-checked. We sweep the catalog for dead links and stale
           entries rather than scraping a registry. That is the whole difference between this
           and a directory with twelve thousand listings, most of which no longer resolve.
         </p>

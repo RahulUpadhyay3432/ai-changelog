@@ -4,11 +4,18 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT } from "@/lib/design-tokens";
+import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
+import { FEED_ROW_CAP } from "@/lib/supabase";
 
 export function HeroPill({ storyCount }: { storyCount: number }) {
   const reduce = useReducedMotion();
 
-  const label = storyCount > 0 ? `${storyCount} stories today` : "Updated daily";
+  // The count is the whole feed window, not today, and the query caps at
+  // FEED_ROW_CAP rows, so a capped number is shown as a floor rather than a total.
+  const label =
+    storyCount <= 0
+      ? "Updated daily"
+      : `${storyCount}${storyCount >= FEED_ROW_CAP ? "+" : ""} stories / last ${FEED_WINDOW_LABEL}`;
 
   return (
     <motion.div

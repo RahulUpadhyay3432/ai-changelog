@@ -75,7 +75,7 @@ export default async function McpDetail({ params }: Props) {
             acceptedAnswer: { "@type": "Answer", text: `Run: ${claudeCodeCommand(s.name, install)}` },
           }]
         : []),
-      { "@type": "Question", name: `Is the ${s.name} MCP server official?`, acceptedAnswer: { "@type": "Answer", text: s.by === "official" ? `Yes , ${s.name} is an official MCP server.` : `${s.name} is a community-built MCP server.` } },
+      { "@type": "Question", name: `Is the ${s.name} MCP server official?`, acceptedAnswer: { "@type": "Answer", text: s.by === "official" ? `Yes, ${s.name} is an official MCP server.` : `${s.name} is a community-built MCP server.` } },
     ],
   };
   const howToLd = install
@@ -183,7 +183,7 @@ export default async function McpDetail({ params }: Props) {
         <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em", margin: 0 }}>What it does</h2>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "12px 0 0" }}>{s.description}</p>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "14px 0 0" }}>
-          Like any MCP server, {s.name} plugs into MCP-compatible assistants (such as Claude and other clients) so the model can use it as a tool , no custom integration code required.
+          Like any MCP server, {s.name} plugs into MCP-compatible assistants (such as Claude and other clients) so the model can use it as a tool, with no custom integration code required.
         </p>
       </section>
 

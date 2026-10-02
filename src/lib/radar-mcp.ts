@@ -142,7 +142,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Git", by: "official", category: "Dev tools",
     tagline: "Run git operations on a local repository.",
-    description: "A reference server exposing git commands, status, diff, log, commit , so an assistant can inspect and manage version history directly.",
+    description: "A reference server exposing git commands (status, diff, log, commit) so an assistant can inspect and manage version history directly.",
     url: "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
   },
   {
@@ -226,7 +226,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Playwright", by: "official", category: "Browser & automation",
     tagline: "Drive a real browser to navigate and act.",
-    description: "Microsoft's Playwright MCP server lets an assistant control a browser, click, type, navigate, and read pages , using accessibility structure rather than screenshots.",
+    description: "Microsoft's Playwright MCP server lets an assistant control a browser (click, type, navigate, read pages) using accessibility structure rather than screenshots.",
     url: "https://github.com/microsoft/playwright-mcp",
   },
   {
@@ -270,7 +270,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Pipedream", by: "official", category: "Productivity",
     tagline: "Reach 2,500+ apps through one connector.",
-    description: "Pipedream's MCP server exposes thousands of prebuilt actions across 2,500+ APIs, so an assistant can act across your whole SaaS stack, with auth handled , from a single connection.",
+    description: "Pipedream's MCP server exposes thousands of prebuilt actions across 2,500+ APIs, so an assistant can act across your whole SaaS stack from a single connection, with auth handled.",
     url: "https://github.com/PipedreamHQ/pipedream",
   },
   {
@@ -350,7 +350,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Figma Dev Mode", by: "official", category: "Dev tools",
     tagline: "Pull Figma's official design context into your IDE.",
-    description: "Figma's official Dev Mode MCP server gives an AI coding tool structured access to your selected frames, layout, variables, and components , so generated code matches the design.",
+    description: "Figma's official Dev Mode MCP server gives an AI coding tool structured access to your selected frames (layout, variables, and components) so generated code matches the design.",
     url: "https://developers.figma.com/docs/figma-mcp-server",
   },
   {
@@ -472,7 +472,7 @@ export const MCP_SERVERS: McpServer[] = [
   {
     name: "Stagehand", by: "official", category: "Browser & automation",
     tagline: "Automate browsers using natural language instructions.",
-    description: "Stagehand by Browserbase lets an assistant act on websites in natural language, click, fill forms, and extract data , backed by a managed cloud browser with reliable visual grounding.",
+    description: "Stagehand by Browserbase lets an assistant act on websites in natural language (click, fill forms, extract data) backed by a managed cloud browser with reliable visual grounding.",
     url: "https://github.com/browserbase/stagehand",
   },
   {

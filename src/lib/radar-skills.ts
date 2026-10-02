@@ -77,7 +77,7 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "Word documents",
     tagline: "Generate and edit .docx with real formatting.",
-    description: "A Claude Skill that produces proper Word files, headings, styles, tables and tracked structure , instead of plain text you have to reformat.",
+    description: "A Claude Skill that produces proper Word files with headings, styles, tables and tracked structure, instead of plain text you have to reformat.",
     category: "Writing & content", platform: "Claude",
     url: "https://github.com/anthropics/skills/tree/main/skills/docx",
   },
@@ -121,14 +121,14 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "Karpathy Behavioural",
     tagline: "Teach the agent to avoid the classic LLM coding pitfalls.",
-    description: "Encodes Andrej Karpathy's observations about where LLMs go wrong writing software, think before coding, keep it simple, make surgical changes, verify the result , as rules the agent follows. One of the most-starred skill repos on GitHub.",
+    description: "Encodes Andrej Karpathy's observations about where LLMs go wrong writing software (think before coding, keep it simple, make surgical changes, verify the result) as rules the agent follows. One of the most-starred skill repos on GitHub.",
     category: "Coding & dev", platform: "Claude",
     url: "https://github.com/multica-ai/andrej-karpathy-skills",
   },
   {
     name: "Caveman",
     tagline: "Cut agent output tokens by writing terse, high-signal replies.",
-    description: "A widely-starred Claude skill that reshapes the model's verbosity, 65% average output-token reduction across benchmarks , so long agent sessions stay cheaper and faster without losing the substance.",
+    description: "A widely-starred Claude skill that reshapes the model's verbosity, a 65% average output-token reduction across benchmarks, so long agent sessions stay cheaper and faster without losing the substance.",
     category: "Coding & dev", platform: "Claude",
     url: "https://github.com/JuliusBrussee/caveman",
   },
@@ -188,7 +188,7 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "Frontend design",
     tagline: "Give the assistant a real design system and taste.",
-    description: "The official Anthropic Claude Skill that hands the model a design philosophy, distinctive typography, purposeful colour, intentional motion , so generated UIs look designed rather than default.",
+    description: "The official Anthropic Claude Skill that hands the model a design philosophy (distinctive typography, purposeful colour, intentional motion) so generated UIs look designed rather than default.",
     category: "Design & images", platform: "Claude",
     url: "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
   },
@@ -232,7 +232,7 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "PowerPoint decks",
     tagline: "Build polished slide decks, no template wrangling.",
-    description: "A Claude Skill that generates real .pptx presentations, layouts, speaker notes and consistent styling , from an outline or brief.",
+    description: "A Claude Skill that generates real .pptx presentations with layouts, speaker notes and consistent styling, from an outline or brief.",
     category: "Productivity & docs", platform: "Claude",
     url: "https://github.com/anthropics/skills/tree/main/skills/pptx",
   },
@@ -262,7 +262,7 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "Excel spreadsheets",
     tagline: "Create .xlsx with formulas and charts.",
-    description: "A Claude Skill that builds working spreadsheets, formulas, pivot-style summaries and charts , not just a table of numbers.",
+    description: "A Claude Skill that builds working spreadsheets with formulas, pivot-style summaries and charts, not just a table of numbers.",
     category: "Data & sheets", platform: "Claude",
     url: "https://github.com/anthropics/skills/tree/main/skills/xlsx",
   },
@@ -331,7 +331,7 @@ export const AI_SKILLS: AiSkill[] = [
   {
     name: "NotebookLM",
     tagline: "Ground a research session in your own documents.",
-    description: "Google's AI research tool indexes your uploaded sources, papers, notes, PDFs, transcripts , and answers questions, writes briefings, and generates audio summaries based solely on what you provide.",
+    description: "Google's AI research tool indexes your uploaded sources (papers, notes, PDFs, transcripts) and answers questions, writes briefings, and generates audio summaries based solely on what you provide.",
     category: "Research & analysis", platform: "Gemini",
     url: "https://notebooklm.google.com",
   },

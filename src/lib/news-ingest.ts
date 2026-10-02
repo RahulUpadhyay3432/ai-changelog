@@ -5,6 +5,7 @@ import {
   parseExtractedEntities,
   type ExtractedEntity,
 } from "@/lib/entities";
+import { sanitizeSummary } from "@/lib/quality";
 
 // Moved out of api/news/fetch/route.ts unchanged so both the Vercel cron path
 // and the HERMES backlog path (src/app/api/hermes/results/route.ts) share one
@@ -103,7 +104,11 @@ export function parseClassifyResponse(text: string, fallback: CategorySlug): Cla
     ? (rawSlug as CategorySlug)
     : fallback;
 
-  const summary = summaryMatch?.[1]?.trim() ?? "";
+  // Sanitised here rather than at each call site: this is the one place both the
+  // cron path and the HERMES backlog path pass through, and the cheap providers
+  // that emit **bold**/em dashes feed both. isBadSummary still sees the sentinels
+  // (LOW_SIGNAL/OFF_TOPIC survive sanitising untouched).
+  const summary = sanitizeSummary(summaryMatch?.[1] ?? "");
   const entities = parseExtractedEntities(entitiesMatch?.[1]);
   return { category, summary, entities };
 }

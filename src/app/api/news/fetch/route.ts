@@ -349,7 +349,7 @@ async function mistralAttempt(key: string, prompt: string): Promise<string | nul
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: process.env.MISTRAL_MODEL ?? "mistral-small-latest",
+      model: process.env.MISTRAL_MODEL ?? "open-mistral-nemo",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 700,
       temperature: 0.3,
@@ -437,6 +437,128 @@ async function callDeepInfra(prompt: string): Promise<string> {
   throw new Error(`DeepInfra: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
 }
 
+/**
+ * Cerebras. OpenAI-compatible, and the fastest tier in the chain by a wide margin
+ * (wafer-scale inference, typically sub-second for a summary this size), which is
+ * why it sits ahead of Groq: a 150-story run is latency-bound, not quality-bound.
+ *
+ * CEREBRAS_API_KEY holds a COMMA-SEPARATED list, rotated exactly like Groq's.
+ *
+ * CEREBRAS_MODEL is an override because the default slug below is UNVERIFIED from
+ * this repo: the keys could not be tested when this was written. Verify before
+ * trusting it, with `npm run verify:llm` or:
+ *   curl -s https://api.cerebras.ai/v1/models -H "Authorization: Bearer $KEY" \
+ *     | jq -r '.data[].id'
+ * A wrong slug here surfaces as a 404, which is NOT retryable and will mark the
+ * provider dead for the run — the same failure that silently killed OpenRouter
+ * twice (see llm.ts). That is the intended behaviour: fail loudly, not per story.
+ */
+let cerebrasCursor = 0;
+
+function cerebrasKeys(): string[] {
+  return (process.env.CEREBRAS_API_KEY ?? "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+async function cerebrasAttempt(key: string, prompt: string): Promise<string | null> {
+  const res = await fetch("https://api.cerebras.ai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.CEREBRAS_MODEL ?? "llama-3.3-70b",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
+  });
+  if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
+  if (!res.ok) throw new Error(`Cerebras ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  return text || null;
+}
+
+async function callCerebras(prompt: string): Promise<string> {
+  const keys = cerebrasKeys();
+  if (!keys.length) throw new Error("CEREBRAS_API_KEY missing");
+
+  const ROUNDS = 3;
+  for (let round = 0; round < ROUNDS; round++) {
+    for (let i = 0; i < keys.length; i++) {
+      const idx = (cerebrasCursor + i) % keys.length;
+      const text = await cerebrasAttempt(keys[idx], prompt);
+      if (text) {
+        cerebrasCursor = (idx + 1) % keys.length;
+        return text;
+      }
+    }
+    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
+  }
+  throw new Error(`Cerebras: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+}
+
+/**
+ * Z.ai (GLM), called DIRECTLY rather than through OpenRouter. This matters: the
+ * chain has twice tried to reach GLM via OpenRouter's free pool and twice broken
+ * when the `:free` slug was retired out from under it (z-ai/glm-4.5-air:free, then
+ * z-ai/glm-5.2:free). A first-party key is not subject to that churn.
+ *
+ * ZAI_API_KEY holds a COMMA-SEPARATED list, rotated like the others. Z.ai keys are
+ * `{id}.{secret}` — the whole string is the bearer token, dot included.
+ *
+ * ZAI_MODEL default is UNVERIFIED from this repo for the same reason as Cerebras.
+ * glm-4-flash is the cheap/fast tier; glm-4.6 is the strong one if quota allows.
+ */
+let zaiCursor = 0;
+
+function zaiKeys(): string[] {
+  return (process.env.ZAI_API_KEY ?? "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+async function zaiAttempt(key: string, prompt: string): Promise<string | null> {
+  const res = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.ZAI_MODEL ?? "glm-4-flash",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      temperature: 0.3,
+    }),
+    signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
+  });
+  if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
+  if (!res.ok) throw new Error(`Z.ai ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  const text = (data.choices?.[0]?.message?.content ?? "").trim();
+  return text || null;
+}
+
+async function callZai(prompt: string): Promise<string> {
+  const keys = zaiKeys();
+  if (!keys.length) throw new Error("ZAI_API_KEY missing");
+
+  const ROUNDS = 3;
+  for (let round = 0; round < ROUNDS; round++) {
+    for (let i = 0; i < keys.length; i++) {
+      const idx = (zaiCursor + i) % keys.length;
+      const text = await zaiAttempt(keys[idx], prompt);
+      if (text) {
+        zaiCursor = (idx + 1) % keys.length;
+        return text;
+      }
+    }
+    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
+  }
+  throw new Error(`Z.ai: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+}
+
 type ClassifyOutcome =
   | { ok: true; value: ClassifyResult; provider: string }
   | { ok: false; reason: string };
@@ -456,7 +578,20 @@ type ClassifyOutcome =
 // is a single point of failure for the entire feed: when Gemini's prepaid credits
 // ran out on ~2026-08-11, ingestion kept fetching stories and dropping every one
 // of them for eleven days. Any one provider can now go down without freezing the
-// feed. Add keys, not conditionals.
+// feed.
+//
+// "Add keys, not conditionals" used to be the advice here, and it was wrong often
+// enough to be worth correcting. Audited 2026-10-02: of five configured providers,
+// four were failing for reasons no key could fix, and all four reported as some
+// flavour of "exhausted", which reads like spent quota:
+//   mistral    `mistral-small-latest` is provisioned at 0 req/min on the free plan,
+//              so every key 429s forever. A model/plan mismatch, not a limit.
+//   deepinfra  402 no balance, mapped to retryable, so it looked like a rate limit.
+//   openrouter 404, a retired model slug. Not a quota error at all.
+//   gemini     429 credits depleted. The only genuine limit of the four.
+// Adding keys to any of those changes nothing and costs ROUNDS x keys round trips
+// per story. Before adding a key, read the real status code: the provider errors
+// now carry the response body for exactly this reason.
 // Ordered best-first. The last entry is the one that keeps the feed alive when the
 // paid tiers are dry, which is not hypothetical: on 2026-09-04 every run for two days
 // pulled ~306 items and inserted zero, because DeepSeek returned 402 Insufficient
@@ -465,6 +600,8 @@ type ClassifyOutcome =
 // already in the repo on a free model and already used by the knowledge generator; it
 // just was not wired in here.
 const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promise<string> }[] = [
+  { name: "cerebras", envKey: "CEREBRAS_API_KEY", call: callCerebras },
+  { name: "zai-glm", envKey: "ZAI_API_KEY", call: callZai },
   { name: "groq-gpt-oss", envKey: "GROQ_API_KEY", call: callGroq },
   { name: "deepseek-v4-flash", envKey: "DEEPSEEK_API_KEY", call: callDeepSeek },
   { name: "gemini-flash-lite", envKey: "GEMINI_API_KEY", call: callGemini },
@@ -475,7 +612,12 @@ const LLM_PROVIDERS: { name: string; envKey: string; call: (p: string) => Promis
 
 // Auth/balance/missing key won't recover mid-run: drop the provider at once. "key(s)
 // exhausted" is also what a per-minute 429 burst looks like, so it takes several in a row.
-const DEAD_PROVIDER_PATTERN = /\b(401|402|403)\b|API_KEY missing/i;
+// 404 belongs here with the auth failures: it means the model slug or endpoint does
+// not exist, which cannot come back mid-run. It was missing, so every story re-tried
+// OpenRouter's retired `:free` slug and paid the round trip to learn the same thing
+// ~150 times a run. 400 is deliberately NOT included — it can be one story's content
+// rather than the provider, and killing a working provider over one item is worse.
+const DEAD_PROVIDER_PATTERN = /\b(401|402|403|404)\b|API_KEY missing/i;
 const EXHAUSTED_PATTERN = /key\(s\) exhausted/i;
 const EXHAUSTED_STRIKES = 3;
 

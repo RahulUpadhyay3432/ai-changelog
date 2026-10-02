@@ -168,9 +168,14 @@ async function storeBreakdown(id: string, breakdown: string): Promise<void> {
 }
 
 // ── LLM providers ────────────────────────────────────────────────────────────
-// Primary: GLM-4.5-Air (free, ~7s, clean output, non-reasoning so latency is
-// predictable). Fallback: Gemini. Nemotron-550B was rejected — ~3.7 min/call.
-const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
+// Fallback: Gemini. Nemotron-550B was rejected, ~3.7 min/call.
+//
+// z-ai/glm-4.5-air:free was RETIRED and this constant kept pointing at it, so this
+// route has been 404-ing to Gemini on every breakdown. Shares the env override with
+// lib/llm.ts so one config change moves both. Non-reasoning and fast matters more
+// here than anywhere else: this path is interactive, behind a user tap.
+const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL ?? "inclusionai/ling-3.0-flash-sante:free";
 
 // Free-tier latency is variable (usually ~7s, but can spike). Abort if it runs
 // long so we fall back to Gemini fast instead of burning the whole budget and
@@ -178,7 +183,10 @@ const OPENROUTER_MODEL = "z-ai/glm-4.5-air:free";
 const OPENROUTER_TIMEOUT_MS = 14_000;
 
 async function callOpenRouter(prompt: string): Promise<string> {
-  const key = process.env.OPENROUTER_API_KEY;
+  // OPENROUTER_API_KEY is a comma-separated list; take the first rather than
+  // sending the whole string as one bearer token (which 401s). No rotation here
+  // on purpose: one interactive request does not need to spread load.
+  const key = (process.env.OPENROUTER_API_KEY ?? "").split(",")[0]?.trim();
   if (!key) throw new Error("OPENROUTER_API_KEY missing");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
@@ -191,7 +199,9 @@ async function callOpenRouter(prompt: string): Promise<string> {
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,
-        max_tokens: 800,
+        // Matches lib/llm.ts: the free pool is reasoning-model heavy and 800 is not
+        // enough for one to finish thinking AND answer.
+        max_tokens: 2500,
         messages: [{ role: "user", content: prompt }],
       }),
       signal: controller.signal,

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "check:freshness": "node scripts/check-freshness.mjs",
     "gen:heroes": "node scripts/generate-hero-images.mjs",
-    "src:heroes": "node scripts/source-hero-images.mjs"
+    "src:heroes": "node scripts/source-hero-images.mjs",
+    "verify:llm": "node scripts/verify-llm-providers.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

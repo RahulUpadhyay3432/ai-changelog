@@ -58,7 +58,8 @@ export function TopicPicker({ onDone }: { onDone: (slugs: string[] | null) => vo
         right: 0,
         bottom: 0,
         zIndex: 60,
-        padding: "20px 20px 22px",
+        // Clear the BottomNav (48px + safe area) so the actions never sit under it.
+        padding: "20px 20px calc(48px + env(safe-area-inset-bottom, 0px) + 18px)",
         background: "var(--kt-surface-raised, rgba(14,13,12,0.98))",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",

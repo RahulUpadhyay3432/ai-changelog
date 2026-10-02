@@ -7,15 +7,19 @@ import { GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT } from "@/lib/design-tokens";
 import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import { FEED_ROW_CAP } from "@/lib/supabase";
 
-export function HeroPill({ storyCount }: { storyCount: number }) {
+export function HeroPill({ storiesToday, storyCount }: { storiesToday: number; storyCount: number }) {
   const reduce = useReducedMotion();
 
-  // The count is the whole feed window, not today, and the query caps at
-  // FEED_ROW_CAP rows, so a capped number is shown as a floor rather than a total.
+  // This used to print the whole feed-window count under a "today" label, which
+  // both overstated the day and made the feed read as a weekly digest. Now it
+  // counts the last 24h, falls back to naming the window when the day is quiet,
+  // and marks the FEED_ROW_CAP ceiling rather than printing a plateau as a total.
   const label =
-    storyCount <= 0
-      ? "Updated daily"
-      : `${storyCount}${storyCount >= FEED_ROW_CAP ? "+" : ""} stories / last ${FEED_WINDOW_LABEL}`;
+    storiesToday > 0
+      ? `${storiesToday}${storiesToday >= FEED_ROW_CAP ? "+" : ""} stories today`
+      : storyCount > 0
+        ? `${storyCount}${storyCount >= FEED_ROW_CAP ? "+" : ""} stories / last ${FEED_WINDOW_LABEL}`
+        : "Updated daily";
 
   return (
     <motion.div

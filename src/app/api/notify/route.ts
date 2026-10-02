@@ -2,19 +2,38 @@ import webpush from "web-push";
 import { createClient } from "@supabase/supabase-js";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 
-if (process.env.VAPID_SUBJECT && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+// The daily push: one notification pointing at the freshest story.
+//
+// Cron-triggered (see vercel.json, 0 7 * * *). Vercel Cron invokes the path with
+// GET, so GET is the entry point every other cron route in this repo uses; POST
+// stays for manual triggers. This route used to export POST only, which meant the
+// morning cron got a 405 and the push never went out.
+//
+// Gated on the VAPID keys the same way the digest is gated on RESEND_API_KEY:
+// no keys → no-op that SAYS so, rather than a silent zero.
+
+const vapidConfigured = Boolean(
+  process.env.VAPID_SUBJECT && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY
+);
+
+if (vapidConfigured) {
   webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT,
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
+    process.env.VAPID_SUBJECT!,
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
   );
 }
 
+export const runtime = "nodejs";
 export const maxDuration = 60;
 
-export async function POST(req: Request) {
+async function sendDailyPush(req: Request): Promise<Response> {
   if (!isAuthorizedCron(req)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!vapidConfigured) {
+    return Response.json({ sent: 0, expired: 0, skipped: "vapid_not_configured" });
   }
 
   const supabase = createClient(
@@ -72,4 +91,12 @@ export async function POST(req: Request) {
   }
 
   return Response.json({ sent, expired: expiredIds.length });
+}
+
+export async function GET(req: Request) {
+  return sendDailyPush(req);
+}
+
+export async function POST(req: Request) {
+  return sendDailyPush(req);
 }

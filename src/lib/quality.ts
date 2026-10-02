@@ -80,3 +80,41 @@ export function isBadExplainerSection(text: string, minWords = 6): boolean {
   const lower = t.toLowerCase();
   return EXPLAINER_LEAKS.some((p) => lower.includes(p));
 }
+
+// ─── Markdown / em-dash sanitising ──────────────────────────────────────────
+
+/**
+ * Strips the formatting that smaller open models emit despite the prompt
+ * forbidding it, so their output can be used without reading as machine-written.
+ *
+ * This exists because the provider chain's cheap tiers are the ones that ignore
+ * style instructions. `open-mistral-nemo`, `ministral-8b` and most of
+ * OpenRouter's free pool emit `**bold**` and em dashes on roughly every third
+ * summary; nothing downstream removed them, so the choice was a markdown-leaking
+ * card or dropping the story. Sanitising is the third option.
+ *
+ * Deliberately NOT a general markdown renderer: a summary is 2-4 sentences of
+ * plain prose, so anything structural (headings, lists, code fences) is a sign
+ * the model ignored the format and belongs in isBadSummary's hands, not here.
+ */
+export function sanitizeSummary(text: string): string {
+  return (
+    (text ?? "")
+      // Emphasis: **bold**, __bold__, *italic*, _italic_, `code`.
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/__([^_]+)__/g, "$1")
+      .replace(/(^|\s)\*([^*\n]+)\*(?=\s|[.,;:!?)]|$)/g, "$1$2")
+      .replace(/(^|\s)_([^_\n]+)_(?=\s|[.,;:!?)]|$)/g, "$1$2")
+      .replace(/`([^`\n]+)`/g, "$1")
+      // Em/en dash → comma. CLAUDE.md's voice rules ban them and the prompt says
+      // so explicitly; a comma is what the prompt asks for as the replacement.
+      .replace(/\s*[—–]\s*/g, ", ")
+      // A leaked "SUMMARY:" label, which happens when a model repeats the format.
+      .replace(/^\s*SUMMARY:\s*/i, "")
+      // Collapse the punctuation the dash swap can double up (", ," → ",").
+      .replace(/,\s*([,.;:])/g, "$1")
+      .replace(/([.;:])\s*,/g, "$1")
+      .replace(/\s{2,}/g, " ")
+      .trim()
+  );
+}

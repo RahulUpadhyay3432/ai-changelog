@@ -5,6 +5,7 @@ import {
   ArrowRight, ArrowUpRight, Compass, Bookmark, Search,
 } from "lucide-react";
 import { fetchNewsItems, FEED_ROW_CAP } from "@/lib/supabase";
+import type { NewsItem } from "@/lib/types";
 import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import { DESCRIPTION } from "@/lib/brand";
 import { getRadarTools } from "@/lib/knowledge";
@@ -105,6 +106,15 @@ function SeeAll({ href, children }: { href: string; children: React.ReactNode })
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
+// The pill says "today", so it has to count today. `news` is already the newest
+// rows inside the feed window, so a 24h slice of it is exact until the day's
+// volume passes FEED_ROW_CAP, which the pill then marks with a "+". Kept out of
+// the component body: Date.now() in render trips the react-compiler purity rule.
+function countStoriesInLastDay(items: NewsItem[]): number {
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  return items.filter((n) => new Date(n.publishedAt).getTime() > dayAgo).length;
+}
+
 export default async function LandingPage() {
   const [news, tools] = await Promise.all([
     fetchNewsItems().catch(() => []),
@@ -115,11 +125,7 @@ export default async function LandingPage() {
   const mcpCount = MCP_SERVERS.length;
   const skillCount = AI_SKILLS.length;
   const storyCount = news.length;
-  // The pill says "today", so it has to count today. `news` is the newest rows
-  // inside the feed window, so a 24h slice of it is exact until the day's volume
-  // passes FEED_ROW_CAP, which the pill then marks with a "+".
-  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
-  const storiesToday = news.filter((n) => new Date(n.publishedAt).getTime() > dayAgo).length;
+  const storiesToday = countStoriesInLastDay(news);
 
   const githubTools = tools.filter((t) => t.source === "github").slice(0, 5);
   const phTools = tools.filter((t) => t.source === "producthunt").slice(0, 5);

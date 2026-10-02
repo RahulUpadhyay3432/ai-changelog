@@ -172,6 +172,27 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
   return dbToNewsItem({ ...(archived as Omit<DbNewsItem, "created_at">), created_at: "" } as DbNewsItem);
 }
 
+/**
+ * Real story counts, straight from the table.
+ *
+ * NOT derivable from fetchNewsItems(): that applies MAX_PER_SOURCE, which
+ * collapses several hundred stories into a few dozen feed items. Counting the
+ * array it returns made the landing advertise 44 stories when the window held
+ * 429. Copy that states how much news there is has to count the news.
+ */
+export async function countNewsItems(): Promise<{ today: number; window: number }> {
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const [todayRes, windowRes] = await Promise.all([
+    supabase.from("news_items").select("id", { count: "exact", head: true }).gte("published_at", dayAgo),
+    supabase.from("news_items").select("id", { count: "exact", head: true }).gte("published_at", feedCutoffISO()),
+  ]);
+  return { today: todayRes.count ?? 0, window: windowRes.count ?? 0 };
+}
+
+// How many rows the feed reads at once. Not a story total: countNewsItems() is
+// what copy should use, since this is both a row cap and pre-MAX_PER_SOURCE.
+export const FEED_ROW_CAP = 100;
+
 export async function fetchNewsItems(
   categorySlug?: string,
   opts?: { rankOpener?: boolean }
@@ -183,7 +204,7 @@ export async function fetchNewsItems(
     .select("*")
     .gte("published_at", cutoff)
     .order("published_at", { ascending: false })
-    .limit(100);
+    .limit(FEED_ROW_CAP);
 
   if (categorySlug && categorySlug !== "all") {
     query = query.eq("category_slug", categorySlug);

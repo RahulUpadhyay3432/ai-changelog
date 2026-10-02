@@ -56,7 +56,7 @@ timestamp: ${now}
 
 # Kapyn Knowledge Catalog
 
-Kapyn tracks what matters in AI and tech , distilled to 30-second reads.
+Kapyn keeps a curated map of the AI worth using, plus a daily brief distilled to 30-second reads.
 This OKF bundle exposes the structured content behind the feed for AI agents,
 search crawlers, and downstream integrations.
 
@@ -64,8 +64,8 @@ Updated hourly. No paywall. No hype.
 
 # Sections
 
-* [Today's Stories](/okf/stories) , ${storyCount} stories in the last 48h
-* [AI Tools Radar](/okf/tools) , ${toolCount} tools, models, and entities tracked
+* [Today's Stories](/okf/stories): ${storyCount} stories in the last 48h
+* [AI Tools Radar](/okf/tools): ${toolCount} tools, models, and entities tracked
 
 # Today at a Glance (${today})
 

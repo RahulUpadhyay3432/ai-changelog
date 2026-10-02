@@ -1142,7 +1142,7 @@ limit 8;`,
       {
         type: "list",
         items: [
-          "**Anthropic**: Fable 5.1 (the ceiling, $10/$50 per million tokens) · Opus 5 (the recommended default, $5/$25) · Sonnet 5 (the workhorse, $2/$10) · Haiku 4.5 (small and fast, $1/$5, 200K context). Everything above Haiku carries a million-token window.",
+          "**Anthropic**: Fable 5.1 (the ceiling, $10/$50 per million tokens) · Opus 5.5 (the recommended default, $4/$20) · Sonnet 5.5 (the workhorse, $2/$10) · Haiku 4.5 (small and fast, $1/$5, 200K context). Everything above Haiku carries a million-token window.",
           "**OpenAI**: GPT-6 Astra (the new flagship, $10/$50) · GPT-5.6 Sol ($4/$20) · Terra ($2/$12) · Luna ($0.20/$1.20). All four share the same 1.05M-token window.",
         ],
       },

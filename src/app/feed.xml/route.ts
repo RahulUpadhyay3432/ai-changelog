@@ -40,7 +40,7 @@ export async function GET() {
     <title>Kapyn, AI Glossary</title>
     <link>${APP_URL}/explore</link>
     <atom:link href="${APP_URL}/feed.xml" rel="self" type="application/rss+xml" />
-    <description>Plain-English, source-grounded explainers for the concepts shaping AI , from Kapyn.</description>
+    <description>Plain-English, source-grounded explainers for the concepts shaping AI, from Kapyn.</description>
     <language>en</language>
     <lastBuildDate>${now}</lastBuildDate>
 ${items}

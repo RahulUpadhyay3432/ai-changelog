@@ -91,6 +91,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: APP_URL, lastModified: new Date(), changeFrequency: "hourly", priority: 1.0 },
     { url: `${APP_URL}/home`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${APP_URL}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${APP_URL}/methodology`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${APP_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     ...blogUrls,
     { url: `${APP_URL}/radar`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },

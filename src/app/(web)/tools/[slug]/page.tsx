@@ -196,7 +196,7 @@ export default async function ToolDetailPage({ params }: Props) {
       <div style={{ margin: "40px 0 0", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", background: GOLD_SOFT, border: `1px solid ${GOLD_BORDER}`, borderRadius: "16px", padding: "20px 22px" }}>
         <div style={{ flex: 1, minWidth: "200px" }}>
           <h3 style={{ fontFamily: SG, fontSize: "16px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Find more on the Radar</h3>
-          <p style={{ fontSize: "14px", color: TEXT.muted, margin: "5px 0 0", lineHeight: 1.5 }}>Browse every tool, model, and MCP server in one place.</p>
+          <p style={{ fontSize: "14px", color: TEXT.muted, margin: "5px 0 0", lineHeight: 1.5 }}>Browse the curated tools, models and MCP servers in one place.</p>
         </div>
         <Link href="/radar/browse" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#fff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
           Open the Radar <ArrowRight size={16} strokeWidth={2.4} />

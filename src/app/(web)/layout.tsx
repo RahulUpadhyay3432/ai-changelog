@@ -39,9 +39,15 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
       <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>
-        <span>Kapyn, the calm intelligence layer for AI.</span>
+        <span>Kapyn, the calm map of the AI worth using.</span>
         <span className={styles.footerDim}>
-          Every story that matters, distilled to 30 seconds. No paywall, ever.
+          No paid placement. No affiliate rankings. No paywall, ever.
+        </span>
+        <span className={styles.footerLinks}>
+          <Link href="/about" className={styles.footerLink}>About</Link>
+          <Link href="/methodology" className={styles.footerLink}>How it is made</Link>
+          <Link href="/compare" className={styles.footerLink}>Compare models</Link>
+          <Link href="/okf" className={styles.footerLink}>Open data</Link>
         </span>
       </footer>
 

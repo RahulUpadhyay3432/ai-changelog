@@ -4,8 +4,9 @@ import {
   Cpu, Brain, Plug, Sparkles, GitBranch, Trophy,
   ArrowRight, ArrowUpRight, Compass, Bookmark, Search,
 } from "lucide-react";
-import { fetchNewsItems } from "@/lib/supabase";
+import { fetchNewsItems, countNewsItems } from "@/lib/supabase";
 import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
+import { DESCRIPTION } from "@/lib/brand";
 import { getRadarTools } from "@/lib/knowledge";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { MCP_SERVERS } from "@/lib/radar-mcp";
@@ -28,8 +29,7 @@ import { serializeJsonLd } from "@/lib/json-ld";
 export const revalidate = 1800;
 
 const APP_URL = "https://kapyn.app";
-const DESC =
-  "The calm map of the AI worth using, agents, models, tools, MCP servers and skills. Curated, kept current by a daily signal, never behind a paywall.";
+const DESC = DESCRIPTION;
 
 export const metadata: Metadata = {
   title: "Discover the AI worth using: agents, models, tools, MCP servers & skills",
@@ -106,15 +106,19 @@ function SeeAll({ href, children }: { href: string; children: React.ReactNode })
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 export default async function LandingPage() {
-  const [news, tools] = await Promise.all([
+  const [news, tools, counts] = await Promise.all([
     fetchNewsItems().catch(() => []),
     getRadarTools(40).catch(() => []),
+    // Counted in the table, not derived from `news`: the feed caps at
+    // MAX_PER_SOURCE, so its length is a fraction of the stories that exist.
+    countNewsItems().catch(() => ({ today: 0, window: 0 })),
   ]);
 
   const toolCount = CURATED_ESSENTIALS.length;
   const mcpCount = MCP_SERVERS.length;
   const skillCount = AI_SKILLS.length;
-  const storyCount = news.length;
+  const storyCount = counts.window;
+  const storiesToday = counts.today;
 
   const githubTools = tools.filter((t) => t.source === "github").slice(0, 5);
   const phTools = tools.filter((t) => t.source === "producthunt").slice(0, 5);
@@ -140,11 +144,11 @@ export default async function LandingPage() {
 
   const learn = [
     { q: "What is MCP (Model Context Protocol)?", a: "An open standard that lets an AI assistant call external tools and data sources through a uniform interface, so one agent can reach your files, database, and APIs without bespoke glue for each.", slug: "mcp" },
-    { q: "What is an AI agent?", a: "A system that uses a model to decide and act in a loop, calling tools, reading results, and continuing until a goal is met , rather than returning a single response.", slug: "agents" },
+    { q: "What is an AI agent?", a: "A system that uses a model to decide and act in a loop, calling tools, reading results, and continuing until a goal is met, rather than returning a single response.", slug: "agents" },
     { q: "What is RAG?", a: "Retrieval-augmented generation: fetch relevant documents at query time and feed them to the model as context, so answers are grounded in your data instead of the model's memory.", slug: "rag" },
     { q: "What is chain-of-thought?", a: "Prompting a model to reason step by step before answering. Working through intermediate steps tends to improve accuracy on math, logic, and multi-step tasks.", slug: "chain-of-thought" },
     { q: "What is fine-tuning?", a: "Continuing a model's training on your own examples so it adapts to a specific tone, format, or task, an alternative to packing everything into the prompt.", slug: "fine-tuning" },
-    { q: "What is prompt engineering?", a: "The practice of shaping a model's input, instructions, examples, and structure , to get reliable, useful output without changing the model itself.", slug: "prompt-engineering" },
+    { q: "What is prompt engineering?", a: "The practice of shaping a model's input (instructions, examples, and structure) to get reliable, useful output without changing the model itself.", slug: "prompt-engineering" },
   ];
 
   const cardStyle: React.CSSProperties = {
@@ -207,7 +211,7 @@ export default async function LandingPage() {
         <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
-              <HeroPill storyCount={storyCount} />
+              <HeroPill storiesToday={storiesToday} storyCount={storyCount} />
               <HeroHeadline />
               <p style={{ fontSize: "18px", color: TEXT.body, lineHeight: 1.55, margin: "20px 0 0", maxWidth: "480px" }}>
                 Agents, models, tools, MCP servers and skills, curated, kept current by a calm daily signal. No noise, no paywall, ever.
@@ -227,7 +231,7 @@ export default async function LandingPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
                   <span style={{ fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.primary }}>Built for your phone</span>
                   <span style={{ fontSize: "13px", color: TEXT.muted, lineHeight: 1.45, maxWidth: "240px" }}>
-                    Scan for the 30-second daily brief , or{" "}
+                    Scan for the 30-second daily brief, or{" "}
                     <Link href="/?app=1" style={{ color: TEXT.body, fontWeight: 600, textDecoration: "none" }}>open it here →</Link>
                   </span>
                 </div>
@@ -257,7 +261,7 @@ export default async function LandingPage() {
       {/* 3 · The Map ───────────────────────────────────────────────────────── */}
       <section className={styles.section} style={{ padding: "48px 24px" }}>
         <div className={styles.inner}>
-          <SectionHead kicker="The map" title="Everything worth knowing, in one place" sub="Not a search box, a curated, current map of the AI ecosystem. Browse by what you're actually doing." />
+          <SectionHead kicker="The map" title="The AI worth knowing about, in one place" sub="Not a search box. A curated, current map of the AI ecosystem, browsable by what you're actually doing." />
           <div className={styles.mapGrid}>
             {mapCards.map(({ Icon, title, line, count, chips, href }) => (
               <Link key={title} href={href} style={cardStyle}>
@@ -287,7 +291,7 @@ export default async function LandingPage() {
             <div>
               <Kicker>Essential toolkit</Kicker>
               <h2 style={{ fontFamily: SG, fontSize: "28px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: "10px 0 0", lineHeight: 1.1 }}>
-                The tools every AI builder uses
+                The tools most AI builders end up with
               </h2>
             </div>
             <SeeAll href="/radar/browse">See full toolkit</SeeAll>
@@ -407,7 +411,7 @@ export default async function LandingPage() {
             </div>
             <div style={{ flex: 1, minWidth: "200px" }}>
               <h3 style={{ fontFamily: SG, fontSize: "18px", fontWeight: 700, color: TEXT.primary, margin: 0 }}>Keep it in your pocket</h3>
-              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen . Your 30-second daily brief and breaking alerts, one tap away.</p>
+              <p style={{ fontSize: "14px", color: TEXT.muted, margin: "6px 0 0", lineHeight: 1.5 }}>Add Kapyn to your home screen. Your 30-second daily brief, one tap away.</p>
             </div>
             <Link href="/?app=1" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: TEXT.body, border: `1px solid ${HAIRLINE}`, borderRadius: "12px", padding: "11px 18px", textDecoration: "none", flexShrink: 0 }}>
               Open the app <ArrowUpRight size={15} strokeWidth={2.3} />
@@ -424,7 +428,7 @@ export default async function LandingPage() {
               <Kicker>Your toolkit</Kicker>
               <h2 style={{ fontFamily: SG, fontSize: "26px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: "10px 0 0", lineHeight: 1.12 }}>Make the map your map.</h2>
               <p style={{ fontSize: "15px", color: TEXT.body, lineHeight: 1.55, margin: "10px 0 18px", maxWidth: "420px" }}>
-                Save any agent, model, MCP server or skill into a named <strong style={{ color: TEXT.primary, fontWeight: 600 }}>Loadout</strong> , a RAG stack, a hackathon kit, a video pipeline. Yours, on-device, no signup.
+                Save any agent, model, MCP server or skill into a named <strong style={{ color: TEXT.primary, fontWeight: 600 }}>Loadout</strong>: a RAG stack, a hackathon kit, a video pipeline. Yours, on-device, no signup.
               </p>
               <Link className="kt-cta" href="/radar/toolkit" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "14px", fontWeight: 600, color: "#ffffff", background: GOLD, borderRadius: "12px", padding: "11px 18px", textDecoration: "none" }}>
                 Start a Loadout <ArrowRight size={16} strokeWidth={2.4} />
@@ -515,7 +519,7 @@ export default async function LandingPage() {
           <div style={{ textAlign: "center", borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "40px 24px" }}>
             <h2 style={{ fontFamily: SG, fontSize: "24px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.025em", margin: 0 }}>Calm, source-grounded, free forever.</h2>
             <p style={{ fontSize: "15px", color: TEXT.muted, margin: "10px auto 0", maxWidth: "480px", lineHeight: 1.5 }}>
-              No hype. No paywall. No signup wall. Every claim links to its source , so you can trust the map and move on with your day.
+              No hype. No paywall. No signup wall. Every claim links to its source, so you can trust the map and move on with your day.
             </p>
           </div>
         </div>
@@ -532,7 +536,8 @@ export default async function LandingPage() {
             {[
               { h: "Discover", links: [["Radar", "/radar"], ["Tools & Agents", "/radar/browse"], ["MCP servers", "/radar/mcp"], ["Hackathons", "/radar/hackathons"]] },
               { h: "Stay current", links: [["Today's feed", "/?app=1"], ["Trending", "/trending"], ["Categories", "/categories"], ["RSS", "/feed.xml"]] },
-              { h: "Learn", links: [["Blog", "/blog"], ["Explore concepts", "/explore"], ["For LLMs", "/llms.txt"], ["Open data", "/okf"]] },
+              { h: "Learn", links: [["Blog", "/blog"], ["Explore concepts", "/explore"], ["Compare models", "/compare"]] },
+              { h: "Kapyn", links: [["About", "/about"], ["How it's made", "/methodology"], ["Open data", "/okf"], ["For LLMs", "/llms.txt"]] },
             ].map((col) => (
               <div key={col.h}>
                 <span style={{ fontFamily: SG, fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: TEXT.muted }}>{col.h}</span>

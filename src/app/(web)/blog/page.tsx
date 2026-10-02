@@ -30,8 +30,9 @@ export default function BlogIndex() {
   const tags = [...new Set(posts.map((p) => p.tag))].sort();
   const toolCounts = Object.fromEntries(posts.map((p) => [p.slug, postTools(p).length]));
 
-  // Top reads = most comprehensive (most tools), pick 7
-  const topPosts = [...posts]
+  // Ranked by how many tools a post covers, which is depth, not readership. There
+  // is no read/view data in this product, so the label must not imply any.
+  const deepDives = [...posts]
     .sort((a, b) => (toolCounts[b.slug] ?? 0) - (toolCounts[a.slug] ?? 0))
     .slice(0, 7);
 
@@ -68,7 +69,7 @@ export default function BlogIndex() {
         </p>
       </header>
 
-      <BlogIndexClient posts={posts} tags={tags} toolCounts={toolCounts} topPosts={topPosts} />
+      <BlogIndexClient posts={posts} tags={tags} toolCounts={toolCounts} deepDives={deepDives} />
     </>
   );
 }

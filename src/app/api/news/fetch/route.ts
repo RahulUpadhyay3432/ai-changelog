@@ -589,7 +589,7 @@ function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
     // Title: "repo-name, one-line description" so cards are readable without
     // the full summary. Falls back to just the repo name if no description.
     title: repo.description
-      ? `${repo.name} , ${repo.description.slice(0, 120)}`
+      ? `${repo.name}: ${repo.description.slice(0, 120)}`
       : repo.name,
     sourceUrl: repo.htmlUrl,
     sourceName: "GitHub",
@@ -712,9 +712,9 @@ async function insertItems(
       // provider outage doesn't bury it under a hundred identical errors.
       if (!results.llmError) {
         results.llmError = outcome.reason;
-        results.errors.push(`LLM failed , ${outcome.reason}`);
+        results.errors.push(`LLM failed: ${outcome.reason}`);
       }
-      results.errors.push(`LLM failed for "${item.title}" , skipped`);
+      results.errors.push(`LLM failed for "${item.title}", skipped`);
       if (await backlogFailedStory(supabase, item, outcome.reason)) {
         results.backlogged++;
       }
@@ -791,7 +791,7 @@ export async function GET(request: NextRequest) {
         if (!r.ok || isBadSummary(r.value.summary)) {
           results.errors.push(
             !r.ok
-              ? `Re-summary failed for "${item.title}" , ${r.reason}`
+              ? `Re-summary failed for "${item.title}": ${r.reason}`
               : `Bad re-summary skipped for "${item.title}"`,
           );
           continue;

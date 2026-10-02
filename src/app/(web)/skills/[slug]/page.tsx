@@ -128,7 +128,7 @@ export default async function SkillDetail({ params }: Props) {
         <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: "#f5f5f5", letterSpacing: "-0.02em", margin: 0 }}>What it does</h2>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "12px 0 0" }}>{s.description}</p>
         <p style={{ fontSize: "16px", color: "#cbc7bf", lineHeight: 1.7, margin: "14px 0 0" }}>
-          {s.name} runs inside {platformLabel === "Multi-platform" ? "multiple assistants" : platformLabel.replace(" (ChatGPT)", "")}, so you get a specialised assistant for {s.category.toLowerCase()} without writing a custom prompt , open it and start.
+          {s.name} runs inside {platformLabel === "Multi-platform" ? "multiple assistants" : platformLabel.replace(" (ChatGPT)", "")}, so you get a specialised assistant for {s.category.toLowerCase()} without writing a custom prompt. Open it and start.
         </p>
       </section>
 

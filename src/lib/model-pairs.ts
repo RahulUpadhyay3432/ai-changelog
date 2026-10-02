@@ -42,9 +42,9 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "gpt-astra",
     verdict:
-      "The practical version of the frontier question, because Opus 5 costs half what Astra does, $5 and $25 per million tokens against $10 and $50, and Anthropic recommends it as the default for most workloads. Astra is the more capable model on the hardest end-to-end tasks and clearly ahead on computer use. Most teams should establish that Opus fails a task before paying twice as much to fix it.",
+      "The practical version of the frontier question, because Opus 5.5 costs well under half what Astra does, $4 and $20 per million tokens against $10 and $50, and Anthropic recommends it as the default for most workloads. Astra is the more capable model on the hardest end-to-end tasks and clearly ahead on computer use. Most teams should establish that Opus fails a task before paying two and a half times as much to fix it.",
     pickA: [
-      "The default for agentic coding, at half the token price",
+      "The default for agentic coding, at well under half the token price",
       "Enterprise work where the cost of a long agent run is the constraint",
       "Reasoning-effort control to trade depth against spend",
     ],
@@ -86,7 +86,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "gpt-sol",
     verdict:
-      "Two mid-frontier models at almost the same price, now that GPT-6 Astra sits above Sol and Claude Fable 5.1 sits above Opus. Sol is the broader generalist; Opus 5 leads on agentic and coding work and is the model Anthropic itself tells you to start with. Sol is a little cheaper per token. The deciding factor is usually which ecosystem your code already lives in, not raw capability.",
+      "Two mid-frontier models at almost the same price, now that GPT-6 Astra sits above Sol and Claude Fable 5.1 sits above Opus. Sol is the broader generalist; Opus 5.5 leads on agentic and coding work and is the model Anthropic itself tells you to start with. Since Opus 5.5 they list at the same price, $4 and $20 per million tokens, so the deciding factor is usually which ecosystem your code already lives in, not raw capability.",
     pickA: [
       "Multi-step agentic coding where the model runs for a long time without supervision",
       "Large refactors that must respect an existing codebase's conventions",
@@ -102,7 +102,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "gemini-pro",
     verdict:
-      "Two different bets. Opus 5 is the agentic specialist, it holds a task together over many steps. Gemini 3.1 Pro leads reasoning benchmarks and costs meaningfully less per token at the frontier tier. Both carry a million-token context, so the old 'Gemini for long inputs' advantage has largely evaporated.",
+      "Two different bets. Opus 5.5 is the agentic specialist, it holds a task together over many steps. Gemini 3.1 Pro leads reasoning benchmarks and still costs less per token at the frontier tier, $2 and $12 against $4 and $20. Both carry a million-token context, so the old 'Gemini for long inputs' advantage has largely evaporated.",
     pickA: [
       "Agent loops that call tools repeatedly and must not drift",
       "Code that has to match an existing house style",
@@ -132,7 +132,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "grok",
     verdict:
-      "Both are pitched at agentic coding. Opus 5 has the deeper track record and twice the context; Grok 4.6 is cheaper below 200K tokens and offers four reasoning-effort levels instead of three. Grok's catch is the long-context toll: cross 200K and the rate doubles for every token in the request, including the ones below the line.",
+      "Both are pitched at agentic coding. Opus 5.5 has the deeper track record and twice the context; Grok 4.6 is cheaper below 200K tokens and offers four reasoning-effort levels instead of three. Grok's catch is the long-context toll: cross 200K and the rate doubles for every token in the request, including the ones below the line.",
     pickA: [
       "Long sessions that will exceed 200K tokens, no pricing cliff",
       "Work where the coding track record matters more than the price",
@@ -174,7 +174,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-sonnet",
     b: "gpt-terra",
     verdict:
-      "The workhorse tier, where most production traffic actually runs. Both sit around the same price and both inherit their family's million-token context. Sonnet 5 keeps Claude's habit of matching an existing codebase; Terra keeps OpenAI's ecosystem breadth and a lower input price. For most teams this is a coin flip decided by existing integrations.",
+      "The workhorse tier, where most production traffic actually runs. Both inherit their family's million-token context and both take $2 per million input tokens, but Sonnet 5.5 is now the cheaper of the two on output, $10 against $12. Sonnet keeps Claude's habit of matching an existing codebase; Terra keeps OpenAI's ecosystem breadth. For most teams this is a coin flip decided by existing integrations.",
     pickA: [
       "Code generation inside an established repo",
       "Long conditional instructions that must be followed exactly",
@@ -188,7 +188,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-sonnet",
     b: "gemini-pro",
     verdict:
-      "A tier-crossing comparison people make on price. Gemini 3.1 Pro is a frontier model at roughly balanced-tier cost, which makes it genuinely competitive with Sonnet 5 on budget. Sonnet still wins on instruction-following discipline and code that fits its surroundings; Gemini wins on raw reasoning.",
+      "A tier-crossing comparison people make on price. Gemini 3.1 Pro is a frontier model at roughly balanced-tier cost: the same $2 input price as Sonnet 5.5, with $12 output against Sonnet's $10. Sonnet still wins on instruction-following discipline and code that fits its surroundings; Gemini wins on raw reasoning.",
     pickA: [
       "Agentic coding and tool use you want to be predictable",
       "Strict adherence to a long system prompt",
@@ -202,7 +202,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-fable",
     b: "claude-opus",
     verdict:
-      "The within-Claude question. Fable 5.1 landed on 1 September 2026 at $10 and $50 per million tokens, exactly twice Opus 5, and Anthropic still tells you to start on Opus for most workloads. Fable 5.1 is the escalation path for demanding reasoning and long-horizon agentic runs, and its cache reads cost a quarter of a percent of the input price, which changes the maths on long repeated contexts. Escalate when you can point at a task Opus actually fails.",
+      "The within-Claude question. Fable 5.1 landed on 1 September 2026 at $10 and $50 per million tokens, two and a half times Opus 5.5, and Anthropic still tells you to start on Opus for most workloads. Fable 5.1 is the escalation path for demanding reasoning and long-horizon agentic runs, and its cache reads cost a quarter of a percent of the input price, which changes the maths on long repeated contexts. Escalate when you can point at a task Opus actually fails.",
     pickA: [
       "The genuinely hardest problems where being right dominates cost",
       "Work you cannot easily verify yourself",
@@ -216,7 +216,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "claude-sonnet",
     verdict:
-      "The one most Claude users get wrong by defaulting up. Sonnet 5 handles the large majority of real work at a fraction of Opus 5's price, with the same million-token context. Opus earns its cost on long autonomous runs and architectural reasoning, not on the routine edits people usually point it at.",
+      "The one most Claude users get wrong by defaulting up. Sonnet 5.5 handles the large majority of real work at half Opus 5.5's price, with the same million-token context. Opus earns its cost on long autonomous runs and architectural reasoning, not on the routine edits people usually point it at.",
     pickA: [
       "Long agent runs with no human in the loop",
       "Architecture decisions and gnarly debugging",
@@ -286,7 +286,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "kimi",
     verdict:
-      "Closed frontier against the open model that got closest to it. Kimi K3 ships open weights at roughly 2.8 trillion parameters with a million-token context. You can self-host it, which Opus 5 will never allow. Opus is still ahead on agentic reliability, but the gap is now small enough that data-residency or lock-in concerns can decide this outright.",
+      "Closed frontier against the open model that got closest to it. Kimi K3 ships open weights at roughly 2.8 trillion parameters with a million-token context. You can self-host it, which Opus 5.5 will never allow. Opus is still ahead on agentic reliability, but the gap is now small enough that data-residency or lock-in concerns can decide this outright.",
     pickA: [
       "Agentic work where reliability is the whole point",
       "You want a vendor with a support relationship",

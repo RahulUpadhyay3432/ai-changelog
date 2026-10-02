@@ -84,7 +84,7 @@ function CapabilityCard({
         </span>
       </div>
       <p style={{ margin: "0 0 12px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, visibility: peek ? "hidden" : undefined }}>
-        The calm map of the AI worth using.
+        Curated by hand, kept current by a daily signal.
       </p>
       <div style={{ height: "1px", background: HAIRLINE }} />
 
@@ -165,7 +165,7 @@ export function HeroRadarPanel({
             What the Radar does
           </span>
         </div>
-        <p style={{ margin: "0 0 6px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4 }}>The calm map of the AI worth using.</p>
+        <p style={{ margin: "0 0 6px", fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4 }}>Curated by hand, kept current by a daily signal.</p>
         <div style={{ height: "1px", background: HAIRLINE }} />
         {CAPABILITIES.map(({ Icon, title, line }) => (
           <motion.div key={title} variants={row} style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "12px 0", borderBottom: `1px solid ${HAIRLINE}` }}>

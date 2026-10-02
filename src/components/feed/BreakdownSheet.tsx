@@ -26,7 +26,7 @@ const TECH_FACTS = [
   "The term 'artificial intelligence' was coined at a 1956 Dartmouth workshop. Its organizer predicted machines would match human intelligence within a generation.",
   "DeepMind's AlphaGo made Move 37 in Game 2 against Lee Sedol, so unexpected that human commentators initially thought it was a mistake.",
   "The first Git commit was written by Linus Torvalds in 10 days in 2005, after a licensing dispute with the tool previously used for Linux.",
-  "Moore's Law, transistor counts doubling roughly every two years , has held since 1965 and is only now beginning to slow.",
+  "Moore's Law (transistor counts doubling roughly every two years) has held since 1965 and is only now beginning to slow.",
   "NVIDIA's H100 chip contains 80 billion transistors and can sustain 4 petaflops of AI computation.",
   "The first commercial spam email was sent in 1978 over ARPANET, a marketing message to 393 recipients from a DEC salesperson.",
   "Redis, one of the most widely used in-memory databases, was built in a weekend by a single developer while working on a startup analytics tool.",

@@ -4,11 +4,20 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, SG, TEXT } from "@/lib/design-tokens";
+import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 
-export function HeroPill({ storyCount }: { storyCount: number }) {
+export function HeroPill({ storiesToday, storyCount }: { storiesToday: number; storyCount: number }) {
   const reduce = useReducedMotion();
 
-  const label = storyCount > 0 ? `${storyCount} stories today` : "Updated daily";
+  // This used to print the whole feed-window count under a "today" label. Both
+  // numbers are now counted in the table rather than derived from the feed array,
+  // which is capped per source and so understates by several times.
+  const label =
+    storiesToday > 0
+      ? `${storiesToday} stories today`
+      : storyCount > 0
+        ? `${storyCount} stories / last ${FEED_WINDOW_LABEL}`
+        : "Updated daily";
 
   return (
     <motion.div

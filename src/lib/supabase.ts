@@ -172,8 +172,25 @@ export async function fetchNewsItemById(id: string): Promise<NewsItem | null> {
   return dbToNewsItem({ ...(archived as Omit<DbNewsItem, "created_at">), created_at: "" } as DbNewsItem);
 }
 
-// How many rows the feed reads at once. Copy that prints a story count has to
-// know this, or a capped number reads as a real total.
+/**
+ * Real story counts, straight from the table.
+ *
+ * NOT derivable from fetchNewsItems(): that applies MAX_PER_SOURCE, which
+ * collapses several hundred stories into a few dozen feed items. Counting the
+ * array it returns made the landing advertise 44 stories when the window held
+ * 429. Copy that states how much news there is has to count the news.
+ */
+export async function countNewsItems(): Promise<{ today: number; window: number }> {
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const [todayRes, windowRes] = await Promise.all([
+    supabase.from("news_items").select("id", { count: "exact", head: true }).gte("published_at", dayAgo),
+    supabase.from("news_items").select("id", { count: "exact", head: true }).gte("published_at", feedCutoffISO()),
+  ]);
+  return { today: todayRes.count ?? 0, window: windowRes.count ?? 0 };
+}
+
+// How many rows the feed reads at once. Not a story total: countNewsItems() is
+// what copy should use, since this is both a row cap and pre-MAX_PER_SOURCE.
 export const FEED_ROW_CAP = 100;
 
 export async function fetchNewsItems(

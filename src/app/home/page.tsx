@@ -4,8 +4,7 @@ import {
   Cpu, Brain, Plug, Sparkles, GitBranch, Trophy,
   ArrowRight, ArrowUpRight, Compass, Bookmark, Search,
 } from "lucide-react";
-import { fetchNewsItems, FEED_ROW_CAP } from "@/lib/supabase";
-import type { NewsItem } from "@/lib/types";
+import { fetchNewsItems, countNewsItems } from "@/lib/supabase";
 import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import { DESCRIPTION } from "@/lib/brand";
 import { getRadarTools } from "@/lib/knowledge";
@@ -106,26 +105,20 @@ function SeeAll({ href, children }: { href: string; children: React.ReactNode })
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
-// The pill says "today", so it has to count today. `news` is already the newest
-// rows inside the feed window, so a 24h slice of it is exact until the day's
-// volume passes FEED_ROW_CAP, which the pill then marks with a "+". Kept out of
-// the component body: Date.now() in render trips the react-compiler purity rule.
-function countStoriesInLastDay(items: NewsItem[]): number {
-  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
-  return items.filter((n) => new Date(n.publishedAt).getTime() > dayAgo).length;
-}
-
 export default async function LandingPage() {
-  const [news, tools] = await Promise.all([
+  const [news, tools, counts] = await Promise.all([
     fetchNewsItems().catch(() => []),
     getRadarTools(40).catch(() => []),
+    // Counted in the table, not derived from `news`: the feed caps at
+    // MAX_PER_SOURCE, so its length is a fraction of the stories that exist.
+    countNewsItems().catch(() => ({ today: 0, window: 0 })),
   ]);
 
   const toolCount = CURATED_ESSENTIALS.length;
   const mcpCount = MCP_SERVERS.length;
   const skillCount = AI_SKILLS.length;
-  const storyCount = news.length;
-  const storiesToday = countStoriesInLastDay(news);
+  const storyCount = counts.window;
+  const storiesToday = counts.today;
 
   const githubTools = tools.filter((t) => t.source === "github").slice(0, 5);
   const phTools = tools.filter((t) => t.source === "producthunt").slice(0, 5);
@@ -253,7 +246,7 @@ export default async function LandingPage() {
               { n: toolCount, l: "tools" },
               { n: mcpCount, l: "MCP servers" },
               { n: skillCount, l: "AI skills" },
-              { n: storyCount >= FEED_ROW_CAP ? `${FEED_ROW_CAP}+` : storyCount, l: `stories / ${FEED_WINDOW_LABEL}` },
+              { n: storyCount, l: `stories / ${FEED_WINDOW_LABEL}` },
             ].map((s) => (
               <span key={s.l} style={{ display: "inline-flex", alignItems: "baseline", gap: "7px" }}>
                 <span style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, fontVariantNumeric: "tabular-nums" }}>{s.n}</span>

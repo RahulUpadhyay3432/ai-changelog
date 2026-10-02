@@ -409,10 +409,26 @@ export function setPushDismissed(): void {
 // ==========================================
 
 const FEED_PREFS_KEY = "kapyn_feed_prefs";
-// Hint is dismissed permanently only via the ✕ button.
-// Going to Profile does NOT dismiss it — the hint hides naturally once the
-// user has selected ≥1 category (getFeedPrefs().length > 0).
-const FEED_HINT_DISMISSED_KEY = "kapyn_feed_hint_dismissed_v1";
+
+// The first-session topic picker. Separate from FEED_HINT_DISMISSED_KEY on
+// purpose: the old hint was a toast that punted to Profile, and only 98 of 1,093
+// people ever got as far as choosing a topic. Everyone gets one shot at the
+// picker, including people who dismissed the toast, but never anyone who has
+// already chosen (getFeedPrefs() tells us that).
+const TOPIC_PICKER_KEY = "kapyn_topic_picker_v1";
+
+/** True when the picker has had its one turn, or the user already has prefs. */
+export function getTopicPickerDone(): boolean {
+  if (!isBrowser) return true;
+  const prefs = getFeedPrefs();
+  if (prefs !== null && prefs.length > 0) return true;
+  try { return localStorage.getItem(TOPIC_PICKER_KEY) === "1"; } catch { return true; }
+}
+
+export function setTopicPickerDone(): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(TOPIC_PICKER_KEY, "1"); } catch {}
+}
 
 // null = never configured (show all). Array = user's chosen slugs.
 export function getFeedPrefs(): string[] | null {
@@ -426,21 +442,4 @@ export function getFeedPrefs(): string[] | null {
 export function setFeedPrefs(slugs: string[]): void {
   if (!isBrowser) return;
   try { localStorage.setItem(FEED_PREFS_KEY, JSON.stringify(slugs)); } catch {}
-}
-
-// Returns true if hint should be hidden (user dismissed with ✕, or has prefs set)
-export function getFeedHintShown(): boolean {
-  if (!isBrowser) return false;
-  if (localStorage.getItem(FEED_HINT_DISMISSED_KEY) === "1") return true;
-  try {
-    const raw = localStorage.getItem(FEED_PREFS_KEY);
-    const prefs: string[] | null = raw ? JSON.parse(raw) : null;
-    return prefs !== null && prefs.length > 0;
-  } catch { return false; }
-}
-
-// Only call this from the ✕ dismiss button — not from navigating to Profile
-export function setFeedHintShown(): void {
-  if (!isBrowser) return;
-  try { localStorage.setItem(FEED_HINT_DISMISSED_KEY, "1"); } catch {}
 }

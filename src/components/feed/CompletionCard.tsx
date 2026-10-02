@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Flame, Share2, ArrowUp, ChevronRight } from "lucide-react";
 import posthog from "posthog-js";
 import { ShareCardSheet } from "./ShareCardSheet";
-import { getStreak, getFeedHintShown, setFeedHintShown } from "@/lib/storage";
+import { getStreak, getFeedPrefs } from "@/lib/storage";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +30,11 @@ export function CompletionCard({
   useEffect(() => {
     setStreak(getStreak());
     posthog.capture("feed_completed", { read_count: readCount });
-    if (!getFeedHintShown()) {
+    // Second chance at the one action that predicts return. Keyed on whether
+    // they actually have topics, not on whether a hint was dismissed: someone who
+    // skipped the picker should still be offered this at the end of the feed.
+    const prefs = getFeedPrefs();
+    if (prefs === null || prefs.length === 0) {
       setShowFeedHint(true);
     }
   }, [readCount]);

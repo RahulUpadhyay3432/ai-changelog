@@ -3,18 +3,18 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useVelocity, animate } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { CategoryTabs } from "./CategoryTabs";
 import { CardStack } from "./CardStack";
 import { FeedSkeleton } from "./FeedSkeleton";
 import { SwipeHint } from "./SwipeHint";
+import { TopicPicker } from "./TopicPicker";
 import { HomeScreenPill } from "@/components/pwa/HomeScreenPill";
 import { fetchNewsItems, fetchNewsItemById } from "@/lib/supabase";
 import { MOCK_STORIES } from "@/lib/mock-data";
 import { CATEGORY_TABS } from "@/lib/categories";
-import { getFeedHintShown, setFeedHintShown, getStreak, getLastVisitTimestamp, setLastVisitTimestamp } from "@/lib/storage";
+import { getTopicPickerDone, getStreak, getLastVisitTimestamp, setLastVisitTimestamp } from "@/lib/storage";
 import type { CategorySlug, NewsItem } from "@/lib/types";
-import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 
 // A/B: default to the importance-ranked opener; the "feed-opener-ranking" PostHog
@@ -92,8 +92,7 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
   const seededRef = useRef(initialCategory === "all" && initialItems.length > 0);
   const [loadError, setLoadError] = useState(false);
   const [reloadNonce, setReloadNonce] = useState(0); // bump to force a re-fetch (retry)
-  const [showFeedHint, setShowFeedHint] = useState(false);
-  const router = useRouter();
+  const [showTopicPicker, setShowTopicPicker] = useState(false);
   const storiesLenRef = useRef(0); // stable ref so handleRefresh doesn't capture stale stories
   useEffect(() => { storiesLenRef.current = stories.length; }, [stories.length]);
 
@@ -106,14 +105,25 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
     feedCache.current.delete("all");
   }, []);
 
-  // Feed customization hint — shows after 3s, repeats each visit until user taps it
+  // Topic picker — one turn per person, and never for anyone who already has
+  // prefs. Delayed so the first story lands first: the ask makes sense once you
+  // have seen what you are tuning.
   useEffect(() => {
-    if (getFeedHintShown()) return;
+    if (getTopicPickerDone()) return;
     const t = setTimeout(() => {
-      setShowFeedHint(true);
-      posthog.capture("feed_hint_shown");
-    }, 3000);
+      setShowTopicPicker(true);
+      posthog.capture("topic_picker_shown");
+    }, 4000);
     return () => clearTimeout(t);
+  }, []);
+
+  // Applying prefs has to re-resolve "all": it is the feed they are tuning, and
+  // its cached copy was built before the choice existed.
+  const handleTopicsChosen = useCallback((slugs: string[] | null) => {
+    setShowTopicPicker(false);
+    if (!slugs || slugs.length === 0) return;
+    feedCache.current.delete("all");
+    setReloadNonce((n) => n + 1);
   }, []);
 
   // Real-time drag position — drives the card x transform without re-renders
@@ -427,89 +437,9 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
               />
             </motion.div>
 
-            {/* Feed customization hint */}
+            {/* First-session topic picker: the investment moment, in place */}
             <AnimatePresence>
-              {showFeedHint && (
-                <motion.div
-                  initial={{ opacity: 0, y: -12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  style={{
-                    position: "absolute",
-                    top: "14px",
-                    left: 0,
-                    right: 0,
-                    display: "flex",
-                    justifyContent: "center",
-                    zIndex: 50,
-                    padding: "0 20px",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "100%",
-                      maxWidth: "380px",
-                      background: "var(--kt-surface-raised, rgba(15,15,15,0.96))",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                      border: "1px solid var(--kt-hairline, rgba(255,255,255,0.1))",
-                      borderRadius: "16px",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-                      display: "flex",
-                      alignItems: "center",
-                      pointerEvents: "auto",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {/* Main tap area */}
-                    <button
-                      onClick={() => { setShowFeedHint(false); router.push("/profile"); }}
-                      style={{
-                        flex: 1,
-                        background: "none",
-                        border: "none",
-                        padding: "14px 16px",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "3px",
-                      }}
-                    >
-                      <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "var(--kt-text-primary, #e5e5e5)", letterSpacing: "-0.01em" }}>
-                        <Sparkles size={13} strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                        Customize your feed
-                      </span>
-                      <span style={{ fontSize: "12px", color: "var(--kt-text-muted, #525252)", fontWeight: 400 }}>
-                        Pick the topics you care about in Profile
-                      </span>
-                    </button>
-                    {/* Dismiss */}
-                    <button
-                      onClick={() => { setFeedHintShown(); setShowFeedHint(false); }}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        borderLeft: "1px solid rgba(255,255,255,0.06)",
-                        padding: "0 16px",
-                        height: "100%",
-                        minHeight: "52px",
-                        cursor: "pointer",
-                        color: "var(--kt-text-muted, #404040)",
-                        fontSize: "18px",
-                        lineHeight: 1,
-                        flexShrink: 0,
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+              {showTopicPicker && <TopicPicker onDone={handleTopicsChosen} />}
             </AnimatePresence>
           </>
         )}

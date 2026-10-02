@@ -14,6 +14,7 @@ import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
 import { isBadSummary } from "@/lib/quality";
+import { rotateKeys } from "@/lib/llm-rotate";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { fetchPageMeta } from "@/lib/page-meta";
 import { callOpenRouter } from "@/lib/llm";
@@ -241,7 +242,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
  * console.groq.com/docs/rate-limits before switching, because the cheap-looking models
  * are often the ones capped at 100/day.
  */
-let groqCursor = 0;
+const groqCursor = { i: 0 };
 
 function groqKeys(): string[] {
   return (process.env.GROQ_API_KEY ?? "")
@@ -297,22 +298,7 @@ async function groqAttempt(key: string, prompt: string): Promise<string | null> 
 async function callGroq(prompt: string): Promise<string> {
   const keys = groqKeys();
   if (!keys.length) throw new Error("GROQ_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (groqCursor + i) % keys.length;
-      const text = await groqAttempt(keys[idx], prompt);
-      if (text) {
-        groqCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    // Every key was limited or empty this round. The per-minute window is the thing
-    // being waited out, so back off before spending another full cycle on it.
-    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
-  }
-  throw new Error(`Groq: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({ provider: "Groq", keys, cursor: groqCursor, attempt: groqAttempt, prompt });
 }
 
 async function callGemini(prompt: string): Promise<string> {
@@ -338,7 +324,7 @@ async function callGemini(prompt: string): Promise<string> {
  * MISTRAL_API_KEY holds a COMMA-SEPARATED list (two accounts here), rotated the same
  * way as Groq's keys so one account's rate limit doesn't stall the whole provider.
  */
-let mistralCursor = 0;
+const mistralCursor = { i: 0 };
 
 function mistralKeys(): string[] {
   return (process.env.MISTRAL_API_KEY ?? "")
@@ -369,20 +355,7 @@ async function mistralAttempt(key: string, prompt: string): Promise<string | nul
 async function callMistral(prompt: string): Promise<string> {
   const keys = mistralKeys();
   if (!keys.length) throw new Error("MISTRAL_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (mistralCursor + i) % keys.length;
-      const text = await mistralAttempt(keys[idx], prompt);
-      if (text) {
-        mistralCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
-  }
-  throw new Error(`Mistral: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({ provider: "Mistral", keys, cursor: mistralCursor, attempt: mistralAttempt, prompt });
 }
 
 /**
@@ -393,7 +366,7 @@ async function callMistral(prompt: string): Promise<string> {
  * rather than aborting the provider outright, since accounts get topped up
  * independently of each other.
  */
-let deepinfraCursor = 0;
+const deepinfraCursor = { i: 0 };
 
 function deepinfraKeys(): string[] {
   return (process.env.DEEPINFRA_API_KEY ?? "")
@@ -424,20 +397,7 @@ async function deepinfraAttempt(key: string, prompt: string): Promise<string | n
 async function callDeepInfra(prompt: string): Promise<string> {
   const keys = deepinfraKeys();
   if (!keys.length) throw new Error("DEEPINFRA_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (deepinfraCursor + i) % keys.length;
-      const text = await deepinfraAttempt(keys[idx], prompt);
-      if (text) {
-        deepinfraCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
-  }
-  throw new Error(`DeepInfra: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({ provider: "DeepInfra", keys, cursor: deepinfraCursor, attempt: deepinfraAttempt, prompt });
 }
 
 /**
@@ -456,7 +416,7 @@ async function callDeepInfra(prompt: string): Promise<string> {
  * provider dead for the run — the same failure that silently killed OpenRouter
  * twice (see llm.ts). That is the intended behaviour: fail loudly, not per story.
  */
-let cerebrasCursor = 0;
+const cerebrasCursor = { i: 0 };
 
 function cerebrasKeys(): string[] {
   return (process.env.CEREBRAS_API_KEY ?? "")
@@ -487,20 +447,7 @@ async function cerebrasAttempt(key: string, prompt: string): Promise<string | nu
 async function callCerebras(prompt: string): Promise<string> {
   const keys = cerebrasKeys();
   if (!keys.length) throw new Error("CEREBRAS_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (cerebrasCursor + i) % keys.length;
-      const text = await cerebrasAttempt(keys[idx], prompt);
-      if (text) {
-        cerebrasCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
-  }
-  throw new Error(`Cerebras: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({ provider: "Cerebras", keys, cursor: cerebrasCursor, attempt: cerebrasAttempt, prompt });
 }
 
 /**
@@ -515,7 +462,7 @@ async function callCerebras(prompt: string): Promise<string> {
  * ZAI_MODEL default is UNVERIFIED from this repo for the same reason as Cerebras.
  * glm-4-flash is the cheap/fast tier; glm-4.6 is the strong one if quota allows.
  */
-let zaiCursor = 0;
+const zaiCursor = { i: 0 };
 
 function zaiKeys(): string[] {
   return (process.env.ZAI_API_KEY ?? "")
@@ -546,20 +493,7 @@ async function zaiAttempt(key: string, prompt: string): Promise<string | null> {
 async function callZai(prompt: string): Promise<string> {
   const keys = zaiKeys();
   if (!keys.length) throw new Error("ZAI_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (zaiCursor + i) % keys.length;
-      const text = await zaiAttempt(keys[idx], prompt);
-      if (text) {
-        zaiCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    if (round < ROUNDS - 1) await sleep(1500 * (round + 1));
-  }
-  throw new Error(`Z.ai: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({ provider: "Z.ai", keys, cursor: zaiCursor, attempt: zaiAttempt, prompt });
 }
 
 type ClassifyOutcome =

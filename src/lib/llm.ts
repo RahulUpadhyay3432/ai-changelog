@@ -18,6 +18,8 @@
 //   qwen/qwen3.8-27b:free                  41s, 1687 tok, 46 words, clean (too slow)
 //   google/gemma-4-*-it:free               429 from the provider, repeatedly
 //   thinkingmachines/inkling-small:free    403, age-verified accounts only
+import { rotateKeys } from "@/lib/llm-rotate";
+
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? "inclusionai/ling-3.0-flash-sante:free";
 
 // 30s, up from 14s: a reasoning model needs room to finish thinking before it emits
@@ -33,7 +35,7 @@ const OPENROUTER_TIMEOUT_MS = 30_000;
 // real extra quota when the keys sit on separate accounts. Rahul confirmed on
 // 2026-10-03 that these do, which is what makes the full round-robin below pay
 // rather than just spreading retries over one shared bucket.
-let openrouterCursor = 0;
+const openrouterCursor = { i: 0 };
 
 function openrouterKeys(): string[] {
   return (process.env.OPENROUTER_API_KEY ?? "")
@@ -95,21 +97,13 @@ async function openrouterAttempt(
 export async function callOpenRouter(prompt: string, maxTokens = 2500): Promise<string> {
   const keys = openrouterKeys();
   if (!keys.length) throw new Error("OPENROUTER_API_KEY missing");
-
-  const ROUNDS = 3;
-  for (let round = 0; round < ROUNDS; round++) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (openrouterCursor + i) % keys.length;
-      const text = await openrouterAttempt(keys[idx], prompt, maxTokens);
-      if (text) {
-        openrouterCursor = (idx + 1) % keys.length;
-        return text;
-      }
-    }
-    // Every account was limited this round: wait out the per-minute window.
-    if (round < ROUNDS - 1) await new Promise((r) => setTimeout(r, 1500 * (round + 1)));
-  }
-  throw new Error(`OpenRouter: ${keys.length} key(s) exhausted after ${ROUNDS} rounds`);
+  return rotateKeys({
+    provider: "OpenRouter",
+    keys,
+    cursor: openrouterCursor,
+    attempt: (key, p) => openrouterAttempt(key, p, maxTokens),
+    prompt,
+  });
 }
 
 export async function callGemini(prompt: string): Promise<string> {

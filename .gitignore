@@ -43,3 +43,8 @@ next-env.d.ts
 
 .vercel
 .env.local
+
+# Local UI concept prototypes. Untracked on purpose: these were swept into
+# 13aba99 by a `git add -A src/` and went live at /concepts/kapyn-v2 in
+# production. Keep them local until someone deliberately ships them.
+src/app/concepts/

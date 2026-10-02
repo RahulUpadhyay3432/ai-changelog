@@ -558,20 +558,38 @@ const EXHAUSTED_PATTERN = /key\(s\) exhausted/i;
 const EXHAUSTED_STRIKES = 3;
 
 /** Per-request (never module-level: Fluid Compute reuses instances). */
-type ProviderHealth = { dead: string[]; strikes: Record<string, number> };
+type ProviderHealth = {
+  dead: string[];
+  strikes: Record<string, number>;
+  /** First error seen per provider. `deadProviders` named who died and never why,
+   *  so a provider could fail every call of a run and leave no diagnosable trace. */
+  errors: Record<string, string>;
+  /** How many stories each provider was asked to handle. A provider with 0 here
+   *  was never reached; with many and no successes, it is failing silently. */
+  attempts: Record<string, number>;
+  /** Providers skipped entirely for a missing key. Without this, a provider whose
+   *  env var did not reach the deployment is invisible: absent from the used list
+   *  AND from the dead list, which is exactly how zai-glm vanished on run
+   *  37073036239 with no way to tell a missing key from a silent failure. */
+  skipped: Record<string, string>;
+};
 
 async function classifyAndSummarize(
   title: string,
   content: string,
   defaultCategory: CategorySlug,
-  health: ProviderHealth = { dead: [], strikes: {} }
+  health: ProviderHealth = { dead: [], strikes: {}, errors: {}, attempts: {}, skipped: {} }
 ): Promise<ClassifyOutcome> {
   const prompt = buildClassifyAndSummarizePrompt(title, content, defaultCategory);
   const reasons: string[] = [];
 
   for (const provider of LLM_PROVIDERS) {
-    if (!process.env[provider.envKey]) continue;
+    if (!process.env[provider.envKey]) {
+      health.skipped[provider.name] = `${provider.envKey} not set`;
+      continue;
+    }
     if (health.dead.includes(provider.name)) continue;
+    health.attempts[provider.name] = (health.attempts[provider.name] ?? 0) + 1;
     try {
       // Retry handles transient 429/5xx within a provider; the loop handles a
       // provider being down or out of credit entirely.
@@ -581,6 +599,11 @@ async function classifyAndSummarize(
     } catch (err) {
       const errStr = String(err);
       reasons.push(`${provider.name}: ${errStr.slice(0, 160)}`);
+      // Keep the FIRST error per provider for the whole run: later ones are
+      // usually the same cause, and the first is the one worth debugging.
+      if (!health.errors[provider.name]) {
+        health.errors[provider.name] = errStr.slice(0, 200);
+      }
       const strikes = EXHAUSTED_PATTERN.test(errStr) ? (health.strikes[provider.name] ?? 0) + 1 : 0;
       health.strikes[provider.name] = strikes;
       const dead = DEAD_PROVIDER_PATTERN.test(errStr) || strikes >= EXHAUSTED_STRIKES;
@@ -994,7 +1017,13 @@ export async function GET(request: NextRequest) {
     entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0,
     deferred: 0, deadProviders: [], errors: [],
   };
-  const health: ProviderHealth = { dead: results.deadProviders, strikes: {} };
+  const health: ProviderHealth = {
+    dead: results.deadProviders,
+    strikes: {},
+    errors: {},
+    attempts: {},
+    skipped: {},
+  };
 
   // RSS feeds — parallel fetch
   const rssSettled = await Promise.allSettled(
@@ -1037,6 +1066,40 @@ export async function GET(request: NextRequest) {
     results.errors.push(`GitHub API: ${String(err)}`);
   }
 
+  // ── Health verdict ─────────────────────────────────────────────────────────
+  // A run that inserts 100 and drops 46 exited 0 and emailed nobody, which is how
+  // the pipeline stayed degraded for weeks while every run reported success. The
+  // workflow gates on `health.status`, so "worked a bit" stops counting as worked.
+  //
+  // dropRate is measured against what actually reached the summariser. lowSignal
+  // is excluded on purpose: OFF_TOPIC/LOW_SIGNAL is the filter doing its job, not
+  // a failure, and folding it in would make a well-filtered run look broken.
+  const attempted = results.inserted + results.llmFailed + results.lowSignal;
+  const dropRate = attempted > 0 ? results.llmFailed / attempted : 0;
+  const DEGRADED_AT = Number(process.env.INGEST_DROP_ALERT_RATE ?? 0.15);
+
+  const status: "ok" | "degraded" | "down" =
+    attempted > 0 && results.inserted === 0 ? "down" : dropRate > DEGRADED_AT ? "degraded" : "ok";
+
+  const health_report = {
+    status,
+    attempted,
+    dropRate: Number(dropRate.toFixed(3)),
+    degradedAt: DEGRADED_AT,
+    /** Stories served, per provider. */
+    providersUsed: results.llmProviders,
+    /** Stories each provider was ASKED for. Attempts with no matching entry in
+     *  providersUsed is the signature of a provider failing on every call. */
+    providerAttempts: health.attempts,
+    /** First error per provider, the thing deadProviders never told anyone. */
+    providerErrors: health.errors,
+    /** Configured in code but skipped for a missing env var. A provider in here
+     *  is a deployment problem, not a provider problem. */
+    providersSkipped: health.skipped,
+    deadProviders: results.deadProviders,
+  };
+  (results as Record<string, unknown>).health = health_report;
+
   // Track fetch completion server-side
   const posthog = getPostHogClient();
   posthog.capture({
@@ -1054,6 +1117,12 @@ export async function GET(request: NextRequest) {
       backlogged: results.backlogged,
       deferred: results.deferred,
       dead_providers: JSON.stringify(results.deadProviders),
+      health_status: status,
+      drop_rate: Number(dropRate.toFixed(3)),
+      attempted,
+      provider_attempts: JSON.stringify(health.attempts),
+      provider_errors: JSON.stringify(health.errors),
+      providers_skipped: JSON.stringify(health.skipped),
       errors: results.errors.length,
     },
   });

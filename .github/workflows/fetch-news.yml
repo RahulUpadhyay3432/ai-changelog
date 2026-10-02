@@ -37,22 +37,55 @@ jobs:
 
           jq . response.json
 
-          # A 200 with `inserted: 0` is not success. Gemini's prepaid credits ran
-          # out on ~2026-08-11 and every run stayed green for eleven days while
-          # the feed froze, because the endpoint returned 200 and nothing checked
-          # the body. `llmFailed` is the real health signal: the fetch worked,
-          # the summariser did not.
-          llm_failed=$(jq -r '.llmFailed // 0' response.json)
+          # A 200 is not success, and neither is "some of it worked". Gemini's
+          # credits ran out on ~2026-08-11 and every run stayed green for eleven
+          # days while the feed froze, because nothing checked the body. The
+          # weaker version of the same bug survived that fix: this step only
+          # failed when inserted was 0, so the measured 2026-10-02 run that
+          # inserted 100 and dropped 46 also exited 0 and emailed nobody. The
+          # route now returns a health verdict; gate on it.
+          status=$(jq -r '.health.status // "unknown"' response.json)
+          drop_rate=$(jq -r '.health.dropRate // 0' response.json)
+          attempted=$(jq -r '.health.attempted // 0' response.json)
           inserted=$(jq -r '.inserted // 0' response.json)
+          llm_failed=$(jq -r '.llmFailed // 0' response.json)
           llm_error=$(jq -r '.llmError // "none"' response.json)
 
-          echo "inserted=$inserted  llmFailed=$llm_failed"
+          echo "status=$status  inserted=$inserted  llmFailed=$llm_failed  attempted=$attempted  dropRate=$drop_rate"
+          echo "providers used:    $(jq -c '.health.providersUsed // {}' response.json)"
+          echo "provider attempts: $(jq -c '.health.providerAttempts // {}' response.json)"
 
-          if [ "$llm_failed" -gt 0 ]; then
-            echo "::error title=Summarizer failing::${llm_failed} items dropped. First error: ${llm_error}"
-            # Nothing got through at all — the pipeline is down, not just lossy.
-            if [ "$inserted" -eq 0 ]; then
-              exit 1
-            fi
-            echo "::warning::Partial failure — ${inserted} inserted despite ${llm_failed} drops."
+          # A provider configured in code but skipped for a missing env var is a
+          # deployment problem and silent otherwise: absent from both the used and
+          # the dead list, which is how zai-glm vanished on run 37073036239.
+          skipped=$(jq -c '.health.providersSkipped // {}' response.json)
+          if [ "$skipped" != "{}" ]; then
+            echo "::warning title=Provider not configured::$skipped"
           fi
+
+          # Why each dead provider died. deadProviders named who, never why.
+          errs=$(jq -c '.health.providerErrors // {}' response.json)
+          if [ "$errs" != "{}" ]; then
+            echo "::warning title=Provider errors::$errs"
+          fi
+
+          case "$status" in
+            down)
+              echo "::error title=Ingestion down::Nothing summarised out of ${attempted}. First error: ${llm_error}"
+              exit 1
+              ;;
+            degraded)
+              echo "::error title=Ingestion degraded::Dropped ${llm_failed}/${attempted} (${drop_rate}). First error: ${llm_error}"
+              exit 1
+              ;;
+            ok)
+              if [ "$llm_failed" -gt 0 ]; then
+                echo "::warning::${llm_failed}/${attempted} dropped, under the alert threshold."
+              fi
+              echo "Ingestion healthy: ${inserted} inserted."
+              ;;
+            *)
+              echo "::error title=No health verdict::Response had no .health block, so this deploy predates the health check or the body changed shape."
+              exit 1
+              ;;
+          esac

@@ -11,7 +11,7 @@ import { isSafePublicUrl } from "@/lib/url-guard";
 //      configured via SCREENSHOT_URL_TEMPLATE (e.g. urlbox/thum.io paid). Free
 //      screenshot tiers stamp "image not authorized" watermarks, which look
 //      broken, so without a key we skip straight to the gradient.
-//   4. 204 — the client <img> onError shows the clean category-gradient cover
+//   4. 404 — the client <img> onError swaps in the category-gradient cover
 // SSRF-guarded (isSafePublicUrl), responses cached a week.
 export const runtime = "nodejs";
 
@@ -33,8 +33,13 @@ function redirect(location: string): Response {
   return new Response(null, { status: 302, headers: { Location: location, "Cache-Control": WEEK } });
 }
 
+// 404, deliberately, not 204. A 204 is a SUCCESSFUL response with no body, so
+// the browser does not fire `error` on the <img> that requested it: it just
+// paints its own broken-image icon and leaves it there. That is what put a
+// permanent broken marker inside the 340px hero on tool pages. An error status
+// fires onError, which is what the gradient fallback has always been waiting for.
 function empty(): Response {
-  return new Response(null, { status: 204, headers: { "Cache-Control": "public, max-age=86400" } });
+  return new Response(null, { status: 404, headers: { "Cache-Control": "public, max-age=86400" } });
 }
 
 // Extract the PH post slug from a producthunt.com/posts/... URL.

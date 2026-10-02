@@ -4,6 +4,7 @@ import { getCategoryBySlug } from "@/lib/categories";
 import { ClientRedirect } from "./ClientRedirect";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { APP_URL } from "@/lib/site";
+import { TITLE_DEFAULT, DESCRIPTION } from "@/lib/brand";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,8 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!story) {
     return {
-      title: "Kapyn, AI & tech news in 30-second reads",
-      description: "AI and tech news distilled into 30-second reads.",
+      title: TITLE_DEFAULT,
+      description: DESCRIPTION,
     };
   }
 

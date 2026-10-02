@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { TAGLINE, OG_SUBLINE } from "@/lib/brand";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -75,7 +76,7 @@ export default function OgImage() {
               maxWidth: 900,
             }}
           >
-            What happened in AI today.
+            {TAGLINE}.
           </p>
           <p
             style={{
@@ -85,7 +86,7 @@ export default function OgImage() {
               fontWeight: 400,
             }}
           >
-            Every story that matters, distilled to 30 seconds.
+            {OG_SUBLINE}
           </p>
         </div>
 

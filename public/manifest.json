@@ -1,13 +1,13 @@
 {
   "name": "Kapyn",
   "short_name": "Kapyn",
-  "description": "The calm intelligence layer for AI",
+  "description": "The calm map of the AI worth using: agents, models, tools, MCP servers and skills.",
   "start_url": "/?app=1",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0E0D0C",
   "theme_color": "#0E0D0C",
-  "categories": ["news", "technology"],
+  "categories": ["productivity", "technology", "news"],
   "icons": [
     {
       "src": "/api/icon/192",

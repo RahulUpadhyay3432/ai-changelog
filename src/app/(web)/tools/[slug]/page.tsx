@@ -7,6 +7,7 @@ import { getToolBySlugAsync, getPromotedToolPages } from "@/lib/promoted-tools";
 import { getMcpInstall } from "@/lib/mcp-install";
 import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { CoverImage } from "@/app/(radar)/radar/radar-shared";
+import { getToolDepth, type Verdict } from "@/lib/radar-tool-depth";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SURFACE, SG, TEXT } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
 
@@ -21,6 +22,23 @@ export async function generateStaticParams() {
   const promoted = await getPromotedToolPages();
   return [...getAllTools(), ...promoted].map((t) => ({ slug: t.slug }));
 }
+
+
+// Kapyn's stance, from the hand-authored depth layer. The data has existed since
+// the Radar detail sheet shipped; this page was rendering a one-line value prop
+// and three metadata boxes under a 340px image while the verdict sat unused.
+const VERDICT_LABEL: Record<Verdict, string> = {
+  "worth-it": "Worth it",
+  watch: "Worth watching",
+  skip: "Skip",
+  sunset: "Losing relevance",
+};
+const VERDICT_COLOR: Record<Verdict, string> = {
+  "worth-it": "#4ade80",
+  watch: "#fbbf24",
+  skip: "#f87171",
+  sunset: "#a3a3a3",
+};
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -67,6 +85,7 @@ export default async function ToolDetailPage({ params }: Props) {
   if (!tool) notFound();
 
   const fav = favicon(tool.url);
+  const depth = getToolDepth(tool.url);
   const similar = similarTools(tool, 6);
   const facts: { label: string; value: string }[] = [
     { label: "Category", value: tool.category },
@@ -118,17 +137,44 @@ export default async function ToolDetailPage({ params }: Props) {
 
       {/* Cover */}
       <div style={{ margin: "24px 0 0" }}>
-        <CoverImage src={ogImage(tool.url)} height={340} radius={16} />
+        <CoverImage src={ogImage(tool.url)} height={200} radius={16} />
       </div>
+
+      {/* Kapyn's verdict — the decision, before the description */}
+      {depth?.verdict && depth.take && (
+        <section style={{ margin: "26px 0 0", background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px", padding: "18px 20px" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: VERDICT_COLOR[depth.verdict] }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: VERDICT_COLOR[depth.verdict] }} />
+            Kapyn&apos;s take, {VERDICT_LABEL[depth.verdict].toLowerCase()}
+          </span>
+          <p style={{ fontSize: "16.5px", color: "#d4d0c9", lineHeight: 1.65, margin: "10px 0 0" }}>{depth.take}</p>
+        </section>
+      )}
 
       {/* About */}
       <section style={{ margin: "30px 0 0" }}>
         <h2 style={{ fontFamily: SG, fontSize: "20px", fontWeight: 700, color: TEXT.primary, letterSpacing: "-0.02em", margin: 0 }}>About {tool.name}</h2>
-        <p style={{ fontSize: "16.5px", color: "#d4d0c9", lineHeight: 1.7, margin: "12px 0 0" }}>{tool.description ?? tool.valueLine}</p>
-        {tool.description && (
+        <p style={{ fontSize: "16.5px", color: "#d4d0c9", lineHeight: 1.7, margin: "12px 0 0" }}>{depth?.whatItIs ?? tool.description ?? tool.valueLine}</p>
+        {(depth?.whatItIs || tool.description) && (
           <p style={{ fontSize: "15px", color: TEXT.muted, lineHeight: 1.6, margin: "12px 0 0" }}>{tool.valueLine}</p>
         )}
       </section>
+
+      {/* Who it is for / how it works / where it is used */}
+      {depth && (
+        <section style={{ margin: "26px 0 0", display: "grid", gap: "12px" }}>
+          {([
+            ["Who it's for", depth.whoItsFor],
+            ["How it works", depth.howItWorks],
+            ["Where it's used", depth.whereUsed],
+          ] as const).map(([label, body]) => (
+            <div key={label} style={{ background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "14px", padding: "16px 18px" }}>
+              <h3 style={{ fontFamily: SG, fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: TEXT.muted, margin: 0 }}>{label}</h3>
+              <p style={{ fontSize: "15.5px", color: "#d4d0c9", lineHeight: 1.6, margin: "7px 0 0" }}>{body}</p>
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* Key facts */}
       <section style={{ margin: "26px 0 0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "10px" }}>

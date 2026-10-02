@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid, Plug, Activity, Newspaper } from "lucide-react";
+import { Home, TrendingUp, Radar, Bookmark, User, LayoutGrid, Plug, Activity, Newspaper, Wrench } from "lucide-react";
 
 const GLOBAL_NAV = [
   { href: "/", label: "Home", Icon: Home },
@@ -14,15 +14,20 @@ const GLOBAL_NAV = [
 ] as const;
 
 // Radar is its own space — entering it swaps the nav to Radar-specific
-// sections (Today / Pulse / Browse / MCP) plus an exit back to the feed.
-// "Feed" (not "Home") — Home means the landing everywhere else; the exit
-// here goes to the news app at "/". Toolkit stays reachable via desktop
-// side nav and /radar/toolkit.
+// sections plus an exit back to the feed. "Feed" (not "Home") — Home means the
+// landing everywhere else; the exit here goes to the news app at "/".
+//
+// Toolkit is in this list because it used to be missing from it: it was a
+// primary item in the desktop side nav, so you could land on /radar/toolkit on a
+// phone and find no tab in the bar explaining where you were. Saving a tool is
+// also one of the investment actions that goes with coming back, so it should
+// not be the one section you cannot reach by thumb.
 const RADAR_NAV = [
   { href: "/radar", label: "Today", Icon: Radar },
   { href: "/radar/pulse", label: "Pulse", Icon: Activity },
   { href: "/radar/browse", label: "Browse", Icon: LayoutGrid },
   { href: "/radar/mcp", label: "MCP", Icon: Plug },
+  { href: "/radar/toolkit", label: "Toolkit", Icon: Wrench },
   { href: "/", label: "Feed", Icon: Newspaper },
 ] as const;
 

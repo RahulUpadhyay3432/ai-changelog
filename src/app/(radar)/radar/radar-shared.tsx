@@ -174,9 +174,9 @@ export function CoverImage({
 }) {
   const accent = category ? accentFor(category) : face ? accentForFace(face) : NEUTRAL;
   const Icon = fallbackIcon ?? (face ? FACE_ICON[face] ?? Sparkles : Sparkles);
-  // A broken/empty image (e.g. the og-image proxy 204s) falls back to the
-  // category gradient — an empty src never reliably fires onError, so we also
-  // branch on falsy src below.
+  // A broken/empty image falls back to the category gradient. The proxy answers
+  // 404 rather than 204 precisely so onError fires; an empty src never fires it
+  // at all, so we also branch on falsy src below.
   const [failed, setFailed] = useState(false);
   const showImage = !!src && !failed;
   return (
@@ -191,6 +191,9 @@ export function CoverImage({
         ...style,
       }}
     >
+      {/* Base layer: always painted, so a slow or missing image degrades to the
+          brand gradient instead of a flat black rectangle. */}
+      <div style={{ position: "absolute", inset: 0, background: `radial-gradient(120% 90% at 70% -10%, ${accent.ring}40 0%, ${accent.bg} 45%, #0c0c0c 100%)` }} />
       {showImage ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -206,7 +209,6 @@ export function CoverImage({
         </>
       ) : (
         <>
-          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(120% 90% at 70% -10%, ${accent.ring}40 0%, ${accent.bg} 45%, #0c0c0c 100%)` }} />
           <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.5 }}>
             <Icon size={Math.round(height * 0.26)} color={accent.fg} strokeWidth={1.4} />
           </span>

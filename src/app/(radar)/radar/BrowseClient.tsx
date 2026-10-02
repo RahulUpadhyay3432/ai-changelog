@@ -75,7 +75,11 @@ const PRESS = { type: "spring" as const, stiffness: 440, damping: 28 };
 // ─── Logo-led card (matches the MCP / Skills cards — real brand logo, no stock
 //     covers). FaceMark renders the brand logo on a light chip, or nothing when
 //     none resolves; the type tag stays right-aligned either way. ────────────────
-function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: CategorySlug | null; onOpen: (t: RadarThing) => void }) {
+// On a phone the two-up grid left ~160px per card, which truncated almost every
+// name and value line and gave the screenshot more weight than the recommendation.
+// Below `isDesktop` this renders as a compact row instead: one small thumbnail,
+// the name, and two readable lines.
+function BrowseCard({ thing, catSlug, onOpen, row = false }: { thing: RadarThing; catSlug: CategorySlug | null; onOpen: (t: RadarThing) => void; row?: boolean }) {
   const router = useRouter();
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
@@ -115,9 +119,10 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       }}
       onMouseLeave={() => setMouse(null)}
       style={{
-        display: "flex", flexDirection: "column", textAlign: "left",
+        display: "flex", flexDirection: row ? "row" : "column", textAlign: "left",
+        gap: row ? "12px" : undefined, alignItems: row ? "flex-start" : undefined,
         background: SURFACE, border: `1px solid ${HAIRLINE}`, borderRadius: "16px",
-        padding: "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
+        padding: row ? "11px 12px" : "10px", cursor: "pointer", color: "inherit", boxShadow: INNER_HIGHLIGHT,
         minWidth: 0, width: "100%", position: "relative", overflow: "hidden",
       }}
     >
@@ -130,14 +135,27 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       )}
 
       {/* Screenshot cover — og:image → live screenshot → category gradient */}
-      <CoverImage
-        src={thing.imageUrl}
-        category={thing.categorySlug ?? catSlug}
-        face={thing.face}
-        height={132}
-        radius={11}
-        style={{ marginBottom: "10px" }}
-      />
+      {row ? (
+        <div style={{ flexShrink: 0, width: "64px" }}>
+          <CoverImage
+            src={thing.imageUrl}
+            category={thing.categorySlug ?? catSlug}
+            face={thing.face}
+            height={64}
+            radius={10}
+          />
+        </div>
+      ) : (
+        <CoverImage
+          src={thing.imageUrl}
+          category={thing.categorySlug ?? catSlug}
+          face={thing.face}
+          height={132}
+          radius={11}
+          style={{ marginBottom: "10px" }}
+        />
+      )}
+      <div style={row ? { flex: 1, minWidth: 0, display: "flex", flexDirection: "column" } : { display: "contents" }}>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px", minHeight: "20px" }}>
         <FaceMark face={thing.face} category={thing.categorySlug ?? catSlug} logoUrl={thing.logoUrl} label={thing.name} size={26} />
@@ -156,7 +174,7 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
       <span style={{ fontSize: "12.5px", color: TEXT.muted, lineHeight: 1.4, marginTop: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{thing.valueLine}</span>
 
       {/* Footer — metric (left) + open-external affordance (right) */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "auto", paddingTop: "11px", borderTop: `1px solid ${HAIRLINE}` }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: row ? "7px" : "auto", paddingTop: row ? "0" : "11px", borderTop: row ? "none" : `1px solid ${HAIRLINE}` }}>
         {thing.metric ? <MetricChip>{thing.metric}</MetricChip> : <span />}
         <span
           role="button"
@@ -167,6 +185,7 @@ function BrowseCard({ thing, catSlug, onOpen }: { thing: RadarThing; catSlug: Ca
         >
           <ArrowUpRight size={15} strokeWidth={2} color={mouse ? accent.fg : TEXT.muted} style={{ transition: "color 0.2s ease" }} />
         </span>
+      </div>
       </div>
     </motion.button>
   );
@@ -339,9 +358,9 @@ export function BrowseClient(data: BrowseData) {
                 )}
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr 1fr", gap: "10px", padding: isDesktop ? "0" : "4px 20px 16px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(3, 1fr)" : "1fr", gap: isDesktop ? "10px" : "8px", padding: isDesktop ? "0" : "4px 20px 16px" }}>
                 {visible.map((t) => (
-                  <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} />
+                  <BrowseCard key={t.id} thing={t} catSlug={CAT_SLUG[t.category ?? ""] ?? null} onOpen={open} row={!isDesktop} />
                 ))}
               </div>
             )}

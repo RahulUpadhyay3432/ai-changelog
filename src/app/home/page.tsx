@@ -115,6 +115,11 @@ export default async function LandingPage() {
   const mcpCount = MCP_SERVERS.length;
   const skillCount = AI_SKILLS.length;
   const storyCount = news.length;
+  // The pill says "today", so it has to count today. `news` is the newest rows
+  // inside the feed window, so a 24h slice of it is exact until the day's volume
+  // passes FEED_ROW_CAP, which the pill then marks with a "+".
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const storiesToday = news.filter((n) => new Date(n.publishedAt).getTime() > dayAgo).length;
 
   const githubTools = tools.filter((t) => t.source === "github").slice(0, 5);
   const phTools = tools.filter((t) => t.source === "producthunt").slice(0, 5);
@@ -207,7 +212,7 @@ export default async function LandingPage() {
         <div className={styles.inner} style={{ position: "relative", zIndex: 1 }}>
           <div className={styles.hero}>
             <div className={styles.fadeUp}>
-              <HeroPill storyCount={storyCount} />
+              <HeroPill storiesToday={storiesToday} storyCount={storyCount} />
               <HeroHeadline />
               <p style={{ fontSize: "18px", color: TEXT.body, lineHeight: 1.55, margin: "20px 0 0", maxWidth: "480px" }}>
                 Agents, models, tools, MCP servers and skills, curated, kept current by a calm daily signal. No noise, no paywall, ever.

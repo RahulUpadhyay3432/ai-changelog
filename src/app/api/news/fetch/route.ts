@@ -13,7 +13,7 @@ import {
 import type { CategorySlug } from "@/lib/types";
 import { getPostHogClient } from "@/lib/posthog-server";
 import { sendMorningNotification } from "@/lib/push";
-import { isBadSummary } from "@/lib/quality";
+import { isBadSummary, rejectionReason, type RejectionReason } from "@/lib/quality";
 import { rotateKeys } from "@/lib/llm-rotate";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { fetchPageMeta } from "@/lib/page-meta";
@@ -202,6 +202,29 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   throw lastErr;
 }
 
+/**
+ * Read the text out of an OpenAI-compatible completion, rejecting a TRUNCATED
+ * one.
+ *
+ * `finish_reason: "length"` means the model ran out of budget mid-answer, and a
+ * half-written classify response is not a cheap version of a good one: it is
+ * actively harmful, because the half that survives is the CATEGORY line and the
+ * half that is lost is the SUMMARY. Parsing it produced a story with the feed's
+ * default category and an empty summary, which is exactly what shipped blank
+ * cards to the feed (measured 2026-10-03: 31 of 157 live rows).
+ *
+ * Returns null — "retryable, try the next key" — rather than throwing, so one
+ * truncation can't retire a key or kill a provider.
+ */
+function readCompletion(data: {
+  choices?: { message?: { content?: string }; finish_reason?: string }[];
+}): string | null {
+  const choice = data.choices?.[0];
+  if (choice?.finish_reason === "length") return null;
+  const text = (choice?.message?.content ?? "").trim();
+  return text || null;
+}
+
 // DeepSeek's OpenAI-compatible endpoint. v4-flash is the cheap tier and is more
 // than capable of classify-and-summarise; verified against the real prompt, its
 // output parses with parseClassifyResponse unchanged.
@@ -214,15 +237,14 @@ async function callDeepSeek(prompt: string): Promise<string> {
     body: JSON.stringify({
       model: process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1200,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  if (!text) throw new Error("DeepSeek returned empty response");
+  const text = readCompletion(await res.json());
+  if (!text) throw new Error("DeepSeek returned an empty or truncated response");
   return text;
 }
 
@@ -261,22 +283,31 @@ function groqKeys(): string[] {
  * that, treating it as fatal when the same prompt succeeds on a second attempt.
  */
 async function groqAttempt(key: string, prompt: string): Promise<string | null> {
+  const model = process.env.GROQ_MODEL ?? "openai/gpt-oss-20b";
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: process.env.GROQ_MODEL ?? "openai/gpt-oss-20b",
+      model,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1600,
       temperature: 0.3,
+      // gpt-oss is a REASONING model and the budget above is shared between its
+      // thinking and its answer. Measured against the live prompt on 2026-10-03:
+      // on a story it found hard to classify it spent 3,091 reasoning tokens and
+      // emitted ZERO content tokens, so the parse got nothing. Raising the ceiling
+      // alone does not help — at 1,600 it simply thought for 6,172 and truncated
+      // again. Capping the effort is what fixes it: reasoning drops to 68-399
+      // tokens and every response comes back complete.
+      ...(/gpt-oss|reason/i.test(model)
+        ? { reasoning_effort: process.env.GROQ_REASONING_EFFORT ?? "low" }
+        : {}),
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  return text || null;
+  return readCompletion(await res.json());
 }
 
 /**
@@ -339,16 +370,14 @@ async function mistralAttempt(key: string, prompt: string): Promise<string | nul
     body: JSON.stringify({
       model: process.env.MISTRAL_MODEL ?? "open-mistral-nemo",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1200,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Mistral ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  return text || null;
+  return readCompletion(await res.json());
 }
 
 async function callMistral(prompt: string): Promise<string> {
@@ -381,16 +410,14 @@ async function deepinfraAttempt(key: string, prompt: string): Promise<string | n
     body: JSON.stringify({
       model: process.env.DEEPINFRA_MODEL ?? "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1200,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 402 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`DeepInfra ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  return text || null;
+  return readCompletion(await res.json());
 }
 
 async function callDeepInfra(prompt: string): Promise<string> {
@@ -431,16 +458,14 @@ async function cerebrasAttempt(key: string, prompt: string): Promise<string | nu
     body: JSON.stringify({
       model: process.env.CEREBRAS_MODEL ?? "llama-3.3-70b",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1200,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Cerebras ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  return text || null;
+  return readCompletion(await res.json());
 }
 
 async function callCerebras(prompt: string): Promise<string> {
@@ -477,16 +502,14 @@ async function zaiAttempt(key: string, prompt: string): Promise<string | null> {
     body: JSON.stringify({
       model: process.env.ZAI_MODEL ?? "glm-4-flash",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 700,
+      max_tokens: 1200,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
   });
   if (res.status === 429 || res.status === 413 || res.status >= 500) return null;
   if (!res.ok) throw new Error(`Z.ai ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.choices?.[0]?.message?.content ?? "").trim();
-  return text || null;
+  return readCompletion(await res.json());
 }
 
 async function callZai(prompt: string): Promise<string> {
@@ -685,13 +708,28 @@ function phPostsToFeedItems(posts: PHFeedItem[]): FeedItem[] {
 
 // ─── GitHub feed items ────────────────────────────────────────────────────────
 
+/** Trim to at most `max` chars without splitting a word, adding an ellipsis only
+ *  when something was actually removed. */
+function clipAtWord(text: string, max: number): string {
+  const t = text.trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,.;:]+$/, "")}...`;
+}
+
 function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
   return repos.map((repo) => ({
-    // Title: "repo-name, one-line description" so cards are readable without
-    // the full summary. Falls back to just the repo name if no description.
-    title: repo.description
-      ? `${repo.name} , ${repo.description.slice(0, 120)}`
-      : repo.name,
+    // Title: "repo-name, short description". The description is CLIPPED AT A WORD
+    // BOUNDARY, which it previously was not: a flat .slice(0, 120) cut mid-word
+    // and shipped titles like "...with OpenAI, Anthropic and Gemini co".
+    //
+    // 70 rather than 120 because the card gives the title no line limit and the
+    // summary whatever is left, so an over-long title silently eats the summary.
+    // Measured 2026-10-03: GitHub titles averaged 128 chars against 65-69 for
+    // every other source, which is why GitHub cards were the worst-truncated.
+    // The description is not lost, the summary already opens by restating it.
+    title: repo.description ? `${repo.name} , ${clipAtWord(repo.description, 70)}` : repo.name,
     sourceUrl: repo.htmlUrl,
     sourceName: "GitHub",
     defaultCategory: "open-source" as CategorySlug,
@@ -710,6 +748,13 @@ type IngestResults = {
   inserted: number;
   skipped: number;
   lowSignal: number;
+  /** How many stories the quality gate rejected, broken down by why. A run that
+   *  drops a lot of "off-topic" is either doing its job or the gate is eating
+   *  real news, and the single lowSignal counter could not tell those apart. */
+  rejectedByReason: Record<string, number>;
+  /** The rejected stories themselves (capped), so the gate is auditable from one
+   *  run instead of inferred from a shrinking feed. */
+  rejected: { title: string; source: string; reason: RejectionReason; summary: string }[];
   /** Items dropped because the LLM call failed. Non-zero = ingestion is broken. */
   llmFailed: number;
   /** First provider error seen, verbatim — the thing you actually need to debug. */
@@ -823,7 +868,25 @@ async function insertItems(
     }
     results.llmProviders[outcome.provider] = (results.llmProviders[outcome.provider] ?? 0) + 1;
     const { category, summary, entities } = outcome.value;
-    if (isBadSummary(summary)) { results.lowSignal++; return; }
+    const reason = rejectionReason(summary);
+    if (reason) {
+      results.lowSignal++;
+      results.rejectedByReason[reason] = (results.rejectedByReason[reason] ?? 0) + 1;
+      // Capped: a bad provider run can reject a hundred stories and the response
+      // still has to be readable. The counts above stay complete either way.
+      if (results.rejected.length < 60) {
+        results.rejected.push({
+          title: item.title.slice(0, 120),
+          source: item.sourceName,
+          reason,
+          summary: summary.slice(0, 120),
+        });
+      }
+      // Also to the Vercel log, so a rejection is greppable after the response
+      // has scrolled away.
+      console.warn(`[ingest] rejected (${reason}) ${item.sourceName}: ${item.title.slice(0, 100)}`);
+      return;
+    }
 
     const outcome2 = await persistStory(supabase, item, { category, summary, entities });
     if (!outcome2.ok) {
@@ -1013,6 +1076,7 @@ export async function GET(request: NextRequest) {
 
   const results: IngestResults = {
     inserted: 0, skipped: 0, lowSignal: 0,
+    rejectedByReason: {}, rejected: [],
     llmFailed: 0, llmError: null, llmProviders: {},
     entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0,
     deferred: 0, deadProviders: [], errors: [],
@@ -1097,6 +1161,10 @@ export async function GET(request: NextRequest) {
      *  is a deployment problem, not a provider problem. */
     providersSkipped: health.skipped,
     deadProviders: results.deadProviders,
+    /** Why the quality gate rejected what it rejected. Watch "off-topic": the
+     *  gate has known false positives (it called an OpenAI safety-team shakeup
+     *  off-topic in testing), and this is the number that shows it happening. */
+    rejectedByReason: results.rejectedByReason,
   };
   (results as Record<string, unknown>).health = health_report;
 
@@ -1109,6 +1177,7 @@ export async function GET(request: NextRequest) {
       inserted: results.inserted,
       skipped: results.skipped,
       low_signal: results.lowSignal,
+      rejected_by_reason: JSON.stringify(results.rejectedByReason),
       llm_failed: results.llmFailed,
       llm_error: results.llmError,
       llm_providers: JSON.stringify(results.llmProviders),

@@ -202,7 +202,17 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
       }}
     >
       {/* Hero — slightly taller for cinematic feel */}
-      <div style={{ position: "relative", flex: "0 0 42%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
+      {/* Hero: 36%, down from 42%. The card is a fixed height, so the hero and the
+          summary are in direct competition and the summary was losing every time,
+          cut mid-sentence behind the fade below. Measured against the 40 longest
+          live stories at 390x520: 42% fits 8 of 16, 36% fits 15.
+
+          A shrink-on-demand hero (`flex: 0 1 42%` + a min-height on the summary)
+          was tried first and REVERTED: `overflow: hidden` clips at the padding
+          box, so the summary painted straight through the content div's 60px
+          bottom padding and collided with the footer. A fixed basis cannot do
+          that. If this ever needs tuning, it is this one number. */}
+      <div style={{ position: "relative", flex: "0 0 36%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
         {/* Branded gradient sits underneath as a placeholder so there's never a
             black flash while the hero image loads — the image fades in on top. */}
         <CardHeroBackground categorySlug={item.categorySlug} />
@@ -400,7 +410,14 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
             marginBottom: "8px",
             letterSpacing: "0",
             textDecoration: "none",
-            display: "block",
+            // Clamped to 3 lines. The title had no limit and `flexShrink: 0`, so it
+            // could take six lines and starve the summary; measured against the 40
+            // longest live titles, this plus the hero yielding takes "summary fits
+            // the card" from 1 story in 16 to 15.
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
             flexShrink: 0,
             transition: "opacity 0.15s ease",
           }}
@@ -434,6 +451,9 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
               }}
               style={{
                 flex: 1,
+                // Stays 0. A real floor here lets the summary overflow the content
+                // div's bottom padding and paint over the footer, because
+                // `overflow: hidden` clips at the padding box, not the content box.
                 minHeight: 0,
                 overflow: "hidden",
                 display: "flex",
@@ -459,7 +479,7 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
               )}
               <p style={{
                 fontSize: "clamp(13px, 1.7dvh, 16px)",
-                lineHeight: 1.6,
+                lineHeight: 1.5,
                 color: "var(--kt-text-body, #cbc7bf)",
                 fontWeight: 400,
                 margin: 0,

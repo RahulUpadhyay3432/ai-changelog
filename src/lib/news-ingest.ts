@@ -61,6 +61,7 @@ If genuinely unsure, use default: ${defaultCategory}
 SUMMARY RULES:
 - FIRST SENTENCE: A single punchy line (10-15 words max) saying exactly what this IS. For products: "X is a [what it does]." For news: the core fact in one line.
 - THEN 2-3 sentences of detail: what changed or was announced, key numbers, why it matters to AI developers
+- HARD LIMIT: 55 words total. The card has a fixed height and anything longer is cut off mid-sentence behind a fade, so the reader never sees your last point. Typical summaries run 45-50 words; this cap only exists to stop the long tail
 - Plain English, present tense, active voice
 - Make it substantial , readers should feel informed after reading
 - NEVER include raw commit messages, issue refs (#7), tag lists, or changelog boilerplate
@@ -90,16 +91,26 @@ export interface ClassifyResult {
   entities: ExtractedEntity[];
 }
 
+// The sentinels the relevance/signal gate answers with. They are matched here as
+// well as in isBadSummary because the model puts them wherever it likes.
+const SENTINEL = /\b(OFF_TOPIC|LOW_SIGNAL)\b/i;
+
 export function parseClassifyResponse(text: string, fallback: CategorySlug): ClassifyResult {
-  const categoryMatch = text.match(/CATEGORY:\s*(\S+)/);
+  // Labels are matched case-insensitively and through surrounding markdown
+  // (`**SUMMARY:**`), because the cheap tiers of the chain restyle the format
+  // they were told to copy exactly.
+  const categoryMatch = text.match(/[*_\s]*CATEGORY[*_\s]*:\s*([^\n]+)/i);
   // Summary runs from "SUMMARY:" up to the ENTITIES marker (or end of text), so
   // the entities JSON never leaks into the summary body. The boundary tolerates
   // the LLM putting ENTITIES on the same line (no preceding newline) — it just
   // has to be followed by the opening "[".
-  const summaryMatch = text.match(/SUMMARY:\s*([\s\S]*?)(?:\s*ENTITIES:\s*\[|\s*$)/);
-  const entitiesMatch = text.match(/ENTITIES:\s*(\[[\s\S]*?\])/);
+  const summaryMatch = text.match(/[*_\s]*SUMMARY[*_\s]*:\s*([\s\S]*?)(?:\s*[*_\s]*ENTITIES[*_\s]*:\s*\[|\s*$)/i);
+  const entitiesMatch = text.match(/ENTITIES[*_\s]*:\s*(\[[\s\S]*?\])/i);
 
-  const rawSlug = categoryMatch?.[1]?.trim() ?? "";
+  // Take the first token only: models append the category's description from the
+  // prompt ("ai-models, LLMs, model releases, ...") when they run out of room
+  // mid-line, and a trailing comma alone used to sink the whole slug to fallback.
+  const rawSlug = (categoryMatch?.[1] ?? "").trim().split(/[,\s]/)[0].replace(/[.*`]/g, "");
   const category: CategorySlug = VALID_SLUGS.includes(rawSlug as CategorySlug)
     ? (rawSlug as CategorySlug)
     : fallback;
@@ -108,7 +119,30 @@ export function parseClassifyResponse(text: string, fallback: CategorySlug): Cla
   // cron path and the HERMES backlog path pass through, and the cheap providers
   // that emit **bold**/em dashes feed both. isBadSummary still sees the sentinels
   // (LOW_SIGNAL/OFF_TOPIC survive sanitising untouched).
-  const summary = sanitizeSummary(summaryMatch?.[1] ?? "");
+  //
+  // When there is no SUMMARY: label at all, fall back to the WHOLE response
+  // rather than to "". A bare `OFF_TOPIC` with no label is how the relevance
+  // gate most often answers, and returning "" there threw the verdict away and
+  // published the story blank. Anything else unlabelled is junk, and junk is
+  // what the length floor in isBadSummary is for.
+  //
+  // That fallback must never hand the card the raw response: a model that writes
+  // a good summary but forgets the SUMMARY: label still emits its CATEGORY: and
+  // ENTITIES: lines, and those would be long enough to clear the length floor and
+  // land on the card verbatim. Strip the other two labelled lines first, so the
+  // fallback is the model's prose and nothing else.
+  const unlabelled = text
+    .replace(/^[*_\s]*CATEGORY[*_\s]*:[^\n]*$/gim, "")
+    .replace(/^[*_\s]*ENTITIES[*_\s]*:[\s\S]*$/im, "")
+    .trim();
+  let summary = sanitizeSummary(summaryMatch?.[1] ?? unlabelled);
+
+  // A sentinel in the CATEGORY field ("CATEGORY: OFF_TOPIC") is the same verdict
+  // wearing the wrong hat. Carry it into the summary so the gate sees it —
+  // otherwise the invalid slug silently became the feed's default category and
+  // the story sailed through on whatever prose followed.
+  if (SENTINEL.test(rawSlug)) summary = rawSlug.toUpperCase();
+
   const entities = parseExtractedEntities(entitiesMatch?.[1]);
   return { category, summary, entities };
 }

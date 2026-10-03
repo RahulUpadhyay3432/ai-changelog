@@ -182,6 +182,12 @@ export async function fetchNewsItems(
     .from("news_items")
     .select("*")
     .gte("published_at", cutoff)
+    // Last line of defence against a blank card. Ingestion is where an empty
+    // summary gets rejected (quality.ts / parseClassifyResponse); this makes a
+    // regression there a missing story rather than a headline rendered under an
+    // "AI summary" label with nothing beneath it.
+    .not("summary", "is", null)
+    .neq("summary", "")
     .order("published_at", { ascending: false })
     .limit(100);
 

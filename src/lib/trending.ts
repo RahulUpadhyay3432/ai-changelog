@@ -68,6 +68,9 @@ export async function getTrending(
     .from("news_items")
     .select("id, title, summary, source_url, source_name, category_slug, image_url, published_at")
     .gte("published_at", cutoff)
+    // Same blank-summary guard as fetchNewsItems: Trending renders the same card.
+    .not("summary", "is", null)
+    .neq("summary", "")
     .order("published_at", { ascending: false })
     .limit(120);
 

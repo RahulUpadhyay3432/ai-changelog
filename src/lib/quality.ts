@@ -5,13 +5,35 @@
 // or low-signal LLM output reach the UI (CLAUDE.md).
 
 /**
+ * A publishable summary is the prompt's "punchy first line + 2-3 sentences of
+ * detail". Nothing that short is a summary: it is a sentinel, a one-word
+ * fragment from a truncated response, or a refusal.
+ *
+ * This floor is the backstop that was missing. `isBadSummary("")` returned
+ * FALSE, so every response parseClassifyResponse could not read became an
+ * inserted row with an empty summary, which the card then rendered as a
+ * headline under an "AI summary" label with no body. Worse, the responses that
+ * failed to parse were disproportionately the OFF_TOPIC ones (the model answers
+ * the relevance gate with a bare sentinel and no SUMMARY: label), so the gate's
+ * verdict was dropped and the off-topic story was published blank. Measured on
+ * 2026-10-03: 31 of 157 live rows, every one of them off-topic.
+ */
+export const MIN_SUMMARY_WORDS = 12;
+
+/**
  * Detects summaries that must never reach the feed.
  * Catches both exact sentinels (LOW_SIGNAL, OFF_TOPIC) and the prose
  * variations the LLM sometimes writes instead of the sentinel word.
+ *
+ * `minWords` is the length floor above; isBadExplainerSection passes its own,
+ * since an explainer section is a different (shorter) unit than a summary.
  */
-export function isBadSummary(text: string): boolean {
-  const t = text.trim();
+export function isBadSummary(text: string, minWords = MIN_SUMMARY_WORDS): boolean {
+  const t = (text ?? "").trim();
   const lower = t.toLowerCase();
+  // Empty / too short to be a real summary. First, so no pattern below has to
+  // reason about the empty string.
+  if (t.split(/\s+/).filter(Boolean).length < minWords) return true;
   return (
     // Exact sentinels
     t === "LOW_SIGNAL" ||
@@ -41,6 +63,39 @@ export function isBadSummary(text: string): boolean {
     /refs\s+\S+#\d+/i.test(t) ||
     /^v?\d+\.\d+[\w.]*\s*[-–]\s*/i.test(t)
   );
+}
+
+/**
+ * WHY a summary was rejected, as a short stable label.
+ *
+ * The gate used to reject silently into a single `lowSignal` counter, so a run
+ * could drop twenty stories and leave no way to tell a correct OFF_TOPIC call
+ * from the gate eating real news. That matters more now than it did: when the
+ * parser was discarding OFF_TOPIC verdicts, a gate mistake cost a blank card;
+ * now it costs the whole story. Same gate, higher stakes, so it has to say what
+ * it did. Returns null when the summary is publishable.
+ */
+export type RejectionReason =
+  | "empty"
+  | "too-short"
+  | "off-topic"
+  | "low-signal"
+  | "boilerplate";
+
+export function rejectionReason(
+  text: string,
+  minWords = MIN_SUMMARY_WORDS
+): RejectionReason | null {
+  const t = (text ?? "").trim();
+  if (!isBadSummary(t, minWords)) return null;
+  const lower = t.toLowerCase();
+  if (!t) return "empty";
+  if (/\b(off[_\s]?topic)\b/i.test(t) || lower.includes("not related to") ||
+      lower.includes("not about ai") || lower.includes("not about tech") ||
+      lower.includes("no ai/ml")) return "off-topic";
+  if (/\blow[_\s]?signal\b/i.test(t)) return "low-signal";
+  if (t.split(/\s+/).filter(Boolean).length < minWords) return "too-short";
+  return "boilerplate";
 }
 
 // Phrases that mean the model leaked its scaffolding or refused — an explainer
@@ -76,7 +131,7 @@ export function isBadExplainerSection(text: string, minWords = 6): boolean {
   if (!t) return true;
   const words = t.split(/\s+/).filter(Boolean);
   if (words.length < minWords) return true;
-  if (isBadSummary(t)) return true;
+  if (isBadSummary(t, minWords)) return true;
   const lower = t.toLowerCase();
   return EXPLAINER_LEAKS.some((p) => lower.includes(p));
 }

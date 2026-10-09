@@ -5,10 +5,9 @@ import {
   type RadarItem,
   type RadarTool,
 } from "@/lib/knowledge";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
-
-const APP_URL = "https://kapyn.app";
 
 function renderTool(t: RadarTool): string {
   let out = `### ${t.name}\n\n`;

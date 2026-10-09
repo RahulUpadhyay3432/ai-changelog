@@ -5,8 +5,8 @@ import { AI_SKILLS, SKILL_CATEGORY_ORDER, SKILL_CATEGORY_EMOJI, type SkillCatego
 import { slugify } from "@/lib/entities";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const WHAT_ARE_SKILLS =

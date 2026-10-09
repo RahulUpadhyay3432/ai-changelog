@@ -9,8 +9,8 @@ import { lookupRegistryStatus } from "@/lib/mcp-registry";
 import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 type Props = { params: Promise<{ slug: string }> };

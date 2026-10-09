@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { HomeFeed } from "@/components/feed/HomeFeed";
 import { fetchNewsItems } from "@/lib/supabase";
 import type { NewsItem } from "@/lib/types";
@@ -6,6 +7,15 @@ import type { NewsItem } from "@/lib/types";
 // Re-render the cached shell every 5 minutes. Ingestion runs every 2h, so this is
 // far fresher than the content and keeps Supabase off the per-request path.
 export const revalidate = 300;
+
+// "/" serves three variants: cold desktop is rewritten to the /home landing,
+// phones get the app shell, and cookie-holders get the app shell on any device
+// (see src/middleware.ts). They are all the same homepage to a search engine, so
+// "/" self-canonicalises here. Without this the mobile branch — the one Googlebot
+// crawls with — emitted no canonical at all, and /home competed with it.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /**
  * Server-fetch the default "all" feed so the first paint contains real stories.

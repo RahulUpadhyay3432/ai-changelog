@@ -4,6 +4,7 @@ import { Space_Grotesk } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL, SOCIAL_URLS } from "@/lib/site";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -11,8 +12,6 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   display: "swap",
 });
-
-const APP_URL = "https://kapyn.app";
 
 // Sitewide entity graph — establishes Kapyn as a known Organization + WebSite
 // with a sitelinks search box. Lives only here (pages must not re-declare these
@@ -28,7 +27,7 @@ const SITE_JSONLD = {
       logo: `${APP_URL}/api/icon/512`,
       description:
         "The calm map of the AI worth using, agents, models, tools, MCP servers and skills.",
-      sameAs: [] as string[],
+      sameAs: SOCIAL_URLS,
     },
     {
       "@type": "WebSite",
@@ -54,10 +53,10 @@ const SITE_JSONLD = {
       name: "Kapyn",
       alternateName: "Kapyn App",
       url: APP_URL,
-      applicationCategory: "NewsApplication",
+      applicationCategory: "ReferenceApplication",
       operatingSystem: "Web, iOS, Android",
       description:
-        "A mobile-first app delivering AI news as swipeable 30-second dispatches, plus a curated Radar of the AI tools, models, MCP servers and skills worth using.",
+        "A curated map of the AI worth using, agents, models, tools, MCP servers and skills, kept current by a daily signal. Each day's AI news is also distilled to swipeable 30-second dispatches.",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       isAccessibleForFree: true,
       publisher: { "@id": `${APP_URL}/#organization` },

@@ -3,8 +3,7 @@ import { BLOG_POSTS, postTools } from "@/lib/blog-content";
 import { GOLD, SG, TEXT } from "@/lib/design-tokens";
 import { BlogIndexClient } from "@/components/blog/BlogIndexClient";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
 

@@ -9,8 +9,7 @@ import { McpInstallBlock } from "@/components/mcp/McpInstallBlock";
 import { CoverImage } from "@/app/(radar)/radar/radar-shared";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SURFACE, SG, TEXT } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 86400;
 

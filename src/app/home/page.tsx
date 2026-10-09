@@ -17,6 +17,7 @@ import {
 } from "@/lib/design-tokens";
 import { QRCodeBlock } from "@/components/landing/QRCodeBlock";
 import { CommandPalette } from "@/components/CommandPalette";
+import { SocialRow } from "@/components/layout/SocialRow";
 import { TopNav } from "./TopNav";
 import { type MarqueeItem } from "./HeroMarquee";
 import { HeroRadarPanel } from "./HeroRadarPanel";
@@ -24,21 +25,21 @@ import { HeroHeadline } from "./HeroHeadline";
 import { HeroPill } from "./HeroPill";
 import styles from "./landing.module.css";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 1800;
 
-const APP_URL = "https://kapyn.app";
 const DESC =
   "The calm map of the AI worth using, agents, models, tools, MCP servers and skills. Curated, kept current by a daily signal, never behind a paywall.";
 
 export const metadata: Metadata = {
   title: "Discover the AI worth using: agents, models, tools, MCP servers & skills",
   description: DESC,
-  alternates: { canonical: `${APP_URL}/home` },
+  alternates: { canonical: APP_URL },
   openGraph: {
     title: "Kapyn, Find the AI worth using",
     description: DESC,
-    url: `${APP_URL}/home`,
+    url: APP_URL,
     siteName: "Kapyn",
     type: "website",
   },
@@ -528,6 +529,9 @@ export default async function LandingPage() {
             <div>
               <span style={{ fontFamily: SG, fontSize: "20px", fontWeight: 800, letterSpacing: "-0.04em", color: TEXT.primary }}>kapyn</span>
               <p style={{ fontSize: "13.5px", color: TEXT.muted, margin: "10px 0 0", lineHeight: 1.5, maxWidth: "260px" }}>The calm map of the AI worth using. No paywall, ever.</p>
+              <div style={{ marginTop: "16px" }}>
+                <SocialRow />
+              </div>
             </div>
             {[
               { h: "Discover", links: [["Radar", "/radar"], ["Tools & Agents", "/radar/browse"], ["MCP servers", "/radar/mcp"], ["Hackathons", "/radar/hackathons"]] },

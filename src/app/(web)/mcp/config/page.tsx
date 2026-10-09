@@ -4,8 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { MCP_CLIENTS, MCP_FAILURES } from "@/lib/mcp-clients";
 import { GOLD, HAIRLINE, SG, SURFACE, TEXT } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 const DESC =

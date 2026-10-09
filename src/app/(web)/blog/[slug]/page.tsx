@@ -11,8 +11,8 @@ import { GOLD, GOLD_SOFT, GOLD_BORDER, SG } from "@/lib/design-tokens";
 import { READING } from "../theme";
 import styles from "../blog.module.css";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 // Unsplash's API guidelines require the referral parameters on attribution links.
 const UNSPLASH_REFERRAL = "https://unsplash.com/?utm_source=kapyn&utm_medium=referral";
 

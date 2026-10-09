@@ -15,6 +15,16 @@ import { NextResponse, userAgent, type NextRequest } from "next/server";
 const APP_COOKIE = "kapyn_app";
 
 export function middleware(req: NextRequest) {
+  // Every branch below is a response for "/" whose body depends on the
+  // User-Agent, so each one has to say so — otherwise a CDN or proxy is free to
+  // hand the desktop landing page to a phone, or the app shell to a crawler.
+  // Cookie is deliberately NOT in Vary: Googlebot never sends one, and listing it
+  // would split the edge cache per visitor for every real user.
+  const withVary = (res: NextResponse) => {
+    res.headers.set("Vary", "User-Agent");
+    return res;
+  };
+
   // Explicit app entry — remember the choice for a year.
   if (req.nextUrl.searchParams.has("app")) {
     const res = NextResponse.next();
@@ -23,12 +33,12 @@ export function middleware(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
     });
-    return res;
+    return withVary(res);
   }
 
   // Returning app-users (and in-app nav back to "/") keep the app, no landing bounce.
   if (req.cookies.has(APP_COOKIE)) {
-    return NextResponse.next();
+    return withVary(NextResponse.next());
   }
 
   // Cold desktop visitor → the landing. device.type is undefined for desktop,
@@ -37,11 +47,11 @@ export function middleware(req: NextRequest) {
   if (device.type === undefined) {
     const url = req.nextUrl.clone();
     url.pathname = "/home";
-    return NextResponse.rewrite(url);
+    return withVary(NextResponse.rewrite(url));
   }
 
   // Mobile/tablet → the app.
-  return NextResponse.next();
+  return withVary(NextResponse.next());
 }
 
 export const config = {

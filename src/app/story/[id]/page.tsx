@@ -3,8 +3,7 @@ import { fetchNewsItemById } from "@/lib/supabase";
 import { getCategoryBySlug } from "@/lib/categories";
 import { ClientRedirect } from "./ClientRedirect";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 interface Props {
   params: Promise<{ id: string }>;

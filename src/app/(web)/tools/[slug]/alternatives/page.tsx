@@ -5,8 +5,8 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getAllTools, getToolBySlug, kindLabel, type UnifiedTool } from "@/lib/tools-registry";
 import { GOLD, HAIRLINE, SG, SURFACE, TEXT } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 // A page listing one or two alternatives is thin, and thin pages are the actual

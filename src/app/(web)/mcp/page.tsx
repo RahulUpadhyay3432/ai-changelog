@@ -5,8 +5,8 @@ import { MCP_SERVERS, MCP_CATEGORY_ORDER, MCP_CATEGORY_EMOJI, type McpCategory }
 import { slugify } from "@/lib/entities";
 import { GOLD, GOLD_SOFT, GOLD_BORDER, HAIRLINE, SG } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 // The 40-word extractable answer — the format answer engines quote verbatim.

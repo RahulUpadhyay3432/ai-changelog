@@ -3,13 +3,13 @@ import { getRadarTools, getRadarCards, getRadarEssentials } from "@/lib/knowledg
 import { getHackathons } from "@/lib/hackathons";
 import { RadarClient } from "./RadarClient";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
 // Server-fetches the cached radar engine, then hands off to the client for
 // lens-aware (Builder / Exploring) arrangement. ISR every 30 min. RadarClient
 // server-renders a crawlable static index until it hydrates (RadarStaticIndex).
 export const revalidate = 1800;
 
-const APP_URL = "https://kapyn.app";
 const DESC =
   "A curated radar of the AI worth using, agents, models, tools, MCP servers and skills, kept current by a daily signal. No paywall, ever.";
 

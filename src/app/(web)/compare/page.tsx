@@ -5,8 +5,7 @@ import { MODELS, LAST_UPDATED, CATEGORY_LABELS } from "@/lib/models";
 import { MODEL_PAIRS, modelById, pairSlug } from "@/lib/model-pairs";
 import { GOLD, SG, TEXT } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 86400;
 

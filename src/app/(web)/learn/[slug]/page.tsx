@@ -12,8 +12,7 @@ import {
 } from "@/lib/knowledge";
 import styles from "./learn.module.css";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
 export const dynamicParams = true;

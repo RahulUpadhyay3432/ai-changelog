@@ -4,8 +4,8 @@ import { ArrowUpRight } from "lucide-react";
 import { CURATED_ESSENTIALS } from "@/lib/radar-essentials";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 // The 40-word extractable answer for "what are AI tools".

@@ -48,3 +48,7 @@ next-env.d.ts
 # 13aba99 by a `git add -A src/` and went live at /concepts/kapyn-v2 in
 # production. Keep them local until someone deliberately ships them.
 src/app/concepts/
+
+# google service-account keys (belt-and-braces; real key lives in ~/.config/kapyn)
+*service-account*.json
+gsc-*.json

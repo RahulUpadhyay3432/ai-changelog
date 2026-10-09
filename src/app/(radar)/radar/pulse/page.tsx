@@ -3,8 +3,7 @@ import { getRadarTools, getRadarCards, getRadarMcpDiscovered } from "@/lib/knowl
 import { getTrending } from "@/lib/trending";
 import { PulseClient } from "./PulseClient";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 // The weekly Pulse — momentum, not inventory. Server-fetches the radar data, then
 // hands off to PulseClient for the rich, ranked, Radar-styled layout. ISR 30m.

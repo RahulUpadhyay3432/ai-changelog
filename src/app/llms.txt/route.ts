@@ -1,11 +1,10 @@
 import { getLearnEntities } from "@/lib/knowledge";
+import { APP_URL } from "@/lib/site";
 
 // /llms.txt — the emerging standard that hands LLMs/AI crawlers a curated, plain
 // map of the site's high-value content. Generated from the published concept
 // explainers so it stays current as the knowledge base grows.
 export const revalidate = 3600;
-
-const APP_URL = "https://kapyn.app";
 
 function oneLine(s: string | null): string {
   return (s ?? "").replace(/\s+/g, " ").trim();
@@ -17,7 +16,17 @@ export async function GET() {
   const lines: string[] = [
     "# Kapyn",
     "",
-    "> Kapyn is the calm intelligence layer for AI, AI/tech news distilled to 30-second dispatches, plus an auto-generated, source-grounded knowledge base that explains the concepts behind the news. Every explainer is generated from Kapyn's own news stream and cites its sources.",
+    "> Kapyn is the calm map of the AI worth using, agents, models, tools, MCP servers and skills, curated and kept current by a daily signal. It also distills each day's AI/tech news into 30-second dispatches, and auto-generates source-grounded explainers for the concepts behind that news. No paywall.",
+    "",
+    "## Key pages",
+    `- [Kapyn](${APP_URL}): the curated map, plus the swipeable daily news feed`,
+    `- [Radar](${APP_URL}/radar): curated AI agents, models, tools, MCP servers & skills`,
+    `- [MCP servers](${APP_URL}/mcp): directory of Model Context Protocol servers, by category`,
+    `- [AI tools](${APP_URL}/tools): the essential AI tools worth knowing, by category`,
+    `- [AI skills](${APP_URL}/skills): custom GPTs, Claude Skills & Gemini Gems, by use case`,
+    `- [Compare AI models](${APP_URL}/compare): Claude, GPT, Gemini, Llama and more side by side , context, cost, modalities, best-for`,
+    `- [Explore , the AI glossary](${APP_URL}/explore): index of every concept explainer`,
+    `- [Blog](${APP_URL}/blog): guides on the AI and tools worth using`,
     "",
     "## AI concepts & techniques",
   ];
@@ -36,16 +45,6 @@ export async function GET() {
     `- [Catalog index](${APP_URL}/okf): bundle index, story counts, tool inventory, category breakdown`,
     `- [Today's stories](${APP_URL}/okf/stories): full 48h news digest grouped by category`,
     `- [AI tools radar](${APP_URL}/okf/tools): active AI tools, models, and entities tracked by Kapyn`,
-    "",
-    "## Key pages",
-    `- [Explore , the AI glossary](${APP_URL}/explore): index of every concept explainer`,
-    `- [Radar](${APP_URL}/radar): curated AI agents, models, tools, MCP servers & skills`,
-    `- [MCP servers](${APP_URL}/mcp): directory of Model Context Protocol servers, by category`,
-    `- [AI tools](${APP_URL}/tools): the essential AI tools worth knowing, by category`,
-    `- [AI skills](${APP_URL}/skills): custom GPTs, Claude Skills & Gemini Gems, by use case`,
-    `- [Compare AI models](${APP_URL}/compare): Claude, GPT, Gemini, Llama and more side by side , context, cost, modalities, best-for`,
-    `- [Blog](${APP_URL}/blog): guides on the AI and tools worth using`,
-    `- [Kapyn](${APP_URL}): the swipeable AI/tech news feed`,
     ""
   );
 

@@ -8,10 +8,9 @@ import { MODEL_PAIRS, pairSlug } from "@/lib/model-pairs";
 import { getAllTools } from "@/lib/tools-registry";
 import { getPromotedToolPages } from "@/lib/promoted-tools";
 import { slugify } from "@/lib/entities";
+import { APP_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-const APP_URL = "https://kapyn.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(
@@ -90,7 +89,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: APP_URL, lastModified: new Date(), changeFrequency: "hourly", priority: 1.0 },
-    { url: `${APP_URL}/home`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${APP_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     ...blogUrls,
     { url: `${APP_URL}/radar`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },

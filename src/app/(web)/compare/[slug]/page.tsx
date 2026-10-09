@@ -13,8 +13,8 @@ import {
 import { CATEGORY_LABELS, LAST_UPDATED, PRICE_TIER_LABEL, formatContext, type AIModel } from "@/lib/models";
 import { GOLD, HAIRLINE, SG } from "@/lib/design-tokens";
 import { serializeJsonLd } from "@/lib/json-ld";
+import { APP_URL } from "@/lib/site";
 
-const APP_URL = "https://kapyn.app";
 export const revalidate = 86400;
 
 type Props = { params: Promise<{ slug: string }> };

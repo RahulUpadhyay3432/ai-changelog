@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { CommandPalette } from "@/components/CommandPalette";
+import { SocialRow } from "@/components/layout/SocialRow";
 import { ThemeShell, ThemeToggle } from "./theme-shell";
 import styles from "./layout.module.css";
 
@@ -43,6 +44,9 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
         <span className={styles.footerDim}>
           Every story that matters, distilled to 30 seconds. No paywall, ever.
         </span>
+        <div style={{ marginTop: "14px" }}>
+          <SocialRow />
+        </div>
       </footer>
 
       <CommandPalette />

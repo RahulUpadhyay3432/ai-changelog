@@ -1,8 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
-
-const APP_URL = "https://kapyn.app";
 
 const CATEGORY_NAMES: Record<string, string> = {
   "ai-models": "AI Models",
@@ -85,7 +84,7 @@ timestamp: ${now}
 # Kapyn News Digest , ${today}
 
 ${stories.length} stories from the last 48 hours, grouped by category.
-Published by Kapyn (${APP_URL}) , AI/tech news distilled to 30-second reads.
+Published by Kapyn (${APP_URL}) , the curated map of the AI worth using, with each day’s AI/tech news distilled to 30-second reads.
 
 [← Back to catalog](/okf)
 ${sections}`;

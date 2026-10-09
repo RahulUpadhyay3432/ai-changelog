@@ -1,11 +1,10 @@
 import { getLearnEntities } from "@/lib/knowledge";
+import { APP_URL } from "@/lib/site";
 
 // /feed.xml — RSS for the knowledge base (concept explainers). Aids feed-reader
 // discovery, syndication, and freshness signals. Mirrors the canonical domain
 // used by the sitemap + page canonicals (kapyn.app, non-www).
 export const revalidate = 3600;
-
-const APP_URL = "https://kapyn.app";
 
 function esc(s: string): string {
   return s

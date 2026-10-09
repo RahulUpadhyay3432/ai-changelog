@@ -6,8 +6,7 @@ import { CATEGORIES, getCategoryBySlug } from "@/lib/categories";
 import { fetchNewsItems } from "@/lib/supabase";
 import { FEED_WINDOW_LABEL } from "@/lib/feed-window";
 import type { CategorySlug } from "@/lib/types";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 interface Props {
   params: Promise<{ slug: string }>;

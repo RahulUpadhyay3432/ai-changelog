@@ -1,9 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { getRadarCards, getRadarTools, getRadarEssentials } from "@/lib/knowledge";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
-
-const APP_URL = "https://kapyn.app";
 
 interface CategoryRow {
   category_slug: string;
@@ -48,7 +47,7 @@ export async function GET() {
   const md = `---
 type: Knowledge Bundle Index
 title: Kapyn, AI & Tech Intelligence Catalog
-description: Daily structured digest of AI/tech news and tool tracking, updated hourly
+description: Structured map of the AI worth using, tools, models and MCP servers, plus the daily AI/tech news digest. Updated hourly
 resource: ${APP_URL}
 tags: [ai, tech, news, radar, tools, daily-digest, open-knowledge-format]
 timestamp: ${now}

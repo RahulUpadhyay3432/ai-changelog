@@ -2,14 +2,13 @@ import type { NextRequest } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { sendEmail, emailConfigured, escapeHtml } from "@/lib/email";
+import { APP_URL } from "@/lib/site";
 
 // Weekly digest: the AI stories + trending tools that mattered this week, mailed
 // to opted-in subscribers. Gated on RESEND_API_KEY — no key → no-op (reports it).
 // Cron-triggered (see vercel.json).
 export const runtime = "nodejs";
 export const maxDuration = 120;
-
-const APP_URL = "https://kapyn.app";
 
 function getAdmin(): SupabaseClient {
   return createClient(

@@ -3,8 +3,7 @@ import { entityHref } from "@/lib/entities";
 import { getLearnEntities } from "@/lib/knowledge";
 import { ExploreClient, type EntityLite } from "./ExploreClient";
 import { serializeJsonLd } from "@/lib/json-ld";
-
-const APP_URL = "https://kapyn.app";
+import { APP_URL } from "@/lib/site";
 
 export const revalidate = 3600;
 

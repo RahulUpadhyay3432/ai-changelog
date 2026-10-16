@@ -450,7 +450,10 @@ export const INDIA_POSTS: BlogPost[] = [
     date: "2026-10-16",
     readingMin: 6,
     tag: "India",
-    hero: { src: "https://live.staticflickr.com/7330/27929852485_9e415035af_b.jpg", alt: "Neural Network", credit: "Kevin Rheese / flickr (CC BY)" },
+    hero: {
+      src: "/blog/nemotron-indic-pretraining-2-8-trillion-tokens.webp",
+      alt: "Rows of brass bowls holding different Indian spices and grains on a dark wooden floor",
+    },
     body: [
       {
         type: "paragraph",

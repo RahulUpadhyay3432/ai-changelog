@@ -4693,9 +4693,8 @@ limit 8;`,
     readingMin: 6,
     tag: "Architecture",
     hero: {
-      src: U("1451187580459-43490279c0fa"),
-      alt: "Server racks in a data center with blue lighting",
-      credit: "Unsplash",
+      src: "/blog/llm-pipeline-re-summarising-deleted-articles.webp",
+      alt: "A steel paper shredder with a ribbon of paper looping out of it and back into its own slot",
     },
     body: [
       {
@@ -4806,9 +4805,8 @@ limit 8;`,
     readingMin: 8,
     tag: "Roundup",
     hero: {
-      src: U("1504384308090-c894fdcc538d"),
-      alt: "A wall calendar and notes on a desk",
-      credit: "Unsplash",
+      src: "/blog/ai-tooling-october-2026.webp",
+      alt: "A block of blank calendar pages and torn sheets among fallen autumn maple leaves",
     },
     body: [
       {
@@ -4894,6 +4892,242 @@ limit 8;`,
       {
         type: "paragraph",
         text: "Previous months: [September 2026](/blog/ai-tooling-september-2026) and [August 2026](/blog/ai-tooling-august-2026). Kapyn covers every story that matters in 30 seconds: [open the feed](/).",
+      },
+    ],
+  },
+  {
+    slug: "best-ai-apps-october-2026",
+    title: "The best AI apps of October 2026, and what is actually new in each",
+    deck: "Ten AI apps worth your time this month, ranked by usefulness rather than hype. For each one: what changed in the last six weeks, who gets it, and where the catch is.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/best-ai-apps-october-2026.webp",
+      alt: "A row of old wooden toolboxes on a workbench, lids open",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Every big AI app shipped something between mid-September and mid-October. Most of it was model upgrades you will notice without doing anything. Some of it changes what the app is for. This list is the ten apps we would actually recommend this month, and for each one the specific thing that changed, with the date and the plan it needs.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How we picked",
+        text: "Only apps that shipped something verifiable in the last six weeks, checked against the company's own changelog or announcement. Where a feature is still rolling out or in preview, we say so.",
+      },
+      { type: "heading", level: 2, text: "1. ChatGPT: GPT-6 for everyone" },
+      {
+        type: "paragraph",
+        text: "On 7 October OpenAI moved ChatGPT's paid plans (Plus, Pro, Business and Enterprise) to **GPT-6 Sol**, and on 8 October the Free and Go plans moved to the lighter **GPT-6 Luna**. The same release added what OpenAI calls Intelligent UI: answers that mix text with charts, buttons and small forms when the question calls for it. **Best for:** a general default that most people around you already use. **The catch:** the free plan gets Luna, not Sol. [More on ChatGPT](/tools/chatgpt).",
+      },
+      { type: "heading", level: 2, text: "2. Gemini: Gemini 4 Argon in the app" },
+      {
+        type: "paragraph",
+        text: "Google's new flagship, **Gemini 4 Argon**, arrived on 13 October in the Gemini app and in AI Mode in Search for Google AI Pro and Ultra subscribers, with Google Antigravity access for Ultra. **Best for:** people already living in Gmail, Docs and Android. **The catch:** Argon is not on the free plan. We covered the developer side in the [October tooling roundup](/blog/ai-tooling-october-2026). [More on Gemini](/tools/gemini).",
+      },
+      { type: "heading", level: 2, text: "3. Claude: two new models in three weeks" },
+      {
+        type: "paragraph",
+        text: "Anthropic released **Claude Sonnet 5.5** on 28 September and **Claude Haiku 5.5** on 7 October. Haiku 5.5 is priced at $0.10 per million input tokens for prompts up to 100,000 tokens in the API, which makes it one of the cheapest capable models available. **Best for:** long writing, careful analysis and coding, especially with [Claude Code](/tools/claude-code). **The catch:** Haiku 5.5's new tokenizer counts about a quarter more tokens for the same text, so the saving is smaller than the headline. [More on Claude](/tools/claude).",
+      },
+      { type: "heading", level: 2, text: "4. Perplexity: research that keeps running" },
+      {
+        type: "paragraph",
+        text: "Perplexity's 5 October update added **Automations** for ongoing tasks, interactive visualizations inside threads, and GPT-6.1 Sol and Claude Opus 5.5 as model options. On 21 September it added an effort setting for its Computer agent and a skills marketplace. **Best for:** questions that need sources, and research you want re-run on a schedule. **The catch:** agent runs use compute credits, so heavy use pushes you up a plan. [More on Perplexity](/tools/perplexity).",
+      },
+      { type: "heading", level: 2, text: "5. Gemini Notebook: still the best way to read your own documents" },
+      {
+        type: "paragraph",
+        text: "If you are looking for NotebookLM, it was [renamed Gemini Notebook](https://workspaceupdates.googleblog.com/2026/07/notebooklm-now-gemini-notebook.html) on 16 July; old links redirect. It answers only from the sources you give it, which is exactly what you want for contracts, papers, lecture notes or a stack of PDFs. **Best for:** students, analysts and anyone who has to read more than they have time for. **The catch:** it is deliberately narrow; it is not a general assistant. [More on it](/tools/notebooklm).",
+      },
+      { type: "heading", level: 2, text: "6. Cursor: agents you can manage from your phone" },
+      {
+        type: "paragraph",
+        text: "Cursor shipped steadily: **Projects** (10 September, beta), where a coordinator agent plans long work and delegates to other agents; **Rollouts and Security Review** bots on pull requests (23 September); **remote control** of agents running on your computer from the Cursor iOS app (6 October); and an app marketplace for its Origin product (13 October). **Best for:** developers who want an editor built around agents. **The catch:** remote control only works while your computer is on and online. [More on Cursor](/tools/cursor).",
+      },
+      { type: "heading", level: 2, text: "7. GitHub Copilot: Gemini 4 Argon on day one" },
+      {
+        type: "paragraph",
+        text: "Gemini 4 Argon became [generally available in GitHub Copilot](https://github.blog/changelog/2026-10-13-gemini-4-argon-in-github-copilot/) on its launch day, 13 October, for Copilot Pro+, Max, Business and Enterprise, across VS Code, Visual Studio, JetBrains, Xcode, Eclipse, the CLI and the coding agent. **Best for:** teams that want to switch models without switching tools. **The catch:** it is rolling out gradually, and organisation plans may need an admin to enable it. [More on GitHub Copilot](/tools/github-copilot).",
+      },
+      { type: "heading", level: 2, text: "8. Microsoft Copilot: Home, Code and Autopilot" },
+      {
+        type: "paragraph",
+        text: "On 25 September Microsoft [announced a rebuilt Copilot](https://blogs.microsoft.com/blog/2026/09/25/introducing-the-new-copilot-with-home-code-and-autopilot/) with three parts: **Home**, where chat and document work meet; **Code**, which builds small apps, dashboards and automations from a description in a sandbox; and **Autopilot**, a cloud agent that keeps working on recurring tasks when you are not there. **Best for:** organisations already on Microsoft 365. **The catch:** most of it is still rolling out through Microsoft's Frontier programme, and Autopilot is in private preview.",
+      },
+      { type: "heading", level: 2, text: "9. Muse from Meta: a free personal agent, US only for now" },
+      {
+        type: "paragraph",
+        text: "Meta launched [Muse](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) on 8 September: a personal agent that does tasks rather than just answering, running on its own cloud computer, available on iOS, Android, the web and inside WhatsApp. It is free for most needs. **Best for:** trying an agent with no setup, if you are in the US. **The catch:** it is rolling out in the US only.",
+      },
+      { type: "heading", level: 2, text: "10. Grok: a cheaper frontier model for coders" },
+      {
+        type: "paragraph",
+        text: "xAI released [Grok 4.7](https://x.ai/news/grok-4-7) on 21 September, priced from $2 per million input tokens and $6 per million output in the API, and available in Cursor and xAI's own Grok Build. **Best for:** developers comparing frontier models on price. **The catch:** most of the value is in the API and coding tools, not the chat app. [More on Grok](/tools/grok).",
+      },
+      { type: "heading", level: 2, text: "If you only try one thing this month" },
+      {
+        type: "list",
+        items: [
+          "**Everyday use:** stay with the assistant you already have. ChatGPT, Gemini and Claude all improved this month without you doing anything.",
+          "**Work from documents:** Gemini Notebook.",
+          "**Code:** try Gemini 4 Argon inside the tool you already use, since Copilot and Cursor both offer it, before you switch editors.",
+          "**Agents:** Perplexity's Automations are the lowest-effort way to have something run on a schedule.",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn tracks every one of these releases as it happens, in 30 seconds a story. [Open the feed](/) or browse [the tools directory](/tools).",
+      },
+    ],
+  },
+  {
+    slug: "agentic-ai-infrastructure-stack-2026",
+    title: "The agentic AI infrastructure stack in 2026: what to use at each layer",
+    deck: "Building an agent is now a stack decision, not a model decision. Eight layers, the two or three tools that lead each one, and what we would pick for a small team.",
+    date: "2026-10-16",
+    readingMin: 10,
+    tag: "Guide",
+    hero: {
+      src: "/blog/agentic-ai-infrastructure-stack-2026.webp",
+      alt: "Steel scaffolding around an unfinished building at dusk",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "A year ago, building an agent meant picking a model and writing a loop. In 2026 the model is the easy part. The hard parts are around it: how the agent reaches tools, where its code runs safely, how a ten-minute task survives a crash, what it remembers, and how you find out why it did something stupid. Each of those is now its own layer with its own vendors. This is the map.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The short version",
+        text: "Start with a framework and a gateway. Add a sandbox the day your agent runs code, durable execution the day a task takes longer than one request, and tracing on day one. Memory and browser infrastructure come last, when you can name the problem they solve.",
+      },
+      { type: "heading", level: 2, text: "1. Protocols: how agents reach tools" },
+      {
+        type: "list",
+        items: [
+          "**MCP (Model Context Protocol)** is the default way to connect an agent to tools and data. Every major agent client speaks it, which means a tool you expose once works in Claude, ChatGPT, Cursor, Copilot and the rest. The July 2026 spec made servers stateless; we covered [what changed](/blog/mcp-2026-07-28-spec-what-changed). Browse working servers in our [MCP directory](/mcp).",
+          "**A2A (Agent2Agent)** covers the other direction: one agent delegating to another agent over the network. Useful when agents belong to different teams or companies. Most single-team projects do not need it yet.",
+          "**Agent Plugins** packages skills, commands and MCP servers into one folder that any compatible client can load. See our [Agent Plugins 1.0 explainer](/blog/agent-plugins-1-0-explained).",
+        ],
+      },
+      { type: "heading", level: 2, text: "2. Frameworks and SDKs: the agent loop" },
+      {
+        type: "paragraph",
+        text: "This is where you write the agent itself: the loop of calling a model, running tools and deciding when to stop.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Claude Agent SDK.** The harness behind Claude Code, released as a library. The strongest choice if you build on Claude and want file editing, tool use and context management that already work in production.",
+          "**[OpenAI Agents SDK](/tools/openai-agents-sdk).** Small and readable, with handoffs between agents, guardrails and built-in tracing. Best on OpenAI models.",
+          "**Google ADK (Agent Development Kit).** Google's framework, tuned for Gemini and Google Cloud deployment, with support for other models.",
+          "**[LangGraph](/tools/langgraph).** Agents as explicit state graphs with checkpoints and human approval steps. More boilerplate, but the most control when a workflow has to be predictable.",
+          "**[CrewAI](/tools/crewai).** Role-based teams of agents. Quick to get a multi-agent demo running; needs firm stopping rules to avoid agents delegating in circles.",
+          "**Vercel AI SDK and [Mastra](/tools/mastra).** The two leading TypeScript options. The AI SDK covers model calls, tool calling, streaming and UI; Mastra adds workflows, memory and evals on top in an agent-first framework.",
+        ],
+      },
+      { type: "heading", level: 2, text: "3. Durable execution: surviving long tasks" },
+      {
+        type: "paragraph",
+        text: "An agent task that takes ten minutes will eventually hit a timeout, a deploy or a crashed worker. Durable execution records each step, so a task resumes where it stopped instead of starting over and paying for every model call twice.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[Temporal](/tools/temporal).** The battle-tested option, used far beyond AI. Powerful, with a learning curve: workflow code must be deterministic, and side effects live in separate activities.",
+          "**[Inngest](/tools/inngest).** Event-driven durable functions written as plain steps. Lighter to adopt than Temporal for most web teams.",
+          "**Vercel Workflow.** Durable steps in TypeScript for apps already on Vercel, with retries, sleeps and pause-and-resume built in.",
+        ],
+      },
+      { type: "heading", level: 2, text: "4. Sandboxes: running code safely" },
+      {
+        type: "paragraph",
+        text: "The moment your agent writes and runs code, it needs somewhere that is not your server. Sandboxes give it an isolated machine that starts in seconds and is thrown away afterwards.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[E2B](/tools/e2b).** Purpose-built sandboxes for AI-generated code on lightweight microVMs, with SDKs for Python and JavaScript. The default choice for code interpreters.",
+          "**Vercel Sandbox.** Firecracker microVMs on Vercel's platform, generally available since January 2026. A natural fit if the rest of your app is already there.",
+          "**Daytona** focuses on very fast-starting sandboxes for agents, and **[Modal](/tools/modal)** is the pick when the code needs GPUs or heavy Python workloads.",
+        ],
+      },
+      { type: "heading", level: 2, text: "5. Browser infrastructure: agents on the web" },
+      {
+        type: "list",
+        items: [
+          "**[Browserbase](/tools/browserbase).** Hosted headless browsers for agents, with session recording and its Stagehand framework for writing browser actions in plain language.",
+          "**Steel.** An open-source browser API you can self-host.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        text: "Before reaching for a browser, check for an API or an MCP server. A browser is the slowest, most expensive and most fragile way for an agent to get data.",
+      },
+      { type: "heading", level: 2, text: "6. Memory: what the agent keeps between sessions" },
+      {
+        type: "list",
+        items: [
+          "**Mem0.** A memory layer that extracts facts from conversations and retrieves them later. The most common drop-in choice.",
+          "**Letta.** From the team behind MemGPT: stateful agents that manage their own memory blocks. Works best with strong models.",
+          "**[Zep](/tools/zep).** Memory built on a temporal knowledge graph, so it tracks how facts change over time, not just what was said.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Most agents do not need a memory product on day one. A table of user preferences and a search over past tasks covers more than people expect.",
+      },
+      { type: "heading", level: 2, text: "7. Observability and evals: knowing why it failed" },
+      {
+        type: "paragraph",
+        text: "Agents fail quietly: a wrong tool call three steps back, a retry loop, a confident answer built on an empty search. Tracing every step is the only way to see it.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[Langfuse](/tools/langfuse).** Open source and self-hostable, covering tracing, prompt management and evals. The default if you want to own your data.",
+          "**[LangSmith](/tools/langsmith).** LangChain's hosted platform, the obvious choice if you build on LangGraph.",
+          "**[Braintrust](/tools/braintrust).** Evals-first: datasets, scoring and comparing prompt or model changes before they ship.",
+          "**[Arize Phoenix](/tools/arize-phoenix).** Open source and built on OpenTelemetry, so traces fit into observability you may already run.",
+        ],
+      },
+      { type: "heading", level: 2, text: "8. Model gateways: one API for many models" },
+      {
+        type: "list",
+        items: [
+          "**[OpenRouter](/tools/openrouter).** One API key for hundreds of models, including free ones. A warning from experience: free model slugs get retired without much notice, so never hard-code one as your only option.",
+          "**Vercel AI Gateway.** One endpoint across providers, with fallbacks, budgets and observability, integrated with the AI SDK.",
+          "**LiteLLM.** An open-source proxy that puts many providers behind the OpenAI API format. The self-hosted choice.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What we would pick for a small team" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "A framework that matches your language and main model: Claude Agent SDK or OpenAI Agents SDK in Python, the AI SDK or Mastra in TypeScript.",
+          "A gateway with at least two providers behind it from the start.",
+          "Tracing from the first day, with Langfuse if you want to self-host.",
+          "A sandbox the first time the agent runs code it wrote.",
+          "Durable execution once a single task outlives a request.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "We learned the gateway lesson the hard way. Kapyn's own news pipeline runs on a chain of eight model providers, and in October we found most of its spend going to re-summarising articles it had already deleted. That story is [here](/blog/llm-pipeline-re-summarising-deleted-articles).",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn tracks releases across all of these layers as they happen. [Open the feed](/), or browse the [tools directory](/tools) and [MCP servers](/mcp).",
       },
     ],
   },

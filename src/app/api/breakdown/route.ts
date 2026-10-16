@@ -170,6 +170,10 @@ async function storeBreakdown(id: string, breakdown: string): Promise<void> {
 // No retries here, unlike ingestion: a user is waiting, so a failing provider gets
 // one try and we move on, and no new provider starts once the budget is spent.
 const BREAKDOWN_BUDGET_MS = 40_000;
+// Per-provider cap. Without it one stalled provider spent the whole budget: on
+// 2026-10-16 Z.ai's rate-limited keys ran out the 40s before Groq, Gemini or
+// Mistral (all working) were ever tried. A healthy provider answers in ~1-5s.
+const PROVIDER_BUDGET_MS = 8_000;
 
 async function generateBreakdown(prompt: string): Promise<string> {
   const deadline = Date.now() + BREAKDOWN_BUDGET_MS;
@@ -178,17 +182,23 @@ async function generateBreakdown(prompt: string): Promise<string> {
     if (!process.env[provider.envKey]) continue;
     const remaining = deadline - Date.now();
     if (remaining <= 0) break;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
       const text = await Promise.race([
         provider.call(prompt),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("timed out")), remaining)
-        ),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error("timed out")),
+            Math.min(remaining, PROVIDER_BUDGET_MS)
+          );
+        }),
       ]);
       if (text.trim()) return text.trim();
       errors.push(`${provider.name}: empty`);
     } catch (err) {
       errors.push(`${provider.name}: ${String(err).slice(0, 160)}`);
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw new Error(`All providers failed: ${errors.join(" | ") || "none configured"}`);

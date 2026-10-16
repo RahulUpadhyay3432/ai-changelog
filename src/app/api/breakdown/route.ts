@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { LLM_PROVIDERS } from "@/lib/llm-providers";
 
-// Allow enough time for the free model (~7s) plus a fallback hop.
-export const maxDuration = 30;
+// Room for a couple of provider hops; generateBreakdown stops starting new ones at
+// BREAKDOWN_BUDGET_MS so the route answers before this ceiling.
+export const maxDuration = 60;
 
 // Per-IP limit. Higher than a pure click-rate because the client prefetches
 // breakdowns for upcoming cards while scrolling. Enforced via Upstash so it
@@ -88,15 +90,7 @@ Rules:
 - Bold only the most signal-rich words, not common words`;
 
   try {
-    // Primary: OpenRouter (Nemotron). Fallback: Gemini.
-    let text: string;
-    try {
-      text = await callOpenRouter(prompt);
-    } catch (primaryErr) {
-      console.warn("[breakdown] OpenRouter failed, falling back to Gemini:", primaryErr);
-      text = await callGemini(prompt);
-    }
-    if (!text) throw new Error("Empty response from both providers");
+    const text = await generateBreakdown(prompt);
     // Persist so the next view (any user, any session) is instant. Best-effort,
     // awaited so it completes before the serverless function freezes.
     if (persistable && id) await storeBreakdown(id, text);
@@ -168,66 +162,34 @@ async function storeBreakdown(id: string, breakdown: string): Promise<void> {
 }
 
 // ── LLM providers ────────────────────────────────────────────────────────────
-// Fallback: Gemini. Nemotron-550B was rejected, ~3.7 min/call.
+// The same chain as ingestion (@/lib/llm-providers). This route used to carry its
+// own OpenRouter-free + Gemini pair, and on 2026-10-16 both were down at once (the
+// `:free` slug 404s, Gemini 429s on depleted credits) while the feed was fine, so
+// every uncached "Why it matters" tap returned a 500.
 //
-// z-ai/glm-4.5-air:free was RETIRED and this constant kept pointing at it, so this
-// route has been 404-ing to Gemini on every breakdown. Shares the env override with
-// lib/llm.ts so one config change moves both. Non-reasoning and fast matters more
-// here than anywhere else: this path is interactive, behind a user tap.
-const OPENROUTER_MODEL =
-  process.env.OPENROUTER_MODEL ?? "inclusionai/ling-3.0-flash-sante:free";
+// No retries here, unlike ingestion: a user is waiting, so a failing provider gets
+// one try and we move on, and no new provider starts once the budget is spent.
+const BREAKDOWN_BUDGET_MS = 40_000;
 
-// Free-tier latency is variable (usually ~7s, but can spike). Abort if it runs
-// long so we fall back to Gemini fast instead of burning the whole budget and
-// 504-ing — the fallback otherwise only triggers on a hard error, not slowness.
-const OPENROUTER_TIMEOUT_MS = 14_000;
-
-async function callOpenRouter(prompt: string): Promise<string> {
-  // OPENROUTER_API_KEY is a comma-separated list; take the first rather than
-  // sending the whole string as one bearer token (which 401s). No rotation here
-  // on purpose: one interactive request does not need to spread load.
-  const key = (process.env.OPENROUTER_API_KEY ?? "").split(",")[0]?.trim();
-  if (!key) throw new Error("OPENROUTER_API_KEY missing");
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS);
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: OPENROUTER_MODEL,
-        // Matches lib/llm.ts: the free pool is reasoning-model heavy and 800 is not
-        // enough for one to finish thinking AND answer.
-        max_tokens: 2500,
-        messages: [{ role: "user", content: prompt }],
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
-    const data = await res.json();
-    const text = (data.choices?.[0]?.message?.content ?? "").trim();
-    if (!text) throw new Error("OpenRouter returned empty response");
-    return text;
-  } finally {
-    clearTimeout(timer);
+async function generateBreakdown(prompt: string): Promise<string> {
+  const deadline = Date.now() + BREAKDOWN_BUDGET_MS;
+  const errors: string[] = [];
+  for (const provider of LLM_PROVIDERS) {
+    if (!process.env[provider.envKey]) continue;
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    try {
+      const text = await Promise.race([
+        provider.call(prompt),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("timed out")), remaining)
+        ),
+      ]);
+      if (text.trim()) return text.trim();
+      errors.push(`${provider.name}: empty`);
+    } catch (err) {
+      errors.push(`${provider.name}: ${String(err).slice(0, 160)}`);
+    }
   }
-}
-
-async function callGemini(prompt: string): Promise<string> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new Error("GEMINI_API_KEY missing");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${key}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-  });
-  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
-  const data = await res.json();
-  const text = (data.candidates?.[0]?.content?.parts?.[0]?.text ?? "").trim();
-  if (!text) throw new Error("Gemini returned empty response");
-  return text;
+  throw new Error(`All providers failed: ${errors.join(" | ") || "none configured"}`);
 }

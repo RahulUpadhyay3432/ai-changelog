@@ -4798,6 +4798,105 @@ limit 8;`,
       },
     ],
   },
+  {
+    slug: "ai-tooling-october-2026",
+    title: "AI tooling in October 2026: cheap models got good, and agents outgrew Git",
+    deck: "Claude Haiku 5.5 at ten cents per million tokens, Gemini 4 Argon at a price with an expiry date, two open-weight models near a trillion parameters, and Anthropic replacing Git because its agents broke it.",
+    date: "2026-10-16",
+    readingMin: 8,
+    tag: "Roundup",
+    hero: {
+      src: U("1504384308090-c894fdcc538d"),
+      alt: "A wall calendar and notes on a desk",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "September was about two new frontier models. The first half of October was about everything around them: cheaper small models, a new Google flagship priced to win switchers, open weights at a scale that needs a server room, and a clear sign that agents now generate more code than the tools built for humans can carry. This covers 28 September to 16 October.",
+      },
+      { type: "heading", level: 2, text: "The cheap tier is where the action was" },
+      {
+        type: "paragraph",
+        text: "Anthropic shipped **Claude Sonnet 5.5** on 28 September and **Claude Haiku 5.5** on 7 October. Haiku 5.5 is priced at **$0.10 per million input tokens and $0.50 per million output** for prompts up to 100,000 tokens, and five times that above it, according to [Simon Willison's write-up](https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/). Haiku 4.5 cost $1 and $5. That puts it level with OpenAI's GPT-6 Luna on price for anything under 100,000 tokens.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Count tokens, not price per token",
+        text: "Haiku 5.5 uses a new tokenizer. In Willison's test the same long prompt came out at about 1.25 times as many tokens as on Haiku 4.5, so part of the cut is taken back. Reasoning also cannot be switched off, only turned down. Re-run your own prompts through the token counter before you re-do the cost maths.",
+      },
+      {
+        type: "paragraph",
+        text: "OpenAI's answer came earlier: at DevDay on 29 September it introduced **GPT-6.1 Sol**, pitched as close to Astra-level intelligence at a fraction of the price. The pattern across all three labs is the same. The model you would have called mid-tier in spring is now the cheap default, and for most summarising, classifying and routing work it is enough.",
+      },
+      { type: "heading", level: 2, text: "Gemini 4 Argon: a frontier price with an expiry date" },
+      {
+        type: "paragraph",
+        text: "Google released **Gemini 4 Argon** on 13 October. It is [available globally through the Gemini API](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/) in AI Studio, in the Gemini app and AI Mode for Google AI Pro and Ultra subscribers, and in Google Antigravity for Ultra subscribers. It has a 1 million token input-output limit in the API.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Introductory price:** $2 per million input tokens and $10 per million output, with cached input 95% off.",
+          "**From 1 December:** the introductory period ends on 30 November, and the price doubles to $4 and $20.",
+          "**Prompt injection:** Google reports that Argon cut attack success on the Gray Swan indirect prompt injection benchmark to 0.7% across 15 adaptive attempts. That number matters more than most benchmarks if your agent reads web pages or email.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "If you are evaluating Argon, do it before December, but budget on the post-introductory price. A model chosen at $2 that becomes $4 halfway through a quarter is a planning problem, not a pricing one.",
+      },
+      { type: "heading", level: 2, text: "Open weights went to the trillion-parameter range" },
+      {
+        type: "list",
+        items: [
+          "**Mistral Large 4** (6 October): a [1 trillion parameter multimodal mixture-of-experts model with 52 billion active](https://mistral.ai/news/mistral-large-4/), in public preview on Mistral Studio at $1.36 per million input tokens and $4.18 per million output. Mistral says the weights will be released by the end of the month. No license is named yet.",
+          "**Muse Spark Open** from Meta (15 October): about [816 billion total parameters and 42 billion active](https://huggingface.co/blog/meta-muse-spark-open), taking text, images, audio and video in and producing text, with up to 1 million tokens of context. The full-precision weights are about 1.5 TB. An NVFP4 build runs on a single B200 node, and a 2-bit quant runs on a 512 GB Mac Studio at about 18 tokens per second. The announcement does not name a license.",
+          "**EmbeddingGemma 2** from Google (6 October): a small open multimodal embedding model, the kind of release that quietly changes the cost of running your own search.",
+          "**Indian languages:** NVIDIA and AI4Bharat described a 2.8 trillion token pretraining corpus across all 22 scheduled languages. We covered it [in detail](/blog/nemotron-indic-pretraining-2-8-trillion-tokens).",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Open no longer means small. It means you can run it if you have the hardware, and you can read the license before you depend on it. Two of this month's largest releases have not published one yet. Wait for it.",
+      },
+      { type: "heading", level: 2, text: "Agents outgrew Git" },
+      {
+        type: "paragraph",
+        text: "The most interesting engineering post of the month was not about a model. Anthropic described [replacing Git internally](https://simonwillison.net/2026/Oct/13/redesigning-source-control-at-anthropic/) with a system called **Scion**. Code changes merged per day went from about 2,500 in May to over 30,000 by September. CI performs around 25 million checkouts a day, and Anthropic says fetched naively that would be over 600 PB of Git traffic daily. Claude is Scion's heaviest user. A team of seven built it, and the migration took five months.",
+      },
+      {
+        type: "paragraph",
+        text: "GitHub published its own version of the same story the week before, on [rebuilding its Git infrastructure for agent-scale development](https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development/). You do not have Anthropic's problem. But if you run coding agents in parallel, the bottleneck has already moved from writing code to checking it out, reviewing it and testing it.",
+      },
+      { type: "heading", level: 2, text: "Also worth noticing" },
+      {
+        type: "list",
+        items: [
+          "**Claude Frontier Academy** (2 October): [Anthropic committed $100 million](https://anthropic.com/news/claude-frontier-academy) to train 10,000 engineers to deploy Claude inside businesses by the end of 2027. Agent deployment is now treated as a job title, with a vendor certificate.",
+          "**On-device agents:** Liquid AI's LFM2.5-24B-A2B was published on 13 October as a model for running fast, private agents locally.",
+          "**ReviewBench** (5 October): GitHub released an open benchmark for AI code review built on real pull requests.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What to do about it" },
+      {
+        type: "list",
+        items: [
+          "If you pay for a mid-tier model for routine work, test Haiku 5.5, GPT-6 Luna and Gemini's cheaper tiers on your real prompts, counting tokens on each.",
+          "If you are trialling Gemini 4 Argon, write down the 1 December price next to the current one.",
+          "Before building on Mistral Large 4 or Muse Spark Open, wait for the license.",
+          "If your team runs several coding agents, look at review and CI capacity before buying more agent seats.",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Previous months: [September 2026](/blog/ai-tooling-september-2026) and [August 2026](/blog/ai-tooling-august-2026). Kapyn covers every story that matters in 30 seconds: [open the feed](/).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
   // HERMES weekly blog — see src/lib/blog-generated.ts

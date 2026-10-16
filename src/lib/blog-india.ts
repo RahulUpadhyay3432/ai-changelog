@@ -443,4 +443,92 @@ export const INDIA_POSTS: BlogPost[] = [
       { type: "paragraph", text: "Job-share figures from CBRE and Naukri analysis, 2026. National picture in [India's AI startup ecosystem](/blog/india-ai-startup-ecosystem-2026)." },
     ],
   },
+  {
+    slug: "nemotron-indic-pretraining-2-8-trillion-tokens",
+    title: "2.8 trillion tokens in 22 Indian languages: what NVIDIA and AI4Bharat are releasing",
+    deck: "A translated pretraining corpus covering every scheduled Indian language, an open pipeline to generate more, and a first model trained on it. What is in it, and what translation cannot fix.",
+    date: "2026-10-16",
+    readingMin: 6,
+    tag: "India",
+    hero: { src: "https://live.staticflickr.com/7330/27929852485_9e415035af_b.jpg", alt: "Neural Network", credit: "Kevin Rheese / flickr (CC BY)" },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "On 16 October, NVIDIA and AI4Bharat at IIT Madras published details of **Nemotron-pretraining-Indic-v1**: about 2.8 trillion tokens of pretraining data across all 22 scheduled Indian languages. The dataset itself is listed as coming soon. The pipeline used to build it is already open.",
+      },
+      { type: "heading", level: 2, text: "What is being released" },
+      {
+        type: "list",
+        items: [
+          "**The corpus.** About 2.8 trillion tokens, counted with the Gemma-4 tokenizer: 2,601 billion in native scripts and 224.6 billion in romanized form. It spans 34 language-script configurations, such as `hi-Deva-IN` (Hindi in Devanagari) and `hi-Latn-IN` (romanized Hindi).",
+          "**The pipeline.** A [Nemotron Bharat translation plugin](https://github.com/NVIDIA-NeMo/DataDesignerPlugins/tree/main/plugins/data-designer-nemotron-bharat-translation) for NVIDIA's NeMo Data Designer, so other teams can generate similar data.",
+          "**A report and an eval suite.** A companion report on Hugging Face ([nvidia/nemotron-indic-pretraining-report](https://huggingface.co/datasets/nvidia/nemotron-indic-pretraining-report)), and Indic-LLM-Eval-Suite, a benchmark collection AI4Bharat is still building with NVIDIA's support.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        text: "The announcement does not name a license. The authors advise reading the dataset card and license before training on it.",
+      },
+      { type: "heading", level: 2, text: "How it was made" },
+      {
+        type: "paragraph",
+        text: "This is translated data, not text originally written in Indian languages. The source is English documents from 15 subsets of NVIDIA's Nemotron-CC-v2 corpus, covering web text, Q&A, maths, code and specialised content. Every output keeps its source ID, so each translated document can be traced back to the original.",
+      },
+      { type: "paragraph", text: "There are two workflows:" },
+      {
+        type: "list",
+        items: [
+          "**Twelve languages** (Bengali, Gujarati, Hindi, Kannada, Malayalam, Marathi, Nepali, Odia, Punjabi, Tamil, Telugu, Urdu). Gemma-4-31B-it translates whole documents, then scores each output against the English source on an MQM-style rubric. Anything below 75 out of 100 is repaired using that feedback and scored again. Repair recovered 438.4 billion tokens, which are included in the total. These twelve also get romanized versions, made by converting accepted native-script translations.",
+          "**Ten languages** (Assamese, Bodo, Dogri, Kashmiri, Konkani, Maithili, Manipuri, Sanskrit, Santali, Sindhi). Bodhan AI's 8B Indic Translate model translates, and Gemma-4-31B-it scores against the same 75-point bar. These are native script only. Santali was translated in overlapping windows, and Manipuri was translated into Bengali script and then converted to Meitei Mayek.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Does it help?" },
+      {
+        type: "paragraph",
+        text: "NVIDIA's first test is Nemotron 3.5 Super VL, which saw 10 billion Indic tokens during continued pretraining, drawn from the twelve-language subset plus natural Indic text. The configured budget was 100 billion tokens, so this is a small first dose.",
+      },
+      {
+        type: "paragraph",
+        text: "That stage lifted Indic benchmarks by 4.98 to 9.82 percentage points across MILU, Indic MMLU-Pro, Indic ARC-Challenge, Indic ARC-Easy and Indic GSM8K. Against Nemotron 3 Super, the new model scored higher on five of six task benchmarks. The exception was IFEval 1.5, an instruction-following test, which dropped by 2.04 points.",
+      },
+      { type: "heading", level: 2, text: "What translation cannot do" },
+      { type: "paragraph", text: "The authors are direct about the limits:" },
+      {
+        type: "list",
+        items: [
+          "Translation does not replace text originally written in Indian languages, and does not guarantee coverage of local knowledge and culture.",
+          "Quality checks are mostly automated, with sampled human review whose coverage varies by language.",
+          "In the twelve-language workflow, the same model translates and judges its own output.",
+          "The ten lower-resource languages need broader validation by native speakers.",
+          "Deduplication is by source ID, not by meaning.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "One more, which is our reading rather than theirs: the romanized data is converted from native-script translations, so it is transliteration. It is not the code-mixed Hinglish people actually type, and models that need to handle that will still need natural text.",
+      },
+      { type: "heading", level: 2, text: "Why it matters here" },
+      {
+        type: "paragraph",
+        text: "Most scheduled languages beyond Hindi and the large Dravidian languages have very little web text, which makes training data one of the hardest constraints on Indian-language models. A large, traceable, openly generated corpus lowers that floor for every team building Indic models, from startups to the foundation-model work funded under the [IndiaAI Mission](/blog/indiaai-mission-explained-2026).",
+      },
+      {
+        type: "paragraph",
+        text: "The open pipeline may matter more than the corpus. A team can run the same translate, score and repair loop over its own domain text, such as legal, agricultural or health documents, and keep the source trail.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "What to watch",
+        text: "The actual dataset release and its license, the Indic-LLM-Eval-Suite, and whether models trained on natural Indian-language text keep an edge over translated corpora.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Source: [Hugging Face blog, 16 October 2026](https://huggingface.co/blog/nvidia/scaling-indic-pretraining). The wider picture: [India's AI startup ecosystem in 2026](/blog/india-ai-startup-ecosystem-2026).",
+      },
+    ],
+  },
 ];

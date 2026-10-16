@@ -4685,6 +4685,119 @@ limit 8;`,
       },
     ],
   },
+  {
+    slug: "llm-pipeline-re-summarising-deleted-articles",
+    title: "Our news pipeline was paying an LLM to re-summarise articles it had already deleted",
+    deck: "79 of the 86 stories one run inserted were months old. They were summarised, stored, deleted two hours later, and summarised again. The bug, why our health check called it healthy, and the fix.",
+    date: "2026-10-16",
+    readingMin: 6,
+    tag: "Architecture",
+    hero: {
+      src: U("1451187580459-43490279c0fa"),
+      alt: "Server racks in a data center with blue lighting",
+      credit: "Unsplash",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Kapyn turns AI news into 30-second cards. Every couple of hours a job pulls RSS feeds from labs, newsrooms and newsletters, asks an LLM to classify and summarise anything new, and stores the result. On 16 October we found that most of that LLM work was going into articles we had already thrown away.",
+      },
+      { type: "heading", level: 2, text: "What we saw" },
+      {
+        type: "paragraph",
+        text: "We were not looking for it. We were checking a traffic spike, which turned out to be a scraper, and while reading the ingestion logs one number looked wrong in the other direction: run after run reported 60 to 100 new stories. AI news is busy, but not that busy.",
+      },
+      {
+        type: "paragraph",
+        text: "So we looked at what a single run had actually inserted. The 08:38 UTC run reported 86 new stories. **79 of them were published before our seven-day feed window.** The oldest were from April 2025.",
+      },
+      { type: "heading", level: 2, text: "The loop" },
+      { type: "paragraph", text: "Three pieces of reasonable code combined into a loop:" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Feeds keep their archive.** Many RSS feeds, newsletters especially (Import AI, Interconnects and Transformer among them), publish months of back issues, not just the latest few posts.",
+          "**Dedup checks the live table.** Before summarising an item, the job asks whether its URL is already in the feed. If it is, the item is skipped.",
+          "**Cleanup deletes old rows.** Kapyn only shows the last seven days, so each run deletes anything published before that.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Put together: cleanup deletes a three-month-old article, the next run finds it in the RSS feed again, the dedup check finds no matching row, and the article goes back through the LLM as if it were new. It is inserted, the following cleanup deletes it, and the cycle repeats every run.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        text: "The dedup was checking the set of things we **keep**, not the set of things we have **seen**. Those stop being the same set the moment anything is deleted.",
+      },
+      { type: "heading", level: 2, text: "What it cost" },
+      {
+        type: "paragraph",
+        text: "Readers never saw these stories. The feed query filters by publish date, so expired articles were inserted and then hidden. The cost landed elsewhere:",
+      },
+      {
+        type: "list",
+        items: [
+          "**Most of the summarising work.** In the run above, 79 of 86 summaries were for articles that would be deleted at the next cleanup. Our provider chain degraded step by step as the waste used up quota: two providers started returning payment errors and two more hit their rate limits, leaving the feed running on its last fallbacks.",
+          "**Polluted signals.** Each re-inserted article re-linked the companies and models it mentions to our entity tables, which feed the Trending ranking. Old stories were quietly voting in this week's chart.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Why the health check said everything was fine" },
+      {
+        type: "paragraph",
+        text: "Two weeks earlier, after a different outage, we had added a health verdict to every run. It marks a run down when nothing is inserted, and degraded when too many LLM calls fail. By both measures every run looked healthy.",
+      },
+      {
+        type: "paragraph",
+        text: "The churn made the main metric look better. A run that re-summarised 80 old articles reported 80 insertions. The number we watched was inflated by the bug, so it could never have caught the bug.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        text: "If a pipeline's success metric is a count of work done, check that the work was needed. Insert counts, tokens processed and jobs completed all rise when a system is busily redoing the same thing.",
+      },
+      { type: "heading", level: 2, text: "The fix" },
+      { type: "paragraph", text: "Two small changes." },
+      {
+        type: "list",
+        items: [
+          "**Drop expired items first.** An item published before the feed window would be deleted at the next cleanup anyway, so the job now skips it before the dedup check and before any LLM call. Skipped items are counted in a new `stale` field on every run, so the volume stays visible instead of vanishing.",
+          "**Redefine down.** Without the churn, a quiet run can genuinely insert nothing, for example when its only new items are off-topic and the quality filter rejects them. That is the filter working. A run is now only marked down when LLM calls failed and nothing was inserted.",
+        ],
+      },
+      {
+        type: "code",
+        lang: "ts",
+        code: "const cutoffMs = Date.parse(feedCutoffISO());\nconst fresh = items.filter((i) => !(Date.parse(i.publishedAt) < cutoffMs));\nresults.stale += items.length - fresh.length;",
+      },
+      {
+        type: "paragraph",
+        text: "An unparseable date compares as false and is kept, so a feed with broken dates falls back to the old behaviour rather than losing stories.",
+      },
+      { type: "heading", level: 2, text: "What we would check in any ingestion pipeline" },
+      {
+        type: "list",
+        items: [
+          "Compare what you dedup against with what you delete. If you ever delete rows your dedup relies on, this bug is waiting for you.",
+          "Look at the age of what you insert, not just the count. A histogram of publish dates per run would have shown this on day one.",
+          "Track cost per useful item, not cost per run. Here, useful items per run were in single digits.",
+          "Be suspicious of any health metric the failure itself can inflate.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What is next" },
+      {
+        type: "paragraph",
+        text: "The fix shipped on 16 October. Each run should now report around 80 stale items skipped and far fewer insertions, with the same number of stories in the feed. One smaller leak remains: items the quality filter rejects as off-topic are not recorded anywhere, so they are re-judged every run. We will measure it before deciding whether it is worth fixing.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn is a calm AI news feed: every story that matters, in 30 seconds. [Open the feed](/).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
   // HERMES weekly blog — see src/lib/blog-generated.ts

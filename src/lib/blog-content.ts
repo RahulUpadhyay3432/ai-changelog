@@ -5131,6 +5131,106 @@ limit 8;`,
       },
     ],
   },
+  {
+    slug: "top-ai-agents-october-2026",
+    title: "The top 10 AI agents in October 2026: seven that write code, three that run errands",
+    deck: "Agents stopped being demos this autumn. The ten worth using now, what each shipped in the last two months, and the catch with each one.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/top-ai-agents-october-2026.webp",
+      alt: "Ten carved wooden chess knights standing in a row on a dark board",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "An agent is software that takes a goal, makes its own plan and uses tools until the job is done, instead of answering one prompt at a time. In October 2026 the useful ones fall into two groups: coding agents, which are now mature enough to run unattended, and general agents, which do research and errands and are still earlier than their marketing suggests. These are the ten we would use, with what changed recently.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How we checked",
+        text: "Every dated change below comes from the company's own changelog or announcement, or a named publication where noted. Claims we could not confirm were left out, including several that appeared in other roundups this month.",
+      },
+      { type: "heading", level: 2, text: "Coding agents" },
+      { type: "heading", level: 3, text: "1. Claude Code" },
+      {
+        type: "paragraph",
+        text: "Anthropic's agent reads a codebase, edits files, runs commands and opens pull requests from the terminal, the IDE or the desktop app. It now runs on Claude Opus 5.5 and the new Claude Sonnet 5.5 (28 September). **Best for:** large refactors and long, multi-step changes in an existing codebase. **The catch:** subscription plans have rolling usage limits, so heavy days can hit a wall. [More on Claude Code](/tools/claude-code).",
+      },
+      { type: "heading", level: 3, text: "2. GitHub Copilot coding agent" },
+      {
+        type: "paragraph",
+        text: "GitHub's [September VS Code releases](https://github.blog/changelog/2026-10-01-github-copilot-in-vs-code-september-2026-releases/) (1 October) added **agent merge** in preview, where the agent handles review feedback, failed checks and merge conflicts on its own pull request, and **automations** that run agent tasks hourly, daily or weekly. Gemini 4 Argon became available in Copilot on 13 October. **Best for:** teams already on GitHub who want agents inside the pull request flow. **The catch:** the most interesting pieces are still in preview. [More on GitHub Copilot](/tools/github-copilot).",
+      },
+      { type: "heading", level: 3, text: "3. Cursor" },
+      {
+        type: "paragraph",
+        text: "Cursor added **Projects** in beta on 10 September, where a coordinator agent plans long-running work and delegates it to other agents, then bots for deploy monitoring and security review on pull requests (23 September), and remote control of agents running on your computer from its iOS app (6 October). **Best for:** developers who want an editor designed around agents rather than an assistant bolted on. **The catch:** remote control needs your computer awake and online. [More on Cursor](/tools/cursor).",
+      },
+      { type: "heading", level: 3, text: "4. OpenAI Codex" },
+      {
+        type: "paragraph",
+        text: "OpenAI's coding agent runs in the cloud, in a CLI and in the IDE, and is included with ChatGPT's paid plans. It is the most natural choice if you want to hand off well-defined tasks and review the result as a pull request rather than pair with an agent live. **The catch:** it shines on delegated, self-contained tasks more than on exploratory work. [More on Codex](/tools/codex).",
+      },
+      { type: "heading", level: 3, text: "5. Devin" },
+      {
+        type: "paragraph",
+        text: "Cognition's agent now ships alongside Devin Desktop, the editor formerly known as Windsurf. On 10 September Cognition released **SWE-2**, a cheaper coding model used inside Devin Fusion, where a strong planner model leads a session and SWE-2 does the lower-priority work. [DeepLearning.AI's The Batch](https://www.deeplearning.ai/the-batch/one-agent-works-another-directs) reported independent results putting Fusion close to Claude Code on a coding agent index at a lower cost per task. **Best for:** teams that want to assign tickets to an agent like a colleague. **The catch:** cost is consumption-based, so watch usage on large tasks. [More on Devin](/tools/devin).",
+      },
+      { type: "heading", level: 3, text: "6. Google Antigravity" },
+      {
+        type: "paragraph",
+        text: "Google's agent-first development environment, where agents plan, code and verify work across the editor, terminal and browser. Since 13 October, Google AI Ultra subscribers can use Gemini 4 Argon in it, and Google reports internal teams using Argon in Antigravity submitted over 35% more agent-written code. **Best for:** trying Google's newest model in a full agent workflow. **The catch:** Argon access there needs the top Ultra plan.",
+      },
+      { type: "heading", level: 3, text: "7. Cline" },
+      {
+        type: "paragraph",
+        text: "An open-source coding agent for VS Code that works with your own API keys and almost any model provider, and asks for approval before it edits files or runs commands. **Best for:** developers who want full control over which model runs and what it costs. **The catch:** you manage the keys and the bill. [More on Cline](/tools/cline).",
+      },
+      { type: "heading", level: 2, text: "General-purpose agents" },
+      { type: "heading", level: 3, text: "8. Manus" },
+      {
+        type: "paragraph",
+        text: "[Manus 2.0](https://manus.im/blog/introducing-manus-2-0) arrived on 28 September with a new agent harness, Cascade, which in one tested configuration used 23.2% fewer tokens, finished 28.2% faster and cost 32% less to run. It also added a persistent **Cloud Computer**, **Automations** triggered by events such as a new email or Slack message, and a desktop workspace, Manus Studio. **Best for:** multi-step research and document work that runs while you do something else. **The catch:** event-driven automations need careful permission scoping before you connect them to email.",
+      },
+      { type: "heading", level: 3, text: "9. Perplexity Computer" },
+      {
+        type: "paragraph",
+        text: "Perplexity's agent added an effort setting and a skills marketplace on 21 September, then **Automations** for ongoing tasks on 5 October. **Best for:** research that has to be sourced and re-run on a schedule. **The catch:** agent runs consume credits quickly on the lower plans. [More on Perplexity](/tools/perplexity).",
+      },
+      { type: "heading", level: 3, text: "10. ChatGPT agent" },
+      {
+        type: "paragraph",
+        text: "ChatGPT's agent mode works on a virtual computer to browse, fill in forms and assemble documents, and since 7 October it runs on GPT-6 for paid plans. **Best for:** people who already pay for ChatGPT and want one-off tasks done end to end. **The catch:** it pauses for confirmation before important actions, which is right, but it means it is not truly hands-off. [More on ChatGPT](/tools/chatgpt).",
+      },
+      { type: "heading", level: 2, text: "Also worth watching" },
+      {
+        type: "list",
+        items: [
+          "**Muse** from Meta, a free personal agent launched on 8 September, US only so far. Covered in our [best AI apps of October](/blog/best-ai-apps-october-2026).",
+          "**Microsoft Copilot Autopilot**, a cloud agent that keeps working on recurring tasks, in private preview.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Which one to start with" },
+      {
+        type: "list",
+        items: [
+          "**You write code daily:** Claude Code or Cursor for hands-on work, the Copilot coding agent or Codex for delegating tickets.",
+          "**You care about cost:** Cline with your own keys, or Devin Fusion.",
+          "**You do research:** Perplexity Computer, or Manus for longer jobs.",
+          "**You want to build your own:** see our map of [the agentic AI infrastructure stack](/blog/agentic-ai-infrastructure-stack-2026).",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "For the evergreen version of this list, see [best AI agents in 2026](/blog/best-ai-agents-2026) and [best AI coding assistants](/blog/best-ai-coding-assistants-2026). Kapyn covers every agent release as it ships: [open the feed](/).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
   // HERMES weekly blog — see src/lib/blog-generated.ts

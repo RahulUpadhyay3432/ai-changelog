@@ -5231,6 +5231,88 @@ limit 8;`,
       },
     ],
   },
+  {
+    slug: "best-open-source-ai-models-october-2026",
+    title: "The best open-weight AI models of October 2026, and which licenses actually let you use them",
+    deck: "Open weights now run from a 209M forecasting model to 2.8 trillion parameters. The ones worth knowing, what hardware they need, and the license line that decides whether you can ship them.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/best-open-source-ai-models-october-2026.webp",
+      alt: "An old oak library card catalogue with several drawers pulled open",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Two things changed about open models this autumn. The biggest ones got genuinely big, so open no longer means you can run it on a laptop. And licenses split into two camps: standard permissive licenses you can ship without a lawyer, and custom licenses you have to read. This list covers models released or updated between August and mid-October 2026, with the license checked on each model's Hugging Face page.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Read this first: the license split",
+        text: "**Permissive (Apache 2.0 or MIT):** Qwen3.8-27B, DeepSeek-V4.1-Flash, GLM-5.3-Flash, EmbeddingGemma 2, Apertus 1.5. **Custom license, read before shipping:** Muse Spark Open, Kimi K3, Nemotron 3.5 Lightning, LFM2.5-24B-A2B, FLUX.3 Image Klein, Timestral. Mistral Large 4's weights and license are not out yet.",
+      },
+      { type: "heading", level: 2, text: "Runs on one GPU or a good laptop" },
+      {
+        type: "list",
+        items: [
+          "**[Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B)** (Alibaba, August). About 28 billion parameters under Apache 2.0. A strong general model that fits a single large GPU at full precision and consumer GPUs or a Mac when quantized. The safest default if you want one capable open model with no licensing questions. [More on Qwen](/tools/qwen).",
+          "**[LFM2.5-24B-A2B](https://huggingface.co/LiquidAI/LFM2.5-24B-A2B)** (Liquid AI, 13 October). 24 billion parameters with about 2 billion active per token, built for fast, private agents running on-device. Custom LFM license.",
+          "**[Nemotron 3.5 Lightning 30B-A3B](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16)** (NVIDIA, August). About 30 billion parameters, roughly 3 billion active, tuned for low-latency tool calling. NVIDIA's own license.",
+          "**[Apertus 1.5](https://huggingface.co/swiss-ai/Apertus-v1.5-70B)** (Swiss AI). 8B and 70B models under Apache 2.0, notable for publishing its training data as well as its weights. Weights landed in July; release notes followed on 15 October.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Needs a server, and earns it" },
+      {
+        type: "list",
+        items: [
+          "**[DeepSeek-V4.1-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash)** (DeepSeek, 10 September). About 763 billion parameters in its published weights, under the MIT license, which makes it the largest model here you can deploy commercially with almost no conditions. A multi-node GPU job to self-host; most people will use it through a provider. [More on DeepSeek](/tools/deepseek).",
+          "**[GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash)** (Z.ai, August). About 321 billion parameters under MIT. A permissive alternative at roughly half DeepSeek's size.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Frontier-scale open weights" },
+      {
+        type: "list",
+        items: [
+          "**[Muse Spark Open](https://huggingface.co/blog/meta-muse-spark-open)** (Meta, 15 October). About 816 billion total parameters and 42 billion active, taking text, images, audio and video in and producing text, with up to 1 million tokens of context. The NVFP4 build runs on a single B200 node, and a 2-bit quant runs on a 512 GB Mac Studio at about 18 tokens per second. Custom license, and access to the weights is gated behind manual approval. [More on Llama and Meta models](/tools/llama).",
+          "**[Kimi K3](https://huggingface.co/moonshotai/Kimi-K3)** (Moonshot AI, July). About 2.8 trillion parameters in its published weights, the largest open model available. Realistically an API model for nearly everyone. Custom license. [More on Kimi](/tools/kimi).",
+          "**Mistral Large 4** (Mistral, 6 October). A 1 trillion parameter model with 52 billion active, in preview through Mistral's API. Mistral says the weights will be released by the end of October; no license is named yet. [More on Mistral](/tools/mistral).",
+        ],
+      },
+      { type: "heading", level: 2, text: "Specialists worth knowing" },
+      {
+        type: "list",
+        items: [
+          "**[EmbeddingGemma 2](https://huggingface.co/google/embeddinggemma-2)** (Google, October). A 0.7 billion parameter multimodal embedding model under Apache 2.0, small enough for laptops and phones. The cheapest way to run your own semantic search.",
+          "**[FLUX.3 Image Klein](https://huggingface.co/black-forest-labs/flux-3-image-klein)** (Black Forest Labs, October). A 5.5 billion parameter image generation model that runs on consumer GPUs. Custom license; you accept its terms on Hugging Face before downloading.",
+          "**[Timestral](https://huggingface.co/mistralai/Timestral-209M)** (Mistral, 15 October). Time-series forecasting models from 5M to 209M parameters, small enough to run on a CPU. Custom license.",
+        ],
+      },
+      { type: "heading", level: 2, text: "How to choose" },
+      {
+        type: "list",
+        items: [
+          "**One model, no legal review:** Qwen3.8-27B.",
+          "**Largest model you can ship with almost no conditions:** DeepSeek-V4.1-Flash, through a provider unless you run a GPU cluster.",
+          "**On-device or edge:** LFM2.5-24B-A2B for agents, EmbeddingGemma 2 for search.",
+          "**Frontier quality with open weights:** Muse Spark Open, if your use fits its license and you can get access approved.",
+          "**Full transparency, including training data:** Apertus 1.5.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        text: "Parameter counts here are from each model's published weights on Hugging Face, which can differ slightly from the headline number in an announcement. Always read the license file in the repository itself; summaries, including ours, are not legal advice.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Running models yourself? Our [guide to running LLMs locally](/blog/run-llms-locally-2026) covers the hardware side. For the month's closed-model releases, see [AI tooling in October 2026](/blog/ai-tooling-october-2026). Kapyn tracks every release: [open the feed](/).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
   // HERMES weekly blog — see src/lib/blog-generated.ts

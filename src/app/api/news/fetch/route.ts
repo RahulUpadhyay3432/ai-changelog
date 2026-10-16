@@ -368,6 +368,8 @@ const RUN_DEADLINE_MS = 600_000; // leave ~200s of the 800s ceiling for RSS/PH/G
 type IngestResults = {
   inserted: number;
   skipped: number;
+  /** Items published before the feed window, dropped before the summariser. */
+  stale: number;
   lowSignal: number;
   /** How many stories the quality gate rejected, broken down by why. A run that
    *  drops a lot of "off-topic" is either doing its job or the gate is eating
@@ -452,7 +454,18 @@ async function insertItems(
   runStart: number,
   health: ProviderHealth
 ) {
-  const validItems = items.filter(i => i.title && i.sourceUrl);
+  const withUrl = items.filter(i => i.title && i.sourceUrl);
+
+  // Anything published before the feed window is deleted at the start of the next
+  // run, so summarising it is wasted. RSS feeds carry months of archive (Import AI,
+  // Interconnects, Transformer), and the URL dedup below only sees news_items, which
+  // no longer holds them. So every run re-summarised the same expired articles,
+  // inserted them, and the next run deleted them again: 79 of one run's 86 inserts
+  // on 2026-10-16, some from April 2025, and most of the provider spend.
+  // An unparseable date compares false and is kept.
+  const cutoffMs = Date.parse(feedCutoffISO());
+  const validItems = withUrl.filter(i => !(Date.parse(i.publishedAt) < cutoffMs));
+  results.stale += withUrl.length - validItems.length;
   if (validItems.length === 0) return;
 
   // ── Batch dedup: one query instead of N sequential maybeSingle calls ─────
@@ -696,7 +709,7 @@ export async function GET(request: NextRequest) {
   await supabase.from("news_items").update({ category_slug: "startups"   }).eq("category_slug", "producthunt");
 
   const results: IngestResults = {
-    inserted: 0, skipped: 0, lowSignal: 0,
+    inserted: 0, skipped: 0, stale: 0, lowSignal: 0,
     rejectedByReason: {}, rejected: [],
     llmFailed: 0, llmError: null, llmProviders: {},
     entitiesUpserted: 0, mentionsLinked: 0, feedItems: {}, backlogged: 0,
@@ -763,8 +776,11 @@ export async function GET(request: NextRequest) {
   const dropRate = attempted > 0 ? results.llmFailed / attempted : 0;
   const DEGRADED_AT = Number(process.env.INGEST_DROP_ALERT_RATE ?? 0.15);
 
+  // "down" needs a failure, not just an empty run. The expired-article churn used to
+  // guarantee inserts every run; without it, a quiet run whose few new items are all
+  // off-topic inserts nothing, and that is the filter working, not an outage.
   const status: "ok" | "degraded" | "down" =
-    attempted > 0 && results.inserted === 0 ? "down" : dropRate > DEGRADED_AT ? "degraded" : "ok";
+    results.llmFailed > 0 && results.inserted === 0 ? "down" : dropRate > DEGRADED_AT ? "degraded" : "ok";
 
   const health_report = {
     status,
@@ -797,6 +813,7 @@ export async function GET(request: NextRequest) {
     properties: {
       inserted: results.inserted,
       skipped: results.skipped,
+      stale: results.stale,
       low_signal: results.lowSignal,
       rejected_by_reason: JSON.stringify(results.rejectedByReason),
       llm_failed: results.llmFailed,

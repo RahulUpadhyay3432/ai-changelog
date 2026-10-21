@@ -4961,6 +4961,634 @@ limit 8;`,
       },
     ],
   },
+  {
+    slug: "llm-pipeline-re-summarising-deleted-articles",
+    title: "Our news pipeline was paying an LLM to re-summarise articles it had already deleted",
+    deck: "79 of the 86 stories one run inserted were months old. They were summarised, stored, deleted two hours later, and summarised again. The bug, why our health check called it healthy, and the fix.",
+    date: "2026-10-16",
+    readingMin: 6,
+    tag: "Architecture",
+    hero: {
+      src: "/blog/llm-pipeline-re-summarising-deleted-articles.webp",
+      alt: "A steel paper shredder with a ribbon of paper looping out of it and back into its own slot",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Kapyn turns AI news into 30-second cards. Every couple of hours a job pulls RSS feeds from labs, newsrooms and newsletters, asks an LLM to classify and summarise anything new, and stores the result. On 16 October we found that most of that LLM work was going into articles we had already thrown away.",
+      },
+      { type: "heading", level: 2, text: "What we saw" },
+      {
+        type: "paragraph",
+        text: "We were not looking for it. We were checking a traffic spike, which turned out to be a scraper, and while reading the ingestion logs one number looked wrong in the other direction: run after run reported 60 to 100 new stories. AI news is busy, but not that busy.",
+      },
+      {
+        type: "paragraph",
+        text: "So we looked at what a single run had actually inserted. The 08:38 UTC run reported 86 new stories. **79 of them were published before our seven-day feed window.** The oldest were from April 2025.",
+      },
+      { type: "heading", level: 2, text: "The loop" },
+      { type: "paragraph", text: "Three pieces of reasonable code combined into a loop:" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**Feeds keep their archive.** Many RSS feeds, newsletters especially (Import AI, Interconnects and Transformer among them), publish months of back issues, not just the latest few posts.",
+          "**Dedup checks the live table.** Before summarising an item, the job asks whether its URL is already in the feed. If it is, the item is skipped.",
+          "**Cleanup deletes old rows.** Kapyn only shows the last seven days, so each run deletes anything published before that.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Put together: cleanup deletes a three-month-old article, the next run finds it in the RSS feed again, the dedup check finds no matching row, and the article goes back through the LLM as if it were new. It is inserted, the following cleanup deletes it, and the cycle repeats every run.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        text: "The dedup was checking the set of things we **keep**, not the set of things we have **seen**. Those stop being the same set the moment anything is deleted.",
+      },
+      { type: "heading", level: 2, text: "What it cost" },
+      {
+        type: "paragraph",
+        text: "Readers never saw these stories. The feed query filters by publish date, so expired articles were inserted and then hidden. The cost landed elsewhere:",
+      },
+      {
+        type: "list",
+        items: [
+          "**Most of the summarising work.** In the run above, 79 of 86 summaries were for articles that would be deleted at the next cleanup. Our provider chain degraded step by step as the waste used up quota: two providers started returning payment errors and two more hit their rate limits, leaving the feed running on its last fallbacks.",
+          "**Polluted signals.** Each re-inserted article re-linked the companies and models it mentions to our entity tables, which feed the Trending ranking. Old stories were quietly voting in this week's chart.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Why the health check said everything was fine" },
+      {
+        type: "paragraph",
+        text: "Two weeks earlier, after a different outage, we had added a health verdict to every run. It marks a run down when nothing is inserted, and degraded when too many LLM calls fail. By both measures every run looked healthy.",
+      },
+      {
+        type: "paragraph",
+        text: "The churn made the main metric look better. A run that re-summarised 80 old articles reported 80 insertions. The number we watched was inflated by the bug, so it could never have caught the bug.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        text: "If a pipeline's success metric is a count of work done, check that the work was needed. Insert counts, tokens processed and jobs completed all rise when a system is busily redoing the same thing.",
+      },
+      { type: "heading", level: 2, text: "The fix" },
+      { type: "paragraph", text: "Two small changes." },
+      {
+        type: "list",
+        items: [
+          "**Drop expired items first.** An item published before the feed window would be deleted at the next cleanup anyway, so the job now skips it before the dedup check and before any LLM call. Skipped items are counted in a new `stale` field on every run, so the volume stays visible instead of vanishing.",
+          "**Redefine down.** Without the churn, a quiet run can genuinely insert nothing, for example when its only new items are off-topic and the quality filter rejects them. That is the filter working. A run is now only marked down when LLM calls failed and nothing was inserted.",
+        ],
+      },
+      {
+        type: "code",
+        lang: "ts",
+        code: "const cutoffMs = Date.parse(feedCutoffISO());\nconst fresh = items.filter((i) => !(Date.parse(i.publishedAt) < cutoffMs));\nresults.stale += items.length - fresh.length;",
+      },
+      {
+        type: "paragraph",
+        text: "An unparseable date compares as false and is kept, so a feed with broken dates falls back to the old behaviour rather than losing stories.",
+      },
+      { type: "heading", level: 2, text: "What we would check in any ingestion pipeline" },
+      {
+        type: "list",
+        items: [
+          "Compare what you dedup against with what you delete. If you ever delete rows your dedup relies on, this bug is waiting for you.",
+          "Look at the age of what you insert, not just the count. A histogram of publish dates per run would have shown this on day one.",
+          "Track cost per useful item, not cost per run. Here, useful items per run were in single digits.",
+          "Be suspicious of any health metric the failure itself can inflate.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What is next" },
+      {
+        type: "paragraph",
+        text: "The fix shipped on 16 October. Each run should now report around 80 stale items skipped and far fewer insertions, with the same number of stories in the feed. One smaller leak remains: items the quality filter rejects as off-topic are not recorded anywhere, so they are re-judged every run. We will measure it before deciding whether it is worth fixing.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn is a calm AI news feed: every story that matters, in 30 seconds. [Open the feed](/).",
+      },
+    ],
+  },
+  {
+    slug: "ai-tooling-october-2026",
+    title: "AI tooling in October 2026: cheap models got good, and agents outgrew Git",
+    deck: "Claude Haiku 5.5 at ten cents per million tokens, Gemini 4 Argon at a price with an expiry date, two open-weight models near a trillion parameters, and Anthropic replacing Git because its agents broke it.",
+    date: "2026-10-16",
+    readingMin: 8,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/ai-tooling-october-2026.webp",
+      alt: "A block of blank calendar pages and torn sheets among fallen autumn maple leaves",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "September was about two new frontier models. The first half of October was about everything around them: cheaper small models, a new Google flagship priced to win switchers, open weights at a scale that needs a server room, and a clear sign that agents now generate more code than the tools built for humans can carry. This covers 28 September to 16 October.",
+      },
+      { type: "heading", level: 2, text: "The cheap tier is where the action was" },
+      {
+        type: "paragraph",
+        text: "Anthropic shipped **Claude Sonnet 5.5** on 28 September and **Claude Haiku 5.5** on 7 October. Haiku 5.5 is priced at **$0.10 per million input tokens and $0.50 per million output** for prompts up to 100,000 tokens, and five times that above it, according to [Simon Willison's write-up](https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/). Haiku 4.5 cost $1 and $5. That puts it level with OpenAI's GPT-6 Luna on price for anything under 100,000 tokens.",
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        title: "Count tokens, not price per token",
+        text: "Haiku 5.5 uses a new tokenizer. In Willison's test the same long prompt came out at about 1.25 times as many tokens as on Haiku 4.5, so part of the cut is taken back. Reasoning also cannot be switched off, only turned down. Re-run your own prompts through the token counter before you re-do the cost maths.",
+      },
+      {
+        type: "paragraph",
+        text: "OpenAI's answer came earlier: at DevDay on 29 September it introduced **GPT-6.1 Sol**, pitched as close to Astra-level intelligence at a fraction of the price. The pattern across all three labs is the same. The model you would have called mid-tier in spring is now the cheap default, and for most summarising, classifying and routing work it is enough.",
+      },
+      { type: "heading", level: 2, text: "Gemini 4 Argon: a frontier price with an expiry date" },
+      {
+        type: "paragraph",
+        text: "Google released **Gemini 4 Argon** on 13 October. It is [available globally through the Gemini API](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/) in AI Studio, in the Gemini app and AI Mode for Google AI Pro and Ultra subscribers, and in Google Antigravity for Ultra subscribers. It has a 1 million token input-output limit in the API.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Introductory price:** $2 per million input tokens and $10 per million output, with cached input 95% off.",
+          "**From 1 December:** the introductory period ends on 30 November, and the price doubles to $4 and $20.",
+          "**Prompt injection:** Google reports that Argon cut attack success on the Gray Swan indirect prompt injection benchmark to 0.7% across 15 adaptive attempts. That number matters more than most benchmarks if your agent reads web pages or email.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "If you are evaluating Argon, do it before December, but budget on the post-introductory price. A model chosen at $2 that becomes $4 halfway through a quarter is a planning problem, not a pricing one.",
+      },
+      { type: "heading", level: 2, text: "Open weights went to the trillion-parameter range" },
+      {
+        type: "list",
+        items: [
+          "**Mistral Large 4** (6 October): a [1 trillion parameter multimodal mixture-of-experts model with 52 billion active](https://mistral.ai/news/mistral-large-4/), in public preview on Mistral Studio at $1.36 per million input tokens and $4.18 per million output. Mistral says the weights will be released by the end of the month. No license is named yet.",
+          "**Muse Spark Open** from Meta (15 October): about [816 billion total parameters and 42 billion active](https://huggingface.co/blog/meta-muse-spark-open), taking text, images, audio and video in and producing text, with up to 1 million tokens of context. The full-precision weights are about 1.5 TB. An NVFP4 build runs on a single B200 node, and a 2-bit quant runs on a 512 GB Mac Studio at about 18 tokens per second. The announcement does not name a license.",
+          "**EmbeddingGemma 2** from Google (6 October): a small open multimodal embedding model, the kind of release that quietly changes the cost of running your own search.",
+          "**Indian languages:** NVIDIA and AI4Bharat described a 2.8 trillion token pretraining corpus across all 22 scheduled languages. We covered it [in detail](/blog/nemotron-indic-pretraining-2-8-trillion-tokens).",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Open no longer means small. It means you can run it if you have the hardware, and you can read the license before you depend on it. Two of this month's largest releases have not published one yet. Wait for it.",
+      },
+      { type: "heading", level: 2, text: "Agents outgrew Git" },
+      {
+        type: "paragraph",
+        text: "The most interesting engineering post of the month was not about a model. Anthropic described [replacing Git internally](https://simonwillison.net/2026/Oct/13/redesigning-source-control-at-anthropic/) with a system called **Scion**. Code changes merged per day went from about 2,500 in May to over 30,000 by September. CI performs around 25 million checkouts a day, and Anthropic says fetched naively that would be over 600 PB of Git traffic daily. Claude is Scion's heaviest user. A team of seven built it, and the migration took five months.",
+      },
+      {
+        type: "paragraph",
+        text: "GitHub published its own version of the same story the week before, on [rebuilding its Git infrastructure for agent-scale development](https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development/). You do not have Anthropic's problem. But if you run coding agents in parallel, the bottleneck has already moved from writing code to checking it out, reviewing it and testing it.",
+      },
+      { type: "heading", level: 2, text: "Also worth noticing" },
+      {
+        type: "list",
+        items: [
+          "**Claude Frontier Academy** (2 October): [Anthropic committed $100 million](https://anthropic.com/news/claude-frontier-academy) to train 10,000 engineers to deploy Claude inside businesses by the end of 2027. Agent deployment is now treated as a job title, with a vendor certificate.",
+          "**On-device agents:** Liquid AI's LFM2.5-24B-A2B was published on 13 October as a model for running fast, private agents locally.",
+          "**ReviewBench** (5 October): GitHub released an open benchmark for AI code review built on real pull requests.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What to do about it" },
+      {
+        type: "list",
+        items: [
+          "If you pay for a mid-tier model for routine work, test Haiku 5.5, GPT-6 Luna and Gemini's cheaper tiers on your real prompts, counting tokens on each.",
+          "If you are trialling Gemini 4 Argon, write down the 1 December price next to the current one.",
+          "Before building on Mistral Large 4 or Muse Spark Open, wait for the license.",
+          "If your team runs several coding agents, look at review and CI capacity before buying more agent seats.",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Previous months: [September 2026](/blog/ai-tooling-september-2026) and [August 2026](/blog/ai-tooling-august-2026). Kapyn covers every story that matters in 30 seconds: [open the feed](/).",
+      },
+    ],
+  },
+  {
+    slug: "best-ai-apps-october-2026",
+    title: "The best AI apps of October 2026, and what is actually new in each",
+    deck: "Ten AI apps worth your time this month, ranked by usefulness rather than hype. For each one: what changed in the last six weeks, who gets it, and where the catch is.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/best-ai-apps-october-2026.webp",
+      alt: "A row of old wooden toolboxes on a workbench, lids open",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Every big AI app shipped something between mid-September and mid-October. Most of it was model upgrades you will notice without doing anything. Some of it changes what the app is for. This list is the ten apps we would actually recommend this month, and for each one the specific thing that changed, with the date and the plan it needs.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How we picked",
+        text: "Only apps that shipped something verifiable in the last six weeks, checked against the company's own changelog or announcement. Where a feature is still rolling out or in preview, we say so.",
+      },
+      { type: "heading", level: 2, text: "1. ChatGPT: GPT-6 for everyone" },
+      {
+        type: "paragraph",
+        text: "On 7 October OpenAI moved ChatGPT's paid plans (Plus, Pro, Business and Enterprise) to **GPT-6 Sol**, and on 8 October the Free and Go plans moved to the lighter **GPT-6 Luna**. The same release added what OpenAI calls Intelligent UI: answers that mix text with charts, buttons and small forms when the question calls for it. **Best for:** a general default that most people around you already use. **The catch:** the free plan gets Luna, not Sol. [More on ChatGPT](/tools/chatgpt).",
+      },
+      { type: "heading", level: 2, text: "2. Gemini: Gemini 4 Argon in the app" },
+      {
+        type: "paragraph",
+        text: "Google's new flagship, **Gemini 4 Argon**, arrived on 13 October in the Gemini app and in AI Mode in Search for Google AI Pro and Ultra subscribers, with Google Antigravity access for Ultra. **Best for:** people already living in Gmail, Docs and Android. **The catch:** Argon is not on the free plan. We covered the developer side in the [October tooling roundup](/blog/ai-tooling-october-2026). [More on Gemini](/tools/gemini).",
+      },
+      { type: "heading", level: 2, text: "3. Claude: two new models in three weeks" },
+      {
+        type: "paragraph",
+        text: "Anthropic released **Claude Sonnet 5.5** on 28 September and **Claude Haiku 5.5** on 7 October. Haiku 5.5 is priced at $0.10 per million input tokens for prompts up to 100,000 tokens in the API, which makes it one of the cheapest capable models available. **Best for:** long writing, careful analysis and coding, especially with [Claude Code](/tools/claude-code). **The catch:** Haiku 5.5's new tokenizer counts about a quarter more tokens for the same text, so the saving is smaller than the headline. [More on Claude](/tools/claude).",
+      },
+      { type: "heading", level: 2, text: "4. Perplexity: research that keeps running" },
+      {
+        type: "paragraph",
+        text: "Perplexity's 5 October update added **Automations** for ongoing tasks, interactive visualizations inside threads, and GPT-6.1 Sol and Claude Opus 5.5 as model options. On 21 September it added an effort setting for its Computer agent and a skills marketplace. **Best for:** questions that need sources, and research you want re-run on a schedule. **The catch:** agent runs use compute credits, so heavy use pushes you up a plan. [More on Perplexity](/tools/perplexity).",
+      },
+      { type: "heading", level: 2, text: "5. Gemini Notebook: still the best way to read your own documents" },
+      {
+        type: "paragraph",
+        text: "If you are looking for NotebookLM, it was [renamed Gemini Notebook](https://workspaceupdates.googleblog.com/2026/07/notebooklm-now-gemini-notebook.html) on 16 July; old links redirect. It answers only from the sources you give it, which is exactly what you want for contracts, papers, lecture notes or a stack of PDFs. **Best for:** students, analysts and anyone who has to read more than they have time for. **The catch:** it is deliberately narrow; it is not a general assistant. [More on it](/tools/notebooklm).",
+      },
+      { type: "heading", level: 2, text: "6. Cursor: agents you can manage from your phone" },
+      {
+        type: "paragraph",
+        text: "Cursor shipped steadily: **Projects** (10 September, beta), where a coordinator agent plans long work and delegates to other agents; **Rollouts and Security Review** bots on pull requests (23 September); **remote control** of agents running on your computer from the Cursor iOS app (6 October); and an app marketplace for its Origin product (13 October). **Best for:** developers who want an editor built around agents. **The catch:** remote control only works while your computer is on and online. [More on Cursor](/tools/cursor).",
+      },
+      { type: "heading", level: 2, text: "7. GitHub Copilot: Gemini 4 Argon on day one" },
+      {
+        type: "paragraph",
+        text: "Gemini 4 Argon became [generally available in GitHub Copilot](https://github.blog/changelog/2026-10-13-gemini-4-argon-in-github-copilot/) on its launch day, 13 October, for Copilot Pro+, Max, Business and Enterprise, across VS Code, Visual Studio, JetBrains, Xcode, Eclipse, the CLI and the coding agent. **Best for:** teams that want to switch models without switching tools. **The catch:** it is rolling out gradually, and organisation plans may need an admin to enable it. [More on GitHub Copilot](/tools/github-copilot).",
+      },
+      { type: "heading", level: 2, text: "8. Microsoft Copilot: Home, Code and Autopilot" },
+      {
+        type: "paragraph",
+        text: "On 25 September Microsoft [announced a rebuilt Copilot](https://blogs.microsoft.com/blog/2026/09/25/introducing-the-new-copilot-with-home-code-and-autopilot/) with three parts: **Home**, where chat and document work meet; **Code**, which builds small apps, dashboards and automations from a description in a sandbox; and **Autopilot**, a cloud agent that keeps working on recurring tasks when you are not there. **Best for:** organisations already on Microsoft 365. **The catch:** most of it is still rolling out through Microsoft's Frontier programme, and Autopilot is in private preview.",
+      },
+      { type: "heading", level: 2, text: "9. Muse from Meta: a free personal agent, US only for now" },
+      {
+        type: "paragraph",
+        text: "Meta launched [Muse](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) on 8 September: a personal agent that does tasks rather than just answering, running on its own cloud computer, available on iOS, Android, the web and inside WhatsApp. It is free for most needs. **Best for:** trying an agent with no setup, if you are in the US. **The catch:** it is rolling out in the US only.",
+      },
+      { type: "heading", level: 2, text: "10. Grok: a cheaper frontier model for coders" },
+      {
+        type: "paragraph",
+        text: "xAI released [Grok 4.7](https://x.ai/news/grok-4-7) on 21 September, priced from $2 per million input tokens and $6 per million output in the API, and available in Cursor and xAI's own Grok Build. **Best for:** developers comparing frontier models on price. **The catch:** most of the value is in the API and coding tools, not the chat app. [More on Grok](/tools/grok).",
+      },
+      { type: "heading", level: 2, text: "If you only try one thing this month" },
+      {
+        type: "list",
+        items: [
+          "**Everyday use:** stay with the assistant you already have. ChatGPT, Gemini and Claude all improved this month without you doing anything.",
+          "**Work from documents:** Gemini Notebook.",
+          "**Code:** try Gemini 4 Argon inside the tool you already use, since Copilot and Cursor both offer it, before you switch editors.",
+          "**Agents:** Perplexity's Automations are the lowest-effort way to have something run on a schedule.",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn tracks every one of these releases as it happens, in 30 seconds a story. [Open the feed](/) or browse [the tools directory](/tools).",
+      },
+    ],
+  },
+  {
+    slug: "agentic-ai-infrastructure-stack-2026",
+    title: "The agentic AI infrastructure stack in 2026: what to use at each layer",
+    deck: "Building an agent is now a stack decision, not a model decision. Eight layers, the two or three tools that lead each one, and what we would pick for a small team.",
+    date: "2026-10-16",
+    readingMin: 10,
+    tag: "Guide",
+    hero: {
+      src: "/blog/agentic-ai-infrastructure-stack-2026.webp",
+      alt: "Steel scaffolding around an unfinished building at dusk",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "A year ago, building an agent meant picking a model and writing a loop. In 2026 the model is the easy part. The hard parts are around it: how the agent reaches tools, where its code runs safely, how a ten-minute task survives a crash, what it remembers, and how you find out why it did something stupid. Each of those is now its own layer with its own vendors. This is the map.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "The short version",
+        text: "Start with a framework and a gateway. Add a sandbox the day your agent runs code, durable execution the day a task takes longer than one request, and tracing on day one. Memory and browser infrastructure come last, when you can name the problem they solve.",
+      },
+      { type: "heading", level: 2, text: "1. Protocols: how agents reach tools" },
+      {
+        type: "list",
+        items: [
+          "**MCP (Model Context Protocol)** is the default way to connect an agent to tools and data. Every major agent client speaks it, which means a tool you expose once works in Claude, ChatGPT, Cursor, Copilot and the rest. The July 2026 spec made servers stateless; we covered [what changed](/blog/mcp-2026-07-28-spec-what-changed). Browse working servers in our [MCP directory](/mcp).",
+          "**A2A (Agent2Agent)** covers the other direction: one agent delegating to another agent over the network. Useful when agents belong to different teams or companies. Most single-team projects do not need it yet.",
+          "**Agent Plugins** packages skills, commands and MCP servers into one folder that any compatible client can load. See our [Agent Plugins 1.0 explainer](/blog/agent-plugins-1-0-explained).",
+        ],
+      },
+      { type: "heading", level: 2, text: "2. Frameworks and SDKs: the agent loop" },
+      {
+        type: "paragraph",
+        text: "This is where you write the agent itself: the loop of calling a model, running tools and deciding when to stop.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Claude Agent SDK.** The harness behind Claude Code, released as a library. The strongest choice if you build on Claude and want file editing, tool use and context management that already work in production.",
+          "**[OpenAI Agents SDK](/tools/openai-agents-sdk).** Small and readable, with handoffs between agents, guardrails and built-in tracing. Best on OpenAI models.",
+          "**Google ADK (Agent Development Kit).** Google's framework, tuned for Gemini and Google Cloud deployment, with support for other models.",
+          "**[LangGraph](/tools/langgraph).** Agents as explicit state graphs with checkpoints and human approval steps. More boilerplate, but the most control when a workflow has to be predictable.",
+          "**[CrewAI](/tools/crewai).** Role-based teams of agents. Quick to get a multi-agent demo running; needs firm stopping rules to avoid agents delegating in circles.",
+          "**Vercel AI SDK and [Mastra](/tools/mastra).** The two leading TypeScript options. The AI SDK covers model calls, tool calling, streaming and UI; Mastra adds workflows, memory and evals on top in an agent-first framework.",
+        ],
+      },
+      { type: "heading", level: 2, text: "3. Durable execution: surviving long tasks" },
+      {
+        type: "paragraph",
+        text: "An agent task that takes ten minutes will eventually hit a timeout, a deploy or a crashed worker. Durable execution records each step, so a task resumes where it stopped instead of starting over and paying for every model call twice.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[Temporal](/tools/temporal).** The battle-tested option, used far beyond AI. Powerful, with a learning curve: workflow code must be deterministic, and side effects live in separate activities.",
+          "**[Inngest](/tools/inngest).** Event-driven durable functions written as plain steps. Lighter to adopt than Temporal for most web teams.",
+          "**Vercel Workflow.** Durable steps in TypeScript for apps already on Vercel, with retries, sleeps and pause-and-resume built in.",
+        ],
+      },
+      { type: "heading", level: 2, text: "4. Sandboxes: running code safely" },
+      {
+        type: "paragraph",
+        text: "The moment your agent writes and runs code, it needs somewhere that is not your server. Sandboxes give it an isolated machine that starts in seconds and is thrown away afterwards.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[E2B](/tools/e2b).** Purpose-built sandboxes for AI-generated code on lightweight microVMs, with SDKs for Python and JavaScript. The default choice for code interpreters.",
+          "**Vercel Sandbox.** Firecracker microVMs on Vercel's platform, generally available since January 2026. A natural fit if the rest of your app is already there.",
+          "**Daytona** focuses on very fast-starting sandboxes for agents, and **[Modal](/tools/modal)** is the pick when the code needs GPUs or heavy Python workloads.",
+        ],
+      },
+      { type: "heading", level: 2, text: "5. Browser infrastructure: agents on the web" },
+      {
+        type: "list",
+        items: [
+          "**[Browserbase](/tools/browserbase).** Hosted headless browsers for agents, with session recording and its Stagehand framework for writing browser actions in plain language.",
+          "**Steel.** An open-source browser API you can self-host.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        text: "Before reaching for a browser, check for an API or an MCP server. A browser is the slowest, most expensive and most fragile way for an agent to get data.",
+      },
+      { type: "heading", level: 2, text: "6. Memory: what the agent keeps between sessions" },
+      {
+        type: "list",
+        items: [
+          "**Mem0.** A memory layer that extracts facts from conversations and retrieves them later. The most common drop-in choice.",
+          "**Letta.** From the team behind MemGPT: stateful agents that manage their own memory blocks. Works best with strong models.",
+          "**[Zep](/tools/zep).** Memory built on a temporal knowledge graph, so it tracks how facts change over time, not just what was said.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Most agents do not need a memory product on day one. A table of user preferences and a search over past tasks covers more than people expect.",
+      },
+      { type: "heading", level: 2, text: "7. Observability and evals: knowing why it failed" },
+      {
+        type: "paragraph",
+        text: "Agents fail quietly: a wrong tool call three steps back, a retry loop, a confident answer built on an empty search. Tracing every step is the only way to see it.",
+      },
+      {
+        type: "list",
+        items: [
+          "**[Langfuse](/tools/langfuse).** Open source and self-hostable, covering tracing, prompt management and evals. The default if you want to own your data.",
+          "**[LangSmith](/tools/langsmith).** LangChain's hosted platform, the obvious choice if you build on LangGraph.",
+          "**[Braintrust](/tools/braintrust).** Evals-first: datasets, scoring and comparing prompt or model changes before they ship.",
+          "**[Arize Phoenix](/tools/arize-phoenix).** Open source and built on OpenTelemetry, so traces fit into observability you may already run.",
+        ],
+      },
+      { type: "heading", level: 2, text: "8. Model gateways: one API for many models" },
+      {
+        type: "list",
+        items: [
+          "**[OpenRouter](/tools/openrouter).** One API key for hundreds of models, including free ones. A warning from experience: free model slugs get retired without much notice, so never hard-code one as your only option.",
+          "**Vercel AI Gateway.** One endpoint across providers, with fallbacks, budgets and observability, integrated with the AI SDK.",
+          "**LiteLLM.** An open-source proxy that puts many providers behind the OpenAI API format. The self-hosted choice.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What we would pick for a small team" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "A framework that matches your language and main model: Claude Agent SDK or OpenAI Agents SDK in Python, the AI SDK or Mastra in TypeScript.",
+          "A gateway with at least two providers behind it from the start.",
+          "Tracing from the first day, with Langfuse if you want to self-host.",
+          "A sandbox the first time the agent runs code it wrote.",
+          "Durable execution once a single task outlives a request.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "We learned the gateway lesson the hard way. Kapyn's own news pipeline runs on a chain of eight model providers, and in October we found most of its spend going to re-summarising articles it had already deleted. That story is [here](/blog/llm-pipeline-re-summarising-deleted-articles).",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn tracks releases across all of these layers as they happen. [Open the feed](/), or browse the [tools directory](/tools) and [MCP servers](/mcp).",
+      },
+    ],
+  },
+  {
+    slug: "top-ai-agents-october-2026",
+    title: "The top 10 AI agents in October 2026: seven that write code, three that run errands",
+    deck: "Agents stopped being demos this autumn. The ten worth using now, what each shipped in the last two months, and the catch with each one.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/top-ai-agents-october-2026.webp",
+      alt: "Ten carved wooden chess knights standing in a row on a dark board",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "An agent is software that takes a goal, makes its own plan and uses tools until the job is done, instead of answering one prompt at a time. In October 2026 the useful ones fall into two groups: coding agents, which are now mature enough to run unattended, and general agents, which do research and errands and are still earlier than their marketing suggests. These are the ten we would use, with what changed recently.",
+      },
+      {
+        type: "callout",
+        variant: "note",
+        title: "How we checked",
+        text: "Every dated change below comes from the company's own changelog or announcement, or a named publication where noted. Claims we could not confirm were left out, including several that appeared in other roundups this month.",
+      },
+      { type: "heading", level: 2, text: "Coding agents" },
+      { type: "heading", level: 3, text: "1. Claude Code" },
+      {
+        type: "paragraph",
+        text: "Anthropic's agent reads a codebase, edits files, runs commands and opens pull requests from the terminal, the IDE or the desktop app. It now runs on Claude Opus 5.5 and the new Claude Sonnet 5.5 (28 September). **Best for:** large refactors and long, multi-step changes in an existing codebase. **The catch:** subscription plans have rolling usage limits, so heavy days can hit a wall. [More on Claude Code](/tools/claude-code).",
+      },
+      { type: "heading", level: 3, text: "2. GitHub Copilot coding agent" },
+      {
+        type: "paragraph",
+        text: "GitHub's [September VS Code releases](https://github.blog/changelog/2026-10-01-github-copilot-in-vs-code-september-2026-releases/) (1 October) added **agent merge** in preview, where the agent handles review feedback, failed checks and merge conflicts on its own pull request, and **automations** that run agent tasks hourly, daily or weekly. Gemini 4 Argon became available in Copilot on 13 October. **Best for:** teams already on GitHub who want agents inside the pull request flow. **The catch:** the most interesting pieces are still in preview. [More on GitHub Copilot](/tools/github-copilot).",
+      },
+      { type: "heading", level: 3, text: "3. Cursor" },
+      {
+        type: "paragraph",
+        text: "Cursor added **Projects** in beta on 10 September, where a coordinator agent plans long-running work and delegates it to other agents, then bots for deploy monitoring and security review on pull requests (23 September), and remote control of agents running on your computer from its iOS app (6 October). **Best for:** developers who want an editor designed around agents rather than an assistant bolted on. **The catch:** remote control needs your computer awake and online. [More on Cursor](/tools/cursor).",
+      },
+      { type: "heading", level: 3, text: "4. OpenAI Codex" },
+      {
+        type: "paragraph",
+        text: "OpenAI's coding agent runs in the cloud, in a CLI and in the IDE, and is included with ChatGPT's paid plans. It is the most natural choice if you want to hand off well-defined tasks and review the result as a pull request rather than pair with an agent live. **The catch:** it shines on delegated, self-contained tasks more than on exploratory work. [More on Codex](/tools/codex).",
+      },
+      { type: "heading", level: 3, text: "5. Devin" },
+      {
+        type: "paragraph",
+        text: "Cognition's agent now ships alongside Devin Desktop, the editor formerly known as Windsurf. On 10 September Cognition released **SWE-2**, a cheaper coding model used inside Devin Fusion, where a strong planner model leads a session and SWE-2 does the lower-priority work. [DeepLearning.AI's The Batch](https://www.deeplearning.ai/the-batch/one-agent-works-another-directs) reported independent results putting Fusion close to Claude Code on a coding agent index at a lower cost per task. **Best for:** teams that want to assign tickets to an agent like a colleague. **The catch:** cost is consumption-based, so watch usage on large tasks. [More on Devin](/tools/devin).",
+      },
+      { type: "heading", level: 3, text: "6. Google Antigravity" },
+      {
+        type: "paragraph",
+        text: "Google's agent-first development environment, where agents plan, code and verify work across the editor, terminal and browser. Since 13 October, Google AI Ultra subscribers can use Gemini 4 Argon in it, and Google reports internal teams using Argon in Antigravity submitted over 35% more agent-written code. **Best for:** trying Google's newest model in a full agent workflow. **The catch:** Argon access there needs the top Ultra plan.",
+      },
+      { type: "heading", level: 3, text: "7. Cline" },
+      {
+        type: "paragraph",
+        text: "An open-source coding agent for VS Code that works with your own API keys and almost any model provider, and asks for approval before it edits files or runs commands. **Best for:** developers who want full control over which model runs and what it costs. **The catch:** you manage the keys and the bill. [More on Cline](/tools/cline).",
+      },
+      { type: "heading", level: 2, text: "General-purpose agents" },
+      { type: "heading", level: 3, text: "8. Manus" },
+      {
+        type: "paragraph",
+        text: "[Manus 2.0](https://manus.im/blog/introducing-manus-2-0) arrived on 28 September with a new agent harness, Cascade, which in one tested configuration used 23.2% fewer tokens, finished 28.2% faster and cost 32% less to run. It also added a persistent **Cloud Computer**, **Automations** triggered by events such as a new email or Slack message, and a desktop workspace, Manus Studio. **Best for:** multi-step research and document work that runs while you do something else. **The catch:** event-driven automations need careful permission scoping before you connect them to email.",
+      },
+      { type: "heading", level: 3, text: "9. Perplexity Computer" },
+      {
+        type: "paragraph",
+        text: "Perplexity's agent added an effort setting and a skills marketplace on 21 September, then **Automations** for ongoing tasks on 5 October. **Best for:** research that has to be sourced and re-run on a schedule. **The catch:** agent runs consume credits quickly on the lower plans. [More on Perplexity](/tools/perplexity).",
+      },
+      { type: "heading", level: 3, text: "10. ChatGPT agent" },
+      {
+        type: "paragraph",
+        text: "ChatGPT's agent mode works on a virtual computer to browse, fill in forms and assemble documents, and since 7 October it runs on GPT-6 for paid plans. **Best for:** people who already pay for ChatGPT and want one-off tasks done end to end. **The catch:** it pauses for confirmation before important actions, which is right, but it means it is not truly hands-off. [More on ChatGPT](/tools/chatgpt).",
+      },
+      { type: "heading", level: 2, text: "Also worth watching" },
+      {
+        type: "list",
+        items: [
+          "**Muse** from Meta, a free personal agent launched on 8 September, US only so far. Covered in our [best AI apps of October](/blog/best-ai-apps-october-2026).",
+          "**Microsoft Copilot Autopilot**, a cloud agent that keeps working on recurring tasks, in private preview.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Which one to start with" },
+      {
+        type: "list",
+        items: [
+          "**You write code daily:** Claude Code or Cursor for hands-on work, the Copilot coding agent or Codex for delegating tickets.",
+          "**You care about cost:** Cline with your own keys, or Devin Fusion.",
+          "**You do research:** Perplexity Computer, or Manus for longer jobs.",
+          "**You want to build your own:** see our map of [the agentic AI infrastructure stack](/blog/agentic-ai-infrastructure-stack-2026).",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "For the evergreen version of this list, see [best AI agents in 2026](/blog/best-ai-agents-2026) and [best AI coding assistants](/blog/best-ai-coding-assistants-2026). Kapyn covers every agent release as it ships: [open the feed](/).",
+      },
+    ],
+  },
+  {
+    slug: "best-open-source-ai-models-october-2026",
+    title: "The best open-weight AI models of October 2026, and which licenses actually let you use them",
+    deck: "Open weights now run from a 209M forecasting model to 2.8 trillion parameters. The ones worth knowing, what hardware they need, and the license line that decides whether you can ship them.",
+    date: "2026-10-16",
+    readingMin: 9,
+    tag: "Roundup",
+    hero: {
+      src: "/blog/best-open-source-ai-models-october-2026.webp",
+      alt: "An old oak library card catalogue with several drawers pulled open",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Two things changed about open models this autumn. The biggest ones got genuinely big, so open no longer means you can run it on a laptop. And licenses split into two camps: standard permissive licenses you can ship without a lawyer, and custom licenses you have to read. This list covers models released or updated between August and mid-October 2026, with the license checked on each model's Hugging Face page.",
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Read this first: the license split",
+        text: "**Permissive (Apache 2.0 or MIT):** Qwen3.8-27B, DeepSeek-V4.1-Flash, GLM-5.3-Flash, EmbeddingGemma 2, Apertus 1.5. **Custom license, read before shipping:** Muse Spark Open, Kimi K3, Nemotron 3.5 Lightning, LFM2.5-24B-A2B, FLUX.3 Image Klein, Timestral. Mistral Large 4's weights and license are not out yet.",
+      },
+      { type: "heading", level: 2, text: "Runs on one GPU or a good laptop" },
+      {
+        type: "list",
+        items: [
+          "**[Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B)** (Alibaba, August). About 28 billion parameters under Apache 2.0. A strong general model that fits a single large GPU at full precision and consumer GPUs or a Mac when quantized. The safest default if you want one capable open model with no licensing questions. [More on Qwen](/tools/qwen).",
+          "**[LFM2.5-24B-A2B](https://huggingface.co/LiquidAI/LFM2.5-24B-A2B)** (Liquid AI, 13 October). 24 billion parameters with about 2 billion active per token, built for fast, private agents running on-device. Custom LFM license.",
+          "**[Nemotron 3.5 Lightning 30B-A3B](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16)** (NVIDIA, August). About 30 billion parameters, roughly 3 billion active, tuned for low-latency tool calling. Released under the OpenMDW-1.1 license.",
+          "**[Apertus 1.5](https://huggingface.co/swiss-ai/Apertus-v1.5-70B)** (Swiss AI). 8B and 70B models under Apache 2.0, notable for publishing its training data as well as its weights. Weights landed in July; release notes followed on 15 October.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Needs a server, and earns it" },
+      {
+        type: "list",
+        items: [
+          "**[DeepSeek-V4.1-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash)** (DeepSeek, 10 September). About 763 billion parameters in its published weights, under the MIT license, which makes it the largest model here you can deploy commercially with almost no conditions. A multi-node GPU job to self-host; most people will use it through a provider. [More on DeepSeek](/tools/deepseek).",
+          "**[GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash)** (Z.ai, August). About 321 billion parameters under MIT. A permissive alternative at roughly half DeepSeek's size.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Frontier-scale open weights" },
+      {
+        type: "list",
+        items: [
+          "**[Muse Spark Open](https://huggingface.co/blog/meta-muse-spark-open)** (Meta, 15 October). About 816 billion total parameters and 42 billion active, taking text, images, audio and video in and producing text, with up to 1 million tokens of context. The NVFP4 build runs on a single B200 node, and a 2-bit quant runs on a 512 GB Mac Studio at about 18 tokens per second. Custom license, and access to the weights is gated behind manual approval. [More on Llama and Meta models](/tools/llama).",
+          "**[Kimi K3](https://huggingface.co/moonshotai/Kimi-K3)** (Moonshot AI, July). About 2.8 trillion parameters in its published weights, the largest open model available. Realistically an API model for nearly everyone. Custom license. [More on Kimi](/tools/kimi).",
+          "**Mistral Large 4** (Mistral, 6 October). A 1 trillion parameter model with 52 billion active, in preview through Mistral's API. Mistral says the weights will be released by the end of October; no license is named yet. [More on Mistral](/tools/mistral).",
+        ],
+      },
+      { type: "heading", level: 2, text: "Specialists worth knowing" },
+      {
+        type: "list",
+        items: [
+          "**[EmbeddingGemma 2](https://huggingface.co/google/embeddinggemma-2)** (Google, October). A 0.7 billion parameter multimodal embedding model under Apache 2.0, small enough for laptops and phones. The cheapest way to run your own semantic search.",
+          "**[FLUX.3 Image Klein](https://huggingface.co/black-forest-labs/flux-3-image-klein)** (Black Forest Labs, October). A 5.5 billion parameter image generation model that runs on consumer GPUs. Custom license; you accept its terms on Hugging Face before downloading.",
+          "**[Timestral](https://huggingface.co/mistralai/Timestral-209M)** (Mistral, 15 October). Time-series forecasting models from 5M to 209M parameters, small enough to run on a CPU. Custom license.",
+        ],
+      },
+      { type: "heading", level: 2, text: "How to choose" },
+      {
+        type: "list",
+        items: [
+          "**One model, no legal review:** Qwen3.8-27B.",
+          "**Largest model you can ship with almost no conditions:** DeepSeek-V4.1-Flash, through a provider unless you run a GPU cluster.",
+          "**On-device or edge:** LFM2.5-24B-A2B for agents, EmbeddingGemma 2 for search.",
+          "**Frontier quality with open weights:** Muse Spark Open, if your use fits its license and you can get access approved.",
+          "**Full transparency, including training data:** Apertus 1.5.",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        text: "Parameter counts here are from each model's published weights on Hugging Face, which can differ slightly from the headline number in an announcement. Always read the license file in the repository itself; summaries, including ours, are not legal advice.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Running models yourself? Our [guide to running LLMs locally](/blog/run-llms-locally-2026) covers the hardware side. For the month's closed-model releases, see [AI tooling in October 2026](/blog/ai-tooling-october-2026). Kapyn tracks every release: [open the feed](/).",
+      },
+    ],
+  },
   // India vertical + city hubs — see src/lib/blog-india.ts
   ...INDIA_POSTS,
   // HERMES weekly blog — see src/lib/blog-generated.ts

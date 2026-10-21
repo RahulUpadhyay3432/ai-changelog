@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
 import { shouldShowNotifCard } from "@/lib/notifications";
-import { updateStreak, getFeedPrefs, getTopicPickerSkipped } from "@/lib/storage";
+import { updateStreak, getFeedPrefs } from "@/lib/storage";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
@@ -64,10 +64,13 @@ export function CardStack({
   // Push opt-in interstitial (end-of-feed). Gated client-side to avoid a
   // hydration mismatch — shouldShowNotifCard() reads localStorage + permission.
   const [showNotif, setShowNotif] = useState(false);
-  // Only for people who have never expressed a preference — getFeedPrefs()
-  // returns null until they do, so this never nags a returning user.
-  const [showTopics, setShowTopics] = useState(false);
-  useEffect(() => { setShowTopics(getFeedPrefs() === null && !getTopicPickerSkipped()); }, []);
+  // Starts true so the picker is in the server HTML at slot 0. Inserting it after
+  // hydration instead flashed story 0 first, and scroll anchoring then parked the
+  // picker above the viewport where nobody saw it. CSS hides it unless the
+  // pre-paint script in app/layout.tsx set data-first-visit, and that flag is the
+  // only source of truth, so React and CSS can never disagree about it.
+  const [showTopics, setShowTopics] = useState(true);
+  useEffect(() => { setShowTopics(document.documentElement.dataset.firstVisit === "1"); }, []);
   // "Has this person invested?" — true once they have picked topics, in this
   // session or any previous one. Gates the push ask (see NOTIF_SLOT).
   const [hasInvested, setHasInvested] = useState(false);
@@ -370,6 +373,7 @@ export function CardStack({
         {feedEntries.map((entry) => (
           <div
             key={entry.type === "news" ? entry.item.id : entry.type}
+            data-topic-slot={entry.type === "topics" ? "" : undefined}
             style={{ flex: "0 0 100%", scrollSnapAlign: "start", scrollSnapStop: "always" }}
           >
             {entry.type === "news" ? (
@@ -381,6 +385,9 @@ export function CardStack({
             ) : entry.type === "topics" ? (
               <TopicPickerCard
                 onDone={() => {
+                  // Clear the flag too, or a category switch (which remounts this
+                  // stack with showTopics=true) would show the picker again.
+                  delete document.documentElement.dataset.firstVisit;
                   setShowTopics(false);
                   setHasInvested(getFeedPrefs() !== null);
                 }}

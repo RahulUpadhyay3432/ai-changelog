@@ -430,12 +430,8 @@ export function setFeedPrefs(slugs: string[]): void {
 
 // Set by "Skip" on the topic picker card. Without it the picker comes back as
 // the first card of every visit and every category tab for someone who said no.
+// Read only by the pre-paint script in app/layout.tsx, which hardcodes this key.
 const TOPIC_PICKER_SKIPPED_KEY = "kapyn_topic_picker_skipped";
-
-export function getTopicPickerSkipped(): boolean {
-  if (!isBrowser) return false;
-  try { return localStorage.getItem(TOPIC_PICKER_SKIPPED_KEY) === "1"; } catch { return false; }
-}
 
 export function setTopicPickerSkipped(): void {
   if (!isBrowser) return;

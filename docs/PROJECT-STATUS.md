@@ -1,13 +1,29 @@
 # Kapyn — Project Status & Log
 
 > **Living doc.** Single source of truth for "where are we and what's next." Update as steps complete.
-> **Last updated:** 2026-09-04 — *September content pass: the model data, comparison verdicts and catalogs brought back to true after GPT-6 Astra and Claude Fable 5.1, the Windsurf-to-Devin-Desktop rename swept, four new posts, and `npm run check:freshness` added so the next lapse fails CI instead of sitting there.*
+> **Last updated:** 2026-10-21. *Eight PRs merged and live (5e1a644): the content audit plus /about and /methodology, the Oct model and price refresh, 9 posts, the topic picker at card 0, the tool-page fixes, the India feeds and the Instagram share card. A production smoke test then found 2 feed bugs, fixed in #104.*
 >
 > **New-session read order:** (1) `CLAUDE.md` + `AGENTS.md` → (2) **this doc** → (3) `docs/design-foundations.md` before any product/UI work.
 
 ---
 
-## 👉 RIGHT NOW — the one problem that matters
+## 👉 RIGHT NOW (2026-10-21)
+
+**Measure, distribute, and don't build.** PostHog (14 days, bots excluded): the landing page converts fine. 15 of 24 desktop humans went on to the Radar, and 28 of 29 mobile visitors reached the feed. But only about 4 real people a day arrive. **Volume is the constraint**, and every past spike came from a manual push (Reddit was best, 66 people in one July week).
+
+- **Live now:** the topic picker is card 0 for first-timers (#97). PR #104 makes a picker save re-filter the feed straight away and moves the card's bookmark/share pill off the headline.
+- **Read on about 4 Nov,** first sessions only: picker saves (`feed_prefs_changed` with `source=topic_picker_card`; baseline 3 people ever), `topic_picker_skipped`, the share ending at max_depth 0 (baseline 28/44), and D7 return of pickers vs non-pickers.
+- **Distribution:** the Smithery migration guide to r/mcp, then r/ClaudeAI (Smithery shuts down 31 Oct). Instagram, 1 post a day (`?utm_source=instagram` on the bio link). Any story can become an IG card via `/api/share-card?format=ig&id=<uuid>`.
+- **The only build in scope:** a summary-faithfulness check. Stored summaries sometimes add claims their source never makes (TorchTPU "3x"; Modal "leaving Intel/AMD").
+- **Content debt:**
+  - 161 headline-only "India AI" rows from the removed Google News feed (22% of the 7-day feed) should be deleted.
+  - The GitHub trending source has no language or abuse filter.
+- **Founder-only:** Gemini credits (out), the GSC key file (missing), VAPID keys (the push cron works now but no-ops without them), the PostHog bot filter, the `feed-opener-ranking` flag, rotating `CRON_SECRET`.
+- **Open strategic call (Rahul's):** a B2B competitor-intel concierge test, or keep investing in Kapyn ("watch your stack"). Decide after #97's numbers are in.
+
+---
+
+## 👉 Earlier (2026-07-23): the retention diagnosis
 
 **Retention. Not features.**
 

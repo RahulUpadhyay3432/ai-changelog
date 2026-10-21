@@ -106,10 +106,14 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
     feedCache.current.delete("all");
   }, []);
 
-  // Feed customization hint — shows after 3s, repeats each visit until user taps it
+  // Feed customization hint — shows after 3s, repeats each visit until user taps it.
+  // Re-checked when the timer fires: the topic picker is card 0 for first-timers
+  // (data-first-visit), so the hint would cover it, and anyone who picks topics
+  // inside those 3s should not then be told to go and pick them.
   useEffect(() => {
     if (getFeedHintShown()) return;
     const t = setTimeout(() => {
+      if (getFeedHintShown() || document.documentElement.dataset.firstVisit === "1") return;
       setShowFeedHint(true);
       posthog.capture("feed_hint_shown");
     }, 3000);

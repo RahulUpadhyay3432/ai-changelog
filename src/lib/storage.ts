@@ -428,6 +428,16 @@ export function setFeedPrefs(slugs: string[]): void {
   try { localStorage.setItem(FEED_PREFS_KEY, JSON.stringify(slugs)); } catch {}
 }
 
+// Set by "Skip" on the topic picker card. Without it the picker comes back as
+// the first card of every visit and every category tab for someone who said no.
+// Read only by the pre-paint script in app/layout.tsx, which hardcodes this key.
+const TOPIC_PICKER_SKIPPED_KEY = "kapyn_topic_picker_skipped";
+
+export function setTopicPickerSkipped(): void {
+  if (!isBrowser) return;
+  try { localStorage.setItem(TOPIC_PICKER_SKIPPED_KEY, "1"); } catch {}
+}
+
 // Returns true if hint should be hidden (user dismissed with ✕, or has prefs set)
 export function getFeedHintShown(): boolean {
   if (!isBrowser) return false;

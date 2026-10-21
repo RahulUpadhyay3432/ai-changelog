@@ -108,6 +108,12 @@
   --kt-read-code-bg: #1a1815;
 }
 
+/* The feed's topic picker is server-rendered at slot 0 for everyone and shown
+   only to first-timers, flagged before first paint in app/layout.tsx. */
+html:not([data-first-visit]) [data-topic-slot] {
+  display: none;
+}
+
 [data-theme="light"] {
   --kt-canvas: #f7f5f1;
   --kt-surface: #ffffff;

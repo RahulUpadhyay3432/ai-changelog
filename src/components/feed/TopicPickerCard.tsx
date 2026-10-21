@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import posthog from "posthog-js";
-import { setFeedPrefs } from "@/lib/storage";
+import { setFeedPrefs, setTopicPickerSkipped } from "@/lib/storage";
 import { CATEGORY_TABS } from "@/lib/categories";
 import type { CategorySlug } from "@/lib/types";
 
@@ -50,6 +50,7 @@ export function TopicPickerCard({ onDone }: TopicPickerCardProps) {
   };
 
   const handleSkip = () => {
+    setTopicPickerSkipped();
     posthog.capture("topic_picker_skipped");
     onDone();
   };

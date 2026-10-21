@@ -126,11 +126,15 @@ export default function RootLayout({
           }}
         >
           {/* Pre-paint theme: set data-theme on <html> from localStorage before
-              anything renders, so a light-mode user never sees a dark flash. */}
+              anything renders, so a light-mode user never sees a dark flash.
+              Also marks first-timers (no topic prefs, never skipped the picker)
+              so the server-rendered topic picker shows only for them, from the
+              first frame. Keys mirror kapyn_feed_prefs and
+              kapyn_topic_picker_skipped in src/lib/storage.ts. */}
           <script
             dangerouslySetInnerHTML={{
               __html:
-                '(function(){try{var t=localStorage.getItem("kapyn_theme")||localStorage.getItem("kapyn_web_theme");if(t==="light")document.documentElement.dataset.theme="light";}catch(e){}})();',
+                '(function(){try{var d=document.documentElement,t=localStorage.getItem("kapyn_theme")||localStorage.getItem("kapyn_web_theme");if(t==="light")d.dataset.theme="light";if(!localStorage.getItem("kapyn_feed_prefs")&&localStorage.getItem("kapyn_topic_picker_skipped")!=="1")d.dataset.firstVisit="1";}catch(e){}})();',
             }}
           />
           <ServiceWorkerRegistrar />

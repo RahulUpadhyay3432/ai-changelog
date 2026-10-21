@@ -270,7 +270,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: "code",
         lang: "text",
-        code: "Model               Input    Output\nClaude Fable 5.1   $10.00    $50.00\nGPT-6 Astra        $10.00    $50.00\nClaude Opus 5.5     $4.00    $20.00\nGemini 4 Argon      $2.00    $10.00   (until 30 Nov)\nGemini 4 Argon      $4.00    $20.00   (from 1 Dec)\nClaude Sonnet 5.5   $2.00    $10.00\nGPT-6.1 Sol         $2.00    $10.00\nGrok 4.7            $2.00     $6.00\nClaude Haiku 5.5    $0.10     $0.50   (prompts up to 100K)\nGPT-6 Luna          $0.10     $0.50",
+        code: "Model                 Input   Output\nClaude Fable 5.1     $10.00   $50.00\nGPT-6 Astra          $10.00   $50.00\nClaude Opus 5.5       $4.00   $20.00\nGemini 4 Argon *      $2.00   $10.00\nClaude Sonnet 5.5     $2.00   $10.00\nGPT-6.1 Sol           $2.00   $10.00\nGrok 4.7              $2.00    $6.00\nClaude Haiku 5.5 **   $0.10    $0.50\nGPT-6 Luna            $0.10    $0.50\n\n*  Until 30 Nov; $4 / $20 from 1 Dec.\n** Prompts up to 100K tokens.",
       },
       {
         type: "paragraph",

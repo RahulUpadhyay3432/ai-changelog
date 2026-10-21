@@ -19,6 +19,8 @@ const inlineCodeStyle: React.CSSProperties = {
   borderRadius: "5px",
   padding: "1px 5px",
   color: "#efebe2",
+  // Long paths and URLs have no break points and would widen the page on phones.
+  overflowWrap: "anywhere",
 };
 const linkStyle: React.CSSProperties = {
   color: "var(--accent, #5b9bff)",

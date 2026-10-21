@@ -57,7 +57,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-astra",
     b: "gpt-sol",
     verdict:
-      "The within-OpenAI upgrade question. Astra is the generational step and costs $10 and $50 per million tokens; Sol sits at $4 and $20 after August's price cut, and both carry the same 1.05M context window. Astra earns the difference on computer use and long end-to-end work. On ordinary generation, extraction and chat, Sol is the same tool for less than half the money.",
+      "The within-OpenAI upgrade question. Astra sits at the top of the line and costs $10 and $50 per million tokens; Sol sits at $2 and $10, and both carry the same 1.05M context window. Astra earns the difference on computer use and long end-to-end work. On ordinary generation, extraction and chat, Sol is the same tool for a fifth of the money.",
     pickA: [
       "Computer use, browsing, and multi-application workflows",
       "Long autonomous runs where a mid-task failure is expensive",
@@ -86,7 +86,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "gpt-sol",
     verdict:
-      "Two mid-frontier models at almost the same price, now that GPT-6 Astra sits above Sol and Claude Fable 5.1 sits above Opus. Sol is the broader generalist; Opus 5.5 leads on agentic and coding work and is the model Anthropic itself tells you to start with. Since Opus 5.5 they list at the same price, $4 and $20 per million tokens, so the deciding factor is usually which ecosystem your code already lives in, not raw capability.",
+      "Two mid-frontier models, now that GPT-6 Astra sits above Sol and Claude Fable 5.1 sits above Opus. Sol is the broader generalist; Opus 5.5 leads on agentic and coding work and is the model Anthropic itself tells you to start with. At $4 and $20 per million tokens, Opus 5.5 costs twice as much as Sol's $2 and $10, so the deciding factor is whether that agentic edge justifies double the bill.",
     pickA: [
       "Multi-step agentic coding where the model runs for a long time without supervision",
       "Large refactors that must respect an existing codebase's conventions",
@@ -94,7 +94,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     ],
     pickB: [
       "You are already deep in OpenAI tooling and want the least migration friction",
-      "Slightly lower token cost on the same class of work",
+      "Half the token cost on the same class of work",
       "General knowledge and scientific work rather than shipping code",
     ],
   },
@@ -117,13 +117,13 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-sol",
     b: "gemini-pro",
     verdict:
-      "Sol is the stronger all-round generalist; Gemini 3.1 Pro is the better value and the reasoning-benchmark leader. Both handle roughly a million tokens of context, though only Gemini takes audio natively, so this comes down to price sensitivity and which cloud you already pay.",
+      "Sol is the stronger all-round generalist; Gemini 3.1 Pro is the reasoning-benchmark leader at a comparable price, $2 and $12 against Sol's $2 and $10. Both handle roughly a million tokens of context, though only Gemini takes audio natively, so this comes down to modal needs and which cloud you already pay.",
     pickA: [
       "You want the top overall scores and the widest third-party ecosystem",
       "Audio-native workflows",
     ],
     pickB: [
-      "The same tier of capability at a lower price",
+      "Benchmark-leading reasoning at a comparable price",
       "Reasoning-heavy analysis",
       "You are already on Google Cloud or Workspace",
     ],
@@ -132,7 +132,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-opus",
     b: "grok",
     verdict:
-      "Both are pitched at agentic coding. Opus 5.5 has the deeper track record and twice the context; Grok 4.6 is cheaper below 200K tokens and offers four reasoning-effort levels instead of three. Grok's catch is the long-context toll: cross 200K and the rate doubles for every token in the request, including the ones below the line.",
+      "Both are pitched at agentic coding. Opus 5.5 has the deeper track record and twice the context; Grok 4.7 is cheaper below 200K tokens and offers four reasoning-effort levels instead of three. Grok's catch is the long-context toll: cross 200K and the rate doubles for every token in the request, including the ones below the line.",
     pickA: [
       "Long sessions that will exceed 200K tokens, no pricing cliff",
       "Work where the coding track record matters more than the price",
@@ -146,7 +146,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-sol",
     b: "grok",
     verdict:
-      "Sol is the safer default and scores higher overall; Grok 4.6 matches it on some agentic work at a fraction of the short-context price. Grok is the newer and less proven of the two, it shipped in August 2026 , so treat it as the value play rather than the reliable one.",
+      "Sol is the safer default and scores higher overall; Grok 4.7 matches it on some agentic work at lower output cost, $2 and $6 against $2 and $10. Grok is the less proven of the two, so treat it as the value play rather than the reliable one.",
     pickA: [
       "Production work where maturity and ecosystem matter",
       "Requests that routinely run long",
@@ -160,7 +160,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gemini-pro",
     b: "grok",
     verdict:
-      "Similar price band, different shapes. Gemini 3.1 Pro brings a million-token context, three modalities and the reasoning-benchmark lead. Grok 4.6 brings stronger built-in tool use and a 500K window that gets expensive past 200K. Gemini is the more general instrument; Grok is tuned for agents.",
+      "Similar price band, different shapes. Gemini 3.1 Pro brings a million-token context, three modalities and the reasoning-benchmark lead. Grok 4.7 brings stronger built-in tool use and a 500K window that gets expensive past 200K. Gemini is the more general instrument; Grok is tuned for agents.",
     pickA: [
       "Long documents, video, or audio in the prompt",
       "Pure reasoning tasks",
@@ -181,7 +181,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     ],
     pickB: [
       "Mixed text, image and audio workloads",
-      "You want one vendor for the whole GPT-5.6 tier ladder",
+      "You want one vendor for the whole OpenAI tier ladder",
     ],
   },
   {
@@ -209,7 +209,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     ],
     pickB: [
       "Almost everything else. It is the better price-to-capability trade",
-      "High-volume agentic work where the 2x multiplier compounds",
+      "High-volume agentic work where the 2.5x multiplier compounds",
     ],
   },
   {
@@ -230,37 +230,37 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "gpt-sol",
     b: "gpt-terra",
     verdict:
-      "Same family, same million-token context, different price and depth. Sol is the flagship for complex agentic and scientific work; Terra is the production tier that most workloads should default to. OpenAI cut Terra's price in July 2026, widening the gap and making the case for starting low.",
+      "Two OpenAI generations with the same million-token context. Sol has moved to GPT-6.1 at $2 and $10 per million tokens, while Terra stays on GPT-5.6 and no longer appears on OpenAI's main pricing page. Check Terra's current rate before picking it to save money; on the prices OpenAI lists today, Sol is the default.",
     pickA: [
       "Problems where the extra capability changes the outcome",
       "Research-grade or scientific reasoning",
     ],
     pickB: [
-      "Production traffic at scale",
-      "Anything where you would notice the flagship bill",
+      "Workloads validated on GPT-5.6 that have not migrated",
+      "Existing deployments tied to Terra's specific behavior",
     ],
   },
   {
     a: "claude-haiku",
     b: "gemini-flash",
     verdict:
-      "The cheap tier, where the shape of the job matters more than the leaderboard. Gemini Flash, now on 3.8, carries a million-token context and is priced to run constantly, which makes it the better agent workhorse. Haiku 4.5 caps at 200K but stays inside the Claude family, so prompts and tool definitions port cleanly from Sonnet.",
+      "The cheap tier, where the shape of the job matters more than the leaderboard. Both now carry a million-token context. Gemini Flash, on 3.8, is priced to run constantly, which makes it the better agent workhorse; Haiku 5.5 stays inside the Claude family, so prompts and tool definitions port cleanly from Sonnet.",
     pickA: [
       "You already run Claude and want one prompt style across tiers",
       "Latency-sensitive classification",
     ],
     pickB: [
-      "Cheap agent loops that need real context",
-      "Long inputs on a small budget",
+      "Cheap agent loops that run constantly",
+      "You already build on Gemini",
     ],
   },
   {
     a: "gpt-luna",
     b: "gemini-flash",
     verdict:
-      "Both are built for volume, and both got materially cheaper in 2026, OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August and 3.8 Flash since. Luna inherits the GPT-5.6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
+      "Both are built for volume, and both got materially cheaper in 2026, OpenAI cut Luna's price by 80% in July, Google shipped 3.7 Flash in August and 3.8 Flash since. Luna inherits the GPT-6 context window and OpenAI's tooling; Flash is the stronger agent runner. Benchmark them on your own traffic, because at this price tier the differences are workload-specific.",
     pickA: [
-      "You are standardising on the GPT-5.6 ladder",
+      "You are standardising on the GPT-6 ladder",
       "Routing and classification inside an OpenAI stack",
     ],
     pickB: [
@@ -272,7 +272,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "claude-haiku",
     b: "gpt-luna",
     verdict:
-      "Two small models with different context budgets. Luna inherits the full GPT-5.6 window; Haiku 4.5 stops at 200K. If you are doing short, high-frequency tasks the difference rarely shows up, pick the one whose family you already use and stop optimising.",
+      "Two small models that now list at the same $0.10 and $0.50 per million tokens, though Haiku 5.5 charges more once a prompt passes 100K tokens. Both carry long context windows. If you are doing short, high-frequency tasks the difference rarely shows up, pick the one whose family you already use and stop optimising.",
     pickA: [
       "Extraction and classification inside a Claude pipeline",
       "You want vision on a small model",
@@ -315,7 +315,7 @@ export const MODEL_PAIRS: ModelPair[] = [
     a: "deepseek",
     b: "kimi",
     verdict:
-      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder. Context is no longer the separator, DeepSeek V4 carries a million tokens too. If you are picking one open model to self-host, K3 is the more general answer, but DeepSeek remains hard to beat on cost per solved reasoning problem.",
+      "Two open models with different centres of gravity. DeepSeek is reasoning-first and extremely cheap; Kimi K3 is the bigger all-rounder. Context is no longer the separator, DeepSeek V4.1 carries a million tokens too. If you are picking one open model to self-host, K3 is the more general answer, but DeepSeek remains hard to beat on cost per solved reasoning problem.",
     pickA: [
       "Chain-of-thought reasoning on a tight budget",
       "Smaller footprint to run",

@@ -93,12 +93,16 @@ const RSS_FEEDS: { url: string; defaultCategory: CategorySlug; sourceName: strin
 
   // ── India ─────────────────────────────────────────────────────────────────
   // The Western feeds above only catch Indian AI news when they happen to cover
-  // it (e.g. Sarvam via TechCrunch). These close that gap. The Google News query
-  // is the "miss nothing" net: AI-scoped via the query, India-scoped via gl/ceid,
-  // pulling every outlet incl. ones with no RSS (Analytics India Magazine, NDTV,
-  // Forbes India). The direct feeds add clean attribution + images for the two
-  // verticals that matter most (startups/funding, enterprise AI).
-  { url: "https://news.google.com/rss/search?q=(%22artificial%20intelligence%22%20OR%20AI%20OR%20LLM%20OR%20%22generative%20AI%22)%20(India%20OR%20Indian)%20when:3d&hl=en-IN&gl=IN&ceid=IN:en", defaultCategory: "startups", sourceName: "India AI", maxItems: 12 },
+  // it (e.g. Sarvam via TechCrunch). These close that gap.
+  //
+  // No Google News here. Its RSS description is just the headline plus the
+  // outlet name, and its article links open a Google interstitial whose meta
+  // description is Google's own boilerplate, so the summariser got nothing but
+  // a headline and invented the rest (2026-10-21: "cities like Bengaluru and
+  // Hyderabad" on a story that never said so). Every feed here must carry
+  // article text in the item itself.
+  { url: "https://analyticsindiamag.com/feed",                             defaultCategory: "startups",       sourceName: "Analytics India Magazine", maxItems: 10 },
+  { url: "https://www.livemint.com/rss/AI",                                defaultCategory: "big-tech",       sourceName: "Mint", maxItems: 6 },
   { url: "https://cio.economictimes.indiatimes.com/rss/artificial-intelligence", defaultCategory: "big-tech",  sourceName: "ET CIO" },
   { url: "https://inc42.com/feed/",                                        defaultCategory: "startups",       sourceName: "Inc42", maxItems: 8 },
 

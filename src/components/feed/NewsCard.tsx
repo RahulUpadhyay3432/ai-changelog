@@ -22,6 +22,11 @@ interface NewsCardProps {
   isNew?: boolean;
 }
 
+// Hero height as a share of the card. The action pill is positioned off the same
+// number so it straddles the image/text boundary; when the hero went 42% → 36%
+// the pill stayed at 42% and landed on the headline's first line.
+const HERO_BASIS = "36%";
+
 // The card summary is generated at ingestion by this model (api/news/fetch).
 // Hardcoded for the attribution label (true for the vast majority of stories).
 // Summaries now come from a provider chain (DeepSeek first, Gemini fallback), so
@@ -212,7 +217,7 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
           box, so the summary painted straight through the content div's 60px
           bottom padding and collided with the footer. A fixed basis cannot do
           that. If this ever needs tuning, it is this one number. */}
-      <div style={{ position: "relative", flex: "0 0 36%", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
+      <div style={{ position: "relative", flex: `0 0 ${HERO_BASIS}`, overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
         {/* Branded gradient sits underneath as a placeholder so there's never a
             black flash while the hero image loads — the image fades in on top. */}
         <CardHeroBackground categorySlug={item.categorySlug} />
@@ -253,7 +258,7 @@ function NewsCardInner({ item, onSave, isSaved = false, isNew = false }: NewsCar
         style={{
           position: "absolute",
           right: "12px",
-          top: "calc(42% - 22px)",
+          top: `calc(${HERO_BASIS} - 22px)`,
           zIndex: 20,
           display: "flex",
           flexDirection: "row",

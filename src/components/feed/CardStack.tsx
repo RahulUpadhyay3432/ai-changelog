@@ -19,6 +19,10 @@ interface CardStackProps {
   onSave?: (id: string) => void;
   onHorizontalDrag?: (dx: number) => void;
   onHorizontalDragEnd?: (dx: number) => void;
+  // Fired when the slot-0 topic picker saves prefs (not on Skip), so the parent
+  // can re-resolve the feed. The stack below the picker was loaded before any
+  // prefs existed, so without this the cards right after "Use these" ignore them.
+  onTopicsSaved?: () => void;
   // Unix ms of the user's previous visit (null for first-timers). Stories
   // published after it get a "New" badge — the returning-user hook.
   lastVisit?: number | null;
@@ -54,7 +58,7 @@ type FeedEntry =
 
 export function CardStack({
   items, onIndexChange, onRefresh, onSave,
-  onHorizontalDrag, onHorizontalDragEnd, lastVisit,
+  onHorizontalDrag, onHorizontalDragEnd, onTopicsSaved, lastVisit,
 }: CardStackProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -389,7 +393,9 @@ export function CardStack({
                   // stack with showTopics=true) would show the picker again.
                   delete document.documentElement.dataset.firstVisit;
                   setShowTopics(false);
-                  setHasInvested(getFeedPrefs() !== null);
+                  const saved = getFeedPrefs() !== null;
+                  setHasInvested(saved);
+                  if (saved) onTopicsSaved?.();
                 }}
               />
             ) : (

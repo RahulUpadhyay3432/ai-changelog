@@ -5260,7 +5260,7 @@ limit 8;`,
         items: [
           "**[Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B)** (Alibaba, August). About 28 billion parameters under Apache 2.0. A strong general model that fits a single large GPU at full precision and consumer GPUs or a Mac when quantized. The safest default if you want one capable open model with no licensing questions. [More on Qwen](/tools/qwen).",
           "**[LFM2.5-24B-A2B](https://huggingface.co/LiquidAI/LFM2.5-24B-A2B)** (Liquid AI, 13 October). 24 billion parameters with about 2 billion active per token, built for fast, private agents running on-device. Custom LFM license.",
-          "**[Nemotron 3.5 Lightning 30B-A3B](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16)** (NVIDIA, August). About 30 billion parameters, roughly 3 billion active, tuned for low-latency tool calling. NVIDIA's own license.",
+          "**[Nemotron 3.5 Lightning 30B-A3B](https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16)** (NVIDIA, August). About 30 billion parameters, roughly 3 billion active, tuned for low-latency tool calling. Released under the OpenMDW-1.1 license.",
           "**[Apertus 1.5](https://huggingface.co/swiss-ai/Apertus-v1.5-70B)** (Swiss AI). 8B and 70B models under Apache 2.0, notable for publishing its training data as well as its weights. Weights landed in July; release notes followed on 15 October.",
         ],
       },

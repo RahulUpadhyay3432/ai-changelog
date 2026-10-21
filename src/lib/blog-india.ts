@@ -465,7 +465,7 @@ export const INDIA_POSTS: BlogPost[] = [
         type: "list",
         items: [
           "**The corpus.** About 2.8 trillion tokens, counted with the Gemma-4 tokenizer: 2,601 billion in native scripts and 224.6 billion in romanized form. It spans 34 language-script configurations, such as `hi-Deva-IN` (Hindi in Devanagari) and `hi-Latn-IN` (romanized Hindi).",
-          "**The pipeline.** A [Nemotron Bharat translation plugin](https://github.com/NVIDIA-NeMo/DataDesignerPlugins/tree/main/plugins/data-designer-nemotron-bharat-translation) for NVIDIA's NeMo Data Designer, so other teams can generate similar data.",
+          "**The pipeline.** A [Nemotron Indic translation plugin](https://github.com/NVIDIA-NeMo/DataDesignerPlugins/tree/main/plugins/data-designer-nemotron-indic-translation) for NVIDIA's NeMo Data Designer, so other teams can generate similar data.",
           "**A report and an eval suite.** A companion report on Hugging Face ([nvidia/nemotron-indic-pretraining-report](https://huggingface.co/datasets/nvidia/nemotron-indic-pretraining-report)), and Indic-LLM-Eval-Suite, a benchmark collection AI4Bharat is still building with NVIDIA's support.",
         ],
       },

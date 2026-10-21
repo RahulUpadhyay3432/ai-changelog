@@ -1,0 +1,490 @@
+{
+  "conflicts": [
+    {
+      "fact_ids": [
+        "f8",
+        "f32"
+      ],
+      "note": "The Decoder reported on September 23, 2026, that Muse attracted 500,000 users in its first week, whereas The Verge reported on September 24, 2026, citing Apptopia, that Muse has 600,000 daily active users in the US alone. The 600,000 US daily active user count exceeds the previously reported 500,000 total first-week user count."
+    },
+    {
+      "fact_ids": [
+        "f20",
+        "f32",
+        "f38",
+        "f42"
+      ],
+      "note": "TechCrunch reported on September 24, 2026, that Muse debuted at Meta's Connect event, but earlier reports show Muse was already active and in users' hands prior to that event: Ars Technica reported a critical zero-day vulnerability in Muse on September 21, 2026; The Decoder reported Amazon blocked Muse from online shopping on September 21, 2026; and The Decoder reported on September 23, 2026, that Muse had already attracted 500,000 users in its first week."
+    }
+  ],
+  "facts": [
+    {
+      "certainty": "confirmed",
+      "id": "f1",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "Meta's Muse can be tricked into revealing its entire filesystem."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f2",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "Developers Peter James and Jonny L. Saunders showed that with minimal prompting Muse will zip and share the root filesystem."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f3",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "The root filesystem revealed by Muse included Ubuntu system files, app templates, and internal documentation."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f4",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "The filesystem incident exposes almost no prompt injection resistance in Muse."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f5",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "The incident raises concerns about security for persistent Linux VMs used by the model."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f6",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:14:12+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem",
+      "text": "Meta's Muse model uses persistent Linux VMs."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f7",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "Meta's Muse is a consumer AI agent that tops the App Store charts."
+    },
+    {
+      "certainty": "reported",
+      "id": "f8",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "On September 24, 2026, The Verge reported Muse has 600,000 daily active users in the US, according to Apptopia."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f9",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "Muse's architecture shows striking similarities to OpenClaw."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f10",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "OpenClaw is the platform that inspired many other agents."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f11",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "Instinct is another AI agent platform valued at $2.5 billion."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f12",
+      "kind": "fact",
+      "published_at": "2026-09-24T17:10:38+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike",
+      "text": "Instinct has been gaining attention in the tech industry."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f13",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "At Meta Connect 2026, Meta announced Muse can now generate video avatars."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f14",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "At Meta Connect 2026, Meta announced Muse can send and receive emails."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f15",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "At Meta Connect 2026, Meta announced Muse can control macOS."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f16",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "Meta announced that video avatars, email integration, and Mac control broaden Muse's personal assistant capabilities."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f17",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "The update enhances Muse's productivity and creative use cases."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f18",
+      "kind": "fact",
+      "published_at": "2026-09-24T13:10:54+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/",
+      "text": "The update positions Muse more competitively against other AI assistants."
+    },
+    {
+      "certainty": "planned",
+      "id": "f19",
+      "kind": "fact",
+      "published_at": "2026-09-24T01:13:32+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/everything-new-coming-to-metas-ai-agent-muse/",
+      "text": "Meta launches Muse, a new AI agent set to power its upcoming AI glasses."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f20",
+      "kind": "fact",
+      "published_at": "2026-09-24T01:13:32+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/everything-new-coming-to-metas-ai-agent-muse/",
+      "text": "Muse debuted at Meta's Connect event on September 24, 2026."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f21",
+      "kind": "fact",
+      "published_at": "2026-09-24T01:13:32+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/everything-new-coming-to-metas-ai-agent-muse/",
+      "text": "At Meta's Connect event, CEO Mark Zuckerberg announced Muse's integration into Meta's wearable tech."
+    },
+    {
+      "certainty": "planned",
+      "id": "f22",
+      "kind": "fact",
+      "published_at": "2026-09-24T01:13:32+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/everything-new-coming-to-metas-ai-agent-muse/",
+      "text": "Muse promises multimodal interaction, blending vision, language, and contextual awareness to enhance user experiences on the glasses platform."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f23",
+      "kind": "fact",
+      "published_at": "2026-09-24T00:46:17+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/meta-made-a-tamagotchi-like-wearable-for-its-muse-ai-agent/",
+      "text": "Meta releases a Tamagotchi-style wearable that houses its Muse AI agent."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f24",
+      "kind": "fact",
+      "published_at": "2026-09-24T00:46:17+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/meta-made-a-tamagotchi-like-wearable-for-its-muse-ai-agent/",
+      "text": "The tiny hardware device acts as a mobile home for Muse, allowing the agent to run on edge and be carried around."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f25",
+      "kind": "fact",
+      "published_at": "2026-09-24T00:46:17+00:00",
+      "source_name": "TechCrunch AI",
+      "source_url": "https://techcrunch.com/2026/09/23/meta-made-a-tamagotchi-like-wearable-for-its-muse-ai-agent/",
+      "text": "The tiny hardware device opens new possibilities for developers to integrate Muse into physical products and experiment with on-device AI."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f26",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Meta integrates Muse AI agent into its new smart glasses, enabling voice-activated task assistance."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f27",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Users can summon Muse on the smart glasses to guide workouts."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f28",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Users can summon Muse on the smart glasses to log meals."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f29",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Users can summon Muse on the smart glasses to help shop for nearby products."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f30",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Meta's new smart glasses gain FDA-cleared hearing enhancement features."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f31",
+      "kind": "fact",
+      "published_at": "2026-09-23T23:40:56+00:00",
+      "source_name": "The Verge",
+      "source_url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features",
+      "text": "Integrating Muse into smart glasses showcases how AI agents are being embedded in AR hardware, offering developers a new platform for voice-driven interactions and accessibility solutions."
+    },
+    {
+      "certainty": "reported",
+      "id": "f32",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "On September 23, 2026, The Decoder reported Meta's new AI agent Muse attracts 500,000 users in its first week."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f33",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "Muse tops Apple's App Store."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f34",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "Meta described Muse as \"heavily inspired\" by the open-source OpenClaw."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f35",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "Muse has nearly identical file names and contents to the open-source OpenClaw."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f36",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "The rapid adoption of Muse sparks IP concerns."
+    },
+    {
+      "certainty": "reported",
+      "id": "f37",
+      "kind": "fact",
+      "published_at": "2026-09-23T14:42:38+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/",
+      "text": "Muse's rapid adoption and similarities to OpenClaw prompt OpenAI to consider a response."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f38",
+      "kind": "fact",
+      "published_at": "2026-09-21T22:24:38+00:00",
+      "source_name": "Ars Technica",
+      "source_url": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/",
+      "text": "On September 21, 2026, Ars Technica reported Muse, Meta's new AI assistant, contains a critical zero-day vulnerability."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f39",
+      "kind": "fact",
+      "published_at": "2026-09-21T22:24:38+00:00",
+      "source_name": "Ars Technica",
+      "source_url": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/",
+      "text": "Muse is described as Meta's extraordinarily privileged AI assistant."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f40",
+      "kind": "fact",
+      "published_at": "2026-09-21T22:24:38+00:00",
+      "source_name": "Ars Technica",
+      "source_url": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/",
+      "text": "A simple ClickFix attack can fully hijack the highly privileged Muse agent."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f41",
+      "kind": "fact",
+      "published_at": "2026-09-21T22:24:38+00:00",
+      "source_name": "Ars Technica",
+      "source_url": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/",
+      "text": "The zero-day flaw leaves the Muse assistant open to complete takeover through basic social engineering techniques."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f42",
+      "kind": "fact",
+      "published_at": "2026-09-21T13:37:51+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/amazon-blocks-metas-ai-agent-muse-from-online-shopping/",
+      "text": "On September 21, 2026, The Decoder reported Amazon blocks Meta's AI agent Muse from shopping on its platform."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f43",
+      "kind": "fact",
+      "published_at": "2026-09-21T13:37:51+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/amazon-blocks-metas-ai-agent-muse-from-online-shopping/",
+      "text": "Amazon prevents the new Meta agent from browsing or purchasing items on Amazon.com."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f44",
+      "kind": "fact",
+      "published_at": "2026-09-21T13:37:51+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/amazon-blocks-metas-ai-agent-muse-from-online-shopping/",
+      "text": "Amazon's block limits Meta's real-world testing of Muse."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f45",
+      "kind": "fact",
+      "published_at": "2026-09-21T13:37:51+00:00",
+      "source_name": "The Decoder",
+      "source_url": "https://the-decoder.com/amazon-blocks-metas-ai-agent-muse-from-online-shopping/",
+      "text": "Amazon's block of Muse underscores competitive tensions and raises questions about platform access for AI agents."
+    },
+    {
+      "certainty": "confirmed",
+      "id": "f46",
+      "kind": "context",
+      "text": "A ClickFix attack is a social engineering technique that deceives a user into copying and executing malicious commands or scripts under the pretense of resolving a software error."
+    }
+  ],
+  "open_questions": [
+    "Has Meta patched or mitigated the critical zero-day vulnerability in Muse that permits full hijack via ClickFix attacks?",
+    "Has Meta introduced prompt injection defenses or filesystem access controls to prevent Muse from revealing and sharing its root filesystem and persistent Linux VM files?",
+    "How is Meta isolating and sandboxing persistent Linux virtual machines and macOS system controls to prevent privileged agents from accessing host resources or unauthorized directories?",
+    "What technical controls or detection systems did Amazon implement to identify and block Muse from browsing and shopping on Amazon.com?",
+    "How does OpenAI intend to respond legally or technically to allegations that Muse copied OpenClaw's architecture and file contents?",
+    "Were any user data, credentials, or private files exposed or compromised when Muse shared its root filesystem containing internal documentation and system files?",
+    "What specific system permissions does Muse request and require on macOS, and what user confirmation prompts exist before actions are executed?",
+    "Does Meta's Tamagotchi-style edge wearable execute model reasoning fully locally on-device, or does it depend on cloud-hosted persistent Linux VMs?"
+  ],
+  "sources": [
+    {
+      "source_name": "The Verge",
+      "title": "Muse will apparently let you download its entire filesystem",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/1000222/meta-muse-ai-filesystem"
+    },
+    {
+      "source_name": "The Verge",
+      "title": "Muse sure looks a lot like OpenClaw",
+      "url": "https://www.theverge.com/report/1000180/muse-openclaw-instinct-lookalike"
+    },
+    {
+      "source_name": "The Decoder",
+      "title": "Meta gives its Muse AI agent video avatars, email addresses, and Mac control",
+      "url": "https://the-decoder.com/meta-gives-its-muse-ai-agent-video-avatars-email-addresses-and-mac-control/"
+    },
+    {
+      "source_name": "TechCrunch AI",
+      "title": "Everything new coming to Meta\u2019s AI agent Muse",
+      "url": "https://techcrunch.com/2026/09/23/everything-new-coming-to-metas-ai-agent-muse/"
+    },
+    {
+      "source_name": "TechCrunch AI",
+      "title": "Meta made a Tamagotchi-like wearable for its Muse AI agent",
+      "url": "https://techcrunch.com/2026/09/23/meta-made-a-tamagotchi-like-wearable-for-its-muse-ai-agent/"
+    },
+    {
+      "source_name": "The Verge",
+      "title": "Muse is coming to Meta smart glasses",
+      "url": "https://www.theverge.com/tech/999673/meta-connect-2026-muse-glasses-features"
+    },
+    {
+      "source_name": "The Decoder",
+      "title": "Meta's AI agent Muse draws 500,000 users in a week along with claims it copied OpenClaw",
+      "url": "https://the-decoder.com/metas-ai-agent-muse-draws-500000-users-in-a-week-along-with-claims-it-copied-openclaw/"
+    },
+    {
+      "source_name": "Ars Technica",
+      "title": "Muse, Meta's extraordinarily privileged AI assistant, has a serious 0-day",
+      "url": "https://arstechnica.com/security/2026/09/muse-metas-extraordinarily-privileged-ai-assistant-has-a-serious-0-day/"
+    },
+    {
+      "source_name": "The Decoder",
+      "title": "Amazon blocks Meta's AI agent Muse from online shopping",
+      "url": "https://the-decoder.com/amazon-blocks-metas-ai-agent-muse-from-online-shopping/"
+    }
+  ]
+}

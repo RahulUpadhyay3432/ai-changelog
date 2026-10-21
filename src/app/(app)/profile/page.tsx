@@ -8,6 +8,7 @@ import { CATEGORIES } from "@/lib/categories";
 import { FeedbackSheet } from "@/components/feedback/FeedbackSheet";
 import { subscribeToNotifications } from "@/lib/notifications";
 import posthog from "posthog-js";
+import { TAGLINE } from "@/lib/brand";
 
 type NotifState = "unsupported" | "default" | "granted" | "denied" | "busy";
 
@@ -467,7 +468,7 @@ export default function ProfilePage() {
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--kt-text-muted, #a3a3a3)", lineHeight: 1.6, margin: "0 0 12px", fontWeight: 500 }}>
-            Kapyn delivers AI and tech news in 30-second reads, no noise, no paywalls.
+            Kapyn is the calm map of the AI worth using: a curated Radar of agents, models, tools, MCP servers and skills, plus a 30-second daily brief on what changed. No noise, no paywall.
           </p>
           <p style={{ fontSize: "13px", color: "var(--kt-text-muted, #525252)", lineHeight: 1.6, margin: 0 }}>
             Sources: OpenAI Blog · Google DeepMind · Hugging Face · TechCrunch AI · VentureBeat · The Verge · Ars Technica · MIT Tech Review · Microsoft AI
@@ -476,7 +477,7 @@ export default function ProfilePage() {
       </div>
 
       <p style={{ textAlign: "center", fontSize: "12px", color: "var(--kt-text-muted, #404040)", marginTop: "auto", padding: "24px" }}>
-        Kapyn v1.0.0 · What happened in AI today.
+        Kapyn · {TAGLINE}.
       </p>
     </div>
   );

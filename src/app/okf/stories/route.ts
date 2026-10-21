@@ -81,10 +81,10 @@ tags: [${allTags.join(", ")}]
 timestamp: ${now}
 ---
 
-# Kapyn News Digest , ${today}
+# Kapyn News Digest: ${today}
 
 ${stories.length} stories from the last 48 hours, grouped by category.
-Published by Kapyn (${APP_URL}) , the curated map of the AI worth using, with each day’s AI/tech news distilled to 30-second reads.
+Published by Kapyn (${APP_URL}), the curated map of the AI worth using, with each day’s AI/tech news distilled to 30-second reads.
 
 [← Back to catalog](/okf)
 ${sections}`;

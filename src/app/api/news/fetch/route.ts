@@ -341,7 +341,7 @@ function clipAtWord(text: string, max: number): string {
 
 function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
   return repos.map((repo) => ({
-    // Title: "repo-name, short description". The description is CLIPPED AT A WORD
+    // Title: "repo-name: short description". The description is CLIPPED AT A WORD
     // BOUNDARY, which it previously was not: a flat .slice(0, 120) cut mid-word
     // and shipped titles like "...with OpenAI, Anthropic and Gemini co".
     //
@@ -350,7 +350,7 @@ function githubReposToFeedItems(repos: GitHubRepo[]): FeedItem[] {
     // Measured 2026-10-03: GitHub titles averaged 128 chars against 65-69 for
     // every other source, which is why GitHub cards were the worst-truncated.
     // The description is not lost, the summary already opens by restating it.
-    title: repo.description ? `${repo.name} , ${clipAtWord(repo.description, 70)}` : repo.name,
+    title: repo.description ? `${repo.name}: ${clipAtWord(repo.description, 70)}` : repo.name,
     sourceUrl: repo.htmlUrl,
     sourceName: "GitHub",
     defaultCategory: "open-source" as CategorySlug,
@@ -492,9 +492,9 @@ async function insertItems(
       // provider outage doesn't bury it under a hundred identical errors.
       if (!results.llmError) {
         results.llmError = outcome.reason;
-        results.errors.push(`LLM failed , ${outcome.reason}`);
+        results.errors.push(`LLM failed: ${outcome.reason}`);
       }
-      results.errors.push(`LLM failed for "${item.title}" , skipped`);
+      results.errors.push(`LLM failed for "${item.title}", skipped`);
       if (await backlogFailedStory(supabase, item, outcome.reason)) {
         results.backlogged++;
       }
@@ -589,7 +589,7 @@ export async function GET(request: NextRequest) {
         if (!r.ok || isBadSummary(r.value.summary)) {
           results.errors.push(
             !r.ok
-              ? `Re-summary failed for "${item.title}" , ${r.reason}`
+              ? `Re-summary failed for "${item.title}": ${r.reason}`
               : `Bad re-summary skipped for "${item.title}"`,
           );
           continue;

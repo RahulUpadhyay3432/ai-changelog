@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bookmark } from "lucide-react";
+import Link from "next/link";
+import { Bookmark, ArrowRight } from "lucide-react";
 import { CardStack } from "@/components/feed/CardStack";
 import { getSavedStories } from "@/lib/storage";
 import type { NewsItem } from "@/lib/types";
@@ -111,11 +112,28 @@ export default function SavedPage() {
               <Bookmark size={28} className="animate-pulse" style={{ color: "rgba(255, 255, 255, 0.4)" }} />
             </div>
             <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 700, color: "var(--kt-text-primary, #f5f5f5)", letterSpacing: "-0.02em" }}>
-              Your Archive is Empty
+              Nothing saved yet
             </h2>
             <p style={{ fontSize: "14px", margin: 0, color: "var(--kt-text-muted, #737373)", lineHeight: 1.5 }}>
-              Stories you bookmark will appear here in a premium, swipeable stack. Keep track of what matters.
+              Tap the bookmark on any story and it lands here, ready to pick up later.
             </p>
+            <Link
+              href="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "7px",
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "var(--kt-text-primary, #f5f5f5)",
+                border: "1px solid var(--kt-hairline, rgba(255,255,255,0.12))",
+                borderRadius: "12px",
+                padding: "10px 16px",
+                textDecoration: "none",
+              }}
+            >
+              Open the feed <ArrowRight size={15} strokeWidth={2.3} />
+            </Link>
           </div>
         </div>
       ) : (

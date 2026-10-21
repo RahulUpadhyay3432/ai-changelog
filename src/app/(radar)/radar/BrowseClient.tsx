@@ -230,7 +230,7 @@ export function BrowseClient(data: BrowseData) {
           <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: SG, fontSize: "32px", fontWeight: 700, color: TEXT.primary, margin: 0, letterSpacing: "-0.035em", lineHeight: 1.02 }}>Explore the radar</h1>
             <p style={{ fontSize: "15px", color: TEXT.body, margin: "8px 0 0", lineHeight: 1.45, maxWidth: "300px" }}>
-              Every tool, model and company in one place.
+              The tools, models and companies worth tracking, in one place.
             </p>
           </div>
           <span style={{ flexShrink: 0, marginTop: "6px" }}><ThemeToggle /></span>

@@ -5,6 +5,7 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { APP_URL, SOCIAL_URLS } from "@/lib/site";
+import { TITLE_DEFAULT, DESCRIPTION, DESCRIPTION_SHORT, APP_DESCRIPTION } from "@/lib/brand";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -25,8 +26,7 @@ const SITE_JSONLD = {
       name: "Kapyn",
       url: APP_URL,
       logo: `${APP_URL}/api/icon/512`,
-      description:
-        "The calm map of the AI worth using, agents, models, tools, MCP servers and skills.",
+      description: DESCRIPTION_SHORT,
       sameAs: SOCIAL_URLS,
     },
     {
@@ -39,7 +39,7 @@ const SITE_JSONLD = {
         "@type": "SearchAction",
         target: {
           "@type": "EntryPoint",
-          urlTemplate: `${APP_URL}/explore?q={search_term_string}`,
+          urlTemplate: `${APP_URL}/search?q={search_term_string}`,
         },
         "query-input": "required name=search_term_string",
       },
@@ -55,8 +55,7 @@ const SITE_JSONLD = {
       url: APP_URL,
       applicationCategory: "ReferenceApplication",
       operatingSystem: "Web, iOS, Android",
-      description:
-        "A curated map of the AI worth using, agents, models, tools, MCP servers and skills, kept current by a daily signal. Each day's AI news is also distilled to swipeable 30-second dispatches.",
+      description: APP_DESCRIPTION,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       isAccessibleForFree: true,
       publisher: { "@id": `${APP_URL}/#organization` },
@@ -70,11 +69,10 @@ export const metadata: Metadata = {
     google: "vwiJeZYbR-J6Se91wicz3KZlpXtY8_YlWTxuZ7gRfjc",
   },
   title: {
-    default: "Kapyn, The calm signal layer for AI",
+    default: TITLE_DEFAULT,
     template: "%s | Kapyn",
   },
-  description:
-    "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+  description: DESCRIPTION,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -89,18 +87,16 @@ export const metadata: Metadata = {
     apple: [{ url: "/api/icon/180", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Kapyn, The calm signal layer for AI",
-    description:
-      "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+    title: TITLE_DEFAULT,
+    description: DESCRIPTION,
     url: APP_URL,
     siteName: "Kapyn",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kapyn, The calm signal layer for AI",
-    description:
-      "Find the AI worth using, a curated map of the tools, models, MCP servers and skills worth your time, plus what happened in AI in 30 seconds a day. No paywall, ever.",
+    title: TITLE_DEFAULT,
+    description: DESCRIPTION,
   },
 };
 

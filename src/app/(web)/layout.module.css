@@ -17,6 +17,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 16px 24px;
   background: var(--kt-web-header-bg, rgba(16, 15, 13, 0.82));
   backdrop-filter: blur(12px);
@@ -43,6 +44,23 @@
   display: flex;
   gap: 20px;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+  .header {
+    padding: 14px 16px;
+  }
+  .nav {
+    gap: 13px;
+  }
+  .navLink {
+    font-size: 13px;
+  }
+  .wordmark {
+    font-size: 20px;
+  }
 }
 
 .navLink {
@@ -77,6 +95,22 @@
   box-sizing: border-box;
   font-size: 13px;
   color: var(--kt-text-muted, #737373);
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.footerLink {
+  color: var(--kt-text-muted, #737373);
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  color: var(--kt-text-body, #a3a3a3);
 }
 
 .footerDim {

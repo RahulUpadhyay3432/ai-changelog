@@ -39,7 +39,7 @@ const RAW: Record<string, ToolDepth> = {
   "https://claude.ai": {
     whatItIs: "Anthropic's assistant, known for long-context reasoning and strong coding.",
     howItWorks: "It reads large documents or codebases in a single context window and works through them step by step, with optional tool use and file uploads.",
-    whoItsFor: "Builders and writers who work with long inputs, full repos, contracts, research , and want careful, structured output.",
+    whoItsFor: "Builders and writers who work with long inputs (full repos, contracts, research) and want careful, structured output.",
     whereUsed: "Codebase reasoning, document analysis, and writing that needs to hold a lot of context at once.",
   },
   "https://gemini.google.com": {
@@ -82,7 +82,7 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://devin.ai/desktop": {
     whatItIs: "An agentic IDE that builds features end to end, called Windsurf until June 2026.",
-    howItWorks: "Its agent keeps track of your project state and takes multi-step actions, editing files, running commands , while you stay in the loop. Cognition now sits it alongside the Devin cloud agent, so local and hand-off work share one account.",
+    howItWorks: "Its agent keeps track of your project state and takes multi-step actions (editing files, running commands) while you stay in the loop. Cognition now sits it alongside the Devin cloud agent, so local and hand-off work share one account.",
     whoItsFor: "Developers who want a more autonomous coding agent inside a full editor.",
     whereUsed: "Feature development and larger changes where the agent handles several steps at once.",
   },
@@ -147,7 +147,7 @@ const RAW: Record<string, ToolDepth> = {
   "https://replicate.com": {
     whatItIs: "A service to run and deploy machine-learning models with one API call.",
     howItWorks: "Models are packaged as containers you call over HTTP; you can run community models or push your own.",
-    whoItsFor: "Developers who want to use models, especially image, video, and audio , without managing infrastructure.",
+    whoItsFor: "Developers who want to use models, especially image, video and audio, without managing infrastructure.",
     whereUsed: "Image and media generation, and shipping custom models behind an API.",
   },
   "https://huggingface.co": {
@@ -174,7 +174,7 @@ const RAW: Record<string, ToolDepth> = {
   // ── Agents & automation ──
   "https://n8n.io": {
     whatItIs: "A workflow automation tool you can self-host, with first-class AI nodes.",
-    howItWorks: "You connect triggers and actions on a visual canvas, including LLM and agent nodes , and the workflow runs on your own infrastructure.",
+    howItWorks: "You connect triggers and actions on a visual canvas, including LLM and agent nodes, and the workflow runs on your own infrastructure.",
     whoItsFor: "Technical teams who want automation and AI workflows without sending data to a closed SaaS.",
     whereUsed: "Internal automations, data pipelines, and self-hosted AI agents.",
   },
@@ -226,13 +226,13 @@ const RAW: Record<string, ToolDepth> = {
   },
   "https://semgrep.dev": {
     whatItIs: "A fast static analysis tool that scans code for security and quality bugs.",
-    howItWorks: "It matches code against rules, pattern-based, so you can write your own , and flags issues in seconds across many languages.",
+    howItWorks: "It matches code against pattern-based rules you can write yourself, and flags issues in seconds across many languages.",
     whoItsFor: "Developers and security teams who want quick, customizable scanning in CI.",
     whereUsed: "Catching vulnerabilities and enforcing code standards before merge.",
   },
   "https://socket.dev": {
     whatItIs: "A tool that catches malicious and risky open-source dependencies.",
-    howItWorks: "It inspects what packages actually do, network access, install scripts, shell use , to flag supply-chain attacks traditional scanners miss.",
+    howItWorks: "It inspects what packages actually do (network access, install scripts, shell use) to flag supply-chain attacks traditional scanners miss.",
     whoItsFor: "Teams worried about compromised or sketchy packages entering their codebase.",
     whereUsed: "Reviewing new dependencies and guarding the supply chain in pull requests.",
   },
@@ -430,7 +430,7 @@ const RAW: Record<string, ToolDepth> = {
   // ── Orchestration (added) ──
   "https://mastra.ai": {
     whatItIs: "A TypeScript framework for agents, workflows, and RAG.",
-    howItWorks: "It gives you typed building blocks, agents, tools, workflows, memory , to assemble AI features in one codebase.",
+    howItWorks: "It gives you typed building blocks (agents, tools, workflows, memory) to assemble AI features in one codebase.",
     whoItsFor: "TypeScript developers who want structure for production AI apps.",
     whereUsed: "Agents, RAG, and multi-step AI workflows in JavaScript stacks.",
   },

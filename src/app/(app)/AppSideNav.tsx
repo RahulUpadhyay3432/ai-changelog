@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Newspaper, Radar, TrendingUp, Bookmark, User, FileText, Home, type LucideIcon } from "lucide-react";
 import { GOLD, TEXT, SG } from "@/lib/design-tokens";
+import { TAGLINE } from "@/lib/brand";
 
 // Desktop-only left rail for the app shell — the same nav language as the Radar
 // sidebar, so the feed and Radar read as one product. Hidden below the desktop
@@ -63,7 +64,7 @@ export function AppSideNav() {
         {SECONDARY.map((i) => item(i, true))}
       </div>
       <div style={{ marginTop: "auto", padding: "0 12px", fontSize: "12px", color: "var(--kt-text-muted, #615c57)", lineHeight: 1.5 }}>
-        Calm intelligence for AI.<br />No paywall, ever.
+        {TAGLINE}.<br />No paywall, ever.
       </div>
     </>
   );

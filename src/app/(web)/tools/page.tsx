@@ -10,10 +10,10 @@ export const revalidate = 86400;
 
 // The 40-word extractable answer for "what are AI tools".
 const WHAT_ARE_TOOLS =
-  "AI tools are the apps and services that put AI to work, chat assistants, coding copilots, image and video generators, agent frameworks, and the infrastructure to run them , so you can build, create and ship without starting from scratch.";
+  "AI tools are the apps and services that put AI to work: chat assistants, coding copilots, image and video generators, agent frameworks, and the infrastructure to run them, so you can build, create and ship without starting from scratch.";
 
 const DESC =
-  "A curated directory of the essential AI tools worth knowing, models and chat, coding, UI and design, agents, inference, data and more , the must-know names, by category.";
+  "A curated directory of the essential AI tools worth knowing: models and chat, coding, UI and design, agents, inference, data and more. The must-know names, by category.";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "Models & chat": "🧠",

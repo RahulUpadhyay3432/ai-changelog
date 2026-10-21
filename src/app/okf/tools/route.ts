@@ -77,7 +77,7 @@ tags: [${allTopics.join(", ")}]
 timestamp: ${now}
 ---
 
-# Kapyn Radar , AI Tools Catalog (${today})
+# Kapyn Radar: AI Tools Catalog (${today})
 
 Tracking ${total} items: ${tools.length} trending tools · ${entities.length} AI entities · ${essentials.length} essentials
 

@@ -15,7 +15,7 @@
 // setting on a frontier model, not a separate product. The category is kept for
 // models whose whole pitch is reasoning-first.
 
-export const LAST_UPDATED = "2026-09-04";
+export const LAST_UPDATED = "2026-10-02";
 
 export type ModelCategory = "frontier" | "balanced" | "efficient" | "reasoning" | "open";
 
@@ -70,7 +70,7 @@ export const MODELS: AIModel[] = [
   {
     id: "claude-opus",
     name: "Claude Opus",
-    currentVersion: "Opus 5",
+    currentVersion: "Opus 5.5",
     provider: "Anthropic",
     providerUrl: "https://www.anthropic.com/claude",
     pricingUrl: "https://www.anthropic.com/pricing",
@@ -79,7 +79,7 @@ export const MODELS: AIModel[] = [
     priceTier: "$$$",
     modalities: ["text", "vision"],
     openWeights: false,
-    bestFor: "Agentic coding and multi-step engineering work, near the ceiling, at half the price",
+    bestFor: "Agentic coding and multi-step engineering work, near the ceiling at a fraction of the price",
     strengths: ["Leads agentic benchmarks", "Best-in-class coding", "Reasoning-effort control"],
   },
   {
@@ -147,7 +147,7 @@ export const MODELS: AIModel[] = [
   {
     id: "claude-sonnet",
     name: "Claude Sonnet",
-    currentVersion: "Sonnet 5",
+    currentVersion: "Sonnet 5.5",
     provider: "Anthropic",
     providerUrl: "https://www.anthropic.com/claude",
     pricingUrl: "https://www.anthropic.com/pricing",

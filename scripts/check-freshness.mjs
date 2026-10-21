@@ -24,7 +24,12 @@ const notes = [];
 const fail = (where, msg) => failures.push(`${where}: ${msg}`);
 
 // ─── 1. models.ts is the declared source of truth, so its age is the headline signal ──
-const MAX_MODEL_AGE_DAYS = 45;
+// This is a calendar reminder, NOT a release check: nothing here knows whether a
+// provider shipped. At 45 days the file sat 10 days behind Claude Opus 5.5 and still
+// passed, so the window is shorter now. The real fix is a release-watch source that
+// reads provider pages; until that exists, treat a pass as "recently looked at",
+// never as "current".
+const MAX_MODEL_AGE_DAYS = 21;
 
 const modelsSrc = read("src/lib/models.ts");
 const stamp = modelsSrc.match(/export const LAST_UPDATED = "(\d{4}-\d{2}-\d{2})"/);
@@ -87,7 +92,7 @@ for (const f of CONTENT_FILES) {
 
 // The same names must not survive in the comparison verdicts or on the landing page,
 // neither of which has a roundup exemption.
-for (const f of ["src/lib/model-pairs.ts", "src/app/home/page.tsx"]) {
+for (const f of ["src/lib/model-pairs.ts", "src/app/home/page.tsx", "src/app/(web)/compare/page.tsx"]) {
   const src = read(f);
   for (const re of RETIRED) {
     const hit = src.match(re);

@@ -37,7 +37,7 @@ function SearchInner() {
         Search Kapyn
       </h1>
       <p style={{ fontSize: "14px", color: TEXT.muted, margin: "0 0 28px" }}>
-        Tools, MCP servers, AI skills, and guides, all in one place.
+        Tools, MCP servers, AI skills and guides. News stories and explainers are not indexed here yet.
       </p>
 
       {/* Search input */}
@@ -68,7 +68,7 @@ function SearchInner() {
       {!hasQuery && (
         <div style={{ color: TEXT.muted, fontSize: "14px", lineHeight: 1.6 }}>
           <p style={{ margin: "0 0 20px" }}>
-            Start typing to search across {ALL_RESULTS.length}+ tools, MCP servers, AI skills, and guides.
+            Start typing to search across {ALL_RESULTS.length} tools, MCP servers, AI skills and guides.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {["cursor", "claude", "supabase", "github", "mcp", "rag"].map((s) => (
@@ -97,7 +97,7 @@ function SearchInner() {
             <Link href="/radar/browse" style={{ color: GOLD, textDecoration: "none" }}>
               radar browse
             </Link>{" "}
-            for everything on the map.
+            to browse the catalog by category.
           </p>
         </div>
       )}

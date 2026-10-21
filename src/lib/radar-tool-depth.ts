@@ -257,7 +257,7 @@ const RAW: Record<string, ToolDepth> = {
     whereUsed: "Tracking cost per feature, latency, and usage across models.",
   },
   "https://langfuse.com": {
-    whatItIs: "Open-source tracing and evaluation for LLM applications.",
+    whatItIs: "Open-source tracing and evaluation for LLM applications. Joined ClickHouse and remains open source.",
     howItWorks: "It captures traces of model and agent runs and lets you score outputs, run evals, and manage prompts, self-hostable or managed.",
     whoItsFor: "Engineers who want open, self-hostable observability for their AI stack.",
     whereUsed: "Tracing agents, running evals, and versioning prompts in production.",
@@ -449,7 +449,7 @@ const RAW: Record<string, ToolDepth> = {
     whereUsed: "Managing API keys and config across services and environments.",
   },
   "https://lakera.ai": {
-    whatItIs: "A security layer that guards LLM apps against misuse.",
+    whatItIs: "A security layer that guards LLM apps against misuse, now part of Check Point Software.",
     howItWorks: "It screens prompts and outputs for prompt injection, data leaks, and unsafe content before they reach the model or user.",
     whoItsFor: "Teams putting LLM features in front of real users.",
     whereUsed: "Protecting chatbots and agents from prompt-injection attacks.",
@@ -524,7 +524,7 @@ const VERDICTS: Record<string, { verdict: Verdict; take: string }> = {
   "https://deepseek.com":    { verdict: "worth-it", take: "Frontier-grade reasoning at a fraction of the price, the value pick. If your data-governance team is comfortable with the origin." },
 
   // AI coding
-  "https://cursor.com":                  { verdict: "worth-it", take: "The best AI editor today, full stop. The catch: it's a paid VS Code fork, so you're betting your daily driver on a startup's roadmap and pricing." },
+  "https://cursor.com":                  { verdict: "worth-it", take: "The best AI editor today, full stop. The catch: it's a paid VS Code fork, so you're betting your daily driver on SpaceXAI's roadmap and pricing." },
   "https://github.com/features/copilot": { verdict: "worth-it", take: "Cheap, safe, everywhere. But it's autocomplete, Cursor and Claude Code have lapped it on real multi-file work." },
   "https://claude.com/claude-code":      { verdict: "worth-it", take: "The strongest terminal agent right now, if you live in the CLI. GUI-first devs will bounce; it assumes you trust it with your shell." },
   "https://lovable.dev":  { verdict: "watch", take: "Magic for a demo, brittle past it. Perfect for a v0 or a pitch; painful to maintain once real users arrive. Prototype, don't ship." },
@@ -577,7 +577,7 @@ const VERDICTS: Record<string, { verdict: Verdict; take: string }> = {
   "https://snyk.io":       { verdict: "worth-it", take: "The incumbent for dependency and code scanning, thorough. Priced like an enterprise tool the moment you're past the free tier." },
   "https://semgrep.dev":   { verdict: "worth-it", take: "Fast, writable static analysis that fits CI. Generous free tier; the real value is in writing your own rules." },
   "https://helicone.ai":   { verdict: "worth-it", take: "One-line LLM observability, the easiest place to start watching cost and latency. Choose Langfuse instead if you'd rather self-host." },
-  "https://langfuse.com":  { verdict: "worth-it", take: "Open-source tracing and evals, self-host and own the data. More setup than Helicone, more control." },
+  "https://langfuse.com":  { verdict: "worth-it", take: "Open-source tracing and evals, joined ClickHouse and remains open source. Self-host and own the data; more setup than Helicone, more control." },
   "https://braintrust.dev": { verdict: "worth-it", take: "Actually measure whether a prompt or model change helped before you ship it. The discipline it forces is the real product." },
 
   // Media

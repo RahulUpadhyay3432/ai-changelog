@@ -15,7 +15,7 @@
 // setting on a frontier model, not a separate product. The category is kept for
 // models whose whole pitch is reasoning-first.
 
-export const LAST_UPDATED = "2026-10-02";
+export const LAST_UPDATED = "2026-10-21";
 
 export type ModelCategory = "frontier" | "balanced" | "efficient" | "reasoning" | "open";
 
@@ -103,14 +103,14 @@ export const MODELS: AIModel[] = [
     provider: "OpenAI",
     providerUrl: "https://openai.com",
     pricingUrl: "https://openai.com/api/pricing/",
-    currentVersion: "GPT-5.6 Sol",
+    currentVersion: "GPT-6.1 Sol",
     category: "frontier",
     contextK: 1000,
-    priceTier: "$$$",
+    priceTier: "$$",
     modalities: ["text", "vision"],
     openWeights: false,
     bestFor: "Frontier-grade generalist work now that Astra has taken the top of the line",
-    strengths: ["Strong across reasoning and code", "Broadest ecosystem", "Cheaper than it was in July"],
+    strengths: ["Strong across reasoning and code", "Broadest ecosystem", "Cached input at $0.10 per 1M tokens"],
   },
   {
     id: "gemini-pro",
@@ -128,9 +128,24 @@ export const MODELS: AIModel[] = [
     strengths: ["Leads reasoning benchmarks", "Huge context", "Strong price for the tier"],
   },
   {
+    id: "gemini-4-argon",
+    name: "Gemini 4 Argon",
+    currentVersion: "4 Argon",
+    provider: "Google",
+    providerUrl: "https://deepmind.google/technologies/gemini/",
+    pricingUrl: "https://ai.google.dev/pricing",
+    category: "frontier",
+    contextK: 1000,
+    priceTier: "$$$",
+    modalities: ["text"],
+    openWeights: false,
+    bestFor: "Complex software engineering, deep mathematical and scientific problem solving, and autonomous multi-step agents",
+    strengths: ["Flagship reasoning model", "Long-decode generation up to 1M tokens", "$2/$10 until 30 Nov 2026, then $4/$20"],
+  },
+  {
     id: "grok",
     name: "Grok",
-    currentVersion: "4.6",
+    currentVersion: "4.7",
     provider: "xAI",
     providerUrl: "https://x.ai",
     pricingUrl: "https://docs.x.ai/docs/models",
@@ -194,7 +209,7 @@ export const MODELS: AIModel[] = [
   {
     id: "gpt-luna",
     name: "GPT Luna",
-    currentVersion: "GPT-5.6 Luna",
+    currentVersion: "GPT-6 Luna",
     provider: "OpenAI",
     providerUrl: "https://openai.com",
     pricingUrl: "https://openai.com/api/pricing/",
@@ -204,17 +219,17 @@ export const MODELS: AIModel[] = [
     modalities: ["text", "vision"],
     openWeights: false,
     bestFor: "Classification, routing, and extraction at volume",
-    strengths: ["Cheapest in the GPT-5.6 family", "Frontier-family context", "Fast"],
+    strengths: ["Cheapest in the GPT-6 family", "Frontier-family context", "Fast"],
   },
   {
     id: "claude-haiku",
     name: "Claude Haiku",
-    currentVersion: "Haiku 4.5",
+    currentVersion: "Haiku 5.5",
     provider: "Anthropic",
     providerUrl: "https://www.anthropic.com/claude",
     pricingUrl: "https://www.anthropic.com/pricing",
     category: "efficient",
-    contextK: 200,
+    contextK: 1000,
     priceTier: "$",
     modalities: ["text", "vision"],
     openWeights: false,
@@ -226,7 +241,7 @@ export const MODELS: AIModel[] = [
   {
     id: "deepseek",
     name: "DeepSeek",
-    currentVersion: "V4",
+    currentVersion: "V4.1",
     provider: "DeepSeek",
     providerUrl: "https://www.deepseek.com",
     pricingUrl: "https://platform.deepseek.com",

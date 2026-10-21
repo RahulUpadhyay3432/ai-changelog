@@ -223,7 +223,8 @@
   z-index: 2;
   width: 100%;
   max-width: 820px;
-  padding: 30px 34px 30px;
+  /* Top padding clears .heroBack once a long title and deck outgrow min-height. */
+  padding: 56px 34px 30px;
 }
 .heroTitle {
   font-family: var(--font-space-grotesk), sans-serif;
@@ -247,7 +248,7 @@
     min-height: 280px;
   }
   .heroInner {
-    padding: 22px 20px;
+    padding: 52px 20px 22px;
   }
 }
 

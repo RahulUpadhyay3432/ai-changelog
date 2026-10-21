@@ -57,6 +57,282 @@ const U = (id: string, w = 1600) =>
   `https://images.unsplash.com/photo-${id}?w=${w}&q=75&auto=format&fit=crop`;
 
 export const BLOG_POSTS: BlogPost[] = [
+  // ─── News: Smithery shutdown (time-sensitive, 31 Oct 2026) ────────────────
+  {
+    slug: "smithery-shutdown-mcp-migration",
+    title: "Smithery's MCP proxy shuts down on 31 October: how to move each server to its official URL",
+    deck: "Smithery's proxy URLs, API, accounts and keys stop working on 31 October. Who is affected, how to find Smithery entries in your configs, and the official endpoint for 12 common servers.",
+    date: "2026-10-21",
+    readingMin: 7,
+    tag: "MCP",
+    hero: {
+      src: "/blog/smithery-shutdown-mcp-migration.webp",
+      alt: "An old telephone switchboard with one patch cord pulled out and lying on the desk, the other cords still plugged in",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Smithery shuts down its MCP proxy and managed identity on 31 October 2026. After that date, server URLs on `run.tools` and `server.smithery.ai` stop working, and so do Smithery accounts, API keys, Connect and Toolbox. If any MCP server in your setup came from Smithery, it needs a new URL before the end of the month. For most servers the fix is one line: point the client at the vendor's own endpoint.",
+      },
+      { type: "heading", level: 2, text: "What stops working on 31 October" },
+      {
+        type: "paragraph",
+        text: "The notice at [smithery.ai/future](https://smithery.ai/future) is signed by cofounder Anirudh Kamath. Smithery is now part of Arcade. The list of what stops is short and specific:",
+      },
+      {
+        type: "list",
+        items: [
+          "Server URLs on `run.tools` and `server.smithery.ai`.",
+          "The Smithery API, Smithery Connect and Smithery Toolbox.",
+          "Smithery accounts and API keys.",
+          "The Smithery CLI and SDKs. The current versions are marked deprecated, and connecting through Smithery is no longer possible.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "What stays is the directory. smithery.ai continues as a public, non-proxied MCP registry, now powered by Arcade.dev. Pages for verified servers show the vendor's direct URL instead of a Smithery one: `mcp.linear.app/mcp` in place of `linear.run.tools` or `server.smithery.ai/linear`. If a server you use is not in the list below, its Smithery page is the quickest place to find the official URL.",
+      },
+      {
+        type: "paragraph",
+        text: "Paid plans are refunded for every charge since 5 August, and subscriptions are cancelled. Smithery says refunds usually arrive within 5 to 10 business days. Kamath offers help with migrations at ani [at] smithery [dot] ai.",
+      },
+      { type: "heading", level: 2, text: "Who is affected" },
+      {
+        type: "list",
+        items: [
+          "**Individual developers.** Anyone who added a server to Claude Desktop, Claude Code, Cursor, VS Code, Windsurf or Codex by copying a Smithery URL or a `@smithery/cli` command. Those tools disappear from your agent on 31 October.",
+          "**Teams with shared configs.** A `.mcp.json` or `.cursor/mcp.json` committed to a repository breaks for every teammate at once. One fix in the repo covers everyone.",
+          "**Products built on Smithery.** If you used Connect, the API or managed identity to run OAuth and tool calls for your own users, there is no one-line swap. Smithery's note says these setups need a replacement before 31 October.",
+        ],
+      },
+      { type: "heading", level: 2, text: "How to find Smithery entries in your configs" },
+      {
+        type: "paragraph",
+        text: "Search your MCP config files for three strings: `run.tools`, `server.smithery.ai` and `@smithery/cli`. The first two appear in remote server URLs. The third appears in the `args` of servers installed through the Smithery CLI. On macOS or Linux, this checks the usual places in one pass:",
+      },
+      {
+        type: "code",
+        lang: "bash",
+        code: "grep -nE 'run\\.tools|server\\.smithery\\.ai|@smithery/cli' \\\n  ~/.cursor/mcp.json .cursor/mcp.json \\\n  ~/.claude.json .mcp.json .vscode/mcp.json \\\n  ~/.codex/config.toml \\\n  \"$HOME/Library/Application Support/Claude/claude_desktop_config.json\" 2>/dev/null",
+      },
+      {
+        type: "paragraph",
+        text: "Where each client keeps its config:",
+      },
+      {
+        type: "list",
+        items: [
+          "**Claude Desktop:** `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, `%APPDATA%\\Claude\\claude_desktop_config.json` on Windows, under `mcpServers`.",
+          "**Claude Code:** `~/.claude.json` for your own servers, `.mcp.json` at the repository root for shared ones.",
+          "**Cursor:** `~/.cursor/mcp.json` globally, `.cursor/mcp.json` per project.",
+          "**VS Code:** `.vscode/mcp.json` per workspace. The top-level key is `servers`, not `mcpServers`.",
+          "**Codex:** `~/.codex/config.toml`, one `[mcp_servers.<name>]` table per server.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Swapping one server: Linear as the example" },
+      {
+        type: "paragraph",
+        text: "A Smithery entry usually takes one of two shapes. The remote form points at a Smithery URL:",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: "{\n  \"mcpServers\": {\n    \"linear\": {\n      \"url\": \"https://linear.run.tools\"\n    }\n  }\n}",
+      },
+      {
+        type: "paragraph",
+        text: "The CLI form runs Smithery's package locally. The server name and flags vary, but `@smithery/cli` in `args` is the tell:",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: "{\n  \"mcpServers\": {\n    \"linear\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@smithery/cli@latest\", \"run\", \"<server>\", \"--key\", \"<smithery-key>\"]\n    }\n  }\n}",
+      },
+      {
+        type: "paragraph",
+        text: "Replace either one with the vendor's endpoint. In Cursor:",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: "{\n  \"mcpServers\": {\n    \"linear\": {\n      \"url\": \"https://mcp.linear.app/mcp\"\n    }\n  }\n}",
+      },
+      {
+        type: "paragraph",
+        text: "In a shared Claude Code `.mcp.json`, add the transport type:",
+      },
+      {
+        type: "code",
+        lang: "json",
+        code: "{\n  \"mcpServers\": {\n    \"linear\": {\n      \"type\": \"http\",\n      \"url\": \"https://mcp.linear.app/mcp\"\n    }\n  }\n}",
+      },
+      {
+        type: "paragraph",
+        text: "From the Claude Code command line, it is two commands:",
+      },
+      {
+        type: "code",
+        lang: "bash",
+        code: "claude mcp remove linear\nclaude mcp add --transport http linear https://mcp.linear.app/mcp",
+      },
+      {
+        type: "paragraph",
+        text: "Claude Desktop is the exception. Remote servers are added in the app's settings as custom connectors, not in the JSON file. Delete the Smithery entry from `claude_desktop_config.json`, restart the app, and add the vendor URL as a connector.",
+      },
+      { type: "heading", level: 2, text: "Official endpoints for 12 common servers" },
+      {
+        type: "paragraph",
+        text: "Each endpoint below appears on the vendor's own documentation, checked on 21 October 2026. Most use Streamable HTTP and sign you in with OAuth the first time you connect.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Linear:** `https://mcp.linear.app/mcp`, or `https://mcp.linear.app/mcp/readonly` for read-only access. OAuth. [Linear MCP docs](https://linear.app/docs/mcp).",
+          "**GitHub:** `https://api.githubcopilot.com/mcp/`, with OAuth or a personal access token. For a local server, GitHub publishes the Docker image `ghcr.io/github/github-mcp-server`. The old `@modelcontextprotocol/server-github` package is deprecated on npm. [GitHub MCP Server](https://github.com/github/github-mcp-server).",
+          "**Notion:** `https://mcp.notion.com/mcp`, with `https://mcp.notion.com/sse` for clients that need SSE. OAuth. [Notion MCP guide](https://developers.notion.com/guides/mcp/get-started-with-mcp).",
+          "**Slack:** `https://mcp.slack.com/mcp`. OAuth. [Slack MCP server docs](https://docs.slack.dev/ai/slack-mcp-server).",
+          "**Sentry:** `https://mcp.sentry.dev/mcp`. OAuth. Add `/<organization>` or `/<organization>/<project>` to the URL to limit the session to one org or project. [Sentry MCP](https://mcp.sentry.dev).",
+          "**Stripe:** `https://mcp.stripe.com`, with OAuth or an API key sent as a bearer token. [Stripe MCP docs](https://docs.stripe.com/mcp).",
+          "**Supabase:** `https://mcp.supabase.com/mcp`, or `http://localhost:54321/mcp` against a local Supabase CLI stack. [Supabase MCP guide](https://supabase.com/docs/guides/getting-started/mcp).",
+          "**Context7:** `https://mcp.context7.com/mcp`, with an API key, or `https://mcp.context7.com/mcp/oauth` for OAuth. `npx ctx7 setup` configures supported clients for you. [Context7 client setup](https://context7.com/docs/resources/all-clients).",
+          "**Cloudflare:** `https://mcp.cloudflare.com/mcp` covers the whole Cloudflare API and its developer docs. Product-specific servers sit at `*.mcp.cloudflare.com/mcp`, such as `https://docs.mcp.cloudflare.com/mcp` for documentation. [Cloudflare's MCP servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/).",
+          "**Neon:** `https://mcp.neon.tech/mcp`, with OAuth or a Neon API key as a bearer token. Add `?readonly=true` to block writes, or `?category=` to limit which tools are active. [Neon MCP Server docs](https://neon.com/docs/ai/neon-mcp-server).",
+          "**PostHog:** `https://mcp.posthog.com/mcp`, or run `npx @posthog/wizard mcp add` to configure it. [PostHog MCP docs](https://posthog.com/docs/model-context-protocol).",
+          "**Brave Search:** no hosted endpoint. Run `npx -y @brave/brave-search-mcp-server` locally with a `BRAVE_API_KEY` environment variable. Brave's own Claude Desktop guide still shows `@modelcontextprotocol/server-brave-search`, which is deprecated on npm. [Brave Search MCP Server](https://github.com/brave/brave-search-mcp-server).",
+        ],
+      },
+      {
+        type: "callout",
+        variant: "tip",
+        title: "Not on this list?",
+        text: "Open the server's page on smithery.ai. Smithery says verified server pages now show the direct vendor URL. If there is no official remote endpoint, look for the vendor's own package or Docker image, and avoid third-party wrappers you cannot trace back to the vendor.",
+      },
+      { type: "heading", level: 2, text: "What to check after switching" },
+      {
+        type: "paragraph",
+        text: "Smithery sat in the middle, holding credentials and passing calls through. Going direct removes that layer, so four things are worth a look.",
+      },
+      {
+        type: "list",
+        items: [
+          "**Sign in again.** OAuth sessions held by Smithery do not carry over. Each client asks you to authorise the vendor directly the first time it connects. In Claude Code, run `/mcp` to finish sign-in. Servers that take a key, such as Brave Search, need it in your config or environment.",
+          "**Tool names.** A vendor's server may name tools differently from the Smithery-hosted version. If prompts, skills or subagent definitions call tools by name, check them against what the new server lists.",
+          "**Transport.** Remote endpoints need a client that supports HTTP servers. For a stdio-only client, `npx -y mcp-remote <url>` bridges the gap, as Linear's docs show.",
+          "**Restart and confirm.** Restart the editor or agent session after editing a config file, then confirm the server shows as connected and its tools are listed. In Claude Code, `/mcp` shows the status of every server.",
+        ],
+      },
+      { type: "heading", level: 2, text: "What this says about MCP" },
+      {
+        type: "paragraph",
+        text: "Hosted proxies made sense when few vendors ran their own MCP servers. Now that Linear, GitHub, Notion, Slack, Stripe, Cloudflare and most of the servers above host official endpoints, a middle layer adds a dependency without adding much. The open question is managed identity: the job of handling OAuth for many users across many servers. Smithery has stepped out of it, and Arcade is one of the companies building for it. If your product depends on that layer, choosing its replacement is the decision to make this month.",
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn's [MCP directory](/mcp) lists servers with their official endpoints. For the wider picture, see [what MCP is](/blog/what-is-mcp-model-context-protocol) and [the best MCP servers for Claude](/blog/best-mcp-servers-for-claude-2026).",
+      },
+    ],
+  },
+  // ─── Models: frontier API prices, October 2026 ───────────────────────────
+  {
+    slug: "frontier-model-prices-october-2026",
+    title: "Frontier model prices in October 2026: what changed and what each one costs now",
+    deck: "Anthropic, OpenAI, Google and xAI re-priced their catalogs between late September and mid-October. The current price table, a worked monthly cost example, and the three changes worth acting on.",
+    date: "2026-10-21",
+    readingMin: 5,
+    tag: "Models",
+    hero: {
+      src: "/blog/frontier-model-prices-october-2026.webp",
+      alt: "A row of cast-iron balance weights, from large to very small, on a worn wooden counter beside a brass scale",
+    },
+    body: [
+      {
+        type: "paragraph",
+        lead: true,
+        text: "Between late September and mid-October 2026, Anthropic, OpenAI, Google and xAI all changed their API prices. The new catalogs settle into three bands. A $10 input and $50 output top tier for the hardest reasoning. A $2 input and $10 output middle tier that most engineering work now runs on. And a floor of $0.10 input and $0.50 output for classification and extraction. Opus 5.5, and Gemini 4 Argon from December, sit between the top and the middle at $4 and $20. All prices here are per million tokens.",
+      },
+      { type: "heading", level: 2, text: "What changed" },
+      {
+        type: "list",
+        items: [
+          "**Anthropic cut Opus and Haiku.** [Claude Opus 5.5](https://platform.claude.com/docs/en/about-claude/pricing) costs $4 input and $20 output, against $5 and $25 for Opus 5. Claude Sonnet 5.5 arrived at $2 and $10. Claude Haiku 5.5, released on 7 October, costs $0.10 and $0.50 for prompts up to 100,000 tokens, a tenth of Haiku 4.5's $1 and $5. Claude Fable 5.1 keeps Fable 5's $10 and $50, but its cache reads drop from $1 to $0.25.",
+          "**OpenAI moved to the GPT-6 family.** [GPT-6.1 Sol](https://openai.com/api/pricing/) costs $2 input and $10 output. Kapyn previously listed GPT-5.6 Sol at $4 and $20, so the middle of OpenAI's range is now half the price. GPT-6 Luna covers high volume at $0.10 and $0.50, and GPT-6 Astra holds the top at $10 and $50.",
+          "**Google launched Gemini 4 Argon with an end date on its price.** Argon became available on 13 October. It costs $2 input and $10 output [until 30 November](https://ai.google.dev/gemini-api/docs/pricing), then $4 and $20 from 1 December.",
+          "**xAI priced Grok 4.7.** [Grok 4.7](https://docs.x.ai/docs/models) costs $2 input and $6 output, with a 500,000 token context window. Its output rate is the lowest in the middle tier.",
+        ],
+      },
+      { type: "heading", level: 2, text: "The October 2026 price table" },
+      {
+        type: "paragraph",
+        text: "Standard API rates for text, per million tokens, as listed on each vendor's pricing page on 21 October 2026:",
+      },
+      {
+        type: "code",
+        lang: "text",
+        code: "Model                 Input   Output\nClaude Fable 5.1     $10.00   $50.00\nGPT-6 Astra          $10.00   $50.00\nClaude Opus 5.5       $4.00   $20.00\nGemini 4 Argon *      $2.00   $10.00\nClaude Sonnet 5.5     $2.00   $10.00\nGPT-6.1 Sol           $2.00   $10.00\nGrok 4.7              $2.00    $6.00\nClaude Haiku 5.5 **   $0.10    $0.50\nGPT-6 Luna            $0.10    $0.50\n\n*  Until 30 Nov; $4 / $20 from 1 Dec.\n** Prompts up to 100K tokens.",
+      },
+      {
+        type: "paragraph",
+        text: "The vendors now match each other at almost every band. Fable 5.1 and Astra share the top price. Sonnet 5.5, Sol and Argon, for now, share the middle. Haiku 5.5 and Luna share the floor. On list price alone, there is little left to choose between the big labs within a tier, so quality on your own tasks and the details below decide it.",
+      },
+      { type: "heading", level: 2, text: "What a month of usage costs" },
+      {
+        type: "paragraph",
+        text: "Take a workload of 50 million input tokens and 10 million output tokens a month. That five-to-one ratio is typical of retrieval, review and summarisation, where the model reads far more than it writes. The monthly cost at each band:",
+      },
+      {
+        type: "list",
+        items: [
+          "**$10 / $50 (Fable 5.1, Astra):** 50 × $10 + 10 × $50 = **$1,000**.",
+          "**$4 / $20 (Opus 5.5, Argon from December):** 50 × $4 + 10 × $20 = **$400**. The same work on Opus 5 costs $500.",
+          "**$2 / $10 (Sonnet 5.5, Sol, Argon until 30 November):** 50 × $2 + 10 × $10 = **$200**. At GPT-5.6 Sol's previous $4 and $20, it was $400.",
+          "**$2 / $6 (Grok 4.7):** 50 × $2 + 10 × $6 = **$160**.",
+          "**$0.10 / $0.50 (Haiku 5.5, Luna):** 50 × $0.10 + 10 × $0.50 = **$10**. On Haiku 4.5, it was $100.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The same month costs $1,000 at the top and $10 at the floor, a factor of 100. Moving routine steps, such as classifying, extracting and routing, off frontier models is still the largest saving available. Choosing between vendors inside a band moves the bill far less.",
+      },
+      { type: "heading", level: 2, text: "Three things the headline rates leave out" },
+      {
+        type: "list",
+        items: [
+          "**Tokenizers differ.** [Simon Willison found](https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/) that Haiku 5.5's tokenizer counts roughly 25 percent more tokens than Haiku 4.5 for the same text. In the example above, that turns $10 into about $12.50: still about 87 percent cheaper than Haiku 4.5, but short of the headline 90. Compare costs on your own prompts, not on token counts from another model.",
+          "**Long prompts cost more on Haiku 5.5.** Above 100,000 tokens, Haiku 5.5 bills $0.50 input and $2.50 output, five times its standard rate. If your prompts carry long documents, check which side of that line they fall on.",
+          "**Caching changes the input bill.** Cache reads cost $0.10 on Sonnet 5.5, $0.20 on Opus 5.5 and $0.25 on Fable 5.1. OpenAI charges $0.10 for cached input on Sol and $1.00 on Astra. Gemini 4 Argon's context caching costs $0.10 until 30 November and $0.20 after. For agents and chat products that resend the same long system prompt, cached input can matter more than the base rate.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Three takeaways" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "**$2 and $10 is the new default middle tier.** Sonnet 5.5 and Sol both sit there, and Argon does until December. If you last priced a workload on GPT-5.6 Sol, the same work now costs about half.",
+          "**Argon doubles on 1 December.** At $2 and $10 it matches Sonnet 5.5 and Sol. From 1 December it costs $4 and $20, the same as Opus 5.5. If you pick Argon for price, budget for the December rate.",
+          "**The floor is low enough to stop rationing.** At $0.10 and $0.50, Haiku 5.5 and Luna make high-volume classification and extraction a rounding error next to the rest of a stack. Check the tokenizer and the 100,000 token line before you rely on the exact figure.",
+        ],
+      },
+      { type: "heading", level: 2, text: "Sources" },
+      {
+        type: "list",
+        items: [
+          "[Anthropic: Claude API pricing](https://platform.claude.com/docs/en/about-claude/pricing)",
+          "[OpenAI: API pricing](https://openai.com/api/pricing/)",
+          "[Google: Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)",
+          "[Google: Introducing Gemini 4 Argon](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/)",
+          "[xAI: Models and pricing](https://docs.x.ai/docs/models)",
+          "[Simon Willison: notes on Claude Haiku 5.5](https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/)",
+        ],
+      },
+      { type: "divider" },
+      {
+        type: "paragraph",
+        text: "Kapyn's [model comparison](/compare) tracks the current version of each model family. For choosing between the two biggest labs, see [Claude vs GPT](/blog/claude-vs-gpt-which-to-use).",
+      },
+    ],
+  },
   // ─── Guide: indie stack ───────────────────────────────────────────────────
   {
     slug: "ai-stack-for-indie-hackers-2026",

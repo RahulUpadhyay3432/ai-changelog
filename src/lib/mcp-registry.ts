@@ -62,6 +62,11 @@ function isActiveLatest(meta: RawEntry["_meta"]): boolean {
 
 // Page through the registry, keeping active/latest servers that have a GitHub repo.
 // Bounded by maxPages (30/page) so we never try to swallow the whole 10k.
+// Without a cap, a slow registry hangs every /mcp/[slug] page past Next's 60s
+// static-generation limit and fails the whole deploy (seen 2026-10-21 on
+// /mcp/docker). A timeout lands in the existing catch, i.e. "not listed".
+const REGISTRY_TIMEOUT_MS = 8000;
+
 export async function fetchMcpRegistryServers(maxPages = 6): Promise<RegistryServer[]> {
   const out: RegistryServer[] = [];
   const seen = new Set<string>();
@@ -74,6 +79,7 @@ export async function fetchMcpRegistryServers(maxPages = 6): Promise<RegistrySer
       const res = await fetch(url, {
         headers: { accept: "application/json" },
         next: { revalidate: 86400 },
+        signal: AbortSignal.timeout(REGISTRY_TIMEOUT_MS),
       });
       if (!res.ok) break;
       json = await res.json();
@@ -190,7 +196,7 @@ export async function lookupRegistryStatus(repoUrl: string): Promise<RegistrySta
   try {
     const res = await fetch(
       `${REGISTRY_URL}?search=${encodeURIComponent(wanted.split("/").pop() ?? "")}&limit=50`,
-      { next: { revalidate: 86400 } },
+      { next: { revalidate: 86400 }, signal: AbortSignal.timeout(REGISTRY_TIMEOUT_MS) },
     );
     if (!res.ok) return null;
     const json = (await res.json()) as { servers?: RawEntry[] };

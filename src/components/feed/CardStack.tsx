@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NewsCard } from "./NewsCard";
 import type { NewsItem } from "@/lib/types";
 import { shouldShowNotifCard } from "@/lib/notifications";
-import { updateStreak, getFeedPrefs } from "@/lib/storage";
+import { updateStreak, getFeedPrefs, getTopicPickerSkipped } from "@/lib/storage";
 import { prefetchBreakdown } from "@/lib/breakdown-cache";
 import posthog from "posthog-js";
 
@@ -30,8 +30,8 @@ const DIRECTION_LOCK_THRESHOLD = 8;
 //
 // History: it used to sit at the end of the stack (~100 cards), so nobody saw it.
 // Moving it to slot 5 helped, but measured depth data shows 23 of 42 sessions end
-// on card 0 and the topic picker at slot 2 shifts this one to index 6 — still
-// past most readers.
+// on card 0 — still past most readers. The topic picker at slot 0 shifts it one
+// further, but the two rarely coexist: picking topics hides the picker.
 //
 // It now sits at slot 4 AND is gated on investment: we only ask people who have
 // actually picked topics. That ordering is deliberate, because a denied
@@ -40,12 +40,12 @@ const DIRECTION_LOCK_THRESHOLD = 8;
 // whereas asking straight after someone has invested is when a yes is most
 // likely. See docs/analytics-findings-aug-2026.md.
 const NOTIF_SLOT = 4;
-// The topic picker sits at slot 2, not 5. Measured: over half of all feed
-// sessions end on card 0, so anything deeper reaches almost nobody — and picking
-// a category in the first session is the strongest retention predictor we have
-// with a real sample (24.5% return vs a 9.5% baseline, n=98).
-// See docs/analytics-findings-aug-2026.md.
-const TOPIC_SLOT = 2;
+// The topic picker is the first card for anyone who has neither picked topics
+// nor skipped. At slot 2 it reached almost nobody: 28 of 44 first sessions ended
+// on card 0 and only 8 got past card 1. Picking a category in the first session
+// is the strongest retention predictor we have with a real sample (24.5% return
+// vs a 9.5% baseline, n=98). See docs/analytics-findings-aug-2026.md.
+const TOPIC_SLOT = 0;
 
 type FeedEntry =
   | { type: "news"; item: NewsItem; newsIdx: number }
@@ -67,7 +67,7 @@ export function CardStack({
   // Only for people who have never expressed a preference — getFeedPrefs()
   // returns null until they do, so this never nags a returning user.
   const [showTopics, setShowTopics] = useState(false);
-  useEffect(() => { setShowTopics(getFeedPrefs() === null); }, []);
+  useEffect(() => { setShowTopics(getFeedPrefs() === null && !getTopicPickerSkipped()); }, []);
   // "Has this person invested?" — true once they have picked topics, in this
   // session or any previous one. Gates the push ask (see NOTIF_SLOT).
   const [hasInvested, setHasInvested] = useState(false);

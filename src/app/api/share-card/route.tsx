@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getCategoryBySlug } from "@/lib/categories";
 import { getTrending } from "@/lib/trending";
 import type { CategorySlug } from "@/lib/types";
+import { igCard } from "./ig-card";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,9 @@ const W = 1080;
 const H = 1920;
 
 export async function GET(req: Request) {
-  const weekly = new URL(req.url).searchParams.get("kind") === "weekly";
+  const params = new URL(req.url).searchParams;
+  if (params.get("format") === "ig") return igCard(params.get("id"));
+  const weekly = params.get("kind") === "weekly";
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

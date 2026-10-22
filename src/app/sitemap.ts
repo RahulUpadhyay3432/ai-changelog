@@ -10,7 +10,9 @@ import { getPromotedToolPages } from "@/lib/promoted-tools";
 import { slugify } from "@/lib/entities";
 import { APP_URL } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// Hourly, not per request: every crawler fetch used to re-read up to 5,000
+// archive rows plus the promoted tools from Supabase.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(

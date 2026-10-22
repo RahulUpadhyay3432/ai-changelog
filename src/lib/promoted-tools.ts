@@ -6,6 +6,7 @@
 // that need no database, so the DB-backed half lives here instead and is
 // imported only by the pages that actually query it.
 
+import { unstable_cache } from "next/cache";
 import { getPromotedTools, type PromotedTool } from "@/lib/knowledge";
 import { getToolBySlug, REGISTRY_SLUGS, type UnifiedTool } from "@/lib/tools-registry";
 import { slugify } from "@/lib/blog-content";
@@ -24,25 +25,37 @@ function promotedToUnified(p: PromotedTool): UnifiedTool {
   };
 }
 
+// One Supabase read per hour, shared by every /tools/[slug] render and the sitemap.
+// Uncached, each of those pulled ~250KB (300 rows) to look up a single slug, and
+// crawlers walking tool URLs made that most of Supabase's egress (Oct 2026: the
+// free-plan quota ran out 7x over and the project was restricted).
+const loadPromotedToolPages = unstable_cache(
+  async (): Promise<UnifiedTool[]> => {
+    try {
+      const promoted = await getPromotedTools();
+      const taken = REGISTRY_SLUGS;
+      const seen = new Set<string>();
+      return promoted.flatMap((p) => {
+        const u = promotedToUnified(p);
+        if (!u.slug || taken.has(u.slug) || seen.has(u.slug)) return [];
+        seen.add(u.slug);
+        return [u];
+      });
+    } catch {
+      return []; // DB unreachable → fall back to the curated set, never a broken build
+    }
+  },
+  ["promoted-tool-pages-v1"],
+  { revalidate: 3600 }
+);
+
 /**
  * Promoted tools as UnifiedTool, with any slug that already belongs to a curated
  * entry dropped. The curated version always wins: it has hand-written depth,
  * where a promoted entry has an LLM one-liner.
  */
 export async function getPromotedToolPages(): Promise<UnifiedTool[]> {
-  try {
-    const promoted = await getPromotedTools();
-    const taken = REGISTRY_SLUGS;
-    const seen = new Set<string>();
-    return promoted.flatMap((p) => {
-      const u = promotedToUnified(p);
-      if (!u.slug || taken.has(u.slug) || seen.has(u.slug)) return [];
-      seen.add(u.slug);
-      return [u];
-    });
-  } catch {
-    return []; // DB unreachable → fall back to the curated set, never a broken build
-  }
+  return loadPromotedToolPages();
 }
 
 /** Curated first, then promoted. Returns undefined when neither has the slug. */

@@ -4,9 +4,10 @@ import { HomeFeed } from "@/components/feed/HomeFeed";
 import { fetchNewsItems } from "@/lib/supabase";
 import type { NewsItem } from "@/lib/types";
 
-// Re-render the cached shell every 5 minutes. Ingestion runs every 2h, so this is
-// far fresher than the content and keeps Supabase off the per-request path.
-export const revalidate = 300;
+// Re-render the cached shell every 30 minutes. Ingestion runs every 2h, so this is
+// still fresher than the content, and the client re-resolves the feed on mount.
+// It was 5 minutes, which crawlers kept warm: ~290 full-feed reads a day.
+export const revalidate = 1800;
 
 // "/" serves three variants: cold desktop is rewritten to the /home landing,
 // phones get the app shell, and cookie-holders get the app shell on any device

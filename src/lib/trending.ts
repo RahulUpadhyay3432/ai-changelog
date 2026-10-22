@@ -9,6 +9,7 @@
 // Upgrade seam: once a Gemini billing cap is set, a daily editor pass can replace
 // the heuristic with LLM-picked Top 3 + a one-line "why it leads today."
 
+import { unstable_cache } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import type { NewsItem } from "./types";
 import { scoreStoriesByCoverage } from "./coverage";
@@ -57,7 +58,7 @@ export interface TrendingResult {
 // Ranks the last `windowHours` of news. `topCount` distinct-topic highlights up
 // top, the next `restCount` as the trending list. Degrades to recency when the
 // entity graph is thin (every heat collapses to its recency term).
-export async function getTrending(
+async function computeTrending(
   windowHours = 36,
   topCount = 3,
   restCount = 18
@@ -103,3 +104,8 @@ export async function getTrending(
 
   return { top, rest };
 }
+
+// 120 rows plus the coverage join is ~110KB per call, and the share card and
+// pulse page call this per request. Ingestion runs every 2h, so a 30-minute
+// shared cache loses nothing. The arguments are part of the cache key.
+export const getTrending = unstable_cache(computeTrending, ["trending-v1"], { revalidate: 1800 });

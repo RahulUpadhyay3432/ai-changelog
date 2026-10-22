@@ -256,6 +256,14 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
     return items.length > 0 ? items.length : storiesLenRef.current;
   }, [activeCategory]);
 
+  // The slot-0 picker just saved topic prefs. The stack under it was resolved
+  // before they existed, so re-resolve now instead of on the next visit. Prefs
+  // only shape "all"; on another tab, dropping the cache is enough.
+  const handleTopicsSaved = useCallback(() => {
+    feedCache.current.delete("all");
+    if (activeCategory === "all") setReloadNonce((n) => n + 1);
+  }, [activeCategory]);
+
   // ── Real-time drag (called every touchmove) ──────────────────────────────
   const handleHorizontalDrag = useCallback((dx: number) => {
     if (isAnimating.current) return;
@@ -427,6 +435,7 @@ export function HomeFeed({ initialItems = [] }: { initialItems?: NewsItem[] } = 
                 onRefresh={handleRefresh}
                 onHorizontalDrag={handleHorizontalDrag}
                 onHorizontalDragEnd={handleHorizontalDragEnd}
+                onTopicsSaved={handleTopicsSaved}
                 lastVisit={lastVisit}
               />
             </motion.div>
